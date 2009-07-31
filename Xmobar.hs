@@ -271,7 +271,7 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
   r <- ask
   (as,ds) <- io $ textExtents fontst s
   let (conf,d)             = (config &&& display) r
-      Rectangle _ _ wid _  = rect r
+      Rectangle _ _ wid ht = rect r
       totSLen              = foldr (\(_,_,len) -> (+) len) 0 sl
       valign               = fi $ as + ds
       remWidth             = fi wid - fi totSLen
@@ -282,5 +282,8 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
       (fc,bc)              = case (break (==',') c) of
                                (f,',':b) -> (f, b           )
                                (f,    _) -> (f, bgColor conf)
+  withColors d [bc] $ \[bc'] -> do
+    io $ setForeground d gc bc'
+    io $ fillRectangle d dr gc offset 0 (fi l) ht
   io $ printString d dr fontst gc fc bc offset valign s
   printStrings dr gc fontst (offs + l) a xs
