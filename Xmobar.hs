@@ -277,7 +277,7 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
       remWidth             = fi wid - fi totSLen
       offset               = case a of
                                C -> (remWidth + offs) `div` 2
-                               R -> remWidth - 1
+                               R -> remWidth
                                L -> offs
       (fc,bc)              = case (break (==',') c) of
                                (f,',':b) -> (f, b           )
