@@ -23,6 +23,12 @@ import Config
 import Runnable
 import Commands
 
+import Control.Monad.Writer(mapM_, ap, liftM, liftM2, MonadWriter, tell)
+import Control.Applicative.Permutation(optAtom, runPermsSep)
+import Control.Applicative(Applicative, (<*>), Alternative, empty, (<$), (<$>))
+import qualified Control.Applicative
+
+import Data.List(tails, find, inits)
 import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Perm
@@ -105,11 +111,8 @@ allTillSep :: Config -> Parser String
 allTillSep = many . noneOf . sepChar
 
 stripComments :: String -> String
-stripComments = unlines . map (drop 5 . strip False . (replicate 5 ' '++)) . lines
+stripComments = unlines . map (strip False) . lines
     where strip m ('-':'-':xs) = if m then "--" ++ strip m xs else ""
-          strip m ('\\':xss) = case xss of
-                                '\\':xs -> '\\' : strip m xs
-                                _ -> strip m $ drop 1 xss
           strip m ('"':xs) = '"': strip (not m) xs
           strip m (x:xs) = x : strip m xs
           strip _ [] = []
@@ -124,43 +127,17 @@ parseConfig = runParser parseConf fields "Config" . stripComments
         x <- unWrapParser perms
         wrapSkip (string "}")
         eof
-        s <- getState
-        return (x,s)
-
-      perms = permute $ Config
-              <$?> pFont         <|?> pBgColor
-              <|?> pFgColor      <|?> pPosition
-              <|?> pLowerOnStart <|?> pCommands
-              <|?> pSepChar      <|?> pAlignSep
-              <|?> pTemplate
-
-      fields    = [ "font", "bgColor", "fgColor", "sepChar", "alignSep"
-                  , "template", "position", "lowerOnStart", "commands"]
-      pFont     = strField font     "font"
-      pBgColor  = strField bgColor  "bgColor"
-      pFgColor  = strField fgColor  "fgColor"
-      pSepChar  = strField sepChar  "sepChar"
-      pAlignSep = strField alignSep "alignSep"
-      pTemplate = strField template "template"
-
-      pPosition     = field position     "position"     $ tillFieldEnd >>= read' "position"
-      pLowerOnStart = field lowerOnStart "lowerOnStart" $ tillFieldEnd >>= read' "lowerOnStart"
-      pCommands     = field commands     "commands"     $ readCommands
-
-      staticPos = do string "Static"
-                     wrapSkip (string "{")
-                     p <- many (noneOf "}")
-                     wrapSkip (string "}")
-                     string ","
-                     return ("Static {"  ++ p  ++ "}")
-      tillFieldEnd = staticPos <|> many (noneOf ",}\n\r")
-
-      commandsEnd  = wrapSkip (string "]") >> oneOf "},"
-      readCommands = manyTill anyChar (try commandsEnd) >>= read' commandsErr . flip (++) "]"
-
-      strField e n = field e n . between (strDel "start" n) (strDel "end" n) . many $ noneOf "\"\n\r"
-      strDel   t n = char '"' <?> strErr t n
-      strErr   t n = "the " ++ t ++ " of the string field " ++ n ++ " - a double quote (\")."
+        return x
+      perms = runPermsSep (WrappedParser $ wrapSkip $ string ",") $ liftM9 Config
+        <$> withDef font         "font"          strField
+        <*> withDef bgColor      "bgColor"       strField
+        <*> withDef fgColor      "fgColor"       strField
+        <*> withDef position     "position"     (field readsToParsec)
+        <*> withDef lowerOnStart "lowerOnStart" (field parseEnum    )
+        <*> withDef commands     "commands"     (field readsToParsec)
+        <*> withDef sepChar      "sepChar"       strField
+        <*> withDef alignSep     "alignSep"      strField
+        <*> withDef template     "template"      strField
 
       wrapSkip   x = many space >> x >>= \r -> many space >> return r
       sepEndSpc    = mapM_ (wrapSkip . try . string)
@@ -169,11 +146,10 @@ parseConfig = runParser parseConf fields "Config" . stripComments
                      updateState (filter (/= n)) >> sepEndSpc [n,"="] >>
                      wrapSkip c >>= \r -> fieldEnd >> return r
 
-      read' d s = case reads s of
-                    [(x, _)] -> return x
-                    _        -> fail $ "error reading the " ++ d ++ " field: " ++ s
+      withDef ext name parser = optAtom (do tell [name]; return $ ext defaultConfig)
+                                        (liftM return $ WrappedParser $ parser name)
 
-commandsErr :: String
-commandsErr = "commands: this usually means that a command could not be parsed.\n" ++
-              "The error could be located at the begining of the command which follows the offending one."
+      parseEnum = choice $ map (\x -> x <$ string (show x)) [minBound .. maxBound]
 
+      strField name = flip field name $ between (char '"') (char '"') (many1 . satisfy $ (/= '"'))
+      field cont name = sepEndSpaces [name,"="] >> cont
