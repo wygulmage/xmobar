@@ -131,12 +131,17 @@ Other configuration options:
 :    Default font color.
 
 `position`
-:     Top, TopW, Bottom, BottomW or Static (with x, y, width and height).
+:     Top, TopW, TopSize, Bottom, BottomW, BottomSize or Static (with x, y,
+      width and height).
 
 :     TopW and BottomW take 2 arguments: an alignment parameter (L for
       left, C for centered, R for Right) and an integer for the
       percentage width xmobar window will have in respect to the
       screen width.
+
+:     TopSize and BottomSize take 3 arguments: an alignment parameter, an
+      integer for the percentage width, and an integer for the minimum pixel
+      height that the xmobar window will have.
 
 :     For example:
 

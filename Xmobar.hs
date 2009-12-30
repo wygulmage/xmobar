@@ -147,13 +147,11 @@ setPosition :: XPosition -> [Rectangle] -> Dimension -> (Rectangle,Bool)
 setPosition p rs ht =
     case p' of
     Top                -> (Rectangle rx          ry      rw      h     , True)
-    TopW L i           -> (Rectangle rx          ry     (nw i)   h     , True)
-    TopW R i           -> (Rectangle (right  i)  ry     (nw i)   h     , True)
-    TopW C i           -> (Rectangle (center i)  ry     (nw i)   h     , True)
+    TopW a i           -> (Rectangle (ax a i  )  ry     (nw i )  h     , True)
+    TopSize a i ch     -> (Rectangle (ax a i  )  ry     (nw i ) (mh ch), True)
     Bottom             -> (Rectangle rx          ny      rw      h     , True)
-    BottomW L i        -> (Rectangle rx          ny     (nw i)   h     , True)
-    BottomW R i        -> (Rectangle (right  i)  ny     (nw i)   h     , True)
-    BottomW C i        -> (Rectangle (center i)  ny     (nw i)   h     , True)
+    BottomW a i        -> (Rectangle (ax a i  )  ny     (nw i )  h     , True)
+    BottomSize a i ch  -> (Rectangle (ax a i  )  ny     (nw i ) (mh ch), True)
     Static cx cy cw ch -> (Rectangle (fi cx   ) (fi cy) (fi cw) (fi ch), True)
     OnScreen _ p''     -> setPosition p'' [scr] ht
     where
@@ -164,9 +162,13 @@ setPosition p rs ht =
       center i = rx + (fi $ div (remwid i) 2)
       right  i = rx + (fi $ remwid i)
       remwid i = rw - pw (fi i)
+      ax L     = const rx
+      ax R     = right
+      ax C     = center
       pw i     = rw * (min 100 i) `div` 100
       nw       = fi . pw . fi
       h        = fi ht
+      mh h'    = max (fi h') h
 
       safeIndex i = lookup i . zip [0..]
 
@@ -192,8 +194,10 @@ getStrutValues r@(Rectangle x y w h) p rwh =
     OnScreen _ p'   -> getStrutValues r p' rwh
     Top             -> [0, 0, st,  0, 0, 0, 0, 0, nx, nw,  0,  0]
     TopW    _ _     -> [0, 0, st,  0, 0, 0, 0, 0, nx, nw,  0,  0]
+    TopSize      {} -> [0, 0, st,  0, 0, 0, 0, 0, nx, nw,  0,  0]
     Bottom          -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
     BottomW _ _     -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
+    BottomSize   {} -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
     Static _ _ _ _  -> getStaticStrutValues p rwh
     where st = fi y + fi h
           sb = rwh - fi y

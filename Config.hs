@@ -58,8 +58,10 @@ data Config =
 
 data XPosition = Top
                | TopW Align Int
+               | TopSize Align Int Int
                | Bottom
                | BottomW Align Int
+               | BottomSize Align Int Int
                | Static {xpos, ypos, width, height :: Int}
                | OnScreen Int XPosition
                  deriving ( Read, Eq )
