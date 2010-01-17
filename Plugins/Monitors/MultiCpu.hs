@@ -45,12 +45,12 @@ parseMultiCpu =
      return $ zipWith (\x y -> zipWith (\a b -> (a + b) / 2.0) x y)  p1 p0
 
 percent :: [Float] -> [Float] -> [Float]
-percent b a = map (/ tot) $ take 4 dif
+percent b a = if tot > 0 then map (/ tot) $ take 4 dif else [0, 0, 0, 0]
   where dif = zipWith (-) b a
         tot = foldr (+) 0 dif
 
 formatMultiCpus :: [[Float]] -> Monitor [String]
-formatMultiCpus [] = return $ take 15 (repeat "-1%")
+formatMultiCpus [] = return $ take 15 (repeat "0%")
 formatMultiCpus xs = fmap concat $ mapM formatMultiCpu xs
 
 formatMultiCpu :: [Float] -> Monitor [String]
