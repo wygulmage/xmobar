@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Plugins.Monitors.MultiCpu where
+module Plugins.Monitors.MultiCpu(multiCpuConfig, runMultiCpu) where
 
 import Plugins.Monitors.Common
 import qualified Data.ByteString.Lazy.Char8 as B
@@ -25,22 +25,22 @@ multiCpuConfig = mkMConfig
                           , k <- ["total","user","nice","system","idle"]]
 
 
-multiCpuData :: IO [[Float]]
-multiCpuData = do s <- B.readFile "/proc/stat"
-                  return $ multiCpuParser s
+cpuData :: IO [[Float]]
+cpuData = do s <- B.readFile "/proc/stat"
+             return $ cpuParser s
 
-multiCpuParser :: B.ByteString -> [[Float]]
-multiCpuParser = map (map read . tail) . lns
+cpuParser :: B.ByteString -> [[Float]]
+cpuParser = map (map read . tail) . lns
   where lns = takeWhile isCpu . map unpW . B.lines
         isCpu (w:_) = "cpu" `isPrefixOf` w
         isCpu _ = False
         unpW = map B.unpack . B.words
 
-parseMultiCpu :: IO [[Float]]
-parseMultiCpu =
-  do (as, bs) <- doActionTwiceWithDelay 350000 multiCpuData
+parseCpuData :: IO [[Float]]
+parseCpuData =
+  do (as, bs) <- doActionTwiceWithDelay 350000 cpuData
      let p0 = zipWith percent bs as
-     (as', bs') <- doActionTwiceWithDelay 350000 multiCpuData
+     (as', bs') <- doActionTwiceWithDelay 350000 cpuData
      let p1 = zipWith percent bs' as'
      return $ zipWith (\x y -> zipWith (\a b -> (a + b) / 2.0) x y)  p1 p0
 
@@ -51,10 +51,10 @@ percent b a = if tot > 0 then map (/ tot) $ take 4 dif else [0, 0, 0, 0]
 
 formatMultiCpus :: [[Float]] -> Monitor [String]
 formatMultiCpus [] = return $ take 15 (repeat "0%")
-formatMultiCpus xs = fmap concat $ mapM formatMultiCpu xs
+formatMultiCpus xs = fmap concat $ mapM formatCpu xs
 
-formatMultiCpu :: [Float] -> Monitor [String]
-formatMultiCpu x
+formatCpu :: [Float] -> Monitor [String]
+formatCpu x
   | length x < 4 = return $ take 5 (repeat "")
   | otherwise  = mapM (showWithColors f) . map (* 100) $ (t:x)
             where f s = floatToPercent (s / 100)
@@ -62,6 +62,6 @@ formatMultiCpu x
 
 runMultiCpu :: [String] -> Monitor String
 runMultiCpu _ =
-  do c <- io $ parseMultiCpu
+  do c <- io $ parseCpuData
      l <- formatMultiCpus c
      parseTemplate l
