@@ -22,6 +22,7 @@ import Plugins.Monitors.Net
 import Plugins.Monitors.Mem
 import Plugins.Monitors.Swap
 import Plugins.Monitors.Cpu
+import Plugins.Monitors.MultiCpu
 import Plugins.Monitors.Batt
 import Plugins.Monitors.Thermal
 import Plugins.Monitors.CpuFreq
@@ -32,6 +33,7 @@ data Monitors = Weather Station   Args Rate
               | Memory            Args Rate
               | Swap              Args Rate
               | Cpu               Args Rate
+              | MultiCpu          Args Rate
               | Battery           Args Rate
               | BatteryP [String] Args Rate
               | Thermal   Zone    Args Rate
@@ -54,6 +56,7 @@ instance Exec Monitors where
     alias (Memory     _ _) = "memory"
     alias (Swap       _ _) = "swap"
     alias (Cpu        _ _) = "cpu"
+    alias (MultiCpu   _ _) = "multicpu"
     alias (Battery    _ _) = "battery"
     alias (BatteryP  _ _ _)= "battery"
     alias (CpuFreq    _ _) = "cpufreq"
@@ -64,6 +67,7 @@ instance Exec Monitors where
     start (Memory     a r) = runM a          memConfig      runMem      r
     start (Swap       a r) = runM a          swapConfig     runSwap     r
     start (Cpu        a r) = runM a          cpuConfig      runCpu      r
+    start (MultiCpu   a r) = runM a          multiCpuConfig runMultiCpu r
     start (Battery    a r) = runM a          battConfig     runBatt     r
     start (BatteryP s a r) = runM a          battConfig    (runBatt' s) r
     start (CpuFreq    a r) = runM a          cpuFreqConfig  runCpuFreq  r
