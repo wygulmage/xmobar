@@ -30,11 +30,11 @@ cpuData = do s <- B.readFile "/proc/stat"
              return $ cpuParser s
 
 cpuParser :: B.ByteString -> [[Float]]
-cpuParser = map (map read . tail) . lns
-  where lns = takeWhile isCpu . map unpW . B.lines
-        isCpu (w:_) = "cpu" `isPrefixOf` w
+cpuParser = map parseList . cpuLists
+  where cpuLists = takeWhile isCpu . map B.words . B.lines
+        isCpu (w:_) = "cpu" `isPrefixOf` (B.unpack w)
         isCpu _ = False
-        unpW = map B.unpack . B.words
+        parseList = map (read . B.unpack) . tail
 
 parseCpuData :: IO [[Float]]
 parseCpuData =
