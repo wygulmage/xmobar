@@ -38,11 +38,12 @@ cpuParser = map parseList . cpuLists
 
 parseCpuData :: IO [[Float]]
 parseCpuData =
-  do (as, bs) <- doActionTwiceWithDelay 350000 cpuData
+  do (as, bs) <- doActionTwiceWithDelay 950000 cpuData
      let p0 = zipWith percent bs as
-     (as', bs') <- doActionTwiceWithDelay 350000 cpuData
-     let p1 = zipWith percent bs' as'
-     return $ zipWith (\x y -> zipWith (\a b -> (a + b) / 2.0) x y)  p1 p0
+     return p0
+     -- (as', bs') <- doActionTwiceWithDelay 350000 cpuData
+     -- let p1 = zipWith percent bs' as'
+     -- return $ zipWith (\x y -> zipWith (\a b -> (a + b) / 2.0) x y)  p1 p0
 
 percent :: [Float] -> [Float] -> [Float]
 percent b a = if tot > 0 then map (/ tot) $ take 4 dif else [0, 0, 0, 0]
