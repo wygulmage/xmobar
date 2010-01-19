@@ -21,7 +21,7 @@ import Data.List(isPrefixOf)
 multiCpuConfig :: IO MConfig
 multiCpuConfig = mkMConfig
                  "Cpu: <total>"
-                 [ k ++ n | n <- "":(map show [0 :: Int ..])
+                 [ k ++ n | n <- "" : map show [0 :: Int ..]
                           , k <- ["total","user","nice","system","idle"]]
 
 
@@ -32,7 +32,7 @@ cpuData = do s <- B.readFile "/proc/stat"
 cpuParser :: B.ByteString -> [[Float]]
 cpuParser = map parseList . cpuLists
   where cpuLists = takeWhile isCpu . map B.words . B.lines
-        isCpu (w:_) = "cpu" `isPrefixOf` (B.unpack w)
+        isCpu (w:_) = "cpu" `isPrefixOf` B.unpack w
         isCpu _ = False
         parseList = map (read . B.unpack) . tail
 
@@ -57,13 +57,13 @@ formatMultiCpus xs = fmap concat $ mapM formatCpu xs
 formatCpu :: [Float] -> Monitor [String]
 formatCpu x
   | length x < 4 = return $ take 5 emptyPercs
-  | otherwise  = mapM (showWithColors f) . map (* 100) $ (t:x)
-            where f s = pad $ floatToPercent (s / 100)
+  | otherwise  = mapM (showWithColors f . (* 100)) (t:x)
+            where f = pad . floatToPercent . (/ 100)
                   t = foldr (+) 0 $ take 3 x
                   pad s = take (4 - length s) "    " ++ s
 
 runMultiCpu :: [String] -> Monitor String
 runMultiCpu _ =
-  do c <- io $ parseCpuData
+  do c <- io parseCpuData
      l <- formatMultiCpus c
      parseTemplate l
