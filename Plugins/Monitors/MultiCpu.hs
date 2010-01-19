@@ -41,26 +41,26 @@ parseCpuData =
   do (as, bs) <- doActionTwiceWithDelay 950000 cpuData
      let p0 = zipWith percent bs as
      return p0
-     -- (as', bs') <- doActionTwiceWithDelay 350000 cpuData
-     -- let p1 = zipWith percent bs' as'
-     -- return $ zipWith (\x y -> zipWith (\a b -> (a + b) / 2.0) x y)  p1 p0
 
 percent :: [Float] -> [Float] -> [Float]
 percent b a = if tot > 0 then map (/ tot) $ take 4 dif else [0, 0, 0, 0]
   where dif = zipWith (-) b a
         tot = foldr (+) 0 dif
 
+emptyPercs :: [String]
+emptyPercs = repeat "  0%"
+
 formatMultiCpus :: [[Float]] -> Monitor [String]
-formatMultiCpus [] = return $ take 15 (repeat "  0%")
+formatMultiCpus [] = return $ take 15 emptyPercs
 formatMultiCpus xs = fmap concat $ mapM formatCpu xs
 
 formatCpu :: [Float] -> Monitor [String]
 formatCpu x
-  | length x < 4 = return $ take 5 (repeat "")
+  | length x < 4 = return $ take 5 emptyPercs
   | otherwise  = mapM (showWithColors f) . map (* 100) $ (t:x)
             where f s = pad $ floatToPercent (s / 100)
                   t = foldr (+) 0 $ take 3 x
-                  pad s = take (4 - length s) (repeat ' ') ++ s
+                  pad s = take (4 - length s) "    " ++ s
 
 runMultiCpu :: [String] -> Monitor String
 runMultiCpu _ =
