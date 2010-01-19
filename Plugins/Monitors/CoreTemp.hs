@@ -35,7 +35,7 @@ runCoreTemp _ = do
     let dir = "/sys/bus/platform/devices"
         file = "temp1_input"
         pattern = "coretemp."
-        divisor = (floor . (/1000.0)) :: Double -> Integer
+        divisor = (round . (/1000.0)) :: Double -> Integer
         failureMessage = "CoreTemp: N/A"
     checkedDataRetrieval failureMessage dir file pattern divisor
 
