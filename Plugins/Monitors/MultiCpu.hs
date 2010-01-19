@@ -51,15 +51,16 @@ percent b a = if tot > 0 then map (/ tot) $ take 4 dif else [0, 0, 0, 0]
         tot = foldr (+) 0 dif
 
 formatMultiCpus :: [[Float]] -> Monitor [String]
-formatMultiCpus [] = return $ take 15 (repeat "0%")
+formatMultiCpus [] = return $ take 15 (repeat "  0%")
 formatMultiCpus xs = fmap concat $ mapM formatCpu xs
 
 formatCpu :: [Float] -> Monitor [String]
 formatCpu x
   | length x < 4 = return $ take 5 (repeat "")
   | otherwise  = mapM (showWithColors f) . map (* 100) $ (t:x)
-            where f s = floatToPercent (s / 100)
+            where f s = pad $ floatToPercent (s / 100)
                   t = foldr (+) 0 $ take 3 x
+                  pad s = take (4 - length s) (repeat ' ') ++ s
 
 runMultiCpu :: [String] -> Monitor String
 runMultiCpu _ =
