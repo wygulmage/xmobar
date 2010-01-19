@@ -25,19 +25,23 @@ import Data.List (isPrefixOf)
 -- Function checks the existence of first file specified by pattern and if the
 -- file doesn't exists failure message is shown, otherwise the data retrieval
 -- is performed.
-checkedDataRetrieval :: String -> String -> String -> String -> Double -> Monitor String
-checkedDataRetrieval failureMessage dir file pattern divisor = do
+checkedDataRetrieval :: (Num a, Ord a, Show a) =>
+                        String -> String -> String -> String -> (Double -> a)
+                        -> Monitor String
+checkedDataRetrieval failureMessage dir file pattern trans = do
     exists <- io $ fileExist $ concat [dir, "/", pattern, "0/", file]
     case exists of
          False  -> return failureMessage
-         True   -> retrieveData dir file pattern divisor
+         True   -> retrieveData dir file pattern trans
 
 -- |
--- Function retrieves data from files in directory dir specified by pattern.
--- String values are converted to double and adjusted with divisor. Final array
--- is processed by template parser function and returned as monitor string.
-retrieveData :: String -> String -> String -> Double -> Monitor String
-retrieveData dir file pattern divisor = do
+-- Function retrieves data from files in directory dir specified by
+-- pattern. String values are converted to double and 'trans' applied
+-- to each one. Final array is processed by template parser function
+-- and returned as monitor string.
+retrieveData :: (Num a, Ord a, Show a) =>
+                String -> String -> String -> (Double -> a) -> Monitor String
+retrieveData dir file pattern trans = do
     count <- io $ dirCount dir pattern
     contents <- io $ mapM getGuts $ files count
     values <- mapM (showWithColors show) $ map conversion contents
@@ -50,5 +54,5 @@ retrieveData dir file pattern divisor = do
                                                        && isDigit (last s))
         files count = map (\i -> concat [dir, "/", pattern, show i, "/", file])
                           [0 .. count - 1]
-        conversion = (/divisor) . (read :: String -> Double)
+        conversion = trans . (read :: String -> Double)
 

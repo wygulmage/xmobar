@@ -36,5 +36,5 @@ runCpuFreq _ = do
         pattern = "cpu"
         divisor = 1e6 :: Double
         failureMessage = "CpuFreq: N/A"
-    checkedDataRetrieval failureMessage dir file pattern divisor
+    checkedDataRetrieval failureMessage dir file pattern (/divisor)
 
