@@ -3,7 +3,7 @@
 -- Module      :  Plugins.Monitors.Cpu
 -- Copyright   :  (c) Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
--- 
+--
 -- Maintainer  :  Andrea Rossato <andrea.rossato@unibz.it>
 -- Stability   :  unstable
 -- Portability :  unportable
@@ -31,23 +31,19 @@ cpuParser =
     map read . map B.unpack . tail . B.words . flip (!!) 0 . B.lines
 
 parseCPU :: IO [Float]
-parseCPU = 
+parseCPU =
     do (a,b) <- doActionTwiceWithDelay 750000 cpuData
        let dif = zipWith (-) b a
            tot = foldr (+) 0 dif
            percent = map (/ tot) dif
        return percent
 
-formatCpu :: [Float] -> Monitor [String] 
+formatCpu :: [Float] -> Monitor [String]
 formatCpu [] = return [""]
-formatCpu x =
-    do let f s = floatToPercent (s / 100)
-           t = foldr (+) 0 $ take 3 x
-           list = t:x
-       mapM (showWithColors f) . map (* 100) $ list
+formatCpu xs = showPercentsWithColors $ (foldr (+) 0 $ take 3 xs) : xs
 
 runCpu :: [String] -> Monitor String
 runCpu _ =
     do c <- io $ parseCPU
        l <- formatCpu c
-       parseTemplate l 
+       parseTemplate l

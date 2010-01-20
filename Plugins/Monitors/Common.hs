@@ -3,7 +3,7 @@
 -- Module      :  Plugins.Monitors.Common
 -- Copyright   :  (c) Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
--- 
+--
 -- Maintainer  :  Andrea Rossato <andrea.rossato@unibz.it>
 -- Stability   :  unstable
 -- Portability :  unportable
@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Plugins.Monitors.Common ( 
+module Plugins.Monitors.Common (
                        -- * Monitors
                        -- $monitor
                          Monitor
@@ -36,6 +36,7 @@ module Plugins.Monitors.Common (
                        -- ** String Manipulation
                        -- $strings
                        , showWithColors
+                       , showPercentsWithColors
                        , takeDigits
                        , showDigits
                        , floatToPercent
@@ -49,9 +50,10 @@ module Plugins.Monitors.Common (
 
 import Control.Concurrent
 import Control.Monad.Reader
+import Control.Monad (zipWithM)
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.IORef
-import qualified Data.Map as Map 
+import qualified Data.Map as Map
 import Data.List
 import Numeric
 import Text.ParserCombinators.Parsec
@@ -72,18 +74,19 @@ data MConfig =
        , highColor   :: IORef (Maybe String)
        , template    :: IORef String
        , export      :: IORef [String]
-       } 
+       , ppad        :: IORef Int
+       }
 
 -- | from 'http:\/\/www.haskell.org\/hawiki\/MonadState'
 type Selector a = MConfig -> IORef a
 
 sel :: Selector a -> Monitor a
-sel s = 
+sel s =
     do hs <- ask
        liftIO $ readIORef (s hs)
 
 mods :: Selector a -> (a -> a) -> Monitor ()
-mods s m = 
+mods s m =
     do v <- ask
        io $ modifyIORef (s v) m
 
@@ -106,7 +109,8 @@ mkMConfig tmpl exprts =
        hc <- newIORef Nothing
        t  <- newIORef tmpl
        e  <- newIORef exprts
-       return $ MC nc l lc h hc t e
+       p  <- newIORef 0
+       return $ MC nc l lc h hc t e p
 
 data Opts = HighColor String
           | NormalColor String
@@ -114,6 +118,7 @@ data Opts = HighColor String
           | Low String
           | High String
           | Template String
+          | PercentPad String
 
 options :: [OptDescr Opts]
 options =
@@ -123,9 +128,10 @@ options =
     , Option ['n']  ["normal"]   (ReqArg NormalColor "color number" ) "Color for the normal threshold: ex \"#00FF00\""
     , Option ['l']  ["low"]      (ReqArg LowColor "color number"    ) "Color for the low threshold: ex \"#0000FF\""
     , Option ['t']  ["template"] (ReqArg Template "output template" ) "Output template."
+    , Option ['p']  ["ppad"]     (ReqArg PercentPad "percent padding" ) "Minimum percentage width."
     ]
 
-doArgs :: [String] 
+doArgs :: [String]
        -> ([String] -> Monitor String)
        -> Monitor String
 doArgs args action =
@@ -145,6 +151,7 @@ doConfigOptions (o:oo) =
          NormalColor nc -> setConfigValue (Just nc) normalColor >> next
          LowColor    lc -> setConfigValue (Just lc) lowColor >> next
          Template     t -> setConfigValue t template >> next
+         PercentPad   p -> setConfigValue (read p) ppad >> next
 
 runM :: [String] -> IO MConfig -> ([String] -> Monitor String) -> Int -> (String -> IO ()) -> IO ()
 runM args conf action r cb = do go
@@ -165,7 +172,7 @@ io = liftIO
 -- $parsers
 
 runP :: Parser [a] -> String -> IO [a]
-runP p i = 
+runP p i =
     do case (parse p "" i) of
          Left _ -> return []
          Right x  -> return x
@@ -193,7 +200,7 @@ getAfterString s =
        } <|> return ("<" ++ s ++ " not found!>")
 
 skipTillString :: String -> Parser String
-skipTillString s = 
+skipTillString s =
     manyTill skipRestOfLine $ string s
 
 -- | Parses the output template string
@@ -203,7 +210,7 @@ templateStringParser =
        ; com <- templateCommandParser
        ; ss <- nonPlaceHolder
        ; return (s, com, ss)
-       } 
+       }
     where
       nonPlaceHolder = liftM concat . many $
                        (many1 $ noneOf "<") <|> colorSpec
@@ -238,14 +245,14 @@ parseTemplate l =
     do t <- getConfigValue template
        s <- io $ runP templateParser t
        e <- getConfigValue export
-       let m = Map.fromList . zip e $ l 
-       return $ combine m s 
+       let m = Map.fromList . zip e $ l
+       return $ combine m s
 
 -- | Given a finite "Map" and a parsed templatet produces the
 -- | resulting output string.
 combine :: Map.Map String String -> [(String, String, String)] -> String
 combine _ [] = []
-combine m ((s,ts,ss):xs) = 
+combine m ((s,ts,ss):xs) =
     s ++ str ++ ss ++ combine m xs
         where str = Map.findWithDefault err ts m
               err = "<" ++ ts ++ " not found!>"
@@ -255,7 +262,7 @@ combine m ((s,ts,ss):xs) =
 type Pos = (Int, Int)
 
 takeDigits :: Int -> Float -> Float
-takeDigits d n = 
+takeDigits d n =
     fromIntegral ((round (n * fact)) :: Int) / fact
   where fact = 10 ^ d
 
@@ -263,13 +270,17 @@ showDigits :: Int -> Float -> String
 showDigits d n =
     showFFloat (Just d) n ""
 
-floatToPercent :: Float -> String
-floatToPercent n = 
-    showDigits 0 (n * 100) ++ "%"
+floatToPercent :: Float -> Monitor String
+floatToPercent n =
+  do pad <- getConfigValue ppad
+     let p = showDigits 0 (n * 100) ++ "%"
+         plen = length p
+         pstr x = if x > 0 then replicate x ' ' else ""
+     return $ pstr (1 + pad - plen) ++ p
 
 stringParser :: Pos -> B.ByteString -> String
 stringParser (x,y) =
-     B.unpack . li x . B.words . li y . B.lines 
+     B.unpack . li x . B.words . li y . B.lines
     where li i l | length l > i = l !! i
                  | otherwise    = B.empty
 
@@ -286,15 +297,20 @@ showWithColors f x =
     do h <- getConfigValue high
        l <- getConfigValue low
        let col = setColor $ f x
-           [ll,hh] = map fromIntegral $ sort [l, h] -- consider high < low 
+           [ll,hh] = map fromIntegral $ sort [l, h] -- consider high < low
        head $ [col highColor   | x > hh ] ++
               [col normalColor | x > ll ] ++
               [col lowColor    | True]
 
+showPercentsWithColors :: [Float] -> Monitor [String]
+showPercentsWithColors fs =
+  do fstrs <- mapM floatToPercent fs
+     zipWithM (showWithColors . const) fstrs (map (*100) fs)
+
 -- $threads
 
 doActionTwiceWithDelay :: Int -> IO [a] -> IO ([a], [a])
-doActionTwiceWithDelay delay action = 
+doActionTwiceWithDelay delay action =
     do v1 <- newMVar []
        forkIO $! getData action v1 0
        v2 <- newMVar []

@@ -16,7 +16,7 @@ module Plugins.Monitors.MultiCpu(multiCpuConfig, runMultiCpu) where
 
 import Plugins.Monitors.Common
 import qualified Data.ByteString.Lazy.Char8 as B
-import Data.List(isPrefixOf)
+import Data.List (isPrefixOf)
 
 multiCpuConfig :: IO MConfig
 multiCpuConfig = mkMConfig
@@ -47,20 +47,14 @@ percent b a = if tot > 0 then map (/ tot) $ take 4 dif else [0, 0, 0, 0]
   where dif = zipWith (-) b a
         tot = foldr (+) 0 dif
 
-emptyPercs :: [String]
-emptyPercs = repeat "  0%"
-
 formatMultiCpus :: [[Float]] -> Monitor [String]
-formatMultiCpus [] = return $ take 15 emptyPercs
+formatMultiCpus [] = showPercentsWithColors $ replicate 15 0.0
 formatMultiCpus xs = fmap concat $ mapM formatCpu xs
 
 formatCpu :: [Float] -> Monitor [String]
-formatCpu x
-  | length x < 4 = return $ take 5 emptyPercs
-  | otherwise  = mapM (showWithColors f . (* 100)) (t:x)
-            where f = pad . floatToPercent . (/ 100)
-                  t = foldr (+) 0 $ take 3 x
-                  pad s = take (4 - length s) "    " ++ s
+formatCpu xs
+  | length xs < 4 = showPercentsWithColors $ replicate 5 0.0
+  | otherwise  = showPercentsWithColors $ (foldr (+) 0 $ take 3 xs) : xs
 
 runMultiCpu :: [String] -> Monitor String
 runMultiCpu _ =

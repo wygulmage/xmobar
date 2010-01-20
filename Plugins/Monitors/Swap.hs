@@ -3,7 +3,7 @@
 -- Module      :  Plugins.Monitors.Swap
 -- Copyright   :  (c) Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
--- 
+--
 -- Maintainer  :  Andrea Rossato <andrea.rossato@unibz.it>
 -- Stability   :  unstable
 -- Portability :  unportable
@@ -30,7 +30,7 @@ parseMEM :: IO [Float]
 parseMEM =
     do file <- fileMEM
        let li i l
-               | l /= [] = (head l) !! i 
+               | l /= [] = (head l) !! i
                | otherwise = B.empty
            fs s l
                | l == []    = False
@@ -41,17 +41,16 @@ parseMEM =
            free = get_data "SwapFree:" st
        return [tot, (tot - free), free, (tot - free) / tot]
 
-formatSwap :: [Float] -> Monitor [String] 
+formatSwap :: [Float] -> Monitor [String]
 formatSwap x =
     do let f1 n = showDigits 2 n
-           f2 n = floatToPercent n
            (hd, tl) = splitAt 3 x
        firsts <- mapM (showWithColors f1) hd
-       lasts <- mapM (showWithColors f2) tl
+       lasts <- showPercentsWithColors (map (/100) tl)
        return $ firsts ++ lasts
 
 runSwap :: [String] -> Monitor String
 runSwap _ =
     do m <- io $ parseMEM
        l <- formatSwap m
-       parseTemplate l 
+       parseTemplate l

@@ -61,10 +61,7 @@ parseBATT bfs =
        return $ if isNaN left then NA else Batt left c0
 
 formatBatt :: Float -> Monitor [String]
-formatBatt x =
-    do let f s = floatToPercent (s / 100)
-       l <- showWithColors f (x * 100)
-       return [l]
+formatBatt x = showPercentsWithColors [x]
 
 runBatt :: [String] -> Monitor String
 runBatt = runBatt' ["BAT0","BAT1","BAT2"]
