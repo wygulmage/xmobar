@@ -258,8 +258,9 @@ External Commands). All other commands are provided by plugins.
 [xmobar] comes with some plugins, providing a set of system monitors,
 a standard input reader, an Unix named pipe reader, and a configurable
 date plugin. These plugins install the following internal commands:
-`Weather`, `Network`, `Memory`, `Swap`, `Cpu`, `Battery`, `Thermal`,
-`CpuFreq`, `CoreTemp`, `Date`, `StdinReader`, `CommandReader`, and `PipeReader`.
+`Weather`, `Network`, `Memory`, `Swap`, `Cpu`, `MultiCpu`, `Battery`,
+`Thermal`, `CpuFreq`, `CoreTemp`, `Date`, `StdinReader`,
+`CommandReader`, and `PipeReader`.
 
 To remove them see below Installing/Removing a Plugin
 
@@ -316,6 +317,15 @@ Monitors have default aliases.
 - Args: the argument list (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `total`, `user`, `nice`, `system`, `idle`
+- Default template: `Cpu: <total>`
+
+`MultiCpu Args RefreshRate`
+
+- aliases to `multicpu`
+- Args: the argument list (see below)
+- Variables that can be used with the `-t`/`--template` argument:
+	    `total`, `user`, `nice`, `system`, `idle`,
+	    `total0`, `user0`, `nice0`, `system0`, `idle0`, ...
 - Default template: `Cpu: <total>`
 
 `Battery Args RefreshRate`
@@ -386,6 +396,7 @@ These are the arguments that can be used for internal commands in the
     -h color number     --high=color number         Color for the high threshold: es "#FF0000"
     -n color number     --normal=color number       Color for the normal threshold: es "#00FF00"
     -l color number     --low=color number          Color for the low threshold: es "#0000FF"
+    -p number           --ppad=number               Pad percentages to given width
     -t output template  --template=output template  Output template of the command.
 
 Commands' arguments must be set as a list. Es:
