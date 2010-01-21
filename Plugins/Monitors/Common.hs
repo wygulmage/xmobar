@@ -59,7 +59,7 @@ import Numeric
 import Text.ParserCombinators.Parsec
 import System.Console.GetOpt
 import Control.Exception (SomeException,handle)
-import System.Process(readProcess)
+import System.Process (readProcess)
 
 import Plugins
 -- $monitor
@@ -75,6 +75,10 @@ data MConfig =
        , template    :: IORef String
        , export      :: IORef [String]
        , ppad        :: IORef Int
+       , minWidth    :: IORef Int
+       , maxWidth    :: IORef Int
+       , padChars    :: IORef [Char]
+       , padRight    :: IORef Bool
        }
 
 -- | from 'http:\/\/www.haskell.org\/hawiki\/MonadState'
@@ -110,7 +114,11 @@ mkMConfig tmpl exprts =
        t  <- newIORef tmpl
        e  <- newIORef exprts
        p  <- newIORef 0
-       return $ MC nc l lc h hc t e p
+       mn <- newIORef 0
+       mx <- newIORef 0
+       pc <- newIORef " "
+       pr <- newIORef False
+       return $ MC nc l lc h hc t e p mn mx pc pr
 
 data Opts = HighColor String
           | NormalColor String
@@ -119,16 +127,24 @@ data Opts = HighColor String
           | High String
           | Template String
           | PercentPad String
+          | MinWidth String
+          | MaxWidth String
+          | PadChars String
+          | PadAlign String
 
 options :: [OptDescr Opts]
 options =
-    [ Option ['H']  ["High"]     (ReqArg High "number"              ) "The high threshold"
-    , Option ['L']  ["Low"]      (ReqArg Low "number"               ) "The low threshold"
-    , Option ['h']  ["high"]     (ReqArg HighColor "color number"   ) "Color for the high threshold: ex \"#FF0000\""
-    , Option ['n']  ["normal"]   (ReqArg NormalColor "color number" ) "Color for the normal threshold: ex \"#00FF00\""
-    , Option ['l']  ["low"]      (ReqArg LowColor "color number"    ) "Color for the low threshold: ex \"#0000FF\""
-    , Option ['t']  ["template"] (ReqArg Template "output template" ) "Output template."
+    [ Option ['H']  ["High"]     (ReqArg High "number"              )   "The high threshold"
+    , Option ['L']  ["Low"]      (ReqArg Low "number"               )   "The low threshold"
+    , Option ['h']  ["high"]     (ReqArg HighColor "color number"   )   "Color for the high threshold: ex \"#FF0000\""
+    , Option ['n']  ["normal"]   (ReqArg NormalColor "color number" )   "Color for the normal threshold: ex \"#00FF00\""
+    , Option ['l']  ["low"]      (ReqArg LowColor "color number"    )   "Color for the low threshold: ex \"#0000FF\""
+    , Option ['t']  ["template"] (ReqArg Template "output template" )   "Output template."
     , Option ['p']  ["ppad"]     (ReqArg PercentPad "percent padding" ) "Minimum percentage width."
+    , Option ['m']  ["minwidth"] (ReqArg MinWidth "minimum width")      "Minimum field width"
+    , Option ['M']  ["maxwidth"] (ReqArg MaxWidth "maximum width")      "Maximum field width"
+    , Option ['c']  ["padchars"] (ReqArg PadChars "padding chars")      "Characters to use for padding"
+    , Option ['a']  ["align"]    (ReqArg PadAlign "padding alignment")  "'l' for left padding, 'r' for right"
     ]
 
 doArgs :: [String]
@@ -144,6 +160,7 @@ doConfigOptions :: [Opts] -> Monitor ()
 doConfigOptions [] = io $ return ()
 doConfigOptions (o:oo) =
     do let next = doConfigOptions oo
+           nz s = let x = read s in max 0 x
        case o of
          High         h -> setConfigValue (read h) high >> next
          Low          l -> setConfigValue (read l) low >> next
@@ -151,7 +168,11 @@ doConfigOptions (o:oo) =
          NormalColor nc -> setConfigValue (Just nc) normalColor >> next
          LowColor    lc -> setConfigValue (Just lc) lowColor >> next
          Template     t -> setConfigValue t template >> next
-         PercentPad   p -> setConfigValue (read p) ppad >> next
+         PercentPad   p -> setConfigValue (nz p) ppad >> next
+         MinWidth    mn -> setConfigValue (nz mn) minWidth >> next
+         MaxWidth    mx -> setConfigValue (nz mx) maxWidth >> next
+         PadChars    pc -> setConfigValue pc padChars >> next
+         PadAlign    pa -> setConfigValue (isPrefixOf "r" pa) padRight >> next
 
 runM :: [String] -> IO MConfig -> ([String] -> Monitor String) -> Int -> (String -> IO ()) -> IO ()
 runM args conf action r cb = do go
@@ -270,13 +291,25 @@ showDigits :: Int -> Float -> String
 showDigits d n =
     showFFloat (Just d) n ""
 
+padString :: Int -> Int -> String -> Bool -> String -> String
+padString mnw mxw pad pr s =
+  let len = length s
+      rmin = if mnw == 0 then 1 else mnw
+      rmax = if mxw == 0 then max len rmin else mxw
+      (rmn, rmx) = if rmin <= rmax then (rmin, rmax) else (rmax, rmin)
+      rlen = min (max rmn len) rmx
+  in if rlen < len then
+       take rlen s
+     else let ps = take (rlen - len) (cycle pad)
+          in if pr then s ++ ps else ps ++ s
+
 floatToPercent :: Float -> Monitor String
 floatToPercent n =
   do pad <- getConfigValue ppad
-     let p = showDigits 0 (n * 100) ++ "%"
-         plen = length p
-         pstr x = if x > 0 then replicate x ' ' else ""
-     return $ pstr (1 + pad - plen) ++ p
+     pc <- getConfigValue padChars
+     pr <- getConfigValue padRight
+     let p = showDigits 0 (n * 100)
+     return $ padString pad pad pc pr p ++ "%"
 
 stringParser :: Pos -> B.ByteString -> String
 stringParser (x,y) =
@@ -296,7 +329,11 @@ showWithColors :: (Num a, Ord a) => (a -> String) -> a -> Monitor String
 showWithColors f x =
     do h <- getConfigValue high
        l <- getConfigValue low
-       let col = setColor $ f x
+       mn <- getConfigValue minWidth
+       mx <- getConfigValue maxWidth
+       p <- getConfigValue padChars
+       pr <- getConfigValue padRight
+       let col = setColor $ padString mn mx p pr $ f x
            [ll,hh] = map fromIntegral $ sort [l, h] -- consider high < low
        head $ [col highColor   | x > hh ] ++
               [col normalColor | x > ll ] ++
