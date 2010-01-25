@@ -35,7 +35,7 @@ parseMountedDevices =
   map undev . filter isDev . map (firstTwo . B.words) . B.lines
     where
       firstTwo (a:b:_) = (B.unpack a, B.unpack b)
-      firstTwo _ = error "Unexpected mtab format"
+      firstTwo _ = ("", "")
       isDev (d, _) = "/dev/" `isPrefixOf` d
       undev (d, f) = (drop 5 d, f)
 
@@ -64,7 +64,7 @@ parseData reqs mounted dat dat2 =
         in
          case (f1, f2) of
           (Just (_, x), Just (_, y)) -> formatDev path (dev, zipWith (-) y x)
-          _ -> error $ "Device " ++ dev ++ "not found in diskstats"
+          _ -> (dev, path, [0, 0, 0])
   in map format rm
 
 formatDev :: Path -> (DevName, [Float]) -> (DevName, Path, [Float])
@@ -73,8 +73,8 @@ formatDev path (dev, xs) =
       wSp = speed (xs !! 6) (xs !! 7)
       sp =  speed (xs !! 2 + xs !! 6) (xs !! 3 + xs !! 7)
       speed x t = if t == 0 then 0 else 500 * x / t
-  in
-   (dev, path, [sp, rSp, wSp])
+      dat = if length xs > 6 then [sp, rSp, wSp] else [0, 0, 0]
+  in (dev, path, dat)
 
 speedToStr :: Int -> Float -> String
 speedToStr n x =
@@ -110,7 +110,3 @@ runDisk disks _ = do
   dat <- io $ mountedData (map fst disks)
   strs <- mapM (\(d, p, xs) -> runDisk' (findTempl d p disks) xs) dat
   return $ intercalate " " strs
-
-
-
-
