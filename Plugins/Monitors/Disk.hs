@@ -87,8 +87,8 @@ speedToStr n x =
    else
      if x < 1024 then
        let (ds, _) = floatToDigits 10 (x / 1024)
-           tr = if (length ds) > 1 then show $ ds !! 1 else "0"
-       in s ("0." ++ (show $ ds !! 0) ++ tr) (n + 1)
+           tr = if length ds > 1 then show $ ds !! 1 else "0"
+       in s ("0." ++ show (head ds) ++ tr) (n + 1)
      else
        speedToStr (n + 1) (x / 1024)
 
