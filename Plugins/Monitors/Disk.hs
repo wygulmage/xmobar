@@ -77,20 +77,15 @@ formatDev path (dev, xs) =
   in (dev, path, dat)
 
 speedToStr :: Int -> Float -> String
-speedToStr n x =
-  let units = ["B", "K", "M", "T"]
-      toI = round :: Float -> Integer
-      s y j = y ++ units !! j
-  in
-   if n > 2 || x < 103 then
-     s (show $ toI x) n
-   else
-     if x < 1024 then
-       let (ds, _) = floatToDigits 10 (x / 1024)
-           tr = if length ds > 1 then show $ ds !! 1 else "0"
-       in s ("0." ++ show (head ds) ++ tr) (n + 1)
-     else
-       speedToStr (n + 1) (x / 1024)
+speedToStr n x
+  | n > 2 || x < 103 = show (rInt x) ++ units !! n
+  | x < 1024 = "0." ++ s2 ds ++ units !! (n + 1)
+  | otherwise = speedToStr (n + 1) (x / 1024)
+  where units = ["B", "K", "M", "T"]
+        rInt = round :: Float ->Integer
+        s2 (a:b:_) = show a ++ show b
+        s2 as = show (head as) ++ "0"
+        (ds, _) = floatToDigits 10 (x / 1024)
 
 runDisk' :: String -> [Float] -> Monitor String
 runDisk' tmp xs = do
