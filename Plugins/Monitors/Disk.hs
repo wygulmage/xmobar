@@ -80,7 +80,7 @@ speedToStr :: Int -> Float -> String
 speedToStr n x =
   let units = ["B", "K", "M", "T"]
       toI = round :: Float -> Integer
-      s y j = y ++ units !! j ++ "/s"
+      s y j = y ++ units !! j
   in
    if n > 2 || x < 103 then
      s (show $ toI x) n

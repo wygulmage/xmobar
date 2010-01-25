@@ -348,6 +348,16 @@ Monitors have default aliases.
 	    `left`
 - Default template: `Batt: <left>`
 
+`Disk Disks Args RefreshRate`
+
+- aliases to `disk`
+- Disks: list of pairs of the form (device or mount point, template),
+  where the template can contain <total>, <read>, <write> for total,
+  read and write speed, respectively. Example:
+  `[("/", "<read> <write>"), ("sdb1", "<total>")]`
+- Args: the argument list (see below). `-t`/`--template` is ignored.
+- Default template: none (you must specify a template for each file system).
+
 `Thermal Zone Args RefreshRate`
 
 - aliases to the Zone: so `Zone "THRM" []` can be used in template as `%THRM%`
