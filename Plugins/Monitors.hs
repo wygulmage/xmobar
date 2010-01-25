@@ -27,18 +27,20 @@ import Plugins.Monitors.Batt
 import Plugins.Monitors.Thermal
 import Plugins.Monitors.CpuFreq
 import Plugins.Monitors.CoreTemp
+import Plugins.Monitors.Disk
 
-data Monitors = Weather Station   Args Rate
-              | Network Interface Args Rate
-              | Memory            Args Rate
-              | Swap              Args Rate
-              | Cpu               Args Rate
-              | MultiCpu          Args Rate
-              | Battery           Args Rate
-              | BatteryP [String] Args Rate
-              | Thermal   Zone    Args Rate
-              | CpuFreq           Args Rate
-              | CoreTemp          Args Rate
+data Monitors = Weather  Station    Args Rate
+              | Network  Interface  Args Rate
+              | Memory   Args       Rate
+              | Swap     Args       Rate
+              | Cpu      Args       Rate
+              | MultiCpu Args       Rate
+              | Battery  Args       Rate
+              | BatteryP [String]   Args Rate
+              | Disk     DiskSpec   Args Rate
+              | Thermal  Zone       Args Rate
+              | CpuFreq  Args       Rate
+              | CoreTemp Args       Rate
                 deriving (Show,Read,Eq)
 
 type Args      = [String]
@@ -48,6 +50,7 @@ type Station   = String
 type Zone      = String
 type Interface = String
 type Rate      = Int
+type DiskSpec  = [(String, String)]
 
 instance Exec Monitors where
     alias (Weather  s _ _) = s
@@ -61,6 +64,7 @@ instance Exec Monitors where
     alias (BatteryP  _ _ _)= "battery"
     alias (CpuFreq    _ _) = "cpufreq"
     alias (CoreTemp   _ _) = "coretemp"
+    alias (Disk     _ _ _) = "disk"
     start (Weather  s a r) = runM (a ++ [s]) weatherConfig  runWeather  r
     start (Network  i a r) = runM (a ++ [i]) netConfig      runNet      r
     start (Thermal  z a r) = runM (a ++ [z]) thermalConfig  runThermal  r
@@ -72,3 +76,4 @@ instance Exec Monitors where
     start (BatteryP s a r) = runM a          battConfig    (runBatt' s) r
     start (CpuFreq    a r) = runM a          cpuFreqConfig  runCpuFreq  r
     start (CoreTemp   a r) = runM a          coreTempConfig runCoreTemp r
+    start (Disk     s a r) = runM a          diskConfig     (runDisk s) r
