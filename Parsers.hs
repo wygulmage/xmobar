@@ -119,10 +119,10 @@ stripComments = unlines . map (drop 5 . strip False . (replicate 5 ' '++)) . lin
 parseConfig :: String -> Either ParseError (Config,[String])
 parseConfig = runParser parseConf fields "Config" . stripComments
     where
-      parseConf = do
-        many space
-        sepEndSpc ["Config","{"]
-        x <- perms
+      parseConf = parse $ do
+        sepEndSpaces ["Config","{"]
+        x <- unWrapParser perms
+        wrapSkip (string "}")
         eof
         s <- getState
         return (x,s)
