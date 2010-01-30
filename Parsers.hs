@@ -51,7 +51,7 @@ textParser c = do s <- many1 $
 --   accepts only parsers with return type Char.
 notFollowedBy' :: Parser a -> Parser b -> Parser a
 notFollowedBy' p e = do x <- p
-                        notFollowedBy (e >> return '*')
+                        notFollowedBy $ try (e >> return '*')
                         return x
 
 -- | Parsers a string wrapped in a color specification.
