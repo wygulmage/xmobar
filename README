@@ -344,7 +344,7 @@ Monitors have default aliases.
 `BatteryP Dirs Args RefreshRate`
 
 - aliases to `battery`
-- Files: list of directories in /proc/acpi/battery/ directory where to
+- Dirs: list of directories in /proc/acpi/battery/ directory where to
   look for the `state` and `info` files. Example:
   `["BAT0","BAT1","BAT2"]`. Only the first 3 directories will be
   searched.
@@ -353,9 +353,20 @@ Monitors have default aliases.
 	    `left`
 - Default template: `Batt: <left>`
 
-`Disk Disks Args RefreshRate`
+`DiskU Disks Args RefreshRate`
 
-- aliases to `disk`
+- aliases to `disku`
+- Disks: list of pairs of the form (device or mount point, template),
+  where the template can contain <size>, <free>, <used>, <freep> or
+  <usedp> for total, free, used, free percentage and used percentage
+  of the given file system capacity. Example:
+  `[("/", "<used>/<size>"), ("sdb1", "<usedp>")]`
+- Args: the argument list (see below). `-t`/`--template` is ignored.
+- Default template: none (you must specify a template for each file system).
+
+`DiskIO Disks Args RefreshRate`
+
+- aliases to `diskio`
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain <total>, <read>, <write> for total,
   read and write speed, respectively. Example:
