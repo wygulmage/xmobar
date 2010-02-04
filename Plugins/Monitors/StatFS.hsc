@@ -1,0 +1,72 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Plugins.Monitors.StatFS
+-- Copyright   :  (c) Jose A Ortega Ruiz
+-- License     :  BSD-style (see LICENSE)
+--
+-- Maintainer  :  Jose A Ortega Ruiz <jao@gnu.org>
+-- Stability   :  unstable
+-- Portability :  unportable
+--
+--  A binding to C's statvfs(2)
+--
+-----------------------------------------------------------------------------
+
+{-# LANGUAGE CPP, ForeignFunctionInterface, EmptyDataDecls #-}
+
+
+module Plugins.Monitors.StatFS (FileSystemStats(..), getFileSystemStats) where
+
+import Foreign
+import Foreign.C.Types
+import Foreign.C.String
+import Foreign.Storable
+import Data.ByteString (useAsCString)
+import Data.ByteString.Char8 (pack)
+
+#include <sys/vfs.h>
+
+data FileSystemStats = FileSystemStats {
+  fsStatBlockSize :: Integer
+  -- ^ Optimal transfer block size.
+  , fsStatBlockCount :: Integer
+  -- ^ Total data blocks in file system.
+  , fsStatByteCount :: Integer
+  -- ^ Total bytes in file system.
+  , fsStatBytesFree :: Integer
+  -- ^ Free bytes in file system.
+  , fsStatBytesAvailable :: Integer
+  -- ^ Free bytes available to non-superusers.
+  , fsStatBytesUsed :: Integer
+  -- ^ Bytes used.
+  } deriving (Show, Eq)
+
+data CStatfs
+
+foreign import ccall unsafe "sys/vfs.h statfs64"
+  c_statfs :: CString -> Ptr CStatfs -> IO CInt
+
+toI :: CLong -> Integer
+toI = toInteger
+
+getFileSystemStats :: String -> IO (Maybe FileSystemStats)
+getFileSystemStats path =
+  allocaBytes (#size struct statfs) $ \vfs ->
+  useAsCString (pack path) $ \cpath -> do
+    res <- c_statfs cpath vfs
+    case res of
+      -1 -> return Nothing
+      _  -> do
+        bsize <- (#peek struct statfs, f_bsize) vfs
+        bcount <- (#peek struct statfs, f_blocks) vfs
+        bfree <- (#peek struct statfs, f_bfree) vfs
+        bavail <- (#peek struct statfs, f_bavail) vfs
+        let bpb = toI bsize
+        return $ Just FileSystemStats
+                       { fsStatBlockSize = bpb
+                       , fsStatBlockCount = toI bcount
+                       , fsStatByteCount = toI bcount * bpb
+                       , fsStatBytesFree = toI bfree * bpb
+                       , fsStatBytesAvailable = toI bavail * bpb
+                       , fsStatBytesUsed = toI (bcount - bfree) * bpb
+                       }

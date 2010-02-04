@@ -36,7 +36,9 @@ module Plugins.Monitors.Common (
                        -- ** String Manipulation
                        -- $strings
                        , showWithColors
+                       , showWithColors'
                        , showPercentsWithColors
+                       , showWithUnits
                        , takeDigits
                        , showDigits
                        , floatToPercent
@@ -291,6 +293,14 @@ showDigits :: Int -> Float -> String
 showDigits d n =
     showFFloat (Just d) n ""
 
+showWithUnits :: Int -> Int -> Float -> String
+showWithUnits d n x
+  | x < 0 = "-" ++ showWithUnits d n (-x)
+  | n > 3 || x < 10^d = show (round x :: Int) ++ units n
+  | x <= 1024 = showDigits d (x/1024) ++ units (n+1)
+  | otherwise = showWithUnits d (n+1) (x/1024)
+  where units = (!!) ["B", "K", "M", "G", "T"]
+
 padString :: Int -> Int -> String -> Bool -> String -> String
 padString mnw mxw pad pr s =
   let len = length s
@@ -338,6 +348,9 @@ showWithColors f x =
        head $ [col highColor   | x > hh ] ++
               [col normalColor | x > ll ] ++
               [col lowColor    | True]
+
+showWithColors' :: (Num a, Ord a) => String -> a -> Monitor String
+showWithColors' str v = showWithColors (const str) v
 
 showPercentsWithColors :: [Float] -> Monitor [String]
 showPercentsWithColors fs =

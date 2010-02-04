@@ -37,7 +37,8 @@ data Monitors = Weather  Station    Args Rate
               | MultiCpu Args       Rate
               | Battery  Args       Rate
               | BatteryP [String]   Args Rate
-              | Disk     DiskSpec   Args Rate
+              | DiskU    DiskSpec   Args Rate
+              | DiskIO   DiskSpec   Args Rate
               | Thermal  Zone       Args Rate
               | CpuFreq  Args       Rate
               | CoreTemp Args       Rate
@@ -64,16 +65,18 @@ instance Exec Monitors where
     alias (BatteryP  _ _ _)= "battery"
     alias (CpuFreq    _ _) = "cpufreq"
     alias (CoreTemp   _ _) = "coretemp"
-    alias (Disk     _ _ _) = "disk"
-    start (Weather  s a r) = runM (a ++ [s]) weatherConfig  runWeather  r
-    start (Network  i a r) = runM (a ++ [i]) netConfig      runNet      r
-    start (Thermal  z a r) = runM (a ++ [z]) thermalConfig  runThermal  r
-    start (Memory     a r) = runM a          memConfig      runMem      r
-    start (Swap       a r) = runM a          swapConfig     runSwap     r
-    start (Cpu        a r) = runM a          cpuConfig      runCpu      r
-    start (MultiCpu   a r) = runM a          multiCpuConfig runMultiCpu r
-    start (Battery    a r) = runM a          battConfig     runBatt     r
-    start (BatteryP s a r) = runM a          battConfig    (runBatt' s) r
-    start (CpuFreq    a r) = runM a          cpuFreqConfig  runCpuFreq  r
-    start (CoreTemp   a r) = runM a          coreTempConfig runCoreTemp r
-    start (Disk     s a r) = runM a          diskConfig     (runDisk s) r
+    alias (DiskU    _ _ _) = "disku"
+    alias (DiskIO   _ _ _) = "diskio"
+    start (Weather  s a r) = runM (a ++ [s]) weatherConfig  runWeather    r
+    start (Network  i a r) = runM (a ++ [i]) netConfig      runNet        r
+    start (Thermal  z a r) = runM (a ++ [z]) thermalConfig  runThermal    r
+    start (Memory     a r) = runM a          memConfig      runMem        r
+    start (Swap       a r) = runM a          swapConfig     runSwap       r
+    start (Cpu        a r) = runM a          cpuConfig      runCpu        r
+    start (MultiCpu   a r) = runM a          multiCpuConfig runMultiCpu   r
+    start (Battery    a r) = runM a          battConfig     runBatt       r
+    start (BatteryP s a r) = runM a          battConfig    (runBatt' s)   r
+    start (CpuFreq    a r) = runM a          cpuFreqConfig  runCpuFreq    r
+    start (CoreTemp   a r) = runM a          coreTempConfig runCoreTemp   r
+    start (DiskU    s a r) = runM a          diskUConfig    (runDiskU s)  r
+    start (DiskIO   s a r) = runM a          diskIOConfig   (runDiskIO s) r
