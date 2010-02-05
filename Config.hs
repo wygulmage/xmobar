@@ -35,6 +35,7 @@ import Plugins.EWMH
 
 #ifdef INOTIFY
 import Plugins.Mail
+import Plugins.MBox
 #endif
 
 -- $config
@@ -96,7 +97,7 @@ infixr :*:
 -- this function's type signature.
 runnableTypes :: Command :*: Monitors :*: Date :*: PipeReader :*: CommandReader :*: StdinReader :*: XMonadLog :*: EWMH :*:
 #ifdef INOTIFY
-                 Mail :*:
+                 Mail :*: MBox :*:
 #endif
                  ()
 runnableTypes = undefined

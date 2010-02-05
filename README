@@ -410,7 +410,25 @@ Monitors have default aliases.
 - aliases to `Mail`
 - Args: list of maildirs in form [("name1","path1"),("name2","path2")]
 - This plugin requires INOTIFY support in Linux kernel and hinotify library.
-  To activate, pass --flags="with_inotify" to "runhaskell Setup configure".
+  To activate, pass --flags="with_inotify" to "runhaskell Setup configure"
+  or to "cabal configure".
+
+`MBox Mboxes BaseDir`
+
+- aliases to `MBox`
+- Mboxes a list of mbox files of the form [("name", "path", "color")],
+  where name is the displayed name, path the absolute or relative (to
+  BaseDir) path of the mbox file, and color the color to use to display
+  the mail count (use an empty string for the default).
+- BaseDir is a string giving the base directory where mbox files with
+  a relative path live. It can be empty if all your paths are
+  absolute.
+- This plugin requires INOTIFY support in Linux kernel and hinotify library.
+  To activate, pass --flags="with_inotify" to "runhaskell Setup
+  configure" or to "cabal configure".
+- Example:
+   `Run MBox [("I ", "inbox", "red"), ("O ", "/foo/mbox", "")] "/var/mail/"`
+  will look for mails in /var/mail/inbox and /foo/mbox.
 
 ### Monitor Plugins Commands Arguments
 
