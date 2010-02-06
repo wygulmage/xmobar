@@ -23,15 +23,9 @@ import Config
 import Runnable
 import Commands
 
-import Control.Monad.Writer(mapM_, ap, liftM, liftM2, MonadWriter, tell)
-import Control.Applicative.Permutation(optAtom, runPermsSep)
-import Control.Applicative(Applicative, (<*>), Alternative, empty, (<$), (<$>))
-import qualified Control.Applicative
-
-import Data.List(tails, find, inits)
 import qualified Data.Map as Map
-
-import Text.ParserCombinators.Parsec as Parsec
+import Text.ParserCombinators.Parsec
+import Text.ParserCombinators.Parsec.Perm
 
 -- | Runs the string parser
 parseString :: Config -> String -> IO [(String, String)]
@@ -110,43 +104,6 @@ combine c m ((ts,s,ss):xs) = (com, s, ss) : combine c m xs
 allTillSep :: Config -> Parser String
 allTillSep = many . noneOf . sepChar
 
-newtype WrappedParser tok st a = WrappedParser { unWrapParser :: GenParser tok st a }
-    deriving (Functor,Monad)
-
-instance Applicative (WrappedParser tok st) where
-    pure = WrappedParser . return
-    (<*>) x y = WrappedParser $ unWrapParser x `ap` unWrapParser y
-
-instance Alternative (WrappedParser tok st) where
-    (<|>) x y = WrappedParser $ try (unWrapParser x) Parsec.<|> unWrapParser y
-    empty = WrappedParser pzero
-
-readsToParsec :: Read b => CharParser st b
-readsToParsec = do
-    pos0 <- getPosition
-    input <- getInput
-    case reads input of
-        (result,rest):_ -> do
-            maybe (return Nothing) (fmap Just) $ do
-                  ls <- fmap (lines . fst) . find ((==rest) . snd)
-                            $ zip (inits input) (tails input)
-                  lastLine <- safeLast ls
-                  return $ setPosition
-                      . flip setSourceColumn (length lastLine)
-                      . flip incSourceLine (length ls - 1) $ pos0
-            setInput rest
-            return result
-        _ -> setInput input >> fail "readsToParsec failed"
-
-safeLast :: [a] -> Maybe a
-safeLast [] = Nothing
-safeLast xs = Just (last xs)
-
-liftM9 :: (Monad m) => (a1 -> a2 -> a3 -> a4 -> a5 -> a6 -> a7 -> a8 -> a9 -> b) ->
-          m a1 -> m a2 -> m a3 -> m a4 -> m a5 -> m a6 -> m a7 -> m a8 -> m a9 -> m b
-liftM9 fun a b c d e f g h i
-    = fun `liftM` a `ap` b `ap` c `ap` d `ap` e `ap` f `ap` g `ap` h `ap` i
-
 stripComments :: String -> String
 stripComments = unlines . map (drop 5 . strip False . (replicate 5 ' '++)) . lines
     where strip m ('-':'-':xs) = if m then "--" ++ strip m xs else ""
@@ -159,33 +116,57 @@ stripComments = unlines . map (drop 5 . strip False . (replicate 5 ' '++)) . lin
 
 -- | Parse the config, logging a list of fields that were missing and replaced
 -- by the default definition.
-parseConfig :: MonadWriter [String] m => String -> Either ParseError (m Config)
-parseConfig = parseConf "Config" . stripComments
+parseConfig :: String -> Either ParseError (Config,[String])
+parseConfig = runParser parseConf fields "Config" . stripComments
     where
-      parseConf = parse $ do
-        sepEndSpaces ["Config","{"]
-        x <- unWrapParser perms
-        wrapSkip (string "}")
+      parseConf = do
+        many space
+        sepEndSpc ["Config","{"]
+        x <- perms
         eof
-        return x
-      perms = runPermsSep (WrappedParser $ wrapSkip $ string ",") $ liftM9 Config
-        <$> withDef font         "font"          strField
-        <*> withDef bgColor      "bgColor"       strField
-        <*> withDef fgColor      "fgColor"       strField
-        <*> withDef position     "position"     (field readsToParsec)
-        <*> withDef lowerOnStart "lowerOnStart" (field parseEnum    )
-        <*> withDef commands     "commands"     (field readsToParsec)
-        <*> withDef sepChar      "sepChar"       strField
-        <*> withDef alignSep     "alignSep"      strField
-        <*> withDef template     "template"      strField
+        s <- getState
+        return (x,s)
 
-      wrapSkip x = many space >> liftM2 const x (many space)
-      sepEndSpaces = mapM_ (\s -> liftM2 const (string s) $ many space)
+      perms = permute $ Config
+              <$?> pFont         <|?> pBgColor
+              <|?> pFgColor      <|?> pPosition
+              <|?> pLowerOnStart <|?> pCommands
+              <|?> pSepChar      <|?> pAlignSep
+              <|?> pTemplate
 
-      withDef ext name parser = optAtom (do tell [name]; return $ ext defaultConfig)
-                                        (liftM return $ WrappedParser $ parser name)
+      fields    = [ "font", "bgColor", "fgColor", "sepChar", "alignSep"
+                  , "template", "position", "lowerOnStart", "commands"]
+      pFont     = strField font     "font"
+      pBgColor  = strField bgColor  "bgColor"
+      pFgColor  = strField fgColor  "fgColor"
+      pSepChar  = strField sepChar  "sepChar"
+      pAlignSep = strField alignSep "alignSep"
+      pTemplate = strField template "template"
 
-      parseEnum = choice $ map (\x -> x <$ string (show x)) [minBound .. maxBound]
+      pPosition     = field position     "position"     $ tillFieldEnd >>= read' "position"
+      pLowerOnStart = field lowerOnStart "lowerOnStart" $ tillFieldEnd >>= read' "lowerOnStart"
+      pCommands     = field commands     "commands"     $ readCommands
 
-      strField name = flip field name $ between (char '"') (char '"') (many1 . satisfy $ (/= '"'))
-      field cont name = sepEndSpaces [name,"="] >> cont
+      tillFieldEnd = many $ noneOf ",} \n\r"
+      commandsEnd  = wrapSkip (string "]") >> oneOf "},"
+      readCommands = manyTill anyChar (try commandsEnd) >>= read' commandsErr . flip (++) "]"
+
+      strField e n = field e n . between (strDel "start" n) (strDel "end" n) . many $ noneOf "\"\n\r"
+      strDel   t n = char '"' <?> strErr t n
+      strErr   t n = "the " ++ t ++ " of the string field " ++ n ++ " - a double quote (\")."
+
+      wrapSkip   x = many space >> x >>= \r -> many space >> return r
+      sepEndSpc    = mapM_ (wrapSkip . try . string)
+      fieldEnd     = many $ space <|> oneOf ",}"
+      field  e n c = (,) (e defaultConfig) $
+                     updateState (filter (/= n)) >> sepEndSpc [n,"="] >>
+                     wrapSkip c >>= \r -> fieldEnd >> return r
+
+      read' d s = case reads s of
+                    [(x, _)] -> return x
+                    _        -> fail $ "error reading field: " ++ d
+
+commandsErr :: String
+commandsErr = "commands: this usually means that a command could not be parsed.\n" ++
+              "The error could be located at the begining of the command which follows the offending one."
+

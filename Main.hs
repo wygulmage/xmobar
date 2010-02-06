@@ -35,8 +35,7 @@ import System.Console.GetOpt
 import System.Exit
 import System.Environment
 import System.Posix.Files
-
-import Control.Monad.Writer (MonadWriter,MonadIO,unless,runWriterT)
+import Control.Monad (unless)
 
 -- $main
 
@@ -46,9 +45,9 @@ main = do
   d   <- openDisplay ""
   args     <- getArgs
   (o,file) <- getOpts args
-  (c,defaultings) <- runWriterT $ case file of
-                    [cfgfile] -> readConfig cfgfile
-                    _         -> readDefaultConfig
+  (c,defaultings) <- case file of
+                       [cfgfile] -> readConfig cfgfile
+                       _         -> readDefaultConfig
 
   unless (null defaultings) $ putStrLn $ "Fields missing from config defaulted: "
                                             ++ intercalate "," defaultings
@@ -68,19 +67,20 @@ main = do
   releaseFont d fs
 
 -- | Reads the configuration files or quits with an error
-readConfig :: (MonadIO m, MonadWriter [String] m) => FilePath -> m Config
+readConfig :: FilePath -> IO (Config,[String])
 readConfig f = do
   file <- io $ fileExist f
   s    <- io $ if file then readFileSafe f else error $ f ++ ": file not found!\n" ++ usage
   either (\err -> error $ f ++ ": configuration file contains errors at:\n" ++ show err)
-         id $ parseConfig s
+         return $ parseConfig s
+
 -- | Read default configuration file or load the default config
-readDefaultConfig :: (MonadIO m, MonadWriter [String] m) => m Config
+readDefaultConfig :: IO (Config,[String])
 readDefaultConfig = do
   home <- io $ getEnv "HOME"
   let path = home ++ "/.xmobarrc"
   f <- io $ fileExist path
-  if f then readConfig path else return defaultConfig
+  if f then readConfig path else return (defaultConfig,[])
 
 data Opts = Help
           | Version
