@@ -151,7 +151,8 @@ runM args conf action r cb = do go
     where go = do
             c <- conf
             let ac = doArgs args action
-            s <- handle (\x -> const (return "error") $ x `asTypeOf` (undefined::SomeException)) $ runReaderT ac c
+                he = return . (++) "error: " . show . flip asTypeOf (undefined::SomeException)
+            s <- handle he $ runReaderT ac c
             cb s
             tenthSeconds r
             go
