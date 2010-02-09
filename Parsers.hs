@@ -5,7 +5,7 @@
 -- Copyright   :  (c) Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
--- Maintainer  :  Andrea Rossato <andrea.rossato@unibz.it>
+-- Maintainer  :  Andrea Rossato <andrea.rossato@unitn.it>
 -- Stability   :  unstable
 -- Portability :  unportable
 --
@@ -93,8 +93,8 @@ parseTemplate c s =
            m  = Map.fromList $ zip cl (commands c)
        return $ combine c m str
 
--- | Given a finite "Map" and a parsed templatet produces the
--- | resulting output string.
+-- | Given a finite "Map" and a parsed template produce the resulting
+-- output string.
 combine :: Config -> Map.Map String Runnable -> [(String, String, String)] -> [(Runnable,String,String)]
 combine _ _ [] = []
 combine c m ((ts,s,ss):xs) = (com, s, ss) : combine c m xs

@@ -5,7 +5,7 @@
 -- Copyright   :  (C) 2007 Andrea Rossato
 -- License     :  BSD3
 --
--- Maintainer  :  andrea.rossato@unibz.it
+-- Maintainer  :  andrea.rossato@unitn.it
 -- Stability   :  unstable
 -- Portability :  unportable
 --

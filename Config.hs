@@ -6,7 +6,7 @@
 -- Copyright   :  (c) Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
--- Maintainer  :  Andrea Rossato <andrea.rossato@unibz.it>
+-- Maintainer  :  Andrea Rossato <andrea.rossato@unitn.it>
 -- Stability   :  unstable
 -- Portability :  unportable
 --
