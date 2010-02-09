@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -w #-}
 {-# LANGUAGE CPP, RecordWildCards, NamedFieldPuns, GeneralizedNewtypeDeriving #-}
 
 -----------------------------------------------------------------------------
