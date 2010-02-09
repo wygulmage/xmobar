@@ -1,5 +1,5 @@
 name:               xmobar
-version:            0.9.2
+version:            0.10
 homepage:           http://code.haskell.org/~arossato/xmobar
 synopsis:           A Minimalistic Text Based Status Bar
 description: 	    Xmobar is a minimalistic text based status bar.
@@ -22,12 +22,14 @@ flag small_base
 
 flag with_xft
   description: Use Xft to render text. UTF-8 support included.
+  default: False
 
 flag with_utf8
   description: With UTF-8 support.
 
 flag with_inotify
   description: inotify support (modern Linux only).  Required for the Mail plugin.
+  default: False
 
 executable xmobar
     main-is:            Main.hs
