@@ -40,7 +40,6 @@ import Control.Concurrent
 import Control.Concurrent.STM
 import Control.Exception hiding (handle)
 import Data.Bits
-import Data.Char
 import Data.Maybe(fromMaybe)
 import Data.Typeable (Typeable)
 

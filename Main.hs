@@ -64,7 +64,6 @@ main = do
   vars  <- mapM startCommand cl
   (r,w) <- createWin d fs conf
   eventLoop (XConf d r w fs conf) vars
-  releaseFont d fs
 
 -- | Reads the configuration files or quits with an error
 readConfig :: FilePath -> IO (Config,[String])

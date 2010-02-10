@@ -16,7 +16,6 @@ module XUtil
     , initFont
     , initCoreFont
     , initUtf8Font
-    , releaseFont
     , textExtents
     , textWidth
     , printString
@@ -32,19 +31,18 @@ module XUtil
     ) where
 
 import Control.Concurrent
-import Control.Monad
 import Control.Monad.Trans
 import Data.IORef
 import Foreign
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import qualified Graphics.X11.Xlib as Xlib (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
+import System.Mem.Weak ( addFinalizer )
 import System.Posix.Types (Fd(..))
 import System.IO
-import System.IO.Unsafe (unsafePerformIO)
 #if defined XFT || defined UTF8
-import Foreign.C
 # if __GLASGOW_HASKELL__ < 612
+import Foreign.C
 import qualified System.IO.UTF8 as UTF8 (readFile,hGetLine)
 # else
 import qualified System.IO as UTF8 (readFile,hGetLine)
@@ -82,49 +80,46 @@ data XFont =Core FontStruct
 initFont :: Display ->String -> IO XFont
 initFont d s =
 #ifdef XFT
-  if xftPrefix `isPrefixOf` s then
-     do setupLocale
-        xftdraw <- xftFontOpen d (defaultScreenOfDisplay d) (drop (length xftPrefix) s)
-        return (Xft xftdraw)
-  else
+       let xftPrefix = "xft:" in
+       if  xftPrefix `isPrefixOf` s then
+           fmap Xft $ initXftFont d s
+       else
 #endif
-#ifdef UTF8
-      (setupLocale >> initUtf8Font d s >>= return . Utf8)
+#if defined UTF8 ||  __GLASGOW_HASKELL__ >= 612
+           fmap Utf8 $ initUtf8Font d s
 #else
-      (initCoreFont d s >>= return . Core)
+           fmap Core $ initCoreFont d s
 #endif
-#ifdef XFT
-  where xftPrefix = "xft:"
-#endif
-
-releaseFont :: Display -> XFont -> IO ()
-#ifdef XFT
-releaseFont d (Xft xftfont) = xftFontClose    d xftfont
-#endif
-releaseFont d (Utf8     fs) = releaseUtf8Font d fs
-releaseFont d (Core     fs) = releaseCoreFont d fs
 
 -- | Given a fontname returns the font structure. If the font name is
 --  not valid the default font will be loaded and returned.
 initCoreFont :: Display -> String -> IO FontStruct
-initCoreFont dpy s = catch (getIt dpy) (fallBack dpy)
-      where getIt    d = loadQueryFont d s
-            fallBack d = const $ loadQueryFont d "-misc-fixed-*-*-*-*-10-*-*-*-*-*-*-*"
-
-releaseCoreFont :: Display -> FontStruct -> IO ()
-releaseCoreFont d = freeFont d
+initCoreFont d s = do
+  f <- catch getIt fallBack
+  addFinalizer f (freeFont d f)
+  return f
+      where getIt    = loadQueryFont d s
+            fallBack = const $ loadQueryFont d "-misc-fixed-*-*-*-*-10-*-*-*-*-*-*-*"
 
 -- | Given a fontname returns the font structure. If the font name is
 --  not valid the default font will be loaded and returned.
 initUtf8Font :: Display -> String -> IO FontSet
-initUtf8Font dpy s = do
-  (_,_,fs) <- catch (getIt dpy) (fallBack dpy)
-  return fs
-      where getIt    d = createFontSet d s
-            fallBack d = const $ createFontSet d "-misc-fixed-*-*-*-*-10-*-*-*-*-*-*-*"
+initUtf8Font d s = do
+  setupLocale
+  (_,_,f) <- catch getIt fallBack
+  addFinalizer f (freeFontSet d f)
+  return f
+      where getIt    = createFontSet d s
+            fallBack = const $ createFontSet d "-misc-fixed-*-*-*-*-10-*-*-*-*-*-*-*"
 
-releaseUtf8Font :: Display -> FontSet -> IO ()
-releaseUtf8Font d = freeFontSet d
+#ifdef XFT
+initXftFont :: Display -> String -> IO XftFont
+initXftFont d s = do
+  setupLocale
+  f <- xftFontOpen d (defaultScreenOfDisplay d) (drop 4 s)
+  addFinalizer f (xftFontClose d f)
+  return f
+#endif
 
 textWidth :: Display -> XFont -> String -> IO Int
 textWidth _   (Utf8 fs) s = return $ fi $ wcTextEscapement fs s
@@ -251,11 +246,14 @@ io = liftIO
 fi :: (Integral a, Num b) => a -> b
 fi = fromIntegral
 
-#if defined XFT || defined UTF8
+#if __GLASGOW_HASKELL__ < 612 && (defined XFT || defined UTF8)
 #include <locale.h>
 foreign import ccall unsafe "locale.h setlocale"
     setlocale :: CInt -> CString -> IO CString
 
-setupLocale :: IO CString
-setupLocale = withCString "" $ setlocale (#const LC_ALL)
+setupLocale :: IO ()
+setupLocale = withCString "" (setlocale $ #const LC_ALL) >> return ()
+# else
+setupLocale :: IO ()
+setupLocale = return ()
 #endif

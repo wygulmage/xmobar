@@ -23,7 +23,6 @@ module Runnable where
 
 import Control.Monad
 import Text.Read
-import Text.ParserCombinators.ReadPrec
 import Config (runnableTypes)
 import Commands
 
