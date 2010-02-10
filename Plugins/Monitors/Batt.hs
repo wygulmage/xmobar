@@ -26,25 +26,36 @@ battConfig = mkMConfig
        "Batt: <left>" -- template
        ["left","status"] -- available replacements
 
-file2batfile :: String -> (String, String, String)
-file2batfile s = ( s' ++ "/charge_full"
-                 , s' ++ "/charge_now"
-                 , s' ++ "/status")
+type File = (String, String)
+
+file2batfile :: String -> (File, File)
+file2batfile s = ( (s' ++ "/charge_full", s' ++ "/energy_full")
+                 , (s' ++ "/charge_now" , s' ++ "/energy_now" )
+                 )
     where s' = "/sys/class/power_supply/" ++ s
 
-readFileBatt :: (String, String, String) -> IO (String, String, String)
-readFileBatt (f,n,s) =
-    do a <- rf f
-       b <- rf n
-       c <- rf s
+readFileBatt :: (File, File) -> IO (String, String, String)
+readFileBatt (f,n) =
+    do a  <- rf f
+       b  <- rf n
+       ac <- fileExist "/sys/class/power_supply/AC0/online"
+       c  <- if not ac
+             then return []
+             else do s <- B.unpack `fmap` catRead "/sys/class/power_supply/AC0/online"
+                     return $ if s == "1\n" then "<fc=green>On</fc>" else"<fc=red>Off</fc>"
        return (a,b,c)
     where rf file = do
-            fe <- fileExist file
-            if fe then B.unpack `fmap` catRead file else return []
+            fe <- fileExist (fst file)
+            if fe
+               then B.unpack `fmap` catRead (fst file)
+               else do fe' <- fileExist (snd file)
+                       if fe'
+                          then B.unpack `fmap` catRead (snd file)
+                          else return []
 
-parseBATT :: [(String, String, String)] -> IO Batt
+parseBATT :: [(File,File)] -> IO Batt
 parseBATT bfs =
-    do [(a0,b0,c0),(a1,b1,_),(a2,b2,_)] <- mapM readFileBatt (take 3 $ bfs ++ repeat ("","",""))
+    do [(a0,b0,c0),(a1,b1,_),(a2,b2,_)] <- mapM readFileBatt (take 3 $ bfs ++ repeat (("",""),("","")))
        let read' s = if s == [] then 0 else read s
            left    = (read' b0 + read' b1 + read' b2) / (read' a0 + read' a1 + read' a2) --present / full
        return $ if isNaN left then NA else Batt left c0
