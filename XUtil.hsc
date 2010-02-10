@@ -176,7 +176,7 @@ printString dpy drw fs@(Xft font) gc fc bc x y s = do
                              (fi $ a + d)
     withXftDraw dpy drw visual colormap $
       \draw -> withXftColorName dpy visual colormap fc $
-      \color -> xftDrawString draw color font x y s
+      \color -> xftDrawString draw color font x (y - 2) s
 #endif
 
 data DynPixel = DynPixel { allocated :: Bool
