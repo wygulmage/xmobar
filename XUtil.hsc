@@ -171,9 +171,9 @@ printString dpy drw fs@(Xft font) gc fc bc x y s = do
     gi     <- xftTextExtents dpy font s
     setForeground dpy gc bcolor
     fillRectangle dpy drw gc (x - fi (xglyphinfo_x gi))
-                             (y - fi a)
+                             (y - fi (a + d))
                              (fi $ xglyphinfo_xOff gi)
-                             (fi $ a + d)
+                             (fi $ 4 + a + d)
     withXftDraw dpy drw visual colormap $
       \draw -> withXftColorName dpy visual colormap fc $
       \color -> xftDrawString draw color font x (y - 2) s
