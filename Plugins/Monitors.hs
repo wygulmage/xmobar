@@ -85,5 +85,5 @@ instance Exec Monitors where
     start (CoreTemp   a r) = runM a          coreTempConfig runCoreTemp   r
     start (DiskU    s a r) = runM a          diskUConfig   (runDiskU s)   r
     start (DiskIO   s a r) = runM a          diskIOConfig  (runDiskIO s)  r
-    start (TopCpu     a r) = runM a          topCpuConfig   runTopCpu     r
     start (TopMem     a r) = runM a          topMemConfig   runTopMem     r
+    start (TopCpu     a r) = startTopCpu a r
