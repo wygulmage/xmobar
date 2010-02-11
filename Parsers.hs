@@ -147,7 +147,7 @@ parseConfig = runParser parseConf fields "Config" . stripComments
       pLowerOnStart = field lowerOnStart "lowerOnStart" $ tillFieldEnd >>= read' "lowerOnStart"
       pCommands     = field commands     "commands"     $ readCommands
 
-      tillFieldEnd = many $ noneOf ",} \n\r"
+      tillFieldEnd = many $ noneOf ",}\n\r"
       commandsEnd  = wrapSkip (string "]") >> oneOf "},"
       readCommands = manyTill anyChar (try commandsEnd) >>= read' commandsErr . flip (++) "]"
 
