@@ -25,6 +25,7 @@ import Plugins.Monitors.Common
 import Control.Exception
 import System.Directory
 import System.FilePath
+import System.IO
 import Foreign.C.Types
 import Data.List (sortBy, foldl')
 import Data.Ord (comparing)
@@ -111,9 +112,11 @@ data TimesVal = TiV !Int !String !Float
 
 cpuTime :: IO Integer
 cpuTime = do
-  s <- readFile "/proc/stat"
-  let ts = map read . tail . words . (!!0) . lines
-  return $ sum (ts s)
+  h <- openFile "/proc/stat" ReadMode
+  s <- hGetLine h
+  let ts = (map read . tail . words) s
+  hClose h
+  return $! sum $! ts
 
 nullTimesVal :: TimesVal
 nullTimesVal = TiV 0 "" 0
@@ -126,14 +129,15 @@ timeinfo pidf =
                  pid = read (head fs)
                  rf = read . (fs!!)
                  n = drop 1 $ init (fs!!1)
-             evaluate $ TiV pid n (rf 14 + rf 15))
+             evaluate $! TiV pid n (rf 14 + rf 15))
 
-timeinfos :: IO [Times]
+timeinfos :: IO [(Integer, Times)]
 timeinfos = do
   fs <- processes
-  tis <- mapM timeinfo fs
-  return [foldl' acc M.empty tis]
-  where acc m (TiV p n t) = if p > 10 then M.insert p (TI n t) m else m
+  tis <- mapM timeinfo $! fs
+  ct <- cpuTime
+  return $! [(ct, foldl' acc M.empty tis)]
+  where acc m (TiV p n t) = M.insert p (TI n t) m
 
 combineTimeInfos :: Times -> Times -> Times
 combineTimeInfos t0 t1 = M.intersectionWith timeDiff t1 t0
@@ -141,15 +145,14 @@ combineTimeInfos t0 t1 = M.intersectionWith timeDiff t1 t0
 
 topTimeProcesses :: Int -> IO [Timeinfo]
 topTimeProcesses n = do
-  c0 <- cpuTime
-  (t0:_, t1:_) <- doActionTwiceWithDelay 500000 timeinfos
-  c1 <- cpuTime
+  ((c0, t0):_, (c1, t1):_) <- doActionTwiceWithDelay 1000000 timeinfos
   let ts = M.elems $ combineTimeInfos t0 t1
-      sts = take n $ sortBy (flip (comparing tm)) ts
+      sts = take n $ sortBy (flip (comparing tm)) (filter nzr ts)
+      nzr = (>0) . tm
       tm (TI _ t) = t
-      lapse = fromIntegral (c1 - c0) / 100
-      norm (TI nm t) = TI nm (t/lapse)
-  return $ if lapse > 0 then map norm sts else sts
+      lapse = fromIntegral (c1 - c0)
+      norm (TI nm t) = TI nm (100 * t / lapse)
+  return $! map norm sts ++ replicate 5 (TI "" 0)
 
 showTimeInfo :: Timeinfo -> Monitor [String]
 showTimeInfo (TI n t) = showInfo n (showDigits 2 t) t
