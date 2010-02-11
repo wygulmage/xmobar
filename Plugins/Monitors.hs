@@ -28,6 +28,7 @@ import Plugins.Monitors.Thermal
 import Plugins.Monitors.CpuFreq
 import Plugins.Monitors.CoreTemp
 import Plugins.Monitors.Disk
+import Plugins.Monitors.Top
 
 data Monitors = Weather  Station    Args Rate
               | Network  Interface  Args Rate
@@ -42,6 +43,8 @@ data Monitors = Weather  Station    Args Rate
               | Thermal  Zone       Args Rate
               | CpuFreq  Args       Rate
               | CoreTemp Args       Rate
+              | TopCpu   Args       Rate
+              | TopMem   Args       Rate
                 deriving (Show,Read,Eq)
 
 type Args      = [String]
@@ -64,6 +67,8 @@ instance Exec Monitors where
     alias (Battery    _ _) = "battery"
     alias (BatteryP  _ _ _)= "battery"
     alias (CpuFreq    _ _) = "cpufreq"
+    alias (TopCpu     _ _) = "top"
+    alias (TopMem     _ _) = "topmem"
     alias (CoreTemp   _ _) = "coretemp"
     alias (DiskU    _ _ _) = "disku"
     alias (DiskIO   _ _ _) = "diskio"
@@ -78,5 +83,7 @@ instance Exec Monitors where
     start (BatteryP s a r) = runM a          battConfig    (runBatt' s)   r
     start (CpuFreq    a r) = runM a          cpuFreqConfig  runCpuFreq    r
     start (CoreTemp   a r) = runM a          coreTempConfig runCoreTemp   r
-    start (DiskU    s a r) = runM a          diskUConfig    (runDiskU s)  r
-    start (DiskIO   s a r) = runM a          diskIOConfig   (runDiskIO s) r
+    start (DiskU    s a r) = runM a          diskUConfig   (runDiskU s)   r
+    start (DiskIO   s a r) = runM a          diskIOConfig  (runDiskIO s)  r
+    start (TopCpu     a r) = runM a          topCpuConfig   runTopCpu     r
+    start (TopMem     a r) = runM a          topMemConfig   runTopMem     r

@@ -35,6 +35,7 @@ module Plugins.Monitors.Common (
                        , parseTemplate
                        -- ** String Manipulation
                        -- $strings
+                       , padString
                        , showWithColors
                        , showWithColors'
                        , showPercentsWithColors
@@ -296,7 +297,7 @@ showDigits d n =
 showWithUnits :: Int -> Int -> Float -> String
 showWithUnits d n x
   | x < 0 = "-" ++ showWithUnits d n (-x)
-  | n > 3 || x < 10^d = show (round x :: Int) ++ units n
+  | n > 3 || x < 10^(d + 1) = show (round x :: Int) ++ units n
   | x <= 1024 = showDigits d (x/1024) ++ units (n+1)
   | otherwise = showWithUnits d (n+1) (x/1024)
   where units = (!!) ["B", "K", "M", "G", "T"]
