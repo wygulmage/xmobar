@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-{-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE ForeignFunctionInterface, BangPatterns #-}
 
 module Plugins.Monitors.Top (startTopCpu, topMemConfig, runTopMem) where
 
@@ -131,21 +131,19 @@ type TIVar = MVar Times
 
 topTimeProcesses :: Int -> TIVar -> Float -> IO [Timeinfo]
 topTimeProcesses n tivar lapse = do
-  t0 <- readMVar tivar
-  t1 <- timeinfos
-  modifyMVar_ tivar (\_ -> return $! t1)
-  let ts = M.elems $ combineTimeInfos t0 t1
-      sts = take n $ sortBy cmp ts
-      cmp (TI _ x) (TI _ y) = compare y x
-      norm (TI nm t) = TI nm (100 * t / lapse)
-  return $! map norm sts
+  modifyMVar tivar $ \t0 ->
+    timeinfos >>= (\(!t1) -> let ts = M.elems $ combineTimeInfos t0 t1
+                                 sts = take n $ sortBy cmp ts
+                                 cmp (TI _ x) (TI _ y) = compare y x
+                                 norm (TI nm t) = TI nm (100 * t / lapse)
+                             in return $! (t1, map norm sts))
 
 showTimeInfo :: Timeinfo -> Monitor [String]
 showTimeInfo (TI n t) = showInfo n (showDigits 1 t) t
 
 runTopCpu :: TIVar -> Float -> [String] -> Monitor String
 runTopCpu tivar lapse _ = do
-   ps <- io $ topTimeProcesses maxProc tivar lapse
+   ps <- io $! topTimeProcesses maxProc tivar lapse
    pstr <- mapM showTimeInfo ps
    parseTemplate $ concat pstr
 
