@@ -132,21 +132,23 @@ data Opts = HighColor String
           | PercentPad String
           | MinWidth String
           | MaxWidth String
+          | Width String
           | PadChars String
           | PadAlign String
 
 options :: [OptDescr Opts]
 options =
-    [ Option ['H']  ["High"]     (ReqArg High "number"              )   "The high threshold"
-    , Option ['L']  ["Low"]      (ReqArg Low "number"               )   "The low threshold"
-    , Option ['h']  ["high"]     (ReqArg HighColor "color number"   )   "Color for the high threshold: ex \"#FF0000\""
-    , Option ['n']  ["normal"]   (ReqArg NormalColor "color number" )   "Color for the normal threshold: ex \"#00FF00\""
-    , Option ['l']  ["low"]      (ReqArg LowColor "color number"    )   "Color for the low threshold: ex \"#0000FF\""
-    , Option ['t']  ["template"] (ReqArg Template "output template" )   "Output template."
-    , Option ['p']  ["ppad"]     (ReqArg PercentPad "percent padding" ) "Minimum percentage width."
-    , Option ['m']  ["minwidth"] (ReqArg MinWidth "minimum width")      "Minimum field width"
-    , Option ['M']  ["maxwidth"] (ReqArg MaxWidth "maximum width")      "Maximum field width"
-    , Option ['c']  ["padchars"] (ReqArg PadChars "padding chars")      "Characters to use for padding"
+    [ Option ['H']  ["High"]     (ReqArg High "number"               )  "The high threshold"
+    , Option ['L']  ["Low"]      (ReqArg Low "number"                )  "The low threshold"
+    , Option ['h']  ["high"]     (ReqArg HighColor "color number"    )  "Color for the high threshold: ex \"#FF0000\""
+    , Option ['n']  ["normal"]   (ReqArg NormalColor "color number"  )  "Color for the normal threshold: ex \"#00FF00\""
+    , Option ['l']  ["low"]      (ReqArg LowColor "color number"     )  "Color for the low threshold: ex \"#0000FF\""
+    , Option ['t']  ["template"] (ReqArg Template "output template"  )  "Output template."
+    , Option ['p']  ["ppad"]     (ReqArg PercentPad "percent padding")  "Minimum percentage width."
+    , Option ['m']  ["minwidth"] (ReqArg MinWidth "minimum width"    )  "Minimum field width"
+    , Option ['M']  ["maxwidth"] (ReqArg MaxWidth "maximum width"    )  "Maximum field width"
+    , Option ['w']  ["width"]    (ReqArg Width "fixed width"         )  "Fixed field width"
+    , Option ['c']  ["padchars"] (ReqArg PadChars "padding chars"    )  "Characters to use for padding"
     , Option ['a']  ["align"]    (ReqArg PadAlign "padding alignment")  "'l' for left padding, 'r' for right"
     ]
 
@@ -174,6 +176,8 @@ doConfigOptions (o:oo) =
          PercentPad   p -> setConfigValue (nz p) ppad >> next
          MinWidth    mn -> setConfigValue (nz mn) minWidth >> next
          MaxWidth    mx -> setConfigValue (nz mx) maxWidth >> next
+         Width        w -> setConfigValue (nz w) minWidth >>
+                           setConfigValue (nz w) maxWidth >> next
          PadChars    pc -> setConfigValue pc padChars >> next
          PadAlign    pa -> setConfigValue (isPrefixOf "r" pa) padRight >> next
 

@@ -465,6 +465,7 @@ These are the arguments that can be used for internal commands in the
     -p number           --ppad=number               Pad percentages to given width
     -m number           --minwidth=number           Minimum field width
     -M number           --maxwidth=number           Maximum field width
+    -w number           --width=number              Fixed field width
     -c chars            --padchars=chars            Chars used (cyclically) for padding
     -a ["r" or "l"]     --align=["r" or "l"]        Pad alignment (right/left)
     -t output template  --template=output template  Output template of the command.
