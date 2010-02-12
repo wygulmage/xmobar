@@ -25,6 +25,7 @@ import System.FilePath
 import System.Posix.Unistd (getSysVar, SysVar(ClockTick))
 import Foreign.C.Types
 import Data.List (sortBy, foldl')
+import Data.Ord (comparing)
 
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as M
@@ -65,7 +66,7 @@ showInfo nm sms mms = do
   return [nm, mstr, both]
 
 defHandle :: a -> SomeException -> IO a
-defHandle def _ = evaluate $! def
+defHandle def _ = evaluate def
 
 handlePidFile :: a -> ([String] -> IO a) -> FilePath -> IO a
 handlePidFile def action pidf =
@@ -75,13 +76,13 @@ handlePidFile def action pidf =
 maxProc :: Int
 maxProc = 5
 
-data Meminfo = MI !String !Int
+type Meminfo = (String, Int)
 
 meminfo :: FilePath -> IO Meminfo
-meminfo = handlePidFile (MI "" 0) $ \fs ->
-  let m = pageSize * (read $! (fs !! 23))
-      n = drop 1 $! init (fs !! 1)
-  in evaluate $! MI n m
+meminfo = handlePidFile ("", 0) $ \fs ->
+  let !m = pageSize * read (fs !! 23)
+      !n = drop 1 $ init (fs !! 1)
+  in evaluate (n, m)
 
 meminfos :: IO [Meminfo]
 meminfos = do
@@ -90,11 +91,10 @@ meminfos = do
 
 topMemProcesses :: Int -> IO [Meminfo]
 topMemProcesses n = fmap (take n . sbm) meminfos
-  where sbm = sortBy cmp
-        cmp (MI _ x) (MI _ y) = compare y x
+  where sbm = sortBy (flip (comparing snd))
 
 showMeminfo :: Meminfo -> Monitor [String]
-showMeminfo (MI nm rss) =
+showMeminfo (nm, rss) =
   showInfo nm sms (ms / 1024)
     where ms = fromIntegral rss
           sms = showWithUnits 2 1 ms
@@ -105,45 +105,47 @@ runTopMem _ = do
   pstr <- mapM showMeminfo ps
   parseTemplate $ concat pstr
 
-data Timeinfo = TI !String !Float
-type Times = IntMap Timeinfo
-data TimesVal = TiV !Int !String !Float
+type Pid = Int
+type TimeInfo = (String, Float)
+type TimeEntry = (Pid, TimeInfo)
+type Times = IntMap TimeInfo
+type TIVar = MVar Times
 
-timeinfo :: FilePath -> IO TimesVal
-timeinfo = handlePidFile (TiV 0 "" 0) $ \fs ->
-  let pid = read (head fs)
-      rf = read . (fs!!)
-      n = drop 1 $ init (fs!!1)
-  in evaluate $! TiV pid n (rf 13 + rf 14)
+timeinfo :: FilePath -> IO TimeEntry
+timeinfo = handlePidFile (0, ("", 0)) $ \fs ->
+  let rf = read . (fs!!)
+      !pid = read (head fs)
+      !n = drop 1 $ init (fs!!1)
+      !t = rf 13 + rf 14
+  in evaluate $ (pid, (n, t))
 
 timeinfos :: IO Times
 timeinfos = do
   fs <- processes
   tis <- mapM timeinfo $! fs
-  return $! foldl' acc M.empty tis
-  where acc m (TiV p n t) = M.insert p (TI n t) m
+  return $ foldl' acc M.empty tis
+  where acc m (p, (n, t)) = M.insert p (n, t) m
 
 combineTimeInfos :: Times -> Times -> Times
-combineTimeInfos t0 t1 = M.intersectionWith timeDiff t1 t0
-  where timeDiff (TI n x1) (TI _ x0) = TI n (x1 - x0)
+combineTimeInfos !t0 !t1 = M.intersectionWith timeDiff t1 t0
+  where timeDiff (n, x1) (_, x0) = (n, (x1 - x0))
 
-type TIVar = MVar Times
-
-topTimeProcesses :: Int -> TIVar -> Float -> IO [Timeinfo]
+topTimeProcesses :: Int -> TIVar -> Float -> IO [TimeInfo]
 topTimeProcesses n tivar lapse = do
   modifyMVar tivar $ \t0 ->
-    timeinfos >>= (\(!t1) -> let ts = M.elems $ combineTimeInfos t0 t1
-                                 sts = take n $ sortBy cmp ts
-                                 cmp (TI _ x) (TI _ y) = compare y x
-                                 norm (TI nm t) = TI nm (100 * t / lapse)
-                             in return $! (t1, map norm sts))
+    timeinfos >>= (\t1 ->
+                    let !ts = M.elems $ combineTimeInfos t0 t1
+                        !sts = take n $ sortBy (flip (comparing snd)) ts
+                        !nts = map norm sts
+                        norm (nm, t) = (nm, 100 * t / lapse)
+                    in return $ (t1, nts))
 
-showTimeInfo :: Timeinfo -> Monitor [String]
-showTimeInfo (TI n t) = showInfo n (showDigits 1 t) t
+showTimeInfo :: TimeInfo -> Monitor [String]
+showTimeInfo (n, t) = showInfo n (showDigits 1 t) t
 
 runTopCpu :: TIVar -> Float -> [String] -> Monitor String
 runTopCpu tivar lapse _ = do
-   ps <- io $! topTimeProcesses maxProc tivar lapse
+   ps <- io $ topTimeProcesses maxProc tivar lapse
    pstr <- mapM showTimeInfo ps
    parseTemplate $ concat pstr
 
