@@ -353,6 +353,28 @@ Monitors have default aliases.
 	    `left`
 - Default template: `Batt: <left>`
 
+`TopCpu Args RefreshRate`
+
+- aliases to `top`
+- Args: the argument list (see below)
+- Variables that can be used with the `-t`/`--template` argument:
+	    `name1`, `cpu1`, `both1`, `name2`, `cpu2`, `both2`, ...
+- Default template: `<both1>`
+- Displays the name and cpu usage of running processes (`bothn`
+  displays both, and is useful to specify an overall maximum and/or
+  minimum width, using the `-m`/`-M` arguments.
+
+`TopMem Args RefreshRate`
+
+- aliases to `topmem`
+- Args: the argument list (see below)
+- Variables that can be used with the `-t`/`--template` argument:
+	    `name1`, `rss1`, `both1`, `name2`, `rss2`, `both2`, ...
+- Default template: `<both1>`
+- Displays the name and RSS (resident memory size) of running
+  processes (`bothn` displays both, and is useful to specify an
+  overall maximum and/or minimum width, using the `-m`/`-M` arguments.
+
 `DiskU Disks Args RefreshRate`
 
 - aliases to `disku`
