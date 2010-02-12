@@ -18,47 +18,37 @@ import qualified Data.ByteString.Lazy.Char8 as B
 import Plugins.Monitors.Common
 import System.Posix.Files (fileExist)
 
-data Batt = Batt Float String
+data Batt = Batt Float
           | NA
 
 battConfig :: IO MConfig
 battConfig = mkMConfig
        "Batt: <left>" -- template
-       ["left","status"] -- available replacements
+       ["left"]       -- available replacements
 
-type File = (String, String)
+file2batfile :: String -> (String, String)
+file2batfile s = ("/proc/acpi/battery/"++ s ++ "/info", "/proc/acpi/battery/"++ s ++ "/state")
 
-file2batfile :: String -> (File, File)
-file2batfile s = ( (s' ++ "/charge_full", s' ++ "/energy_full")
-                 , (s' ++ "/charge_now" , s' ++ "/energy_now" )
-                 )
-    where s' = "/sys/class/power_supply/" ++ s
-
-readFileBatt :: (File, File) -> IO (String, String, String)
-readFileBatt (f,n) =
-    do a  <- rf f
-       b  <- rf n
-       ac <- fileExist "/sys/class/power_supply/AC0/online"
-       c  <- if not ac
-             then return []
-             else do s <- B.unpack `fmap` catRead "/sys/class/power_supply/AC0/online"
-                     return $ if s == "1\n" then "<fc=green>On</fc>" else"<fc=red>Off</fc>"
-       return (a,b,c)
+readFileBatt :: (String, String) -> IO (B.ByteString, B.ByteString)
+readFileBatt (i,s) =
+    do a <- rf i
+       b <- rf s
+       return (a,b)
     where rf file = do
-            fe <- fileExist (fst file)
-            if fe
-               then B.unpack `fmap` catRead (fst file)
-               else do fe' <- fileExist (snd file)
-                       if fe'
-                          then B.unpack `fmap` catRead (snd file)
-                          else return []
+            f <- fileExist file
+            if f then catRead file else return B.empty
 
-parseBATT :: [(File,File)] -> IO Batt
+parseBATT :: [(String, String)] -> IO Batt
 parseBATT bfs =
-    do [(a0,b0,c0),(a1,b1,_),(a2,b2,_)] <- mapM readFileBatt (take 3 $ bfs ++ repeat (("",""),("","")))
-       let read' s = if s == [] then 0 else read s
-           left    = (read' b0 + read' b1 + read' b2) / (read' a0 + read' a1 + read' a2) --present / full
-       return $ if isNaN left then NA else Batt left c0
+    do [(a0,b0),(a1,b1),(a2,b2)] <- mapM readFileBatt (take 3 $ bfs ++ repeat ("",""))
+       let sp p s = case stringParser p s of
+                      [] -> 0
+                      x -> read x
+           (f0, p0) = (sp (3,2) a0, sp (2,4) b0)
+           (f1, p1) = (sp (3,2) a1, sp (2,4) b1)
+           (f2, p2) = (sp (3,2) a2, sp (2,4) b2)
+           left = (p0 + p1 + p2) / (f0 + f1 + f2) --present / full
+       return $ if isNaN left then NA else Batt left
 
 formatBatt :: Float -> Monitor [String]
 formatBatt x = showPercentsWithColors [x]
@@ -70,6 +60,6 @@ runBatt' :: [String] -> [String] -> Monitor String
 runBatt' bfs _ = do
   c <- io $ parseBATT (map file2batfile bfs)
   case c of
-    Batt x s -> do l <- formatBatt x
-                   parseTemplate (l ++ [s])
+    Batt x -> do l <- formatBatt x
+                 parseTemplate l
     NA -> return "N/A"
