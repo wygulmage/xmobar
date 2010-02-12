@@ -23,7 +23,7 @@ import System.Directory
 import System.FilePath
 import System.Posix.Unistd (getSysVar, SysVar(ClockTick))
 import Foreign.C.Types
-import Data.List (sortBy, foldl')
+import Data.List (sortBy)
 import Data.Ord (comparing)
 import Data.IORef
 
@@ -111,24 +111,20 @@ type TimeEntry = (Pid, TimeInfo)
 type Times = IntMap TimeInfo
 type TimesRef = IORef Times
 
-timeinfo :: FilePath -> IO TimeEntry
-timeinfo = handlePidFile (0, ("", 0)) $ \fs ->
+timeEntry :: FilePath -> IO TimeEntry
+timeEntry = handlePidFile (0, ("", 0)) $ \fs ->
   let rf = read . (fs!!)
       !pid = read (head fs)
       !n = drop 1 $ init (fs!!1)
       !t = rf 13 + rf 14
-  in evaluate $ (pid, (n, t))
+  in evaluate (pid, (n, t))
 
 timeinfos :: IO Times
-timeinfos = do
-  fs <- processes
-  tis <- mapM timeinfo $! fs
-  return $ foldl' acc M.empty tis
-  where acc m (p, (n, t)) = M.insert p (n, t) m
+timeinfos = fmap M.fromList (processes >>= mapM timeEntry)
 
 combineTimeInfos :: Times -> Times -> Times
 combineTimeInfos !t0 !t1 = M.intersectionWith timeDiff t1 t0
-  where timeDiff (n, x1) (_, x0) = (n, (x1 - x0))
+  where timeDiff (n, x1) (_, x0) = (n, x1 - x0)
 
 topTimeProcesses :: Int -> TimesRef -> Float -> IO [TimeInfo]
 topTimeProcesses n tref lapse = do
