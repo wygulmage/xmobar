@@ -147,7 +147,14 @@ parseConfig = runParser parseConf fields "Config" . stripComments
       pLowerOnStart = field lowerOnStart "lowerOnStart" $ tillFieldEnd >>= read' "lowerOnStart"
       pCommands     = field commands     "commands"     $ readCommands
 
-      tillFieldEnd = many $ noneOf ",}\n\r"
+      staticPos = do string "Static"
+                     wrapSkip (string "{")
+                     p <- many (noneOf "}")
+                     wrapSkip (string "}")
+                     string ","
+                     return ("Static {"  ++ p  ++ "}")
+      tillFieldEnd = staticPos <|> many (noneOf ",}\n\r")
+
       commandsEnd  = wrapSkip (string "]") >> oneOf "},"
       readCommands = manyTill anyChar (try commandsEnd) >>= read' commandsErr . flip (++) "]"
 
@@ -164,7 +171,7 @@ parseConfig = runParser parseConf fields "Config" . stripComments
 
       read' d s = case reads s of
                     [(x, _)] -> return x
-                    _        -> fail $ "error reading field: " ++ d
+                    _        -> fail $ "error reading the " ++ d ++ " field: " ++ s
 
 commandsErr :: String
 commandsErr = "commands: this usually means that a command could not be parsed.\n" ++
