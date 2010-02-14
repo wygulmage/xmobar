@@ -15,7 +15,6 @@
 module Plugins.Mail where
 
 import Prelude hiding (catch)
-import System.IO
 import Plugins
 
 import Control.Monad
