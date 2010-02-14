@@ -33,7 +33,7 @@ flag with_inotify
 
 executable xmobar
     main-is:            Main.hs
-    other-Modules:      Xmobar, Config, Parsers, Commands, XUtil, Runnable, Plugins
+    other-Modules:      Xmobar, Config, Parsers, Commands, XUtil, Runnable, Plugins, Plugins.Monitors.StatFS
     ghc-options:        -funbox-strict-fields -Wall
     ghc-prof-options:   -prof -auto-all
 
