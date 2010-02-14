@@ -15,11 +15,11 @@
 module Plugins.MBox (MBox(..)) where
 
 import Prelude hiding (catch)
-import System.IO
 import Plugins
 
 import Control.Monad
 import Control.Concurrent.STM
+import Control.Exception (SomeException, handle, evaluate)
 
 import System.Directory
 import System.FilePath
@@ -45,9 +45,9 @@ instance Exec MBox where
         ev = [Modify, Create]
 
     i <- initINotify
-    zipWithM_ (\f v -> addWatch i ev f (handle v)) fs vs
+    zipWithM_ (\f v -> addWatch i ev f (handleNotification v)) fs vs
 
-    forM (zip fs vs) $ \(f, v) -> do
+    forM_ (zip fs vs) $ \(f, v) -> do
       exists <- doesFileExist f
       n <- if exists then countMails f else return 0
       atomically $ writeTVar v (f, n)
@@ -61,12 +61,13 @@ showC m n c =
     where msg = m ++ show n
 
 countMails :: FilePath -> IO Int
-countMails f = do
-  txt <- readFileSafe f
-  return $ length . filter (isPrefixOf "From ") . lines $ txt
+countMails f =
+  handle ((\_ -> evaluate 0) :: SomeException -> IO Int)
+         (do txt <- readFileSafe f
+             evaluate $! length . filter (isPrefixOf "From ") . lines $ txt)
 
-handle :: TVar (FilePath, Int) -> Event -> IO ()
-handle v _ =  do
+handleNotification :: TVar (FilePath, Int) -> Event -> IO ()
+handleNotification v _ =  do
   (p, _) <- atomically $ readTVar v
   n <- countMails p
   atomically $ writeTVar v (p, n)

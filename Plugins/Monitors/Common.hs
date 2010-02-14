@@ -53,7 +53,6 @@ module Plugins.Monitors.Common (
 
 import Control.Concurrent
 import Control.Monad.Reader
-import Control.Monad (zipWithM)
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.IORef
 import qualified Data.Map as Map
