@@ -102,8 +102,8 @@ type Meminfo = (String, Int)
 
 meminfo :: [String] -> Meminfo
 meminfo fs = (n, r)
-  where !n = processName fs
-        !r = pageSize * (read (fs!!23))
+  where n = processName fs
+        r = pageSize * (read (fs!!23))
 
 meminfos :: IO [Meminfo]
 meminfos = handleProcesses ("", 0) meminfo
@@ -132,9 +132,9 @@ type TimesRef = IORef Times
 
 timeEntry :: [String] -> TimeEntry
 timeEntry fs = (p, (n, t))
-  where !p = read (head fs)
-        !n = processName fs
-        !t = read (fs!!13) + read (fs!!14)
+  where p = read (head fs)
+        n = processName fs
+        t = read (fs!!13) + read (fs!!14)
 
 timeEntries :: IO [TimeEntry]
 timeEntries = handleProcesses (0, ("", 0)) timeEntry
@@ -168,7 +168,7 @@ runTopCpu tref lapse _ = do
 
 startTopCpu :: [String] -> Int -> (String -> IO ()) -> IO ()
 startTopCpu a r cb = do
-  t <- getSysVar ClockTick
+  cr <- getSysVar ClockTick
   tref <- newIORef M.empty
-  let lapse = (fromIntegral r * fromIntegral t) / 10
+  let lapse = (fromIntegral r * fromIntegral cr) / 10
   runM a topCpuConfig (runTopCpu tref lapse) r cb
