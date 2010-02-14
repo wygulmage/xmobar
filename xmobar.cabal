@@ -28,13 +28,13 @@ flag with_utf8
   description: With UTF-8 support.
 
 flag with_inotify
-  description: inotify support (modern Linux only).  Required for the Mail plugin.
+  description: inotify support (modern Linux only).  Required for the Mail and MBox plugins.
   default: False
 
 executable xmobar
     main-is:            Main.hs
-    other-Modules:      Xmobar, Config, Parsers, Commands, XUtil, Runnable, Plugins, Plugins.Monitors.StatFS
-    ghc-options:        -funbox-strict-fields -Wall
+
+    other-modules:      Xmobar, Config, Parsers, Commands, XUtil, Runnable, Plugins, Plugins.Monitors.StatFS
     ghc-prof-options:   -prof -auto-all
 
     if true
