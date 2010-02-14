@@ -15,12 +15,12 @@
 {-# LANGUAGE CPP, ForeignFunctionInterface, EmptyDataDecls #-}
 
 
-module Plugins.Monitors.StatFS (FileSystemStats(..), getFileSystemStats) where
+module Plugins.Monitors.StatFS ( FileSystemStats(..)
+                               , getFileSystemStats ) where
 
 import Foreign
 import Foreign.C.Types
 import Foreign.C.String
-import Foreign.Storable
 import Data.ByteString (useAsCString)
 import Data.ByteString.Char8 (pack)
 
@@ -54,9 +54,8 @@ getFileSystemStats path =
   allocaBytes (#size struct statfs) $ \vfs ->
   useAsCString (pack path) $ \cpath -> do
     res <- c_statfs cpath vfs
-    case res of
-      -1 -> return Nothing
-      _  -> do
+    if res == -1 then return Nothing
+      else do
         bsize <- (#peek struct statfs, f_bsize) vfs
         bcount <- (#peek struct statfs, f_blocks) vfs
         bfree <- (#peek struct statfs, f_bfree) vfs
