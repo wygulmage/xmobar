@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Plugins.Monitors.StatFS
+-- Module      :  StatFS
 -- Copyright   :  (c) Jose A Ortega Ruiz
 -- License     :  BSD-style (see LICENSE)
 --
@@ -15,8 +15,7 @@
 {-# LANGUAGE CPP, ForeignFunctionInterface, EmptyDataDecls #-}
 
 
-module Plugins.Monitors.StatFS ( FileSystemStats(..)
-                               , getFileSystemStats ) where
+module StatFS ( FileSystemStats(..), getFileSystemStats ) where
 
 import Foreign
 import Foreign.C.Types

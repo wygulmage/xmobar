@@ -17,7 +17,7 @@ module Plugins.Monitors.Disk ( diskUConfig, runDiskU
                              ) where
 
 import Plugins.Monitors.Common
-import Plugins.Monitors.StatFS
+import StatFS
 
 import Control.Monad (zipWithM)
 import qualified Data.ByteString.Lazy.Char8 as B

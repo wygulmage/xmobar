@@ -433,7 +433,7 @@ Monitors have default aliases.
 - Args: list of maildirs in form [("name1","path1"),("name2","path2")]
 - This plugin requires INOTIFY support in Linux kernel and hinotify library.
   To activate, pass --flags="with_inotify" to "runhaskell Setup configure"
-  or to "cabal configure".
+  or to "cabal install".
 
 `MBox Mboxes BaseDir`
 
@@ -447,7 +447,7 @@ Monitors have default aliases.
   absolute.
 - This plugin requires INOTIFY support in Linux kernel and hinotify library.
   To activate, pass --flags="with_inotify" to "runhaskell Setup
-  configure" or to "cabal configure".
+  configure" or to "cabal install".
 - Example:
    `Run MBox [("I ", "inbox", "red"), ("O ", "/foo/mbox", "")] "/var/mail/"`
   will look for mails in /var/mail/inbox and /foo/mbox.
