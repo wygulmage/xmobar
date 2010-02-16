@@ -76,7 +76,7 @@ getProcessData :: FilePath -> IO [String]
 getProcessData pidf =
   handle ((\_ -> evaluate []) :: SomeException -> IO [String])
          (do s <- strictReadFile $ "/proc" </> pidf </> "stat"
-             evaluate $ words $! s)
+             evaluate $! words s)
 
 processes :: IO [FilePath]
 processes = do
@@ -150,7 +150,7 @@ topTimeProcesses :: Int -> TimesRef -> Float -> IO [TimeInfo]
 topTimeProcesses n tref lapse = do
   t1 <- timeinfos
   t0 <- readIORef tref
-  writeIORef tref $! t1
+  modifyIORef tref (const $! t1)
   let !ts = M.elems $ combineTimeInfos t0 t1
       !sts = take n $ sortBy (flip (comparing snd)) ts
       !nts = map norm sts
