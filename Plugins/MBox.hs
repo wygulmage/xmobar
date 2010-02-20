@@ -25,7 +25,7 @@ import System.Directory
 import System.FilePath
 import System.INotify
 
-import Data.List (isPrefixOf)
+import qualified Data.ByteString.Lazy.Char8 as B
 
 -- | A list of display names, paths to mbox files and display colours,
 -- followed by a directory to resolve relative path names (can be "")
@@ -63,8 +63,9 @@ showC m n c =
 countMails :: FilePath -> IO Int
 countMails f =
   handle ((\_ -> evaluate 0) :: SomeException -> IO Int)
-         (do txt <- readFileSafe f
-             evaluate $! length . filter (isPrefixOf "From ") . lines $ txt)
+         (do txt <- B.readFile f
+             evaluate $! length . filter (B.isPrefixOf from) . B.lines $ txt)
+  where from = B.pack "From "
 
 handleNotification :: TVar (FilePath, Int) -> Event -> IO ()
 handleNotification v _ =  do
