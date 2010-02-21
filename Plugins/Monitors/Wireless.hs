@@ -26,6 +26,6 @@ runWireless (iface:_) = do
   let essid = wiEssid wi
       quality = wiQuality wi
       e = if essid == "" then "N/A" else essid
-  q <- if quality >= 0 then showWithColors show quality else return "N/A"
+  q <- if quality >= 0 then showWithColors show quality else return ""
   parseTemplate [e, q]
 runWireless _ = return ""
