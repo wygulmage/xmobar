@@ -300,6 +300,19 @@ Monitors have default aliases.
 	    `dev`, `rx`, `tx`
 - Default template: `<dev>: <rx>|<tx>`
 
+`Wireless Interface Args RefreshRate`
+
+- aliases to the interface name with the suffix "wi": thus, `Wirelss
+  "wlan0" []` can be used as `%wlan0wi%`
+- Args: the argument list (see below)
+- Variables that can be used with the `-t`/`--template` argument:
+            `essid`, `quality`
+- Default template: `<essid> <quality>`
+- Requires the C library libiw (part of the wireless tools suite)
+  installed in your system. In addition, to activate this plugin you
+  must pass --flags="with_iwlib" to "runhaskell Setup configure"
+  or to "cabal install".
+
 `Memory Args RefreshRate`
 
 - aliases to `memory`

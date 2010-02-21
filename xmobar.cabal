@@ -31,9 +31,13 @@ flag with_inotify
   description: inotify support (modern Linux only).  Required for the Mail plugin.
   default: False
 
+flag with_iwlib
+  description: wireless info support. Required for the Wireless plugin, needs iwlib installed.
+  default: False
+
 executable xmobar
     main-is:            Main.hs
-    other-Modules:      Xmobar, Config, Parsers, Commands, XUtil, StatFS, Runnable, Plugins
+    other-modules:      Xmobar, Config, Parsers, Commands, XUtil, StatFS, Runnable, Plugins
     ghc-prof-options:   -prof -auto-all
 
     if true
@@ -65,3 +69,7 @@ executable xmobar
        build-depends: hinotify
        cpp-options: -DINOTIFY
 
+    if flag(with_iwlib)
+       extra-libraries: iw
+       other-modules: IWlib
+       cpp-options: -DIWLIB

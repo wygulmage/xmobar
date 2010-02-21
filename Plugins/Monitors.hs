@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Xmobar.Plugins.Monitors
@@ -29,6 +31,9 @@ import Plugins.Monitors.CpuFreq
 import Plugins.Monitors.CoreTemp
 import Plugins.Monitors.Disk
 import Plugins.Monitors.Top
+#ifdef IWLIB
+import Plugins.Monitors.Wireless
+#endif
 
 data Monitors = Weather  Station    Args Rate
               | Network  Interface  Args Rate
@@ -45,6 +50,9 @@ data Monitors = Weather  Station    Args Rate
               | CoreTemp Args       Rate
               | TopCpu   Args       Rate
               | TopMem   Args       Rate
+#ifdef IWLIB
+              | Wireless Interface  Args Rate
+#endif
                 deriving (Show,Read,Eq)
 
 type Args      = [String]
@@ -72,6 +80,10 @@ instance Exec Monitors where
     alias (CoreTemp   _ _) = "coretemp"
     alias (DiskU    _ _ _) = "disku"
     alias (DiskIO   _ _ _) = "diskio"
+#ifdef IWLIB
+    alias (Wireless i _ _) = i ++ "wi"
+    start (Wireless i a r) = runM (a ++ [i]) wirelessConfig  runWireless  r
+#endif
     start (Weather  s a r) = runM (a ++ [s]) weatherConfig  runWeather    r
     start (Network  i a r) = runM (a ++ [i]) netConfig      runNet        r
     start (Thermal  z a r) = runM (a ++ [z]) thermalConfig  runThermal    r
