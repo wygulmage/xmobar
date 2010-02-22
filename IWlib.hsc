@@ -69,7 +69,8 @@ getWirelessInfo iface =
                    qualv <- (#peek struct iw_param, value) qual :: IO CInt
                    let qualm = (#ptr struct iw_range, max_qual) rng
                    mv <- (#peek struct iw_param, value) qualm :: IO CInt
-                   return $ fromIntegral qualv / fromIntegral (max 1 mv)
+                   let mxv = if mv > 0 then fromIntegral mv else 1
+                   return $ fromIntegral qualv / mxv
               else return (-1)
          let qv = round (100 * (q :: Double))
-         return $ WirelessInfo { wiEssid = essid, wiQuality = qv }
+         return $ WirelessInfo { wiEssid = essid, wiQuality = min 100 qv }

@@ -36,6 +36,7 @@ module Plugins.Monitors.Common (
                        -- ** String Manipulation
                        -- $strings
                        , padString
+                       , showWithPadding
                        , showWithColors
                        , showWithColors'
                        , showPercentsWithColors
@@ -339,15 +340,20 @@ setColor str s =
             Just c -> return $
                 "<fc=" ++ c ++ ">" ++ str ++ "</fc>"
 
+showWithPadding :: String -> Monitor String
+showWithPadding s =
+    do mn <- getConfigValue minWidth
+       mx <- getConfigValue maxWidth
+       p <- getConfigValue padChars
+       pr <- getConfigValue padRight
+       return $ padString mn mx p pr s
+
 showWithColors :: (Num a, Ord a) => (a -> String) -> a -> Monitor String
 showWithColors f x =
     do h <- getConfigValue high
        l <- getConfigValue low
-       mn <- getConfigValue minWidth
-       mx <- getConfigValue maxWidth
-       p <- getConfigValue padChars
-       pr <- getConfigValue padRight
-       let col = setColor $ padString mn mx p pr $ f x
+       s <- showWithPadding $ f x
+       let col = setColor s
            [ll,hh] = map fromIntegral $ sort [l, h] -- consider high < low
        head $ [col highColor   | x > hh ] ++
               [col normalColor | x > ll ] ++
