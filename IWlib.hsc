@@ -59,7 +59,7 @@ getWirelessInfo iface =
     if (bcr < 0) then return nullInfo else
       do hase <- (#peek struct wireless_config, has_essid) wc :: IO CInt
          eon <- (#peek struct wireless_config, essid_on) wc :: IO CInt
-         essid <- if hase > 0 && eon > 0 then
+         essid <- if hase /= 0 && eon /= 0 then
                     do l <- (#peek struct wireless_config, essid_len) wc
                        let e = (#ptr struct wireless_config, essid) wc
                        peekCStringLen (e, fromIntegral (l :: CInt))
@@ -67,7 +67,7 @@ getWirelessInfo iface =
          q <- if str >= 0 && rgr >=0 then
                 do qualv <- xqual $ (#ptr struct iw_statistics, qual) stats
                    mv <- xqual $ (#ptr struct iw_range, max_qual) rng
-                   let mxv = if mv > 0 then fromIntegral mv else 1
+                   let mxv = if mv /= 0 then fromIntegral mv else 1
                    return $ fromIntegral qualv / mxv
               else return (-1)
          let qv = round (100 * (q :: Double))
