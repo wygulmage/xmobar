@@ -154,7 +154,7 @@ topTimeProcesses n tref lapse = do
   let !ts = M.elems $ combineTimeInfos t0 t1
       !sts = take n $ sortBy (flip (comparing snd)) ts
       !nts = map norm sts
-      norm (nm, t) = (nm, 100 * t / lapse)
+      norm (nm, t) = (nm, min 100 $ 100 * t / lapse)
   return nts
 
 showTimeInfo :: TimeInfo -> Monitor [String]
