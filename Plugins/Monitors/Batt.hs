@@ -24,7 +24,7 @@ data Batt = Batt Float String
 battConfig :: IO MConfig
 battConfig = mkMConfig
        "Batt: <left>" -- template
-       ["left","status"] -- available replacements
+       ["leftbar", "left", "status"] -- available replacements
 
 type File = (String, String)
 
@@ -61,7 +61,10 @@ parseBATT bfs =
        return $ if isNaN left then NA else Batt left c0
 
 formatBatt :: Float -> Monitor [String]
-formatBatt x = showPercentsWithColors [x]
+formatBatt x = do
+  p <- showPercentsWithColors [x]
+  b <- showPercentBar (100 * x) x
+  return (b:p)
 
 runBatt :: [String] -> Monitor String
 runBatt = runBatt' ["BAT0","BAT1","BAT2"]

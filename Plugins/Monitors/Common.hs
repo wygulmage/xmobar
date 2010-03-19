@@ -40,6 +40,7 @@ module Plugins.Monitors.Common (
                        , showWithColors
                        , showWithColors'
                        , showPercentsWithColors
+                       , showPercentBar
                        , showWithUnits
                        , takeDigits
                        , showDigits
@@ -348,16 +349,18 @@ showWithPadding s =
        pr <- getConfigValue padRight
        return $ padString mn mx p pr s
 
+colorizeString :: (Num a, Ord a) => a -> String -> Monitor String
+colorizeString x s = do
+    h <- getConfigValue high
+    l <- getConfigValue low
+    let col = setColor s
+        [ll,hh] = map fromIntegral $ sort [l, h] -- consider high < low
+    head $ [col highColor   | x > hh ] ++
+           [col normalColor | x > ll ] ++
+           [col lowColor    | True]
+
 showWithColors :: (Num a, Ord a) => (a -> String) -> a -> Monitor String
-showWithColors f x =
-    do h <- getConfigValue high
-       l <- getConfigValue low
-       s <- showWithPadding $ f x
-       let col = setColor s
-           [ll,hh] = map fromIntegral $ sort [l, h] -- consider high < low
-       head $ [col highColor   | x > hh ] ++
-              [col normalColor | x > ll ] ++
-              [col lowColor    | True]
+showWithColors f x = showWithPadding (f x) >>= colorizeString x
 
 showWithColors' :: (Num a, Ord a) => String -> a -> Monitor String
 showWithColors' str v = showWithColors (const str) v
@@ -366,6 +369,19 @@ showPercentsWithColors :: [Float] -> Monitor [String]
 showPercentsWithColors fs =
   do fstrs <- mapM floatToPercent fs
      zipWithM (showWithColors . const) fstrs (map (*100) fs)
+
+barBackground :: Char
+barBackground = ':'
+barForeground :: Char
+barForeground = '#'
+barLength :: Int
+barLength = 10
+
+showPercentBar :: Float -> Float -> Monitor String
+showPercentBar v x = do
+  let len = min barLength $ round (fromIntegral barLength * x)
+  s <- colorizeString v (replicate len barForeground)
+  return $ s ++ replicate (barLength - len) barBackground
 
 -- $threads
 

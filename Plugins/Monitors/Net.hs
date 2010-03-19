@@ -29,14 +29,14 @@ interval = 500000
 netConfig :: IO MConfig
 netConfig = mkMConfig
     "<dev>: <rx>|<tx>"      -- template
-    ["dev", "rx", "tx"]     -- available replacements
+    ["dev", "rx", "tx", "rxbar", "txbar"]     -- available replacements
 
 -- Given a list of indexes, take the indexed elements from a list.
 getNElements :: [Int] -> [a] -> [a]
 getNElements ns as = map (as!!) ns
 
 -- Split into words, with word boundaries indicated by the given predicate.
--- Drops delimiters.  Duplicates 'Data.List.Split.wordsBy'. 
+-- Drops delimiters.  Duplicates 'Data.List.Split.wordsBy'.
 --
 -- > map (wordsBy (`elem` " :")) ["lo:31174097 31174097", "eth0:  43598 88888"]
 --
@@ -62,17 +62,21 @@ netParser :: B.ByteString -> [NetDev]
 netParser =
     map (readNetDev . getNElements [0,1,9] . wordsBy (`elem` " :") . B.unpack) . drop 2 . B.lines
 
-formatNet :: Float -> Monitor String
-formatNet d =
-    showWithColors f d
-        where f s = showDigits 1 s ++ "Kb"
+formatNet :: Float -> Monitor (String, String)
+formatNet d = do
+    h <- getConfigValue high
+    let dx = 8 + logBase 10 (d / fromIntegral h)
+    b <- showPercentBar d $ max (dx / 10) 0
+    x <- showWithColors f d
+    return (x, b)
+      where f s = showDigits 1 s ++ "Kb"
 
 printNet :: NetDev -> Monitor String
 printNet nd =
     case nd of
-         ND d r t -> do rx <- formatNet r
-                        tx <- formatNet t
-                        parseTemplate [d,rx,tx]
+         ND d r t -> do (rx, rb) <- formatNet r
+                        (tx, tb) <- formatNet t
+                        parseTemplate [d,rx,tx,rb,tb]
          NA -> return "N/A"
 
 parseNET :: String -> IO [NetDev]

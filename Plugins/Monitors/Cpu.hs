@@ -20,7 +20,7 @@ import qualified Data.ByteString.Lazy.Char8 as B
 cpuConfig :: IO MConfig
 cpuConfig = mkMConfig
        "Cpu: <total>"                           -- template
-       ["total","user","nice","system","idle"]  -- available replacements
+       ["bar","total","user","nice","system","idle"]  -- available replacements
 
 cpuData :: IO [Float]
 cpuData = do s <- B.readFile "/proc/stat"
@@ -40,7 +40,11 @@ parseCPU =
 
 formatCpu :: [Float] -> Monitor [String]
 formatCpu [] = return [""]
-formatCpu xs = showPercentsWithColors $ (foldr (+) 0 $ take 3 xs) : xs
+formatCpu xs = do
+  let t = foldr (+) 0 $ take 3 xs
+  b <- showPercentBar (100 * t) t
+  ps <- showPercentsWithColors (t:xs)
+  return (b:ps)
 
 runCpu :: [String] -> Monitor String
 runCpu _ =

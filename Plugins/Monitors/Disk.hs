@@ -27,7 +27,8 @@ diskIOConfig :: IO MConfig
 diskIOConfig = mkMConfig "" ["total", "read", "write"]
 
 diskUConfig :: IO MConfig
-diskUConfig = mkMConfig "" ["size", "free", "used", "freep", "usedp"]
+diskUConfig = mkMConfig ""
+              ["size", "free", "used", "freep", "usedp", "freebar", "usedbar"]
 
 type DevName = String
 type Path = String
@@ -123,7 +124,9 @@ runDiskU' tmp path = do
       fr = fromIntegral freep / 100
   s <- zipWithM showWithColors' strs [100, freep, 100 - freep]
   sp <- showPercentsWithColors [fr, 1 - fr]
-  parseTemplate $ s ++ sp
+  fb <- showPercentBar (fromIntegral freep) fr
+  ub <- showPercentBar (fromIntegral $ 100 - freep) (1 - fr)
+  parseTemplate $ s ++ sp ++ [fb, ub]
 
 runDiskU :: [(String, String)] -> [String] -> Monitor String
 runDiskU disks _ = do

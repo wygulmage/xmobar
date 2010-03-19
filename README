@@ -297,7 +297,7 @@ Monitors have default aliases.
 - aliases to the interface name: so `Network "eth0" []` can be used as `%eth0%`
 - Args: the argument list (see below)
 - Variables that can be used with the `-t`/`--template` argument:
-	    `dev`, `rx`, `tx`
+	    `dev`, `rx`, `tx`, `rxbar`, `txbar`
 - Default template: `<dev>: <rx>|<tx>`
 
 `Wireless Interface Args RefreshRate`
@@ -306,7 +306,7 @@ Monitors have default aliases.
   "wlan0" []` can be used as `%wlan0wi%`
 - Args: the argument list (see below)
 - Variables that can be used with the `-t`/`--template` argument:
-            `essid`, `quality`
+            `essid`, `quality`, `qualitybar`
 - Default template: `<essid> <quality>`
 - Requires the C library libiw (part of the wireless tools suite)
   installed in your system. In addition, to activate this plugin you
@@ -318,7 +318,8 @@ Monitors have default aliases.
 - aliases to `memory`
 - Args: the argument list (see below)
 - Variables that can be used with the `-t`/`--template` argument:
-	    `total`, `free`, `buffer`, `cache`, `rest`, `used`, `usedratio`
+             `total`, `free`, `buffer`, `cache`, `rest`, `used`,
+             `usedratio`, `usedbar`, `freebar`
 - Default template: `Mem: <usedratio>% (<cache>M)`
 
 `Swap Args RefreshRate`
@@ -334,7 +335,7 @@ Monitors have default aliases.
 - aliases to `cpu`
 - Args: the argument list (see below)
 - Variables that can be used with the `-t`/`--template` argument:
-	    `total`, `user`, `nice`, `system`, `idle`
+	    `total`, `bar`, `user`, `nice`, `system`, `idle`
 - Default template: `Cpu: <total>`
 
 `MultiCpu Args RefreshRate`
@@ -342,8 +343,8 @@ Monitors have default aliases.
 - aliases to `multicpu`
 - Args: the argument list (see below)
 - Variables that can be used with the `-t`/`--template` argument:
-	    `total`, `user`, `nice`, `system`, `idle`,
-	    `total0`, `user0`, `nice0`, `system0`, `idle0`, ...
+	    `total`, `bar`, `user`, `nice`, `system`, `idle`,
+	    `total0`, `bar0`, `user0`, `nice0`, `system0`, `idle0`, ...
 - Default template: `Cpu: <total>`
 
 `Battery Args RefreshRate`
@@ -351,7 +352,7 @@ Monitors have default aliases.
 - aliases to `battery`
 - Args: the argument list (see below)
 - Variables that can be used with the `-t`/`--template` argument:
-	    `left`
+	    `left`, `leftbar`, `status`
 - Default template: `Batt: <left>`
 
 `BatteryP Dirs Args RefreshRate`
@@ -363,7 +364,7 @@ Monitors have default aliases.
   searched.
 - Args: the argument list (see below)
 - Variables that can be used with the `-t`/`--template` argument:
-	    `left`
+	    `left`, `leftbar`, `status`
 - Default template: `Batt: <left>`
 
 `TopCpu Args RefreshRate`
@@ -393,10 +394,10 @@ Monitors have default aliases.
 - aliases to `disku`
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain <size>, <free>, <used>, <freep> or
-  <usedp> for total, free, used, free percentage and used percentage
-  of the given file system capacity. Example:
-  `[("/", "<used>/<size>"), ("sdb1", "<usedp>")]`
-- Args: the argument list (see below). `-t`/`--template` is ignored.
+  <usedp>, <freebar> or <usedbar> for total, free, used, free
+  percentage and used percentage of the given file system capacity. Example:
+  `[("/", "<used>/<size>"), ("sdb1", "<usedbar>")]`
+- Args: the argument list (see above). `-t`/`--template` is ignored.
 - Default template: none (you must specify a template for each file system).
 
 `DiskIO Disks Args RefreshRate`
@@ -406,7 +407,7 @@ Monitors have default aliases.
   where the template can contain <total>, <read>, <write> for total,
   read and write speed, respectively. Example:
   `[("/", "<read> <write>"), ("sdb1", "<total>")]`
-- Args: the argument list (see below). `-t`/`--template` is ignored.
+- Args: the argument list (see above). `-t`/`--template` is ignored.
 - Default template: none (you must specify a template for each file system).
 
 `Thermal Zone Args RefreshRate`

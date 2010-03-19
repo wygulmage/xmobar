@@ -19,10 +19,10 @@ import qualified Data.ByteString.Lazy.Char8 as B
 import Data.List (isPrefixOf)
 
 multiCpuConfig :: IO MConfig
-multiCpuConfig = mkMConfig
-                 "Cpu: <total>"
-                 [ k ++ n | n <- "" : map show [0 :: Int ..]
-                          , k <- ["total","user","nice","system","idle"]]
+multiCpuConfig =
+  mkMConfig "Cpu: <total>"
+            [ k ++ n | n <- "" : map show [0 :: Int ..]
+                     , k <- ["bar","total","user","nice","system","idle"]]
 
 
 cpuData :: IO [[Float]]
@@ -53,8 +53,11 @@ formatMultiCpus xs = fmap concat $ mapM formatCpu xs
 
 formatCpu :: [Float] -> Monitor [String]
 formatCpu xs
-  | length xs < 4 = showPercentsWithColors $ replicate 5 0.0
-  | otherwise  = showPercentsWithColors $ (foldr (+) 0 $ take 3 xs) : xs
+  | length xs < 4 = showPercentsWithColors $ replicate 6 0.0
+  | otherwise = let t = foldr (+) 0 $ take 3 xs
+                in do b <- showPercentBar (100 * t) t
+                      ps <- showPercentsWithColors (t:xs)
+                      return (b:ps)
 
 runMultiCpu :: [String] -> Monitor String
 runMultiCpu _ =
