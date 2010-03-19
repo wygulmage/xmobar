@@ -482,6 +482,9 @@ These are the arguments that can be used for internal commands in the
     -w number           --width=number              Fixed field width
     -c chars            --padchars=chars            Chars used (cyclically) for padding
     -a ["r" or "l"]     --align=["r" or "l"]        Pad alignment (right/left)
+    -b chars            --bback=chars               Chars used to draw bar backgrounds (default ":")
+    -f chars            --bfore=chars               Chars used to draw bar foregrounds (default "#")
+    -W number           --bwidth=number             Bar width (default 10)
     -t output template  --template=output template  Output template of the command.
 
 Commands' arguments must be set as a list. Es:

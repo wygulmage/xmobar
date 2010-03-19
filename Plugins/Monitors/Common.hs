@@ -83,6 +83,9 @@ data MConfig =
        , maxWidth    :: IORef Int
        , padChars    :: IORef [Char]
        , padRight    :: IORef Bool
+       , barBack     :: IORef String
+       , barFore     :: IORef String
+       , barWidth    :: IORef Int
        }
 
 -- | from 'http:\/\/www.haskell.org\/hawiki\/MonadState'
@@ -122,7 +125,10 @@ mkMConfig tmpl exprts =
        mx <- newIORef 0
        pc <- newIORef " "
        pr <- newIORef False
-       return $ MC nc l lc h hc t e p mn mx pc pr
+       bb <- newIORef ":"
+       bf <- newIORef "#"
+       bw <- newIORef 10
+       return $ MC nc l lc h hc t e p mn mx pc pr bb bf bw
 
 data Opts = HighColor String
           | NormalColor String
@@ -136,6 +142,9 @@ data Opts = HighColor String
           | Width String
           | PadChars String
           | PadAlign String
+          | BarBack String
+          | BarFore String
+          | BarWidth String
 
 options :: [OptDescr Opts]
 options =
@@ -151,6 +160,9 @@ options =
     , Option ['w']  ["width"]    (ReqArg Width "fixed width"         )  "Fixed field width"
     , Option ['c']  ["padchars"] (ReqArg PadChars "padding chars"    )  "Characters to use for padding"
     , Option ['a']  ["align"]    (ReqArg PadAlign "padding alignment")  "'l' for left padding, 'r' for right"
+    , Option ['b']  ["bback"]    (ReqArg BarBack "bar background"    )  "Characters used to draw bar backgrounds"
+    , Option ['f']  ["bfore"]    (ReqArg BarFore "bar foreground"    )  "Characters used to draw bar foregrounds"
+    , Option ['W']  ["bwidth"]   (ReqArg BarWidth "bar width"        )  "Bar width"
     ]
 
 doArgs :: [String]
@@ -181,6 +193,9 @@ doConfigOptions (o:oo) =
                            setConfigValue (nz w) maxWidth >> next
          PadChars    pc -> setConfigValue pc padChars >> next
          PadAlign    pa -> setConfigValue (isPrefixOf "r" pa) padRight >> next
+         BarBack     bb -> setConfigValue bb barBack >> next
+         BarFore     bf -> setConfigValue bf barFore >> next
+         BarWidth    bw -> setConfigValue (nz bw) barWidth >> next
 
 runM :: [String] -> IO MConfig -> ([String] -> Monitor String) -> Int -> (String -> IO ()) -> IO ()
 runM args conf action r cb = do go
@@ -370,18 +385,14 @@ showPercentsWithColors fs =
   do fstrs <- mapM floatToPercent fs
      zipWithM (showWithColors . const) fstrs (map (*100) fs)
 
-barBackground :: Char
-barBackground = ':'
-barForeground :: Char
-barForeground = '#'
-barLength :: Int
-barLength = 10
-
 showPercentBar :: Float -> Float -> Monitor String
 showPercentBar v x = do
-  let len = min barLength $ round (fromIntegral barLength * x)
-  s <- colorizeString v (replicate len barForeground)
-  return $ s ++ replicate (barLength - len) barBackground
+  bb <- getConfigValue barBack
+  bf <- getConfigValue barFore
+  bw <- getConfigValue barWidth
+  let len = min bw $ round (fromIntegral bw * x)
+  s <- colorizeString v (take len $ cycle bf)
+  return $ s ++ (take (bw - len) $ cycle bb)
 
 -- $threads
 
