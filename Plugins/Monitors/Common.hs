@@ -41,6 +41,7 @@ module Plugins.Monitors.Common (
                        , showWithColors'
                        , showPercentsWithColors
                        , showPercentBar
+                       , showLogBar
                        , showWithUnits
                        , takeDigits
                        , showDigits
@@ -393,6 +394,12 @@ showPercentBar v x = do
   let len = min bw $ round (fromIntegral bw * x)
   s <- colorizeString v (take len $ cycle bf)
   return $ s ++ (take (bw - len) $ cycle bb)
+
+showLogBar :: Float -> Float -> Monitor String
+showLogBar f v = do
+  h <- fromIntegral `fmap` getConfigValue high
+  bw <- fromIntegral `fmap` getConfigValue barWidth
+  showPercentBar v $ f + (logBase 10 (v / h)) / bw
 
 -- $threads
 

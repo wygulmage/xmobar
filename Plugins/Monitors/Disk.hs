@@ -24,7 +24,8 @@ import qualified Data.ByteString.Lazy.Char8 as B
 import Data.List (isPrefixOf, find, intercalate)
 
 diskIOConfig :: IO MConfig
-diskIOConfig = mkMConfig "" ["total", "read", "write"]
+diskIOConfig = mkMConfig "" ["total", "read", "write",
+                             "totalbar", "readbar", "writebar"]
 
 diskUConfig :: IO MConfig
 diskUConfig = mkMConfig ""
@@ -105,8 +106,9 @@ devTemplates disks mounted dat =
 runDiskIO' :: (String, [Float]) -> Monitor String
 runDiskIO' (tmp, xs) = do
   s <- mapM (showWithColors speedToStr) xs
+  b <- mapM (showLogBar 0.8) xs
   setConfigValue tmp template
-  parseTemplate s
+  parseTemplate $ s ++ b
 
 runDiskIO :: [(String, String)] -> [String] -> Monitor String
 runDiskIO disks _ = do

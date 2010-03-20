@@ -64,9 +64,7 @@ netParser =
 
 formatNet :: Float -> Monitor (String, String)
 formatNet d = do
-    h <- getConfigValue high
-    let dx = 8 + logBase 10 (d / fromIntegral h)
-    b <- showPercentBar d $ max (dx / 10) 0
+    b <- showLogBar 0.8 d
     x <- showWithColors f d
     return (x, b)
       where f s = showDigits 1 s ++ "Kb"
