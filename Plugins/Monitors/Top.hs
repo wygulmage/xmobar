@@ -27,6 +27,7 @@ import Foreign.C.Types
 import Data.List (sortBy)
 import Data.Ord (comparing)
 import Data.IORef
+import Data.Time.Clock
 
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as M
@@ -79,12 +80,8 @@ getProcessData pidf =
              evaluate $! words s)
 
 processes :: IO [FilePath]
-processes = do
-  fs <- getDirectoryContents "/proc"
-  return $! filter isPid $! fs
-  where
-    isPid (x:_) = x `elem` ['0'..'9']
-    isPid _ = False
+processes = fmap (filter isPid) (getDirectoryContents "/proc")
+  where isPid = all (`elem` ['0'..'9'])
 
 handleProcesses :: a -> ([String] -> a) -> IO [a]
 handleProcesses def f = do
@@ -103,7 +100,7 @@ type Meminfo = (String, Int)
 meminfo :: [String] -> Meminfo
 meminfo fs = (n, r)
   where !n = processName fs
-        !r = pageSize * (read (fs!!23))
+        !r = pageSize * read (fs!!23)
 
 meminfos :: IO [Meminfo]
 meminfos = handleProcesses ("", 0) meminfo
@@ -128,7 +125,7 @@ type Pid = Int
 type TimeInfo = (String, Float)
 type TimeEntry = (Pid, TimeInfo)
 type Times = IntMap TimeInfo
-type TimesRef = IORef Times
+type TimesRef = IORef (Times, UTCTime)
 
 timeEntry :: [String] -> TimeEntry
 timeEntry fs = (p, (n, t))
@@ -147,28 +144,30 @@ combineTimeInfos !t0 !t1 = M.intersectionWith timeDiff t1 t0
   where timeDiff (n, x1) (_, x0) = (n, x1 - x0)
 
 topTimeProcesses :: Int -> TimesRef -> Float -> IO [TimeInfo]
-topTimeProcesses n tref lapse = do
-  t1 <- timeinfos
-  t0 <- readIORef tref
-  modifyIORef tref (const $! t1)
+topTimeProcesses n tref scale = do
+  !c1 <- getCurrentTime
+  !t1 <- timeinfos
+  (t0, c0) <- readIORef tref
+  modifyIORef tref (const $! (t1, c1))
   let !ts = M.elems $ combineTimeInfos t0 t1
       !sts = take n $ sortBy (flip (comparing snd)) ts
       !nts = map norm sts
-      norm (nm, t) = (nm, min 100 $ 100 * t / lapse)
+      !scx = (fromRational . toRational $! diffUTCTime c1 c0) * scale / 100
+      norm (nm, t) = (nm, min 100 $ t / scx)
   return nts
 
 showTimeInfo :: TimeInfo -> Monitor [String]
 showTimeInfo (n, t) = showInfo n (showDigits 1 t) t
 
 runTopCpu :: TimesRef -> Float -> [String] -> Monitor String
-runTopCpu tref lapse _ = do
-   ps <- io $ topTimeProcesses maxProc tref lapse
+runTopCpu tref scale _ = do
+   ps <- io $ topTimeProcesses maxProc tref scale
    pstr <- mapM showTimeInfo ps
    parseTemplate $ concat pstr
 
 startTopCpu :: [String] -> Int -> (String -> IO ()) -> IO ()
 startTopCpu a r cb = do
   cr <- getSysVar ClockTick
-  tref <- newIORef M.empty
-  let lapse = (fromIntegral r * fromIntegral cr) / 10
-  runM a topCpuConfig (runTopCpu tref lapse) r cb
+  c <- getCurrentTime
+  tref <- newIORef (M.empty, c)
+  runM a topCpuConfig (runTopCpu tref (fromIntegral cr)) r cb
