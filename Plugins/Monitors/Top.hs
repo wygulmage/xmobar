@@ -153,7 +153,7 @@ topTimeProcesses n tref scale = do
       !sts = take n $ sortBy (flip (comparing snd)) ts
       !nts = map norm sts
       !scx = (fromRational . toRational $! diffUTCTime c1 c0) * scale / 100
-      norm (nm, t) = (nm, min 100 $ t / scx)
+      norm (nm, t) = (nm, t / scx)
   return nts
 
 showTimeInfo :: TimeInfo -> Monitor [String]
