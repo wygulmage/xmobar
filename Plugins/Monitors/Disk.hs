@@ -54,7 +54,7 @@ diskData = do
 
 mountedData :: [DevName] -> IO [(DevName, [Float])]
 mountedData devs = do
-  (dt, dt') <- doActionTwiceWithDelay 950000 diskData
+  (dt, dt') <- doActionTwiceWithDelay 750000 diskData
   return $ map (parseDev (zipWith diff dt' dt)) devs
   where diff (dev, xs) (_, ys) = (dev, zipWith (-) xs ys)
 
