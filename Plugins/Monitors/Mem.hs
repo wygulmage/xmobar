@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Plugins.Monitors.Mem where
+module Plugins.Monitors.Mem (memConfig, runMem, totalMem, usedMem) where
 
 import Plugins.Monitors.Common
 
@@ -35,18 +35,24 @@ parseMEM =
            usedratio = used / total
        return [usedratio, total, free, buffer, cache, rest, used]
 
+totalMem :: IO Float
+totalMem = fmap ((*1024) . (!!1)) parseMEM
+
+usedMem :: IO Float
+usedMem = fmap ((*1024) . (!!6)) parseMEM
+
 formatMem :: [Float] -> Monitor [String]
 formatMem (r:xs) =
-    do let f n = showDigits 0 n
+    do let f = showDigits 0
            rr = 100 * r
        ub <- showPercentBar rr r
        fb <- showPercentBar (100 - rr) (1 - r)
        s <- mapM (showWithColors f) (rr:xs)
        return (ub:fb:s)
-formatMem _ = return $ replicate 8 "N/A"
+formatMem _ = return $ replicate 9 "N/A"
 
 runMem :: [String] -> Monitor String
 runMem _ =
-    do m <- io $ parseMEM
+    do m <- io parseMEM
        l <- formatMem m
        parseTemplate l

@@ -48,7 +48,7 @@ data Monitors = Weather  Station    Args Rate
               | Thermal  Zone       Args Rate
               | CpuFreq  Args       Rate
               | CoreTemp Args       Rate
-              | TopCpu   Args       Rate
+              | TopProc  Args       Rate
               | TopMem   Args       Rate
 #ifdef IWLIB
               | Wireless Interface  Args Rate
@@ -75,7 +75,7 @@ instance Exec Monitors where
     alias (Battery    _ _) = "battery"
     alias (BatteryP  _ _ _)= "battery"
     alias (CpuFreq    _ _) = "cpufreq"
-    alias (TopCpu     _ _) = "top"
+    alias (TopProc    _ _) = "top"
     alias (TopMem     _ _) = "topmem"
     alias (CoreTemp   _ _) = "coretemp"
     alias (DiskU    _ _ _) = "disku"
@@ -98,4 +98,4 @@ instance Exec Monitors where
     start (DiskU    s a r) = runM a          diskUConfig   (runDiskU s)   r
     start (DiskIO   s a r) = runM a          diskIOConfig  (runDiskIO s)  r
     start (TopMem     a r) = runM a          topMemConfig   runTopMem     r
-    start (TopCpu     a r) = startTopCpu a r
+    start (TopProc    a r) = startTop a r
