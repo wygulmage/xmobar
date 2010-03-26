@@ -372,12 +372,13 @@ Monitors have default aliases.
 - aliases to `top`
 - Args: the argument list (see below)
 - Variables that can be used with the `-t`/`--template` argument:
-	    `name1`, `cpu1`, `both1`, `mname1`, `mem1`, `mboth1`,
-            `name2`, `cpu2`, `both2`, `mname2`, `mem2`, `mboth2`,
+	    `no`, `name1`, `cpu1`, `both1`, `mname1`, `mem1`, `mboth1`,
+            `name2`, `cpu2`, `both2`, `mname2`, `mem2`, `mboth2`, ...
 - Default template: `<both1>`
 - Displays the name and cpu/mem usage of running processes (`bothn`
   and `mboth` display both, and is useful to specify an overall
-  maximum and/or minimum width, using the `-m`/`-M` arguments.
+  maximum and/or minimum width, using the `-m`/`-M` arguments. `no` gives
+  the total number of processes.
 
 `TopMem Args RefreshRate`
 

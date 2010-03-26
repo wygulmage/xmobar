@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-{-# LANGUAGE ForeignFunctionInterface, BangPatterns #-}
+{-# LANGUAGE ForeignFunctionInterface #-}
 
 module Plugins.Monitors.Top (startTop, topMemConfig, runTopMem) where
 
@@ -33,23 +33,24 @@ import Data.Time.Clock
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as M
 
+intStrs :: [String]
+intStrs = map show [(1::Int) ..]
 
 topMemConfig :: IO MConfig
-topMemConfig = mkMConfig "<both1>" [ k ++ n | n <- map show [1..maxProc]
-                                            , k <- ["name", "mem", "both"]]
+topMemConfig = mkMConfig "<both1>"
+                 [ k ++ n | n <- intStrs , k <- ["name", "mem", "both"]]
 
 topConfig :: IO MConfig
-topConfig = mkMConfig "<both1>" [ k ++ n | n <- map show [1..maxProc]
-                                         , k <- [ "name", "cpu", "both"
-                                                , "mname", "mem", "mboth"]]
-
-
+topConfig = mkMConfig "<both1>"
+              ("no" : [ k ++ n | n <- intStrs
+                               , k <- [ "name", "cpu", "both"
+                                      , "mname", "mem", "mboth"]])
 
 foreign import ccall "unistd.h getpagesize"
   c_getpagesize :: CInt
 
-pageSize :: Int
-pageSize = fromIntegral c_getpagesize `div` 1024
+pageSize :: Float
+pageSize = fromIntegral c_getpagesize / 1024
 
 showInfo :: String -> String -> Float -> Monitor [String]
 showInfo nm sms mms = do
@@ -73,42 +74,35 @@ processes :: IO [FilePath]
 processes = fmap (filter isPid) (getDirectoryContents "/proc")
   where isPid = all (`elem` ['0'..'9'])
 
-handleProcesses :: a -> ([String] -> a) -> IO [a]
-handleProcesses def f = do
-  ps <- processes
-  pd <- mapM getProcessData $! ps
-  return $! map (\x -> if x == [] then def else f x) pd
+handleProcesses :: ([String] -> a) -> IO [a]
+handleProcesses f =
+  fmap (foldr (\p ps -> if p == [] then ps else f p : ps) [])
+       (processes >>= mapM getProcessData)
 
 processName :: [String] -> String
 processName = drop 1 . init . (!!1)
 
-maxProc :: Int
-maxProc = 5
+sortTop :: [(a, Float)] -> [(a, Float)]
+sortTop =  sortBy (flip (comparing snd))
 
-type Meminfo = (String, Int)
+type Meminfo = (String, Float)
 
 meminfo :: [String] -> Meminfo
 meminfo fs = (n, r)
-  where !n = processName fs
-        !r = pageSize * read (fs!!23)
+  where n = processName fs
+        r = pageSize * read (fs!!23)
 
 meminfos :: IO [Meminfo]
-meminfos = handleProcesses ("", 0) meminfo
-
-topMemProcesses :: Int -> IO [Meminfo]
-topMemProcesses n = fmap (take n . sbm) meminfos
-  where sbm = sortBy (flip (comparing snd))
+meminfos = handleProcesses meminfo
 
 showMeminfo :: Float -> Meminfo -> Monitor [String]
 showMeminfo scale (nm, rss) =
-  showInfo nm sms (ms / (1024 * scale))
-    where ms = fromIntegral rss
-          sms = showWithUnits 2 1 ms
+  showInfo nm (showWithUnits 2 1 rss) (rss / (1024 * scale))
 
 runTopMem :: [String] -> Monitor String
 runTopMem _ = do
-  ps <- io $ topMemProcesses maxProc
-  pstr <- mapM (showMeminfo 1) ps
+  ps <- io meminfos
+  pstr <- mapM (showMeminfo 1) $ sortTop ps
   parseTemplate $ concat pstr
 
 type Pid = Int
@@ -119,46 +113,43 @@ type TimesRef = IORef (Times, UTCTime)
 
 timeMemEntry :: [String] -> (TimeEntry, Meminfo)
 timeMemEntry fs = ((p, (n, t)), (n, r))
-  where !p = read (head fs)
-        !n = processName fs
-        !t = read (fs!!13) + read (fs!!14)
-        !r = pageSize * read (fs!!23)
+  where p = read (head fs)
+        n = processName fs
+        t = read (fs!!13) + read (fs!!14)
+        (_, r) = meminfo fs
 
 timeMemEntries :: IO [(TimeEntry, Meminfo)]
-timeMemEntries = handleProcesses ((0, ("", 0)), ("", 0)) timeMemEntry
+timeMemEntries = handleProcesses timeMemEntry
 
 timeMemInfos :: IO (Times, [Meminfo])
 timeMemInfos =
   fmap (\x -> (M.fromList . map fst $ x, map snd x)) timeMemEntries
 
 combineTimeInfos :: Times -> Times -> Times
-combineTimeInfos !t0 !t1 = M.intersectionWith timeDiff t1 t0
-  where timeDiff (n, x1) (_, x0) = let !d = x1 - x0 in (n, d)
+combineTimeInfos t0 t1 = M.intersectionWith timeDiff t1 t0
+  where timeDiff (n, x1) (_, x0) = (n, x1 - x0)
 
-topProcesses :: Int -> TimesRef -> Float -> IO ([TimeInfo], [Meminfo])
-topProcesses n tref scale = do
+topProcesses :: TimesRef -> Float -> IO (Int, ([TimeInfo], [Meminfo]))
+topProcesses tref scale = do
   c1 <- getCurrentTime
-  (t1, mi) <- timeMemInfos
+  (t1, mis) <- timeMemInfos
   (t0, c0) <- readIORef tref
   writeIORef tref (t1, c1)
-  let ts = M.elems $ combineTimeInfos t0 t1
-      sts = take n $ sortBy (flip (comparing snd)) ts
-      nts = map norm sts
-      scx = (fromRational . toRational $! diffUTCTime c1 c0) * scale / 100
-      norm (nm, t) = (nm, t / scx)
-      mis = take n (sbm mi)
-      sbm = sortBy (flip (comparing snd))
-  return (nts, mis)
+  let scx = (fromRational . toRational $ diffUTCTime c1 c0) * scale / 100
+      ts = M.elems $ combineTimeInfos t0 t1
+      nts = map (\(nm, t) -> (nm, t / scx)) ts
+  return (M.size t1, (sortTop nts, sortTop mis))
 
 showTimeInfo :: TimeInfo -> Monitor [String]
 showTimeInfo (n, t) = showInfo n (showDigits 1 t) t
 
 runTop :: TimesRef -> Float -> Float -> [String] -> Monitor String
 runTop tref scale mscale _ = do
-  (ps, ms) <- io $ topProcesses maxProc tref scale
+  (no, (ps, ms)) <- io $ topProcesses tref scale
   pstr <- mapM showTimeInfo ps
   mstr <- mapM (showMeminfo mscale) ms
-  parseTemplate $ concat $ zipWith (++) pstr mstr
+  let nostr = no `seq` show no
+  parseTemplate $ nostr : (concat $ zipWith (++) pstr mstr)
 
 startTop :: [String] -> Int -> (String -> IO ()) -> IO ()
 startTop a r cb = do
