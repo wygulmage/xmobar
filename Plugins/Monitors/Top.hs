@@ -19,7 +19,7 @@ module Plugins.Monitors.Top (startTop, topMemConfig, runTopMem) where
 import Plugins.Monitors.Common
 import Plugins.Monitors.Mem (usedMem)
 
-import Control.Exception (SomeException, handle, evaluate)
+import Control.Exception (SomeException, handle)
 import System.Directory
 import System.FilePath
 import System.IO
@@ -64,15 +64,15 @@ showInfo nm sms mms = do
   both <- showWithColors' (rnm ++ " " ++ sms) mms
   return [nm, mstr, both]
 
-getProcessData :: FilePath -> IO [String]
-getProcessData pidf =
-  handle ((\_ -> evaluate []) :: SomeException -> IO [String])
-         (withFile ("/proc" </> pidf </> "stat") ReadMode readWords)
-  where readWords = fmap words . hGetLine
-
 processes :: IO [FilePath]
 processes = fmap (filter isPid) (getDirectoryContents "/proc")
   where isPid = all (`elem` ['0'..'9'])
+
+getProcessData :: FilePath -> IO [String]
+getProcessData pidf =
+  handle (const (return []) :: SomeException -> IO [String])
+         (withFile ("/proc" </> pidf </> "stat") ReadMode readWords)
+  where readWords = fmap words . hGetLine
 
 handleProcesses :: ([String] -> a) -> IO [a]
 handleProcesses f =
@@ -88,9 +88,7 @@ sortTop =  sortBy (flip (comparing snd))
 type Meminfo = (String, Float)
 
 meminfo :: [String] -> Meminfo
-meminfo fs = (n, r)
-  where n = processName fs
-        r = pageSize * read (fs!!23)
+meminfo fs = (processName fs, pageSize * read (fs!!23))
 
 meminfos :: IO [Meminfo]
 meminfos = handleProcesses meminfo
@@ -121,9 +119,9 @@ timeMemEntry fs = ((p, (n, t)), (n, r))
 timeMemEntries :: IO [(TimeEntry, Meminfo)]
 timeMemEntries = handleProcesses timeMemEntry
 
-timeMemInfos :: IO (Times, [Meminfo])
+timeMemInfos :: IO (Times, [Meminfo], Int)
 timeMemInfos =
-  fmap (\x -> (M.fromList . map fst $ x, map snd x)) timeMemEntries
+  fmap (\x -> (M.fromList . map fst $ x, map snd x, length x)) timeMemEntries
 
 combineTimeInfos :: Times -> Times -> Times
 combineTimeInfos t0 t1 = M.intersectionWith timeDiff t1 t0
@@ -132,13 +130,12 @@ combineTimeInfos t0 t1 = M.intersectionWith timeDiff t1 t0
 topProcesses :: TimesRef -> Float -> IO (Int, ([TimeInfo], [Meminfo]))
 topProcesses tref scale = do
   c1 <- getCurrentTime
-  (t1, mis) <- timeMemInfos
-  (t0, c0) <- readIORef tref
-  writeIORef tref (t1, c1)
-  let scx = (fromRational . toRational $ diffUTCTime c1 c0) * scale / 100
-      ts = M.elems $ combineTimeInfos t0 t1
-      nts = map (\(nm, t) -> (nm, t / scx)) ts
-  return (M.size t1, (sortTop nts, sortTop mis))
+  (t1, mis, len) <- timeMemInfos
+  atomicModifyIORef tref $ \(t0, c0) ->
+    let scx = (fromRational . toRational $ diffUTCTime c1 c0) * scale / 100
+        ts = M.elems $ combineTimeInfos t0 t1
+        nts = map (\(nm, t) -> (nm, t / scx)) ts
+    in ((t1, c1), (len, (sortTop nts, sortTop mis)))
 
 showTimeInfo :: TimeInfo -> Monitor [String]
 showTimeInfo (n, t) = showInfo n (showDigits 1 t) t
@@ -148,8 +145,7 @@ runTop tref scale mscale _ = do
   (no, (ps, ms)) <- io $ topProcesses tref scale
   pstr <- mapM showTimeInfo ps
   mstr <- mapM (showMeminfo mscale) ms
-  let nostr = no `seq` show no
-  parseTemplate $ nostr : (concat $ zipWith (++) pstr mstr)
+  parseTemplate $! show no : concat (zipWith (++) pstr mstr)
 
 startTop :: [String] -> Int -> (String -> IO ()) -> IO ()
 startTop a r cb = do
