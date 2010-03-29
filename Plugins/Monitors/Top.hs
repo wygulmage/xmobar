@@ -127,22 +127,22 @@ combineTimeInfos :: Times -> Times -> Times
 combineTimeInfos t0 t1 = M.intersectionWith timeDiff t1 t0
   where timeDiff (n, x1) (_, x0) = (n, x1 - x0)
 
-topProcesses :: TimesRef -> Float -> IO (Int, ([TimeInfo], [Meminfo]))
+topProcesses :: TimesRef -> Float -> IO (Int, [TimeInfo], [Meminfo])
 topProcesses tref scale = do
-  c1 <- getCurrentTime
   (t1, mis, len) <- timeMemInfos
+  c1 <- getCurrentTime
   atomicModifyIORef tref $ \(t0, c0) ->
     let scx = (fromRational . toRational $ diffUTCTime c1 c0) * scale / 100
         ts = M.elems $ combineTimeInfos t0 t1
         nts = map (\(nm, t) -> (nm, t / scx)) ts
-    in ((t1, c1), (len, (sortTop nts, sortTop mis)))
+    in ((t1, c1), (len, sortTop nts, sortTop mis))
 
 showTimeInfo :: TimeInfo -> Monitor [String]
 showTimeInfo (n, t) = showInfo n (showDigits 1 t) t
 
 runTop :: TimesRef -> Float -> Float -> [String] -> Monitor String
 runTop tref scale mscale _ = do
-  (no, (ps, ms)) <- io $ topProcesses tref scale
+  (no, ps, ms) <- io $ topProcesses tref scale
   pstr <- mapM showTimeInfo ps
   mstr <- mapM (showMeminfo mscale) ms
   parseTemplate $! show no : concat (zipWith (++) pstr mstr)
