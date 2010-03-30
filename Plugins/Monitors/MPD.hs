@@ -33,9 +33,9 @@ defaultOpts = MOpts { mPlaying = ">>", mStopped = "><", mPaused = "||" }
 
 options :: [OptDescr (MOpts -> MOpts)]
 options =
-  [ Option ['P'] ["playing"] (ReqArg (\x o -> o { mPlaying = x }) "") ""
-  , Option ['S'] ["stopped"] (ReqArg (\x o -> o { mStopped = x }) "") ""
-  , Option ['Z'] ["paused"] (ReqArg (\x o -> o { mPaused = x }) "") ""
+  [ Option "P" ["playing"] (ReqArg (\x o -> o { mPlaying = x }) "") ""
+  , Option "S" ["stopped"] (ReqArg (\x o -> o { mStopped = x }) "") ""
+  , Option "Z" ["paused"] (ReqArg (\x o -> o { mPaused = x }) "") ""
   ]
 
 runMPD :: [String] -> Monitor String
@@ -53,7 +53,7 @@ mopts argv =
     (o, _, []) -> return $ foldr id defaultOpts o
     (_, _, errs) -> ioError . userError $ concat errs
 
-parseMPD :: (M.Response M.Status) -> (M.Response (Maybe M.Song)) -> MOpts
+parseMPD :: M.Response M.Status -> M.Response (Maybe M.Song) -> MOpts
             -> (Float, [String])
 parseMPD (Left e) _ _ = (0, show e:repeat "")
 parseMPD (Right st) song opts = (b, [ss, si, vol, len, lap, plen] ++ sf)
@@ -74,7 +74,7 @@ stateGlyph s o =
     M.Paused -> mPaused o
     M.Stopped -> mStopped o
 
-parseSong :: (M.Response (Maybe M.Song)) -> [String]
+parseSong :: M.Response (Maybe M.Song) -> [String]
 parseSong (Left _) = repeat ""
 parseSong (Right Nothing) = repeat ""
 parseSong (Right (Just s)) =

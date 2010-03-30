@@ -23,18 +23,51 @@ import Control.Exception (SomeException, handle, evaluate)
 
 import System.Directory
 import System.FilePath
+import System.Console.GetOpt
 import System.INotify
+
 
 import qualified Data.ByteString.Lazy.Char8 as B
 
+data Options = Options
+               { oAll :: Bool
+               , oDir :: FilePath
+               , oPrefix :: String
+               , oSuffix :: String
+               }
+
+defaults :: Options
+defaults = Options { oAll = False, oDir = "", oPrefix = "", oSuffix = "" }
+
+options :: [OptDescr (Options -> Options)]
+options =
+  [ Option "a" ["all"] (NoArg (\o -> o { oAll = True })) ""
+  , Option "d" ["dir"] (ReqArg (\x o -> o { oDir = x }) "") ""
+  , Option "p" ["prefix"] (ReqArg (\x o -> o { oPrefix = x }) "") ""
+  , Option "s" ["suffix"] (ReqArg (\x o -> o { oSuffix = x }) "") ""
+  ]
+
+parseOptions :: [String] -> IO Options
+parseOptions args =
+  case getOpt Permute options args of
+    (o, _, []) -> return $ foldr id defaults o
+    (_, _, errs) -> ioError . userError $ concat errs
+
 -- | A list of display names, paths to mbox files and display colours,
--- followed by a directory to resolve relative path names (can be "")
-data MBox = MBox [(String, FilePath, String)] FilePath
+-- followed by a list of options.
+data MBox = MBox [(String, FilePath, String)] [String] String
           deriving (Read, Show)
 
 instance Exec MBox where
-  start (MBox ms dir) cb = do
+  alias (MBox _ _ a) = a
+  start (MBox ms args _) cb = do
     vs <- mapM (const $ newTVarIO ("", 0 :: Int)) ms
+
+    opts <- parseOptions args -- $ words args
+    let dir = oDir opts
+        allb = oAll opts
+        pref = oPrefix opts
+        suff = oSuffix opts
 
     dirExists <- doesDirectoryExist dir
     let ts = map (\(t, _, _) -> t) ms
@@ -53,7 +86,9 @@ instance Exec MBox where
       atomically $ writeTVar v (f, n)
 
     changeLoop (mapM (fmap snd . readTVar) vs) $ \ns ->
-      cb . unwords $ [ showC m n c | (m, n, c) <- zip3 ts ns cs, n /= 0 ]
+      let s = unwords [ showC m n c | (m, n, c) <- zip3 ts ns cs
+                                    , allb || n /= 0 ]
+      in cb (if length s == 0 then "" else pref ++ s ++ suff)
 
 showC :: String -> Int -> String -> String
 showC m n c =
