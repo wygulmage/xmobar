@@ -34,6 +34,9 @@ import Plugins.Monitors.Top
 #ifdef IWLIB
 import Plugins.Monitors.Wireless
 #endif
+#ifdef LIBMPD
+import Plugins.Monitors.MPD
+#endif
 
 data Monitors = Weather  Station    Args Rate
               | Network  Interface  Args Rate
@@ -52,6 +55,9 @@ data Monitors = Weather  Station    Args Rate
               | TopMem   Args       Rate
 #ifdef IWLIB
               | Wireless Interface  Args Rate
+#endif
+#ifdef LIBMPD
+              | MPD      Args       Rate
 #endif
                 deriving (Show,Read,Eq)
 
@@ -82,7 +88,9 @@ instance Exec Monitors where
     alias (DiskIO   _ _ _) = "diskio"
 #ifdef IWLIB
     alias (Wireless i _ _) = i ++ "wi"
-    start (Wireless i a r) = runM (a ++ [i]) wirelessConfig  runWireless  r
+#endif
+#ifdef LIBMPD
+    alias (MPD        _ _) = "mpd"
 #endif
     start (Weather  s a r) = runM (a ++ [s]) weatherConfig  runWeather    r
     start (Network  i a r) = runM (a ++ [i]) netConfig      runNet        r
@@ -99,3 +107,9 @@ instance Exec Monitors where
     start (DiskIO   s a r) = runM a          diskIOConfig  (runDiskIO s)  r
     start (TopMem     a r) = runM a          topMemConfig   runTopMem     r
     start (TopProc    a r) = startTop a r
+#ifdef IWLIB
+    start (Wireless i a r) = runM (a ++ [i]) wirelessConfig runWireless   r
+#endif
+#ifdef LIBMPD
+    start (MPD        a r) = runM a          mpdConfig      runMPD        r
+#endif

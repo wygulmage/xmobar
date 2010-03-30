@@ -443,6 +443,28 @@ Monitors have default aliases.
 - This monitor requires coretemp module to be loaded in kernel
 - Example: `Run CoreTemp ["-t","Temp:\<core0\>|\<core1\>C","-L","40","-H","60","-l","lightblue","-n","gray90","-h","red"] 50`
 
+
+`MPD Args RefreshRate`
+
+- aliases to `mpd`
+- Args: the argument list (see below). In addition you can provide
+  `-P`, `-S` and `-Z`, with an string argument, to represent the
+  playing, stopped and paused states in the `statei` template field.
+- Variables that can be used with the `-t`/`--template` argument:
+             `bar`, `state`, `statei`, `volume`, `length`
+             `lapsed`, `plength`
+             `name`, `artist`, `composer`, `performer`
+             `album`, `title`, `track`, `file`, `genre`
+- Default template: `MPD: <state>`
+- Example:
+    Run MPD ["-t",
+             "<composer> <title> (<album>) <track>/<plength> <statei> ",
+             "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
+   Note that you need "--" to separate regular monitor options from
+   MPD's specific ones.
+- This monitor will only be compiled if you ask for it using the
+  `with_mpd` flag. It needs libmpd 4.1 or later (available on Hackage).
+
 `Mail Args`
 
 - aliases to `Mail`

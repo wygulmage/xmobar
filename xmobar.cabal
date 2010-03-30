@@ -35,6 +35,10 @@ flag with_iwlib
   description: wireless info support. Required for the Wireless plugin, needs iwlib installed.
   default: False
 
+flag with_mpd
+  description: mpd support. Needs libmpd installed.
+  default: False
+
 executable xmobar
     main-is:            Main.hs
     other-modules:      Xmobar, Config, Parsers, Commands, XUtil, StatFS, Runnable, Plugins
@@ -73,3 +77,7 @@ executable xmobar
        extra-libraries: iw
        other-modules: IWlib
        cpp-options: -DIWLIB
+
+    if flag(with_mpd)
+       build-depends: libmpd > 0.4
+       cpp-options: -DLIBMPD
