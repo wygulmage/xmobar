@@ -31,17 +31,21 @@ import qualified Data.ByteString.Lazy.Char8 as B
 
 data Options = Options
                { oAll :: Bool
+               , oUniq :: Bool
                , oDir :: FilePath
                , oPrefix :: String
                , oSuffix :: String
                }
 
 defaults :: Options
-defaults = Options { oAll = False, oDir = "", oPrefix = "", oSuffix = "" }
+defaults = Options {
+  oAll = False, oUniq = False, oDir = "", oPrefix = "", oSuffix = ""
+  }
 
 options :: [OptDescr (Options -> Options)]
 options =
   [ Option "a" ["all"] (NoArg (\o -> o { oAll = True })) ""
+  , Option "u" [] (NoArg (\o -> o { oUniq = True })) ""
   , Option "d" ["dir"] (ReqArg (\x o -> o { oDir = x }) "") ""
   , Option "p" ["prefix"] (ReqArg (\x o -> o { oPrefix = x }) "") ""
   , Option "s" ["suffix"] (ReqArg (\x o -> o { oSuffix = x }) "") ""
@@ -68,6 +72,7 @@ instance Exec MBox where
         allb = oAll opts
         pref = oPrefix opts
         suff = oSuffix opts
+        uniq = oUniq opts
 
     dirExists <- doesDirectoryExist dir
     let ts = map (\(t, _, _) -> t) ms
@@ -75,7 +80,7 @@ instance Exec MBox where
         md = if dirExists then (dir </>) . sec else sec
         fs = map md ms
         cs = map (\(_, _, c) -> c) ms
-        ev = [Modify, Create]
+        ev = [CloseWrite]
 
     i <- initINotify
     zipWithM_ (\f v -> addWatch i ev f (handleNotification v)) fs vs
@@ -86,14 +91,14 @@ instance Exec MBox where
       atomically $ writeTVar v (f, n)
 
     changeLoop (mapM (fmap snd . readTVar) vs) $ \ns ->
-      let s = unwords [ showC m n c | (m, n, c) <- zip3 ts ns cs
-                                    , allb || n /= 0 ]
+      let s = unwords [ showC uniq m n c | (m, n, c) <- zip3 ts ns cs
+                                         , allb || n /= 0 ]
       in cb (if length s == 0 then "" else pref ++ s ++ suff)
 
-showC :: String -> Int -> String -> String
-showC m n c =
+showC :: Bool -> String -> Int -> String -> String
+showC u m n c =
   if c == "" then msg else "<fc=" ++ c ++ ">" ++ msg ++ "</fc>"
-    where msg = m ++ show n
+    where msg = m ++ if not u || n > 1 then show n else ""
 
 countMails :: FilePath -> IO Int
 countMails f =
