@@ -2,7 +2,7 @@
 % Andrea Rossato
 
 About
------
+=====
 
 [xmobar] is a minimalistic, text based, status bar. It was designed to
 work with the [xmonad] Window Manager.
@@ -19,7 +19,7 @@ See `xmobar.config-sample`, distributed with the source code, for a
 sample configuration.
 
 Download
---------
+========
 
 You can get the [xmobar] source code from [Hackage].
 
@@ -39,7 +39,7 @@ Version 0.9 requires Cabal-1.2.x, but should work both with ghc-6.6.1
 and ghc-6.8.1.
 
 Bug Reports
------------
+===========
 
 To submit bug reports you can use the Google code bug tracking system
 available at the following address:
@@ -48,7 +48,7 @@ available at the following address:
 
 
 Installation
-------------
+============
 
 To install simply run:
 
@@ -81,7 +81,7 @@ or
 if you have the default configuration file saved as `~/.xmobarrc`
 
 Utf-8 and Xft Support
----------------------
+=====================
 
 [xmobar] can be compiled with UTF-8 and XFT support. If you want UTF-8
 support only, you just need to run the configuration script with the
@@ -105,9 +105,9 @@ configuration option. For instance:
         font = "xft:Times New Roman-10:italic"
 
 Configuration
--------------
+=============
 
-### Quick Start
+## Quick Start
 
 See `xmobar.config-sample` for an example.
 
@@ -173,7 +173,7 @@ Other configuration options:
 `template`
 :    The output template.
 
-### Running xmobar with i3status
+## Running xmobar with i3status
 
 [xmobar] can be used to display information gathered by [i3status], a
 small program that gathers information and formats it suitable for
@@ -194,7 +194,7 @@ Then you can run it with:
 
     ./i3status -c i3status.conf | xmobar -o -t "%StdinReader%" -c "[Run StdinReader]"
 
-### Command Line Options
+## Command Line Options
 
 [xmobar] can be either configured with a configuration file or with
 command line options. In the second case, the command line options
@@ -226,7 +226,7 @@ xmobar --help):
 	  -x screen     --screen=screen      On which X screen number to start
     Mail bug reports and suggestions to <andrea.rossato@unibz.it>
 
-### The Output Template
+## The Output Template
 
 The output template must contain at least one command. [xmobar] will
 parse the template and will search for the command to be executed in
@@ -240,7 +240,7 @@ operating system to execute a program with the name found in the
 template. If the execution is not successful an error will be
 reported.
 
-### The `commands` Configuration Option
+## The `commands` Configuration Option
 
 The `commands` configuration option is a list of commands information
 and arguments to be used by [xmobar] when parsing the output template.
@@ -272,7 +272,7 @@ To remove them see below Installing/Removing a Plugin
 Other commands can be created as plugins with the Plugin
 infrastructure. See below Writing a Plugin
 
-### System Monitor Plugins
+## System Monitor Plugins
 
 This is the description of the system monitor plugins that are
 installed by default.
@@ -497,7 +497,7 @@ Monitors have default aliases.
   a space in front of the printed string (when it's not empty); it
   can be used in the template with the alias `mbox`.
 
-### Monitor Plugins Commands Arguments
+## Monitor Plugins Commands Arguments
 
 These are the arguments that can be used for internal commands in the
 `commands` configuration option:
@@ -529,7 +529,7 @@ something like:
 
     Glasgow Airport: 16.0C
 
-### Executing External Commands
+## Executing External Commands
 
 In order to execute an external command you can either write the
 command name in the template, in this case it will be executed without
@@ -553,7 +553,7 @@ can be used in the output template as `%uname%`
 
 can be used in the output template as `%mydate%`
 
-### Other Plugins
+## Other Plugins
 
 `Date Args Alias RefreshRate`
 
@@ -564,9 +564,9 @@ can be used in the output template as `%mydate%`
 `PipeReader "/path/to/pipe" Alias`
 
 Plugins
--------
+=======
 
-### Writing a Plugin
+## Writing a Plugin
 
 Writing a plugin for [xmobar] should be very simple. You need to create
 a data type with at least one constructor.
@@ -627,7 +627,7 @@ type to the type list in the type signature of `Config.runnableTypes`.
 For a very basic example see `Plugins/HelloWorld.hs` or the other
 plugins that are distributed with [xmobar].
 
-### Installing/Removing a Plugin
+## Installing/Removing a Plugin
 
 Installing a plugin should require 3 steps. Here we are going to
 install the HelloWorld plugin that comes with [xmobar]:
@@ -680,7 +680,7 @@ To remove the system monitor plugin:
 3. rebuild [xmobar].
 
 Credits
--------
+=======
 
 Thanks to Robert Manea and Spencer Janssen for their help in
 understanding how X works. They gave me suggestions on how to solve
@@ -694,7 +694,7 @@ Janssen, Jens Petersen, Dmitry Kurochkin, Lennart Kolmodin, and
 Norbert Zeh.
 
 Useful links
-------------
+============
 
 The [xmobar] home page
 
@@ -706,14 +706,14 @@ To understand the internal mysteries of xmobar you may try reading
 this tutorial [on X Window Programming in Haskell].
 
 Author
-------
+======
 
 Andrea Rossato
 
 `andrea.rossato at ing.unitn.it`
 
 Legal
------
+=====
 
 This software is released under a BSD-style license. See LICENSE for
 more details.
