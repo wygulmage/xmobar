@@ -26,6 +26,7 @@ flag with_xft
 
 flag with_utf8
   description: With UTF-8 support.
+  default: True
 
 flag with_inotify
   description: inotify support (modern Linux only).  Required for the Mail plugin.
@@ -65,7 +66,7 @@ executable xmobar
        build-depends: utf8-string, X11-xft >= 0.2
        cpp-options: -DXFT
 
-    if flag(with_utf8) && impl (ghc < 6.12.1)
+    if flag(with_utf8)
        build-depends: utf8-string
        cpp-options: -DUTF8
 
