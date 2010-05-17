@@ -69,7 +69,7 @@ hGetLineSafe = hGetLine
 #endif
 
 -- Hide the Core Font/Xft switching here
-data XFont =Core FontStruct
+data XFont = Core FontStruct
            | Utf8 FontSet
 #ifdef XFT
            | Xft  XftFont
