@@ -23,7 +23,12 @@ import Foreign.C.String
 import Data.ByteString (useAsCString)
 import Data.ByteString.Char8 (pack)
 
+#if defined (__FreeBSD__)
+# include <sys/param.h>
+# include <sys/mount.h>
+#else
 #include <sys/vfs.h>
+#endif
 
 data FileSystemStats = FileSystemStats {
   fsStatBlockSize :: Integer
@@ -42,7 +47,11 @@ data FileSystemStats = FileSystemStats {
 
 data CStatfs
 
+#if defined(__FreeBSD__)
+foreign import ccall unsafe "sys/mount.h statfs"
+#else
 foreign import ccall unsafe "sys/vfs.h statfs64"
+#endif
   c_statfs :: CString -> Ptr CStatfs -> IO CInt
 
 toI :: CLong -> Integer
