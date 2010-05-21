@@ -21,7 +21,7 @@ import qualified Network.MPD as M
 mpdConfig :: IO MConfig
 mpdConfig = mkMConfig "MPD: <state>"
               [ "bar", "state", "statei", "volume", "length"
-              , "lapsed", "plength"
+              , "lapsed", "plength", "ppos"
               , "name", "artist", "composer", "performer"
               , "album", "title", "track", "trackno", "file", "genre"
               ]
@@ -56,16 +56,20 @@ mopts argv =
 parseMPD :: M.Response M.Status -> M.Response (Maybe M.Song) -> MOpts
             -> (Float, [String])
 parseMPD (Left e) _ _ = (0, show e:repeat "")
-parseMPD (Right st) song opts = (b, [ss, si, vol, len, lap, plen] ++ sf)
+parseMPD (Right st) song opts = (b, [ss, si, vol, len, lap, plen, pp] ++ sf)
   where s = M.stState st
         ss = show s
         si = stateGlyph s opts
-        vol = int2Str $ M.stVolume st
+        vol = int2str $ M.stVolume st
         (lap, len) = (showTime p, showTime t)
         (p, t) = M.stTime st
         b = if t > 0 then fromIntegral p / fromIntegral t else 0
-        plen = int2Str $ M.stPlaylistLength st
+        plen = int2str $ M.stPlaylistLength st
         sf = parseSong song
+        pp = case M.stSongPos st of
+               Nothing -> ""
+               Just (M.Pos n) -> int2str $ n + 1
+               Just (M.ID n) -> int2str n
 
 stateGlyph :: M.State -> MOpts -> String
 stateGlyph s o =
@@ -80,13 +84,13 @@ parseSong (Right Nothing) = repeat ""
 parseSong (Right (Just s)) =
   [ M.sgName s, M.sgArtist s, M.sgComposer s, M.sgPerformer s
   , M.sgAlbum s, M.sgTitle s, track, trackno, M.sgFilePath s, M.sgGenre s]
-  where (track, trackno) = (int2Str t, int2Str tn)
+  where (track, trackno) = (show t, show tn)
         (t, tn) = M.sgTrack s
 
 showTime :: Integer -> String
-showTime t = int2Str minutes ++ ":" ++ int2Str seconds
+showTime t = int2str minutes ++ ":" ++ int2str seconds
   where minutes = t `div` 60
         seconds = t `mod` 60
 
-int2Str :: (Num a, Ord a) => a -> String
-int2Str x = if x < 10 then '0':sx else sx where sx = show x
+int2str :: (Num a, Ord a) => a -> String
+int2str x = if x < 10 then '0':sx else sx where sx = show x
