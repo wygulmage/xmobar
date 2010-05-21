@@ -132,7 +132,7 @@ topProcesses tref scale = do
   (t1, mis, len) <- timeMemInfos
   c1 <- getCurrentTime
   atomicModifyIORef tref $ \(t0, c0) ->
-    let scx = (fromRational . toRational $ diffUTCTime c1 c0) * scale / 100
+    let scx = realToFrac (diffUTCTime c1 c0) * scale / 100
         ts = M.elems $ combineTimeInfos t0 t1
         nts = map (\(nm, t) -> (nm, t / scx)) ts
     in ((t1, c1), (len, sortTop nts, sortTop mis))
