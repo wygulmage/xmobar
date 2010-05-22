@@ -398,7 +398,7 @@ Monitors have default aliases.
   where the template can contain <size>, <free>, <used>, <freep> or
   <usedp>, <freebar> or <usedbar> for total, free, used, free
   percentage and used percentage of the given file system capacity. Example:
-  `[("/", "<used>/<size>"), ("sdb1", "<usedbar>")]`
+  `[("/", "\<used\>/\<size\>"), ("sdb1", "\<usedbar\>")]`
 - Args: the argument list (see above). `-t`/`--template` is ignored.
 - Default template: none (you must specify a template for each file system).
 
@@ -408,7 +408,7 @@ Monitors have default aliases.
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain <total>, <read>, <write> for total,
   read and write speed, respectively. Example:
-  `[("/", "<read> <write>"), ("sdb1", "<total>")]`
+  `[("/", "\<read\> \<write\>"), ("sdb1", "\<total\>")]`
 - Args: the argument list (see above). `-t`/`--template` is ignored.
 - Default template: none (you must specify a template for each file system).
 
@@ -443,7 +443,6 @@ Monitors have default aliases.
 - This monitor requires coretemp module to be loaded in kernel
 - Example: `Run CoreTemp ["-t","Temp:\<core0\>|\<core1\>C","-L","40","-H","60","-l","lightblue","-n","gray90","-h","red"] 50`
 
-
 `MPD Args RefreshRate`
 
 - aliases to `mpd`
@@ -458,8 +457,8 @@ Monitors have default aliases.
 - Default template: `MPD: <state>`
 - Example:
     Run MPD ["-t",
-             "<composer> <title> (<album>) <track>/<plength> <statei> ",
-             "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
+             "\<composer\> \<title\> (\<album\>) \<track\>/\<plength\> \<statei\> ",
+             "--", "-P", "\>\>", "-Z", "|", "-S", "\>\<"] 10
    Note that you need "--" to separate regular monitor options from
    MPD's specific ones.
 - This monitor will only be compiled if you ask for it using the
