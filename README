@@ -282,7 +282,7 @@ Monitors have default aliases.
 
 `Weather StationID Args RefreshRate`
 
-- aliases to the Station ID: so `Weather "LIPB" []` can be used in template as `%LIBP%`
+- aliases to the Station ID: so `Weather "LIPB" []` can be used in template as `%LIPB%`
 - Args: the argument list (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `station`, `stationState`, `year`, `month`, `day`, `hour`,
