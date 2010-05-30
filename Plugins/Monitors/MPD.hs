@@ -21,7 +21,7 @@ import qualified Network.MPD as M
 mpdConfig :: IO MConfig
 mpdConfig = mkMConfig "MPD: <state>"
               [ "bar", "state", "statei", "volume", "length"
-              , "lapsed", "plength", "ppos"
+              , "lapsed", "remaining", "plength", "ppos"
               , "name", "artist", "composer", "performer"
               , "album", "title", "track", "trackno", "file", "genre"
               ]
@@ -56,13 +56,15 @@ mopts argv =
 parseMPD :: M.Response M.Status -> M.Response (Maybe M.Song) -> MOpts
             -> (Float, [String])
 parseMPD (Left e) _ _ = (0, show e:repeat "")
-parseMPD (Right st) song opts = (b, [ss, si, vol, len, lap, plen, pp] ++ sf)
+parseMPD (Right st) song opts =
+  (b, [ss, si, vol, len, lap, remain, plen, pp] ++ sf)
   where s = M.stState st
         ss = show s
         si = stateGlyph s opts
         vol = int2str $ M.stVolume st
-        (lap, len) = (showTime p, showTime t)
         (p, t) = M.stTime st
+        (lap, len) = (showTime p, showTime t)
+        remain = showTime $ max 0 (t - p)
         b = if t > 0 then fromIntegral p / fromIntegral t else 0
         plen = int2str $ M.stPlaylistLength st
         sf = parseSong song

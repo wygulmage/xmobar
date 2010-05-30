@@ -451,7 +451,8 @@ Monitors have default aliases.
   playing, stopped and paused states in the `statei` template field.
 - Variables that can be used with the `-t`/`--template` argument:
              `bar`, `state`, `statei`, `volume`, `length`
-             `lapsed`, `plength` (playlist length), `ppos` (playlist position)
+             `lapsed`, `remaining`,
+             `plength` (playlist length), `ppos` (playlist position)
              `name`, `artist`, `composer`, `performer`
              `album`, `title`, `track`, `file`, `genre`
 - Default template: `MPD: <state>`
