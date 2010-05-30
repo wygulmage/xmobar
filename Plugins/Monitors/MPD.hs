@@ -57,17 +57,15 @@ parseMPD :: M.Response M.Status -> M.Response (Maybe M.Song) -> MOpts
             -> (Float, [String])
 parseMPD (Left e) _ _ = (0, show e:repeat "")
 parseMPD (Right st) song opts =
-  (b, [ss, si, vol, len, lap, remain, plen, pp] ++ sf)
+  (b, [ss, si, vol, len, lap, remain, plen, pp] ++ parseSong song)
   where s = M.stState st
         ss = show s
         si = stateGlyph s opts
         vol = int2str $ M.stVolume st
         (p, t) = M.stTime st
-        (lap, len) = (showTime p, showTime t)
-        remain = showTime $ max 0 (t - p)
+        [lap, len, remain] = map showTime [p, t, max 0 (t - p)]
         b = if t > 0 then fromIntegral p / fromIntegral t else 0
         plen = int2str $ M.stPlaylistLength st
-        sf = parseSong song
         pp = case M.stSongPos st of
                Nothing -> ""
                Just (M.Pos n) -> int2str $ n + 1
