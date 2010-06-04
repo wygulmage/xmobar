@@ -27,12 +27,12 @@ import Data.List (isPrefixOf)
 -- is performed.
 checkedDataRetrieval :: (Num a, Ord a, Show a) =>
                         String -> String -> String -> String -> (Double -> a)
-                        -> Monitor String
-checkedDataRetrieval failureMessage dir file pattern trans = do
+                        -> (a -> String) -> Monitor String
+checkedDataRetrieval failureMessage dir file pattern trans fmt = do
     exists <- io $ fileExist $ concat [dir, "/", pattern, "0/", file]
     case exists of
          False  -> return failureMessage
-         True   -> retrieveData dir file pattern trans
+         True   -> retrieveData dir file pattern trans fmt
 
 -- |
 -- Function retrieves data from files in directory dir specified by
@@ -40,11 +40,12 @@ checkedDataRetrieval failureMessage dir file pattern trans = do
 -- to each one. Final array is processed by template parser function
 -- and returned as monitor string.
 retrieveData :: (Num a, Ord a, Show a) =>
-                String -> String -> String -> (Double -> a) -> Monitor String
-retrieveData dir file pattern trans = do
+                String -> String -> String -> (Double -> a) -> (a -> String) ->
+                Monitor String
+retrieveData dir file pattern trans fmt = do
     count <- io $ dirCount dir pattern
     contents <- io $ mapM getGuts $ files count
-    values <- mapM (showWithColors show) $ map conversion contents
+    values <- mapM (showWithColors fmt) $ map conversion contents
     parseTemplate values
     where
         getGuts f = withFile f ReadMode hGetLine

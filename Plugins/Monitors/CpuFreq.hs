@@ -23,7 +23,7 @@ import Plugins.Monitors.CoreCommon
 -- cpu frequencies.
 cpuFreqConfig :: IO MConfig
 cpuFreqConfig = mkMConfig
-       "Freq: <cpu0>GHz" -- template
+       "Freq: <cpu0>" -- template
        (zipWith (++) (repeat "cpu") (map show [0 :: Int ..])) -- available
                                                               -- replacements
 
@@ -36,5 +36,7 @@ runCpuFreq _ = do
         pattern = "cpu"
         divisor = 1e6 :: Double
         failureMessage = "CpuFreq: N/A"
-    checkedDataRetrieval failureMessage dir file pattern (/divisor)
+        fmt x | x < 1     = (show (round (x * 1000) :: Integer)) ++ "MHz"
+              | otherwise = (show x) ++ "GHz"
+    checkedDataRetrieval failureMessage dir file pattern (/divisor) fmt
 

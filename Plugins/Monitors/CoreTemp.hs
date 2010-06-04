@@ -37,5 +37,5 @@ runCoreTemp _ = do
         pattern = "coretemp."
         divisor = 1e3 :: Double
         failureMessage = "CoreTemp: N/A"
-    checkedDataRetrieval failureMessage dir file pattern (/divisor)
+    checkedDataRetrieval failureMessage dir file pattern (/divisor) show
 
