@@ -71,7 +71,14 @@ data XPosition = Top
 
 data Align = L | R | C deriving ( Read, Eq )
 
-data Border = NoBorder | TopB | BottomB | FullB deriving ( Read, Eq )
+data Border = NoBorder
+            | TopB
+            | BottomB
+            | FullB
+            | TopBM Int
+            | BottomBM Int
+            | FullBM Int
+              deriving ( Read, Eq )
 
 -- | The default configuration values
 defaultConfig :: Config

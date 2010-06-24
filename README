@@ -157,6 +157,20 @@ Other configuration options:
 
 :         position = Top
 
+`border`
+:     TopB, TopBM, BottomB, BottomBM, FullB, FullBM or NoBorder (default).
+
+:     TopB, BottomB, FullB take no arguments, and request drawing a
+      border at the top, bottom or around xmobar's window,
+      respectively.
+
+:     TopBM, BottomBM, FullBM take an integer argument, which is the
+      margin, in pixels, between the border of the window and the
+      drawn border.
+
+`borderColor`
+:     Border color.
+
 `commands`
 :    For setting the options of the programs to run (optional).
 

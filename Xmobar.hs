@@ -252,7 +252,7 @@ drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
     io $ setForeground d gc bgcolor
     io $ fillRectangle d p gc 0 0 wid ht
     -- draw 1 pixel border if requested
-    io $ drawBorder (border c) d p gc bdcolor (wid - 1) (ht - 1)
+    io $ drawBorder (border c) d p gc bdcolor wid ht
     -- write to the pixmap the new string
     printStrings p gc fs 1 L =<< strLn left
     printStrings p gc fs 1 R =<< strLn right
@@ -267,12 +267,18 @@ drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
 
 drawBorder :: Border -> Display -> Drawable -> GC -> Pixel -> Dimension
            -> Dimension -> IO ()
-drawBorder b d p gc c w h =  case b of
+drawBorder b d p gc c wi ht =  case b of
   NoBorder -> return ()
-  TopB -> sf >> drawLine d p gc 0 0 (fi w) 0
-  BottomB -> sf >> drawLine d p gc 0 (fi h) (fi w) (fi h)
-  FullB -> sf >> drawRectangle d p gc 0 0 w h
+  TopB       -> drawBorder (TopBM 0) d p gc c w h
+  BottomB    -> drawBorder (BottomBM 0) d p gc c w h
+  FullB      -> drawBorder (FullBM 0) d p gc c w h
+  TopBM m    -> sf >> drawLine d p gc 0 (fi m) (fi w) 0
+  BottomBM m -> let rw = (fi h) - (fi m) in
+                 sf >> drawLine d p gc 0 rw (fi w) rw
+  FullBM m   -> let rm = fi m; mp = fi m in
+                 sf >> drawRectangle d p gc mp mp (w - rm) (h - rm)
   where sf = setForeground d gc c
+        (w, h) = (wi - 1, ht - 1)
 
 -- | An easy way to print the stuff we need to print
 printStrings :: Drawable -> GC -> XFont -> Position
