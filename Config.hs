@@ -18,7 +18,7 @@ module Config
     ( -- * Configuration
       -- $config
       Config (..)
-    , XPosition (..), Align (..)
+    , XPosition (..), Align (..), Border(..)
     , defaultConfig
     , runnableTypes
     ) where
@@ -47,6 +47,8 @@ data Config =
            , bgColor        :: String     -- ^ Backgroud color
            , fgColor        :: String     -- ^ Default font color
            , position       :: XPosition  -- ^ Top Bottom or Static
+           , border         :: Border     -- ^ NoBorder TopB BottomB or FullB
+           , borderColor    :: String     -- ^ Border color
            , lowerOnStart   :: Bool       -- ^ Lower to the bottom of the
                                           --   window stack on initialization
            , commands       :: [Runnable] -- ^ For setting the command, the command arguments
@@ -69,6 +71,8 @@ data XPosition = Top
 
 data Align = L | R | C deriving ( Read, Eq )
 
+data Border = NoBorder | TopB | BottomB | FullB deriving ( Read, Eq )
+
 -- | The default configuration values
 defaultConfig :: Config
 defaultConfig =
@@ -76,6 +80,8 @@ defaultConfig =
            , bgColor  = "#000000"
            , fgColor  = "#BFBFBF"
            , position = Top
+           , border = NoBorder
+           , borderColor  = "#BFBFBF"
            , lowerOnStart = True
            , commands = [ Run $ Date "%a %b %_d %Y * %H:%M:%S" "theDate" 10
                         , Run StdinReader]

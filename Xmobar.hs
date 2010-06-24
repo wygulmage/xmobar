@@ -204,19 +204,19 @@ getStrutValues r@(Rectangle x y w h) p rwh =
           nx = fi x
           nw = fi (x + fi w - 1)
 
--- get some reaonable strut values for static placement. 
+-- get some reaonable strut values for static placement.
 getStaticStrutValues :: XPosition -> Int -> [Int]
 getStaticStrutValues (Static cx cy cw ch) rwh
     -- if the yPos is in the top half of the screen, then assume a Top
     -- placement, otherwise, it's a Bottom placement
     | cy < (rwh `div` 2) = [0, 0, st,  0, 0, 0, 0, 0, xs, xe,  0,  0]
     | otherwise          = [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, xs, xe]
-    where st = cy + ch 
+    where st = cy + ch
           sb = rwh - cy
           xs = cx -- a simple calculation for horizontal (x) placement
           xe = xs + cw
 getStaticStrutValues _ _ = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-       
+
 updateWin :: TVar String -> X ()
 updateWin v = do
   xc <- ask
@@ -243,7 +243,7 @@ drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
   let (c,d ) = (config &&& display) r
       (w,fs) = (window &&& fontS  ) r
       strLn  = io . mapM (\(s,cl) -> textWidth d fs s >>= \tw -> return (s,cl,fi tw))
-  withColors d [bgColor c] $ \[bgcolor] -> do
+  withColors d [bgColor c, borderColor c] $ \[bgcolor, bdcolor] -> do
     gc <- io $ createGC  d w
     -- create a pixmap to write to and fill it with a rectangle
     p <- io $ createPixmap d w wid ht
@@ -251,6 +251,8 @@ drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
     -- the fgcolor of the rectangle will be the bgcolor of the window
     io $ setForeground d gc bgcolor
     io $ fillRectangle d p gc 0 0 wid ht
+    -- draw 1 pixel border if requested
+    io $ drawBorder (border c) d p gc bdcolor (wid - 1) (ht - 1)
     -- write to the pixmap the new string
     printStrings p gc fs 1 L =<< strLn left
     printStrings p gc fs 1 R =<< strLn right
@@ -262,6 +264,15 @@ drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
     io $ freePixmap d p
     -- resync
     io $ sync       d True
+
+drawBorder :: Border -> Display -> Drawable -> GC -> Pixel -> Dimension
+           -> Dimension -> IO ()
+drawBorder b d p gc c w h =  case b of
+  NoBorder -> return ()
+  TopB -> sf >> drawLine d p gc 0 0 (fi w) 0
+  BottomB -> sf >> drawLine d p gc 0 (fi h) (fi w) (fi h)
+  FullB -> sf >> drawRectangle d p gc 0 0 w h
+  where sf = setForeground d gc c
 
 -- | An easy way to print the stuff we need to print
 printStrings :: Drawable -> GC -> XFont -> Position

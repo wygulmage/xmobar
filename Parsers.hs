@@ -130,21 +130,25 @@ parseConfig = runParser parseConf fields "Config" . stripComments
       perms = permute $ Config
               <$?> pFont         <|?> pBgColor
               <|?> pFgColor      <|?> pPosition
+              <|?> pBorder       <|?> pBdColor
               <|?> pLowerOnStart <|?> pCommands
               <|?> pSepChar      <|?> pAlignSep
               <|?> pTemplate
 
       fields    = [ "font", "bgColor", "fgColor", "sepChar", "alignSep"
-                  , "template", "position", "lowerOnStart", "commands"]
+                  , "border", "borderColor" ,"template", "position"
+                  , "lowerOnStart", "commands"]
       pFont     = strField font     "font"
       pBgColor  = strField bgColor  "bgColor"
       pFgColor  = strField fgColor  "fgColor"
+      pBdColor  = strField borderColor "borderColor"
       pSepChar  = strField sepChar  "sepChar"
       pAlignSep = strField alignSep "alignSep"
       pTemplate = strField template "template"
 
       pPosition     = field position     "position"     $ tillFieldEnd >>= read' "position"
       pLowerOnStart = field lowerOnStart "lowerOnStart" $ tillFieldEnd >>= read' "lowerOnStart"
+      pBorder       = field border       "border"       $ tillFieldEnd >>= read' "border"
       pCommands     = field commands     "commands"     $ readCommands
 
       staticPos = do string "Static"
