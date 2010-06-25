@@ -251,12 +251,12 @@ drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
     -- the fgcolor of the rectangle will be the bgcolor of the window
     io $ setForeground d gc bgcolor
     io $ fillRectangle d p gc 0 0 wid ht
-    -- draw 1 pixel border if requested
-    io $ drawBorder (border c) d p gc bdcolor wid ht
     -- write to the pixmap the new string
     printStrings p gc fs 1 L =<< strLn left
     printStrings p gc fs 1 R =<< strLn right
     printStrings p gc fs 1 C =<< strLn center
+    -- draw 1 pixel border if requested
+    io $ drawBorder (border c) d p gc bdcolor wid ht
     -- copy the pixmap with the new string to the window
     io $ copyArea   d p w gc 0 0 wid ht 0 0
     -- free up everything (we do not want to leak memory!)
