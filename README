@@ -412,7 +412,7 @@ Monitors have default aliases.
   where the template can contain <size>, <free>, <used>, <freep> or
   <usedp>, <freebar> or <usedbar> for total, free, used, free
   percentage and used percentage of the given file system capacity. Example:
-  `[("/", "\<used\>/\<size\>"), ("sdb1", "\<usedbar\>")]`
+  `[("/", "<used>/<size>"), ("sdb1", "<usedbar>")]`
 - Args: the argument list (see above). `-t`/`--template` is ignored.
 - Default template: none (you must specify a template for each file system).
 
@@ -422,7 +422,7 @@ Monitors have default aliases.
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain <total>, <read>, <write> for total,
   read and write speed, respectively. Example:
-  `[("/", "\<read\> \<write\>"), ("sdb1", "\<total\>")]`
+  `[("/", "<read> <write>"), ("sdb1", "<total>")]`
 - Args: the argument list (see above). `-t`/`--template` is ignored.
 - Default template: none (you must specify a template for each file system).
 
@@ -435,7 +435,7 @@ Monitors have default aliases.
 - Default template: `Thm: <temp>C`
 - This plugin works only on sytems with devices having thermal zone.
   Check directories in /proc/acpi/thermal_zone for possible values.
-- Example: `Run Thermal "THRM" ["-t","iwl4965-temp: \<temp\>C"]`
+- Example: `Run Thermal "THRM" ["-t","iwl4965-temp: <temp>C"]`
 
 `CpuFreq Args RefreshRate`
 
@@ -445,7 +445,7 @@ Monitors have default aliases.
 	    `cpu0`, `cpu1`, ..,  `cpuN`
 - Default template: `Freq: <cpu0>GHz`
 - This monitor requires acpi_cpufreq module to be loaded in kernel
-- Example: `Run CpuFreq ["-t","Freq:\<cpu0\>|\<cpu1\>GHz","-L","0","-H","2","-l","lightblue","-n","white","-h","red"] 50`
+- Example: `Run CpuFreq ["-t","Freq:<cpu0>|<cpu1>GHz","-L","0","-H","2","-l","lightblue","-n","white","-h","red"] 50`
 
 `CoreTemp Args RefreshRate`
 
@@ -455,7 +455,7 @@ Monitors have default aliases.
 	    `core0`, `core1`, ..,  `coreN`
 - Default template: `Temp: <core0>C`
 - This monitor requires coretemp module to be loaded in kernel
-- Example: `Run CoreTemp ["-t","Temp:\<core0\>|\<core1\>C","-L","40","-H","60","-l","lightblue","-n","gray90","-h","red"] 50`
+- Example: `Run CoreTemp ["-t","Temp:<core0>|<core1>C","-L","40","-H","60","-l","lightblue","-n","gray90","-h","red"] 50`
 
 `MPD Args RefreshRate`
 
@@ -471,9 +471,9 @@ Monitors have default aliases.
              `album`, `title`, `track`, `file`, `genre`
 - Default template: `MPD: <state>`
 - Example:
-    Run MPD ["-t",
-             "\<composer\> \<title\> (\<album\>) \<track\>/\<plength\> \<statei\> ",
-             "--", "-P", "\>\>", "-Z", "|", "-S", "\>\<"] 10
+    `Run MPD ["-t",
+              "<composer> <title> (<album>) <track>/<plength> <statei> ",
+              "--", "-P", ">>", "-Z", "|", "-S", "><"] 10`
    Note that you need "--" to separate regular monitor options from
    MPD's specific ones.
 - This monitor will only be compiled if you ask for it using the
