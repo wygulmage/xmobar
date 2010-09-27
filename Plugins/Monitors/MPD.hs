@@ -57,19 +57,19 @@ parseMPD :: M.Response M.Status -> M.Response (Maybe M.Song) -> MOpts
             -> (Float, [String])
 parseMPD (Left e) _ _ = (0, show e:repeat "")
 parseMPD (Right st) song opts =
-  (b, [ss, si, vol, len, lap, remain, plen, pp] ++ parseSong song)
+  (realToFrac b, [ss, si, vol, len, lap, remain, plen, pp] ++ parseSong song)
   where s = M.stState st
         ss = show s
         si = stateGlyph s opts
         vol = int2str $ M.stVolume st
         (p, t) = M.stTime st
-        [lap, len, remain] = map showTime [p, t, max 0 (t - p)]
-        b = if t > 0 then fromIntegral p / fromIntegral t else 0
+        ps = floor p
+        [lap, len, remain] = map showTime [ps, t, max 0 (t - ps)]
+        b = if t > 0 then p / fromIntegral t else 0
         plen = int2str $ M.stPlaylistLength st
         pp = case M.stSongPos st of
                Nothing -> ""
-               Just (M.Pos n) -> int2str $ n + 1
-               Just (M.ID n) -> int2str n
+               Just n -> int2str $ n + 1
 
 stateGlyph :: M.State -> MOpts -> String
 stateGlyph s o =
@@ -82,10 +82,18 @@ parseSong :: M.Response (Maybe M.Song) -> [String]
 parseSong (Left _) = repeat ""
 parseSong (Right Nothing) = repeat ""
 parseSong (Right (Just s)) =
-  [ M.sgName s, M.sgArtist s, M.sgComposer s, M.sgPerformer s
-  , M.sgAlbum s, M.sgTitle s, track, trackno, M.sgFilePath s, M.sgGenre s]
-  where (track, trackno) = (show t, show tn)
-        (t, tn) = M.sgTrack s
+  [ name, artist, composer, performer , album, title
+  , track, trackno, M.sgFilePath s, genre]
+  where str sel = maybe "" head (M.sgGet sel s)
+        name = str M.Name
+        artist = str M.Artist
+        composer = str M.Composer
+        performer = str M.Performer
+        album = str M.Album
+        title = str M.Title
+        genre = str M.Genre
+        track = str M.Track
+        trackno = track
 
 showTime :: Integer -> String
 showTime t = int2str minutes ++ ":" ++ int2str seconds
