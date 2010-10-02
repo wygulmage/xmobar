@@ -23,26 +23,44 @@ mpdConfig = mkMConfig "MPD: <state>"
               [ "bar", "state", "statei", "volume", "length"
               , "lapsed", "remaining", "plength", "ppos"
               , "name", "artist", "composer", "performer"
-              , "album", "title", "track", "trackno", "file", "genre"
+              , "album", "title", "track", "file", "genre"
               ]
 
-data MOpts = MOpts {mPlaying :: String, mStopped :: String, mPaused :: String}
+data MOpts = MOpts
+  { mPlaying :: String
+  , mStopped :: String
+  , mPaused :: String
+  , mHost :: String
+  , mPort :: Integer
+  , mPassword :: String
+  }
 
 defaultOpts :: MOpts
-defaultOpts = MOpts { mPlaying = ">>", mStopped = "><", mPaused = "||" }
+defaultOpts = MOpts
+  { mPlaying = ">>"
+  , mStopped = "><"
+  , mPaused = "||"
+  , mHost = "127.0.0.1"
+  , mPort = 6600
+  , mPassword = ""
+  }
 
 options :: [OptDescr (MOpts -> MOpts)]
 options =
   [ Option "P" ["playing"] (ReqArg (\x o -> o { mPlaying = x }) "") ""
   , Option "S" ["stopped"] (ReqArg (\x o -> o { mStopped = x }) "") ""
   , Option "Z" ["paused"] (ReqArg (\x o -> o { mPaused = x }) "") ""
+  , Option "h" ["host"] (ReqArg (\x o -> o { mHost = x }) "") ""
+  , Option "p" ["port"] (ReqArg (\x o -> o { mPort = read x }) "") ""
+  , Option "x" ["password"] (ReqArg (\x o -> o { mPassword = x }) "") ""
   ]
 
 runMPD :: [String] -> Monitor String
 runMPD args = do
-  status <- io $ M.withMPD M.status
-  song <- io $ M.withMPD M.currentSong
   opts <- io $ mopts args
+  let mpd = M.withMPDEx (mHost opts) (mPort opts) (mPassword opts)
+  status <- io $ mpd M.status
+  song <- io $ mpd M.currentSong
   let (b, s) = parseMPD status song opts
   bs <- showPercentBar (100 * b) b
   parseTemplate (bs:s)
@@ -57,7 +75,7 @@ parseMPD :: M.Response M.Status -> M.Response (Maybe M.Song) -> MOpts
             -> (Float, [String])
 parseMPD (Left e) _ _ = (0, show e:repeat "")
 parseMPD (Right st) song opts =
-  (realToFrac b, [ss, si, vol, len, lap, remain, plen, pp] ++ parseSong song)
+  (b, [ss, si, vol, len, lap, remain, plen, pp] ++ parseSong song)
   where s = M.stState st
         ss = show s
         si = stateGlyph s opts
@@ -65,7 +83,7 @@ parseMPD (Right st) song opts =
         (p, t) = M.stTime st
         ps = floor p
         [lap, len, remain] = map showTime [ps, t, max 0 (t - ps)]
-        b = if t > 0 then p / fromIntegral t else 0
+        b = if t > 0 then realToFrac $ p / fromIntegral t else 0
         plen = int2str $ M.stPlaylistLength st
         pp = case M.stSongPos st of
                Nothing -> ""
@@ -82,8 +100,7 @@ parseSong :: M.Response (Maybe M.Song) -> [String]
 parseSong (Left _) = repeat ""
 parseSong (Right Nothing) = repeat ""
 parseSong (Right (Just s)) =
-  [ name, artist, composer, performer , album, title
-  , track, trackno, M.sgFilePath s, genre]
+  [name, artist, composer, performer , album, title, track, path, genre]
   where str sel = maybe "" head (M.sgGet sel s)
         name = str M.Name
         artist = str M.Artist
@@ -93,7 +110,7 @@ parseSong (Right (Just s)) =
         title = str M.Title
         genre = str M.Genre
         track = str M.Track
-        trackno = track
+        path =  M.sgFilePath s
 
 showTime :: Integer -> String
 showTime t = int2str minutes ++ ":" ++ int2str seconds
