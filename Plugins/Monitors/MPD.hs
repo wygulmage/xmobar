@@ -75,19 +75,16 @@ parseMPD :: M.Response M.Status -> M.Response (Maybe M.Song) -> MOpts
             -> (Float, [String])
 parseMPD (Left e) _ _ = (0, show e:repeat "")
 parseMPD (Right st) song opts =
-  (b, [ss, si, vol, len, lap, remain, plen, pp] ++ parseSong song)
+  (bar, [ss, si, vol, len, lap, remain, plen, ppos] ++ parseSong song)
   where s = M.stState st
         ss = show s
         si = stateGlyph s opts
         vol = int2str $ M.stVolume st
         (p, t) = M.stTime st
-        ps = floor p
-        [lap, len, remain] = map showTime [ps, t, max 0 (t - ps)]
-        b = if t > 0 then realToFrac $ p / fromIntegral t else 0
+        [lap, len, remain] = map showTime [floor p, t, max 0 (t - floor p)]
+        bar = if t > 0 then realToFrac $ p / fromIntegral t else 0
         plen = int2str $ M.stPlaylistLength st
-        pp = case M.stSongPos st of
-               Nothing -> ""
-               Just n -> int2str $ n + 1
+        ppos = maybe "" (int2str . (+1)) $ M.stSongPos st
 
 stateGlyph :: M.State -> MOpts -> String
 stateGlyph s o =
