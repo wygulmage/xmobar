@@ -21,9 +21,9 @@ import qualified Network.MPD as M
 mpdConfig :: IO MConfig
 mpdConfig = mkMConfig "MPD: <state>"
               [ "bar", "state", "statei", "volume", "length"
-              , "lapsed", "remaining", "plength", "ppos"
+              , "lapsed", "remaining", "plength", "ppos", "file"
               , "name", "artist", "composer", "performer"
-              , "album", "title", "track", "file", "genre"
+              , "album", "title", "track", "genre"
               ]
 
 data MOpts = MOpts
@@ -100,17 +100,11 @@ parseSong :: M.Response (Maybe M.Song) -> [String]
 parseSong (Left _) = repeat ""
 parseSong (Right Nothing) = repeat ""
 parseSong (Right (Just s)) =
-  [name, artist, composer, performer , album, title, track, path, genre]
-  where str sel = maybe "" head (M.sgGet sel s)
-        name = str M.Name
-        artist = str M.Artist
-        composer = str M.Composer
-        performer = str M.Performer
-        album = str M.Album
-        title = str M.Title
-        genre = str M.Genre
-        track = str M.Track
-        path =  M.sgFilePath s
+  M.sgFilePath s : map str [ M.Name, M.Artist, M.Composer, M.Performer
+                           , M.Album, M.Title, M.Track, M.Genre ]
+  where join [] = ""
+        join (x:xs) = foldl (\a o -> a ++ ", " ++ o) x xs
+        str sel = maybe "" join (M.sgGet sel s)
 
 showTime :: Integer -> String
 showTime t = int2str minutes ++ ":" ++ int2str seconds
