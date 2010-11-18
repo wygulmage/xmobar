@@ -61,9 +61,8 @@ runMPD args = do
   let mpd = M.withMPDEx (mHost opts) (mPort opts) (mPassword opts)
   status <- io $ mpd M.status
   song <- io $ mpd M.currentSong
-  let (b, s) = parseMPD status song opts
-  bs <- showPercentBar (100 * b) b
-  parseTemplate (bs:s)
+  s <- parseMPD status song opts
+  parseTemplate s
 
 mopts :: [String] -> IO MOpts
 mopts argv =
@@ -72,17 +71,19 @@ mopts argv =
     (_, _, errs) -> ioError . userError $ concat errs
 
 parseMPD :: M.Response M.Status -> M.Response (Maybe M.Song) -> MOpts
-            -> (Float, [String])
-parseMPD (Left e) _ _ = (0, show e:repeat "")
-parseMPD (Right st) song opts =
-  (bar, [ss, si, vol, len, lap, remain, plen, ppos] ++ parseSong song)
+            -> Monitor [String]
+parseMPD (Left e) _ _ = return $ show e:repeat ""
+parseMPD (Right st) song opts = do
+  songData <- parseSong song
+  bar <- showPercentBar (100 * b) b
+  return $ [bar, ss, si, vol, len, lap, remain, plen, ppos] ++ songData
   where s = M.stState st
         ss = show s
         si = stateGlyph s opts
         vol = int2str $ M.stVolume st
         (p, t) = M.stTime st
         [lap, len, remain] = map showTime [floor p, t, max 0 (t - floor p)]
-        bar = if t > 0 then realToFrac $ p / fromIntegral t else 0
+        b = if t > 0 then realToFrac $ p / fromIntegral t else 0
         plen = int2str $ M.stPlaylistLength st
         ppos = maybe "" (int2str . (+1)) $ M.stSongPos st
 
@@ -93,12 +94,13 @@ stateGlyph s o =
     M.Paused -> mPaused o
     M.Stopped -> mStopped o
 
-parseSong :: M.Response (Maybe M.Song) -> [String]
-parseSong (Left _) = repeat ""
-parseSong (Right Nothing) = repeat ""
-parseSong (Right (Just s)) =
-  M.sgFilePath s : map str [ M.Name, M.Artist, M.Composer, M.Performer
-                           , M.Album, M.Title, M.Track, M.Genre ]
+parseSong :: M.Response (Maybe M.Song) -> Monitor [String]
+parseSong (Left _) = return $ repeat ""
+parseSong (Right Nothing) = return $ repeat ""
+parseSong (Right (Just s)) = do
+  let x = M.sgFilePath s : map str [ M.Name, M.Artist, M.Composer, M.Performer
+                                   , M.Album, M.Title, M.Track, M.Genre ]
+  mapM showWithPadding x
   where join [] = ""
         join (x:xs) = foldl (\a o -> a ++ ", " ++ o) x xs
         str sel = maybe "" join (M.sgGet sel s)
