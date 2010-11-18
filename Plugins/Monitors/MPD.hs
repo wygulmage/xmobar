@@ -97,13 +97,14 @@ stateGlyph s o =
 parseSong :: M.Response (Maybe M.Song) -> Monitor [String]
 parseSong (Left _) = return $ repeat ""
 parseSong (Right Nothing) = return $ repeat ""
-parseSong (Right (Just s)) = do
-  let x = M.sgFilePath s : map str [ M.Name, M.Artist, M.Composer, M.Performer
-                                   , M.Album, M.Title, M.Track, M.Genre ]
-  mapM showWithPadding x
-  where join [] = ""
-        join (x:xs) = foldl (\a o -> a ++ ", " ++ o) x xs
-        str sel = maybe "" join (M.sgGet sel s)
+parseSong (Right (Just s)) =
+  let join [] = ""
+      join (x:xs) = foldl (\a o -> a ++ ", " ++ o) x xs
+      str sel = maybe "" join (M.sgGet sel s)
+      sels = [ M.Name, M.Artist, M.Composer, M.Performer
+             , M.Album, M.Title, M.Track, M.Genre ]
+      fields = M.sgFilePath s : map str sels
+  in mapM showWithPadding fields
 
 showTime :: Integer -> String
 showTime t = int2str minutes ++ ":" ++ int2str seconds
