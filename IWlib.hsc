@@ -56,7 +56,7 @@ getWirelessInfo iface =
     str <- c_iw_stats i istr stats rng 1
     rgr <- c_iw_range i istr rng
     c_iw_close i
-    if (bcr < 0) then return nullInfo else
+    if (bcr < 0) then return WirelessInfo { wiEssid = "", wiQuality = 0 } else
       do hase <- (#peek struct wireless_config, has_essid) wc :: IO CInt
          eon <- (#peek struct wireless_config, essid_on) wc :: IO CInt
          essid <- if hase /= 0 && eon /= 0 then
@@ -68,9 +68,8 @@ getWirelessInfo iface =
                    mv <- xqual $ (#ptr struct iw_range, max_qual) rng
                    let mxv = if mv /= 0 then fromIntegral mv else 1
                    return $ fromIntegral qualv / mxv
-              else return (-1)
+              else return 0
          let qv = round (100 * (q :: Double))
          return $ WirelessInfo { wiEssid = essid, wiQuality = min 100 qv }
-    where nullInfo = WirelessInfo { wiEssid = "", wiQuality = -1 }
-          xqual p = let qp = (#ptr struct iw_param, value) p in
+    where xqual p = let qp = (#ptr struct iw_param, value) p in
             (#peek struct iw_quality, qual) qp :: IO CChar
