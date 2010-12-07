@@ -544,7 +544,7 @@ These are the arguments that can be used for internal commands in the
     -W number           --bwidth=number             Bar width (default 10)
     -t output template  --template=output template  Output template of the command.
 
-Commands' arguments must be set as a list. Es:
+Commands' arguments must be set as a list. E.g.:
 
     Run Weather "EGPF" ["-t","<station>: <tempC>C"] 36000
 
@@ -750,8 +750,7 @@ Useful links
 [Mailing list]: http://projects.haskell.org/cgi-bin/mailman/listinfo/xmobar
 [xmobar]: http://code.haskell.org/~arossato/xmobar/
 [xmobar darcs repository]: http://code.haskell.org/xmobar
-[this tutorial]:
-http://www.haskell.org/haskellwiki/X_window_programming_in_Haskell
+[this tutorial]: http://www.haskell.org/haskellwiki/X_window_programming_in_Haskell
 [sawflibs]: http://github.com/jaor/sawflibs
 [sawfish]: http://sawfish.wikia.com/
 
