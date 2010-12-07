@@ -13,10 +13,12 @@ features, like dynamic color management, output templates, and
 extensibility through plugins.
 
 [This is a screen shot] of Andrea's desktop with [xmonad] and xmobar.
+And [this] is xmobar running under [sawfish], with antialised fonts.
 
 [xmonad]: http://xmonad.org
 [Ion3]: http://tuomov.iki.fi/software/
 [This is a screen shot]: http://haskell.org/sitewiki/images/a/ae/Arossato-config.png
+[this]: http://projects.haskell.org/xmobar/xmobar-sawfish.png
 
 Installation
 ============
@@ -751,7 +753,6 @@ Useful links
 [xmobar darcs repository]: http://code.haskell.org/xmobar
 [this tutorial]: http://www.haskell.org/haskellwiki/X_window_programming_in_Haskell
 [sawflibs]: http://github.com/jaor/sawflibs
-[sawfish]: http://sawfish.wikia.com/
 
 Author
 ======
@@ -780,5 +781,6 @@ Copyright &copy; 2010 Jose Antonio Ortega Ruiz
 [i3status]: http://i3.zekjur.net/i3status/
 [iwlib]: http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html
 [libmpd]: http://hackage.haskell.org/package/libmpd/
+[sawfish]: http://sawfish.wikia.com/
 [utf8-string]: http://hackage.haskell.org/package/utf8-string/
 [xmobar.config-sample]: http://github.com/jaor/xmobar/raw/master/xmobar.config-sample
