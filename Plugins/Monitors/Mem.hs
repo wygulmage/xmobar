@@ -47,8 +47,9 @@ formatMem (r:xs) =
            rr = 100 * r
        ub <- showPercentBar rr r
        fb <- showPercentBar (100 - rr) (1 - r)
-       s <- mapM (showWithColors f) (rr:xs)
-       return (ub:fb:s)
+       rs <- showPercentWithColors r
+       s <- mapM (showWithColors f) xs
+       return (ub:fb:rs:s)
 formatMem _ = return $ replicate 9 "N/A"
 
 runMem :: [String] -> Monitor String
