@@ -13,7 +13,7 @@ features, like dynamic color management, output templates, and
 extensibility through plugins.
 
 [This is a screen shot] of Andrea's desktop with [xmonad] and xmobar.
-And [this] is xmobar running under [sawfish], with antialised fonts.
+And [this] is xmobar running under [sawfish], with antialiased fonts.
 
 [xmonad]: http://xmonad.org
 [Ion3]: http://tuomov.iki.fi/software/
