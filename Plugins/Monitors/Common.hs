@@ -88,6 +88,7 @@ data MConfig =
        , barBack     :: IORef String
        , barFore     :: IORef String
        , barWidth    :: IORef Int
+       , usePercent  :: IORef Bool
        }
 
 -- | from 'http:\/\/www.haskell.org\/hawiki\/MonadState'
@@ -129,7 +130,8 @@ mkMConfig tmpl exprts =
        bb <- newIORef ":"
        bf <- newIORef "#"
        bw <- newIORef 10
-       return $ MC nc l lc h hc t e p mn mx pc pr bb bf bw
+       up <- newIORef True
+       return $ MC nc l lc h hc t e p mn mx pc pr bb bf bw up
 
 data Opts = HighColor String
           | NormalColor String
@@ -146,6 +148,7 @@ data Opts = HighColor String
           | BarBack String
           | BarFore String
           | BarWidth String
+          | UsePercent String
 
 options :: [OptDescr Opts]
 options =
@@ -155,6 +158,7 @@ options =
     , Option "n"  ["normal"]   (ReqArg NormalColor "color number"  )  "Color for the normal threshold: ex \"#00FF00\""
     , Option "l"  ["low"]      (ReqArg LowColor "color number"     )  "Color for the low threshold: ex \"#0000FF\""
     , Option "t"  ["template"] (ReqArg Template "output template"  )  "Output template."
+    , Option "P"  ["percent"]  (ReqArg UsePercent "True/False"     )  "Use % to display percents."
     , Option "p"  ["ppad"]     (ReqArg PercentPad "percent padding")  "Minimum percentage width."
     , Option "m"  ["minwidth"] (ReqArg MinWidth "minimum width"    )  "Minimum field width"
     , Option "M"  ["maxwidth"] (ReqArg MaxWidth "maximum width"    )  "Maximum field width"
@@ -180,6 +184,7 @@ doConfigOptions [] = io $ return ()
 doConfigOptions (o:oo) =
     do let next = doConfigOptions oo
            nz s = let x = read s in max 0 x
+           bool s = s == "True"
        case o of
          High         h -> setConfigValue (read h) high >> next
          Low          l -> setConfigValue (read l) low >> next
@@ -197,6 +202,7 @@ doConfigOptions (o:oo) =
          BarBack     bb -> setConfigValue bb barBack >> next
          BarFore     bf -> setConfigValue bf barFore >> next
          BarWidth    bw -> setConfigValue (nz bw) barWidth >> next
+         UsePercent  up -> setConfigValue (bool up) usePercent >> next
 
 runM :: [String] -> IO MConfig -> ([String] -> Monitor String) -> Int -> (String -> IO ()) -> IO ()
 runM args conf action r cb = go
@@ -339,8 +345,10 @@ floatToPercent n =
   do pad <- getConfigValue ppad
      pc <- getConfigValue padChars
      pr <- getConfigValue padRight
+     up <- getConfigValue usePercent
      let p = showDigits 0 (n * 100)
-     return $ padString pad pad pc pr p ++ "%"
+         ps = if up then "%" else ""
+     return $ padString pad pad pc pr p ++ ps
 
 stringParser :: Pos -> B.ByteString -> String
 stringParser (x,y) =

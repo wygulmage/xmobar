@@ -535,6 +535,7 @@ These are the arguments that can be used for internal commands in the
     -h color number     --high=color number         Color for the high threshold: es "#FF0000"
     -n color number     --normal=color number       Color for the normal threshold: es "#00FF00"
     -l color number     --low=color number          Color for the low threshold: es "#0000FF"
+    -P True/False       --percent=True/False        Use % to display percents (default: True)
     -p number           --ppad=number               Pad percentages to given width
     -m number           --minwidth=number           Minimum field width
     -M number           --maxwidth=number           Maximum field width
