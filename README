@@ -247,8 +247,8 @@ xmobar --help):
                                          the output template. Default '%'
       -t template   --template=template  The output template
       -c commands   --commands=commands  The list of commands to be executed
-	  -x screen     --screen=screen      On which X screen number to start
-    Mail bug reports and suggestions to <andrea.rossato@unibz.it>
+      -x screen     --screen=screen      On which X screen number to start
+    Mail bug reports and suggestions to <xmobar@projects.haskell.org>
 
 ## The Output Template
 
@@ -708,10 +708,10 @@ To remove the system monitor plugin:
 Bug Reports
 ===========
 
-To submit bug reports you can use the Google code bug tracking system
-available at the following address:
+To submit bug reports you can use the [bug tracker over at Google
+code] or send mail to our [Mailing list].
 
-<http://code.google.com/p/xmobar/issues>
+[bug tracker over at Google code]: http://code.google.com/p/xmobar/issues
 
 Credits
 =======
@@ -737,7 +737,7 @@ giving the chance to contribute.
 Useful links
 ============
 
-- [Github page](http://github.com/jaor/xmobar).
+- [Github page].
 - [Mailing list].
 - Andrea's original [xmobar] home page, and [xmobar darcs repository].
 
@@ -747,7 +747,6 @@ Useful links
 - My [sawflibs] project includes a module to automate running xmobar
   in [sawfish].
 
-[Mailing list]: http://projects.haskell.org/cgi-bin/mailman/listinfo/xmobar
 [xmobar]: http://code.haskell.org/~arossato/xmobar/
 [xmobar darcs repository]: http://code.haskell.org/xmobar
 [this tutorial]: http://www.haskell.org/haskellwiki/X_window_programming_in_Haskell
@@ -772,12 +771,14 @@ Copyright &copy; 2007-2010 Andrea Rossato
 Copyright &copy; 2010 Jose Antonio Ortega Ruiz
 
 [Github]: http://github.com/jaor/xmobar/
+[Github page]: http://github.com/jaor/xmobar
 [Hackage]: http://hackage.haskell.org/package/xmobar/
 [LICENSE]: https://github.com/jaor/xmobar/raw/master/LICENSE
+[Mailing list]: http://projects.haskell.org/cgi-bin/mailman/listinfo/xmobar
 [MPD]: http://mpd.wikia.com/
 [X11-xft]: http://hackage.haskell.org/package/X11-xft/
 [i3status]: http://i3.zekjur.net/i3status/
 [iwlib]: http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html
 [libmpd]: http://hackage.haskell.org/package/libmpd/
 [utf8-string]: http://hackage.haskell.org/package/utf8-string/
-[xmobar.config-sample]: https://github.com/jaor/xmobar/raw/master/xmobar.config-sample
+[xmobar.config-sample]: http://github.com/jaor/xmobar/raw/master/xmobar.config-sample
