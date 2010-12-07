@@ -21,7 +21,7 @@ import qualified Data.ByteString.Lazy.Char8 as B
 swapConfig :: IO MConfig
 swapConfig = mkMConfig
         "Swap: <usedratio>"                    -- template
-        ["total", "used", "free", "usedratio"] -- available replacements
+        ["usedratio", "total", "used", "free"] -- available replacements
 
 fileMEM :: IO B.ByteString
 fileMEM = B.readFile "/proc/meminfo"
@@ -30,7 +30,7 @@ parseMEM :: IO [Float]
 parseMEM =
     do file <- fileMEM
        let li i l
-               | l /= [] = (head l) !! i
+               | l /= [] = head l !! i
                | otherwise = B.empty
            fs s l
                | l == []    = False
@@ -39,18 +39,17 @@ parseMEM =
            st   = map B.words . B.lines $ file
            tot  = get_data "SwapTotal:" st
            free = get_data "SwapFree:" st
-       return [tot, (tot - free), free, (tot - free) / tot]
+       return [(tot - free) / tot, tot, tot - free, free]
 
 formatSwap :: [Float] -> Monitor [String]
-formatSwap x =
-    do let f1 n = showDigits 2 n
-           (hd, tl) = splitAt 3 x
-       firsts <- mapM (showWithColors f1) hd
-       lasts <- showPercentsWithColors (map (/100) tl)
-       return $ firsts ++ lasts
+formatSwap (r:xs) =
+     do other <- mapM (showWithColors (showDigits 2)) xs
+        ratio <- showPercentWithColors r
+        return $ ratio:other
+formatSwap _ = return $ replicate 4 "N/A"
 
 runSwap :: [String] -> Monitor String
 runSwap _ =
-    do m <- io $ parseMEM
+    do m <- io parseMEM
        l <- formatSwap m
        parseTemplate l

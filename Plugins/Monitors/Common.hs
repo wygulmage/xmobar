@@ -39,6 +39,7 @@ module Plugins.Monitors.Common (
                        , showWithPadding
                        , showWithColors
                        , showWithColors'
+                       , showPercentWithColors
                        , showPercentsWithColors
                        , showPercentBar
                        , showLogBar
@@ -385,6 +386,9 @@ showPercentsWithColors :: [Float] -> Monitor [String]
 showPercentsWithColors fs =
   do fstrs <- mapM floatToPercent fs
      zipWithM (showWithColors . const) fstrs (map (*100) fs)
+
+showPercentWithColors :: Float -> Monitor String
+showPercentWithColors f = liftM head $ showPercentsWithColors [f]
 
 showPercentBar :: Float -> Float -> Monitor String
 showPercentBar v x = do
