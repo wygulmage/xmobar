@@ -29,15 +29,19 @@ flag with_utf8
   default: True
 
 flag with_inotify
-  description: inotify support (modern Linux only).  Required for the Mail plugin.
+  description: inotify support (modern Linux only).  Required for the Mail and MBox plugins.
   default: False
 
 flag with_iwlib
-  description: wireless info support. Required for the Wireless plugin, needs iwlib installed.
+  description: Wireless info support. Required for the Wireless plugin, needs iwlib installed.
   default: False
 
 flag with_mpd
-  description: mpd support. Needs libmpd installed.
+  description: MPD support. Needs libmpd installed.
+  default: False
+
+flag all_extensions
+  description: Includes all optional extensions.
   default: False
 
 executable xmobar
@@ -62,23 +66,23 @@ executable xmobar
     else
        build-depends: base < 3
 
-    if flag(with_xft)
+    if flag(with_xft) || flag(all_extensions)
        build-depends: utf8-string, X11-xft >= 0.2
        cpp-options: -DXFT
 
-    if flag(with_utf8)
+    if flag(with_utf8) || flag(all_extensions)
        build-depends: utf8-string
        cpp-options: -DUTF8
 
-    if flag(with_inotify)
+    if flag(with_inotify) || flag(all_extensions)
        build-depends: hinotify
        cpp-options: -DINOTIFY
 
-    if flag(with_iwlib)
+    if flag(with_iwlib) || flag(all_extensions)
        extra-libraries: iw
        other-modules: IWlib
        cpp-options: -DIWLIB
 
-    if flag(with_mpd)
+    if flag(with_mpd) || flag(all_extensions)
        build-depends: libmpd >= 0.5
        cpp-options: -DLIBMPD
