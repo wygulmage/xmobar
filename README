@@ -569,14 +569,18 @@ option list with the Com template command:
 
 - ProgramName: the name of the program
 - Args: the arguments to be passed to the program at execution time
+- RefreshRate: number of tenths of second between re-runs of the
+  command. A zero or negative rate means that the command will be
+  executed only once.
 - Alias: a name to be used in the template. If the alias is en empty
   string the program name can be used in the template.
 
-Es:
+E.g.:
 
-        Run Com "uname" ["-s","-r"] "" 36000
+        Run Com "uname" ["-s","-r"] "" 0
 
-can be used in the output template as `%uname%`
+can be used in the output template as `%uname%` (and xmobar will call
+_uname_ only once), while
 
         Run Com "date" ["+\"%a %b %_d %H:%M\""] "mydate" 600
 
