@@ -18,9 +18,9 @@ import Plugins.Monitors.Common
 
 memConfig :: IO MConfig
 memConfig = mkMConfig
-       "Mem: <usedratio>% (<cache>M)" -- template
-       ["usedbar", "freebar", "usedratio", "total",  -- available replacements
-        "free", "buffer", "cache", "rest", "used"]
+       "Mem: <usedratio> (<cache>M)" -- template
+       ["usedbar", "freebar", "usedratio", "total",
+        "free", "buffer", "cache", "rest", "used"]  -- available replacements
 
 fileMEM :: IO String
 fileMEM = readFile "/proc/meminfo"
