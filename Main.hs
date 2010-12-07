@@ -120,13 +120,16 @@ getOpts argv =
 usage :: String
 usage = (usageInfo header options) ++ footer
     where header = "Usage: xmobar [OPTION...] [FILE]\nOptions:"
-          footer = "\nMail bug reports and suggestions to " ++ mail
+          footer = "\nMail bug reports and suggestions to " ++ mail ++ "\n"
 
 info :: String
-info = "xmobar " ++ showVersion version ++ " (C) 2007 - 2009 Andrea Rossato " ++ mail ++ license
+info = "xmobar " ++ showVersion version
+        ++ "\n (C) 2007 - 2010 Andrea Rossato "
+        ++ "\n (C) 2010 Jose A Ortega Ruiz\n "
+        ++ mail ++ "\n" ++ license
 
 mail :: String
-mail = "<andrea.rossato@unitn.it>\n"
+mail = "<xmobar@projects.haskell.org>"
 
 license :: String
 license = "\nThis program is distributed in the hope that it will be useful,\n" ++
