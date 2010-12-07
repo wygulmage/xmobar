@@ -83,7 +83,7 @@ data MConfig =
        , ppad        :: IORef Int
        , minWidth    :: IORef Int
        , maxWidth    :: IORef Int
-       , padChars    :: IORef [Char]
+       , padChars    :: IORef String
        , padRight    :: IORef Bool
        , barBack     :: IORef String
        , barFore     :: IORef String
@@ -108,8 +108,7 @@ setConfigValue v s =
        mods s (\_ -> v)
 
 getConfigValue :: Selector a -> Monitor a
-getConfigValue s =
-    sel s
+getConfigValue = sel
 
 mkMConfig :: String
           -> [String]
@@ -150,31 +149,31 @@ data Opts = HighColor String
 
 options :: [OptDescr Opts]
 options =
-    [ Option ['H']  ["High"]     (ReqArg High "number"               )  "The high threshold"
-    , Option ['L']  ["Low"]      (ReqArg Low "number"                )  "The low threshold"
-    , Option ['h']  ["high"]     (ReqArg HighColor "color number"    )  "Color for the high threshold: ex \"#FF0000\""
-    , Option ['n']  ["normal"]   (ReqArg NormalColor "color number"  )  "Color for the normal threshold: ex \"#00FF00\""
-    , Option ['l']  ["low"]      (ReqArg LowColor "color number"     )  "Color for the low threshold: ex \"#0000FF\""
-    , Option ['t']  ["template"] (ReqArg Template "output template"  )  "Output template."
-    , Option ['p']  ["ppad"]     (ReqArg PercentPad "percent padding")  "Minimum percentage width."
-    , Option ['m']  ["minwidth"] (ReqArg MinWidth "minimum width"    )  "Minimum field width"
-    , Option ['M']  ["maxwidth"] (ReqArg MaxWidth "maximum width"    )  "Maximum field width"
-    , Option ['w']  ["width"]    (ReqArg Width "fixed width"         )  "Fixed field width"
-    , Option ['c']  ["padchars"] (ReqArg PadChars "padding chars"    )  "Characters to use for padding"
-    , Option ['a']  ["align"]    (ReqArg PadAlign "padding alignment")  "'l' for left padding, 'r' for right"
-    , Option ['b']  ["bback"]    (ReqArg BarBack "bar background"    )  "Characters used to draw bar backgrounds"
-    , Option ['f']  ["bfore"]    (ReqArg BarFore "bar foreground"    )  "Characters used to draw bar foregrounds"
-    , Option ['W']  ["bwidth"]   (ReqArg BarWidth "bar width"        )  "Bar width"
+    [ Option "H"  ["High"]     (ReqArg High "number"               )  "The high threshold"
+    , Option "L"  ["Low"]      (ReqArg Low "number"                )  "The low threshold"
+    , Option "h"  ["high"]     (ReqArg HighColor "color number"    )  "Color for the high threshold: ex \"#FF0000\""
+    , Option "n"  ["normal"]   (ReqArg NormalColor "color number"  )  "Color for the normal threshold: ex \"#00FF00\""
+    , Option "l"  ["low"]      (ReqArg LowColor "color number"     )  "Color for the low threshold: ex \"#0000FF\""
+    , Option "t"  ["template"] (ReqArg Template "output template"  )  "Output template."
+    , Option "p"  ["ppad"]     (ReqArg PercentPad "percent padding")  "Minimum percentage width."
+    , Option "m"  ["minwidth"] (ReqArg MinWidth "minimum width"    )  "Minimum field width"
+    , Option "M"  ["maxwidth"] (ReqArg MaxWidth "maximum width"    )  "Maximum field width"
+    , Option "w"  ["width"]    (ReqArg Width "fixed width"         )  "Fixed field width"
+    , Option "c"  ["padchars"] (ReqArg PadChars "padding chars"    )  "Characters to use for padding"
+    , Option "a"  ["align"]    (ReqArg PadAlign "padding alignment")  "'l' for left padding, 'r' for right"
+    , Option "b"  ["bback"]    (ReqArg BarBack "bar background"    )  "Characters used to draw bar backgrounds"
+    , Option "f"  ["bfore"]    (ReqArg BarFore "bar foreground"    )  "Characters used to draw bar foregrounds"
+    , Option "W"  ["bwidth"]   (ReqArg BarWidth "bar width"        )  "Bar width"
     ]
 
 doArgs :: [String]
        -> ([String] -> Monitor String)
        -> Monitor String
 doArgs args action =
-    do case (getOpt Permute options args) of
-         (o, n, []  ) -> do doConfigOptions o
-                            action n
-         (_, _, errs) -> return (concat errs)
+    case getOpt Permute options args of
+      (o, n, [])   -> do doConfigOptions o
+                         action n
+      (_, _, errs) -> return (concat errs)
 
 doConfigOptions :: [Opts] -> Monitor ()
 doConfigOptions [] = io $ return ()
@@ -200,7 +199,7 @@ doConfigOptions (o:oo) =
          BarWidth    bw -> setConfigValue (nz bw) barWidth >> next
 
 runM :: [String] -> IO MConfig -> ([String] -> Monitor String) -> Int -> (String -> IO ()) -> IO ()
-runM args conf action r cb = do go
+runM args conf action r cb = go
     where go = do
             c <- conf
             let ac = doArgs args action
@@ -219,9 +218,9 @@ io = liftIO
 
 runP :: Parser [a] -> String -> IO [a]
 runP p i =
-    do case (parse p "" i) of
-         Left _ -> return []
-         Right x  -> return x
+    case parse p "" i of
+      Left _ -> return []
+      Right x  -> return x
 
 getAllBut :: String -> Parser String
 getAllBut s =
@@ -241,8 +240,7 @@ skipRestOfLine =
 getAfterString :: String -> Parser String
 getAfterString s =
     do { try $ manyTill skipRestOfLine $ string s
-       ; v <- manyTill anyChar $ newline
-       ; return v
+       ; manyTill anyChar newline
        } <|> return ("<" ++ s ++ " not found!>")
 
 skipTillString :: String -> Parser String
@@ -259,11 +257,11 @@ templateStringParser =
        }
     where
       nonPlaceHolder = liftM concat . many $
-                       (many1 $ noneOf "<") <|> colorSpec
+                       many1 (noneOf "<") <|> colorSpec
 
 -- | Recognizes color specification and returns it unchanged
 colorSpec :: Parser String
-colorSpec = (try $ string "</fc>") <|> try (
+colorSpec = try (string "</fc>") <|> try (
             do string "<fc="
                s <- many1 (alphaNum <|> char ',' <|> char '#')
                char '>'
@@ -309,7 +307,7 @@ type Pos = (Int, Int)
 
 takeDigits :: Int -> Float -> Float
 takeDigits d n =
-    fromIntegral ((round (n * fact)) :: Int) / fact
+    fromIntegral (round (n * fact) :: Int) / fact
   where fact = 10 ^ d
 
 showDigits :: Int -> Float -> String
@@ -318,7 +316,7 @@ showDigits d n =
 
 showWithUnits :: Int -> Int -> Float -> String
 showWithUnits d n x
-  | x < 0 = "-" ++ showWithUnits d n (-x)
+  | x < 0 = '-' : showWithUnits d n (-x)
   | n > 3 || x < 10^(d + 1) = show (round x :: Int) ++ units n
   | x <= 1024 = showDigits d (x/1024) ++ units (n+1)
   | otherwise = showWithUnits d (n+1) (x/1024)
@@ -380,7 +378,7 @@ showWithColors :: (Num a, Ord a) => (a -> String) -> a -> Monitor String
 showWithColors f x = showWithPadding (f x) >>= colorizeString x
 
 showWithColors' :: (Num a, Ord a) => String -> a -> Monitor String
-showWithColors' str v = showWithColors (const str) v
+showWithColors' str = showWithColors (const str)
 
 showPercentsWithColors :: [Float] -> Monitor [String]
 showPercentsWithColors fs =
@@ -397,13 +395,13 @@ showPercentBar v x = do
   bw <- getConfigValue barWidth
   let len = min bw $ round (fromIntegral bw * x)
   s <- colorizeString v (take len $ cycle bf)
-  return $ s ++ (take (bw - len) $ cycle bb)
+  return $ s ++ take (bw - len) (cycle bb)
 
 showLogBar :: Float -> Float -> Monitor String
 showLogBar f v = do
   h <- fromIntegral `fmap` getConfigValue high
   bw <- fromIntegral `fmap` getConfigValue barWidth
-  showPercentBar v $ f + (logBase 10 (v / h)) / bw
+  showPercentBar v $ f + logBase 10 (v / h) / bw
 
 -- $threads
 
