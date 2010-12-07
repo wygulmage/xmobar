@@ -30,7 +30,7 @@ flag with_utf8
   default: True
 
 flag with_inotify
-  description: inotify support (modern Linux only).  Required for the Mail and MBox plugins.
+  description: inotify support (modern Linux only). Required for the Mail and MBox plugins.
   default: False
 
 flag with_iwlib
