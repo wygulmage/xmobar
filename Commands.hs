@@ -57,22 +57,21 @@ instance Exec Command where
     alias (Com p    _    a _)
         | p /= ""             = if a == "" then p else a
         | otherwise           = ""
-    start (Com prog args _ r) cb = do go
-        where go = do
-                (i,o,e,p) <- runInteractiveCommand (prog ++ concat (map (' ':) args))
+    start (Com prog args _ r) cb = if r > 0 then go else exec
+        where go = exec >> tenthSeconds r >> go
+              exec = do
+                (i,o,e,p) <- runInteractiveCommand (unwords (prog:args))
                 exit <- waitForProcess p
-                let closeHandles = do
-                        hClose o
-                        hClose i
-                        hClose e
+                let closeHandles = hClose o >> hClose i >> hClose e
                 case exit of
                   ExitSuccess -> do
-                            str <- catch (hGetLineSafe o) (\(SomeException _) -> return "")
+                            str <- catch (hGetLineSafe o)
+                                         (\(SomeException _) -> return "")
                             closeHandles
                             cb str
                   _ -> do closeHandles
                           cb $ "Could not execute command " ++ prog
-                tenthSeconds r >> go
+
 
 -- | Work arount to the Int max bound: since threadDelay takes an Int, it
 -- is not possible to set a thread delay grater than about 45 minutes.
@@ -81,5 +80,5 @@ tenthSeconds :: Int -> IO ()
 tenthSeconds s | s >= x = do threadDelay y
                              tenthSeconds (x - s)
                | otherwise = threadDelay (s * 100000)
-               where y = (maxBound :: Int)
+               where y = maxBound :: Int
                      x = y `div` 100000
