@@ -20,7 +20,7 @@ import qualified Data.ByteString.Lazy.Char8 as B
 
 swapConfig :: IO MConfig
 swapConfig = mkMConfig
-        "Swap: <usedratio>"                    -- template
+        "Swap: <usedratio>%"                    -- template
         ["usedratio", "total", "used", "free"] -- available replacements
 
 fileMEM :: IO B.ByteString

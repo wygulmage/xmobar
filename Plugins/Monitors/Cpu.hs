@@ -19,8 +19,8 @@ import qualified Data.ByteString.Lazy.Char8 as B
 
 cpuConfig :: IO MConfig
 cpuConfig = mkMConfig
-       "Cpu: <total>"                           -- template
-       ["bar","total","user","nice","system","idle"]  -- available replacements
+       "Cpu: <total>%"
+       ["bar","total","user","nice","system","idle"]
 
 cpuData :: IO [Float]
 cpuData = do s <- B.readFile "/proc/stat"
@@ -28,7 +28,7 @@ cpuData = do s <- B.readFile "/proc/stat"
 
 cpuParser :: B.ByteString -> [Float]
 cpuParser =
-    map read . map B.unpack . tail . B.words . flip (!!) 0 . B.lines
+    map (read . B.unpack) . tail . B.words . flip (!!) 0 . B.lines
 
 parseCPU :: IO [Float]
 parseCPU =
@@ -48,6 +48,6 @@ formatCpu xs = do
 
 runCpu :: [String] -> Monitor String
 runCpu _ =
-    do c <- io $ parseCPU
+    do c <- io parseCPU
        l <- formatCpu c
        parseTemplate l

@@ -92,7 +92,8 @@ Otherwise, you'll need to install them yourself.
 
 `with_inotify`
 :    Support for inotify in modern linux kernels. This option is needed
-     for the MBox and Mail plugins to work.
+     for the MBox and Mail plugins to work. Requires the [hinotify]
+     package.
 
 `with_iwlib`
 :    Support for wireless cards. Enables the Wireless plugin. No Haskell
@@ -334,10 +335,9 @@ Monitors have default aliases.
 - Variables that can be used with the `-t`/`--template` argument:
             `essid`, `quality`, `qualitybar`
 - Default template: `<essid> <quality>`
-- Requires the C library libiw (part of the wireless tools suite)
+- Requires the C library [libiw] (part of the wireless tools suite)
   installed in your system. In addition, to activate this plugin you
-  must pass --flags="with_iwlib" to "runhaskell Setup configure"
-  or to "cabal install".
+  must pass `--flags="with_iwlib"` during compilation.
 
 `Memory Args RefreshRate`
 
@@ -362,7 +362,7 @@ Monitors have default aliases.
 - Args: the argument list (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `total`, `bar`, `user`, `nice`, `system`, `idle`
-- Default template: `Cpu: <total>`
+- Default template: `Cpu: <total>%`
 
 `MultiCpu Args RefreshRate`
 
@@ -371,7 +371,7 @@ Monitors have default aliases.
 - Variables that can be used with the `-t`/`--template` argument:
 	    `total`, `bar`, `user`, `nice`, `system`, `idle`,
 	    `total0`, `bar0`, `user0`, `nice0`, `system0`, `idle0`, ...
-- Default template: `Cpu: <total>`
+- Default template: `Cpu: <total>%`
 
 `Battery Args RefreshRate`
 
@@ -391,7 +391,7 @@ Monitors have default aliases.
 - Args: the argument list (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `left`, `leftbar`, `status`
-- Default template: `Batt: <left>`
+- Default template: `Batt: <left>%`
 
 `TopProc Args RefreshRate`
 
@@ -423,20 +423,26 @@ Monitors have default aliases.
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain <size>, <free>, <used>, <freep> or
   <usedp>, <freebar> or <usedbar> for total, free, used, free
-  percentage and used percentage of the given file system capacity. Example:
-  `[("/", "<used>/<size>"), ("sdb1", "<usedbar>")]`
+  percentage and used percentage of the given file system capacity.
 - Args: the argument list (see above). `-t`/`--template` is ignored.
 - Default template: none (you must specify a template for each file system).
+- Example:
+
+         DiskU [("/", "<used>/<size>"), ("sdb1", "<usedbar>")]
+               ["-L", "20", "-H", "50", "-m", "1", "-p", "3",]
+               20
 
 `DiskIO Disks Args RefreshRate`
 
 - aliases to `diskio`
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain <total>, <read>, <write> for total,
-  read and write speed, respectively. Example:
-  `[("/", "<read> <write>"), ("sdb1", "<total>")]`
+  read and write speed, respectively.
 - Args: the argument list (see above). `-t`/`--template` is ignored.
 - Default template: none (you must specify a template for each file system).
+- Example:
+
+         Disks [("/", "<read> <write>"), ("sdb1", "<total>")] [] 10
 
 `Thermal Zone Args RefreshRate`
 
@@ -447,7 +453,9 @@ Monitors have default aliases.
 - Default template: `Thm: <temp>C`
 - This plugin works only on sytems with devices having thermal zone.
   Check directories in /proc/acpi/thermal_zone for possible values.
-- Example: `Run Thermal "THRM" ["-t","iwl4965-temp: <temp>C"]`
+- Example:
+
+         Run Thermal "THRM" ["-t","iwl4965-temp: <temp>C"]
 
 `CpuFreq Args RefreshRate`
 
@@ -457,7 +465,10 @@ Monitors have default aliases.
 	    `cpu0`, `cpu1`, ..,  `cpuN`
 - Default template: `Freq: <cpu0>GHz`
 - This monitor requires acpi_cpufreq module to be loaded in kernel
-- Example: `Run CpuFreq ["-t","Freq:<cpu0>|<cpu1>GHz","-L","0","-H","2","-l","lightblue","-n","white","-h","red"] 50`
+- Example:
+
+         Run CpuFreq ["-t", "Freq:<cpu0>|<cpu1>GHz", "-L", "0", "-H", "2",
+                      "-l", "lightblue", "-n","white", "-h", "red"] 50
 
 `CoreTemp Args RefreshRate`
 
@@ -467,10 +478,16 @@ Monitors have default aliases.
 	    `core0`, `core1`, ..,  `coreN`
 - Default template: `Temp: <core0>C`
 - This monitor requires coretemp module to be loaded in kernel
-- Example: `Run CoreTemp ["-t","Temp:<core0>|<core1>C","-L","40","-H","60","-l","lightblue","-n","gray90","-h","red"] 50`
+- Example:
+
+         Run CoreTemp ["-t", "Temp:<core0>|<core1>C",
+                       "-L", "40", "-H", "60",
+                       "-l", "lightblue", "-n", "gray90", "-h", "red"] 50
 
 `MPD Args RefreshRate`
 
+- This monitor will only be compiled if you ask for it using the
+  `with_mpd` flag. It needs [libmpd] 5.0 or later (available on Hackage).
 - aliases to `mpd`
 - Args: the argument list (see below). In addition you can provide
   `-P`, `-S` and `-Z`, with an string argument, to represent the
@@ -484,26 +501,24 @@ Monitors have default aliases.
              `name`, `artist`, `composer`, `performer`
              `album`, `title`, `track`, `file`, `genre`
 - Default template: `MPD: <state>`
-- Example:
-    `Run MPD ["-t",
-              "<composer> <title> (<album>) <track>/<plength> <statei> ",
-              "--", "-P", ">>", "-Z", "|", "-S", "><"] 10`
-   Note that you need "--" to separate regular monitor options from
-   MPD's specific ones.
-- This monitor will only be compiled if you ask for it using the
-  `with_mpd` flag. It needs libmpd 4.1 or later (available on Hackage).
+- Example (note that you need "--" to separate regular monitor options from
+  MPD's specific ones):
+
+         Run MPD ["-t",
+                  "<composer> <title> (<album>) <track>/<plength> <statei> ",
+                  "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
 
 `Mail Args`
 
 - aliases to `Mail`
-- Args: list of maildirs in form [("name1","path1"),("name2","path2")]
-- This plugin requires INOTIFY support in Linux kernel and hinotify library.
-  To activate, pass --flags="with_inotify" to "runhaskell Setup configure"
-  or to "cabal install".
+- Args: list of maildirs in form `[("name1","path1"),("name2","path2")]`
+- This plugin requires inotify support in your linux kernel and the
+  [hinotify] package. To activate, pass `--flags="with_inotify"`
+  during compilation.
 
 `MBox Mboxes Opts Alias`
 
-- Mboxes a list of mbox files of the form [("name", "path", "color")],
+- Mboxes a list of mbox files of the form `[("name", "path", "color")]`,
   where name is the displayed name, path the absolute or relative (to
   BaseDir) path of the mbox file, and color the color to use to display
   the mail count (use an empty string for the default).
@@ -515,15 +530,16 @@ Monitors have default aliases.
                       of displayed mail coints
    -s suffix --suffix suffix  a string giving a suffix for the list
                       of displayed mail coints
-- This plugin requires INOTIFY support in Linux kernel and hinotify library.
-  To activate, pass --flags="with_inotify" to "runhaskell Setup
-  configure" or to "cabal install".
-- Example:
-   `Run MBox [("I ", "inbox", "red"), ("O ", "/foo/mbox", "")]
-             ["-d", "/var/mail/", "-p", " "] "mbox"`
-  will look for mails in `/var/mail/inbox` and `/foo/mbox`, and will put
-  a space in front of the printed string (when it's not empty); it
-  can be used in the template with the alias `mbox`.
+- This plugin requires inotify support in your linux kernel and the
+  [hinotify] package. To activate, pass `--flags="with_inotify"`
+  during compilation.
+- Example. The following command look for mails in `/var/mail/inbox`
+  and `/foo/mbox`, and will put a space in front of the printed string
+  (when it's not empty); it can be used in the template with the alias
+  `mbox`:
+
+         Run MBox [("I ", "inbox", "red"), ("O ", "/foo/mbox", "")]
+                  ["-d", "/var/mail/", "-p", " "] "mbox"
 
 ## Monitor Plugins Commands Arguments
 
@@ -785,6 +801,7 @@ Copyright &copy; 2010 Jose Antonio Ortega Ruiz
 [X11-xft]: http://hackage.haskell.org/package/X11-xft/
 [i3status]: http://i3.zekjur.net/i3status/
 [iwlib]: http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html
+[hinotify]: http://hackage.haskell.org/package/hinotify/
 [libmpd]: http://hackage.haskell.org/package/libmpd/
 [sawfish]: http://sawfish.wikia.com/
 [utf8-string]: http://hackage.haskell.org/package/utf8-string/

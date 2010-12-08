@@ -23,7 +23,7 @@ data Batt = Batt Float String
 
 battConfig :: IO MConfig
 battConfig = mkMConfig
-       "Batt: <left>" -- template
+       "Batt: <left>%" -- template
        ["leftbar", "left", "status"] -- available replacements
 
 type File = (String, String)

@@ -18,7 +18,7 @@ import Plugins.Monitors.Common
 
 memConfig :: IO MConfig
 memConfig = mkMConfig
-       "Mem: <usedratio> (<cache>M)" -- template
+       "Mem: <usedratio>% (<cache>M)" -- template
        ["usedbar", "freebar", "usedratio", "total",
         "free", "buffer", "cache", "rest", "used"]  -- available replacements
 

@@ -130,7 +130,7 @@ mkMConfig tmpl exprts =
        bb <- newIORef ":"
        bf <- newIORef "#"
        bw <- newIORef 10
-       up <- newIORef True
+       up <- newIORef False
        return $ MC nc l lc h hc t e p mn mx pc pr bb bf bw up
 
 data Opts = HighColor String
@@ -184,7 +184,7 @@ doConfigOptions [] = io $ return ()
 doConfigOptions (o:oo) =
     do let next = doConfigOptions oo
            nz s = let x = read s in max 0 x
-           bool s = s == "True"
+           bool = (`elem` ["True", "true", "Yes", "yes", "On", "on"])
        case o of
          High         h -> setConfigValue (read h) high >> next
          Low          l -> setConfigValue (read l) low >> next
@@ -198,13 +198,14 @@ doConfigOptions (o:oo) =
          Width        w -> setConfigValue (nz w) minWidth >>
                            setConfigValue (nz w) maxWidth >> next
          PadChars    pc -> setConfigValue pc padChars >> next
-         PadAlign    pa -> setConfigValue (isPrefixOf "r" pa) padRight >> next
+         PadAlign    a -> setConfigValue ("r" `isPrefixOf` a) padRight >> next
          BarBack     bb -> setConfigValue bb barBack >> next
          BarFore     bf -> setConfigValue bf barFore >> next
          BarWidth    bw -> setConfigValue (nz bw) barWidth >> next
          UsePercent  up -> setConfigValue (bool up) usePercent >> next
 
-runM :: [String] -> IO MConfig -> ([String] -> Monitor String) -> Int -> (String -> IO ()) -> IO ()
+runM :: [String] -> IO MConfig -> ([String] -> Monitor String) -> Int
+        -> (String -> IO ()) -> IO ()
 runM args conf action r cb = go
     where go = do
             c <- conf

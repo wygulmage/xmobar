@@ -20,7 +20,7 @@ import Data.List (isPrefixOf)
 
 multiCpuConfig :: IO MConfig
 multiCpuConfig =
-  mkMConfig "Cpu: <total>"
+  mkMConfig "Cpu: <total>%"
             [ k ++ n | n <- "" : map show [0 :: Int ..]
                      , k <- ["bar","total","user","nice","system","idle"]]
 
