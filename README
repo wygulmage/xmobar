@@ -335,7 +335,7 @@ Monitors have default aliases.
 - Variables that can be used with the `-t`/`--template` argument:
             `essid`, `quality`, `qualitybar`
 - Default template: `<essid> <quality>`
-- Requires the C library [libiw] (part of the wireless tools suite)
+- Requires the C library [iwlib] (part of the wireless tools suite)
   installed in your system. In addition, to activate this plugin you
   must pass `--flags="with_iwlib"` during compilation.
 
