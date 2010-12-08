@@ -310,7 +310,7 @@ Monitors have default aliases.
 `Weather StationID Args RefreshRate`
 
 - aliases to the Station ID: so `Weather "LIPB" []` can be used in template as `%LIPB%`
-- Args: the argument list (see below)
+- Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `station`, `stationState`, `year`, `month`, `day`, `hour`,
 	    `wind`, `visibility`, `skyCondition`, `tempC`, `tempF`,
@@ -321,8 +321,9 @@ Monitors have default aliases.
 
 `Network Interface Args RefreshRate`
 
-- aliases to the interface name: so `Network "eth0" []` can be used as `%eth0%`
-- Args: the argument list (see below)
+- aliases to the interface name: so `Network "eth0" []` can be used as
+  `%eth0%`
+- Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `dev`, `rx`, `tx`, `rxbar`, `txbar`
 - Default template: `<dev>: <rx>|<tx>`
@@ -331,7 +332,7 @@ Monitors have default aliases.
 
 - aliases to the interface name with the suffix "wi": thus, `Wirelss
   "wlan0" []` can be used as `%wlan0wi%`
-- Args: the argument list (see below)
+- Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
             `essid`, `quality`, `qualitybar`
 - Default template: `<essid> <quality>`
@@ -342,7 +343,7 @@ Monitors have default aliases.
 `Memory Args RefreshRate`
 
 - aliases to `memory`
-- Args: the argument list (see below)
+- Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
              `total`, `free`, `buffer`, `cache`, `rest`, `used`,
              `usedratio`, `usedbar`, `freebar`
@@ -351,7 +352,7 @@ Monitors have default aliases.
 `Swap Args RefreshRate`
 
 - aliases to `swap`
-- Args: the argument list (see below)
+- Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `total`, `used`, `free`, `usedratio`
 - Default template: `Swap: <usedratio>%`
@@ -359,7 +360,7 @@ Monitors have default aliases.
 `Cpu Args RefreshRate`
 
 - aliases to `cpu`
-- Args: the argument list (see below)
+- Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `total`, `bar`, `user`, `nice`, `system`, `idle`
 - Default template: `Cpu: <total>%`
@@ -367,7 +368,7 @@ Monitors have default aliases.
 `MultiCpu Args RefreshRate`
 
 - aliases to `multicpu`
-- Args: the argument list (see below)
+- Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `total`, `bar`, `user`, `nice`, `system`, `idle`,
 	    `total0`, `bar0`, `user0`, `nice0`, `system0`, `idle0`, ...
@@ -375,11 +376,7 @@ Monitors have default aliases.
 
 `Battery Args RefreshRate`
 
-- aliases to `battery`
-- Args: the argument list (see below)
-- Variables that can be used with the `-t`/`--template` argument:
-	    `left`, `leftbar`, `status`
-- Default template: `Batt: <left>`
+- Same as `BatteryP ["BAT0", "BAT1", "BAT2"] Args RefreshRate`.
 
 `BatteryP Dirs Args RefreshRate`
 
@@ -388,15 +385,36 @@ Monitors have default aliases.
   look for the `state` and `info` files. Example:
   `["BAT0","BAT1","BAT2"]`. Only the first 3 directories will be
   searched.
-- Args: the argument list (see below)
+- Args: default monitor arguments (see below), plus the following specif ones:
+    - `-O`: string for AC "on" status (default: "On")
+    - `-o`: string for AC "off" status (default: "Off")
+    - `-L`: low power (`watts`) threshold (default: -12)
+    - `-H`: high power threshold (defualt: -10)
+    - `-l`: color to display power lower than the `-L` threshold
+    - `-m`: color to display power lower than the `-H` threshold
+    - `-h`: color to display power highter than the `-H` threshold
+    - `-p`: color to display positive power (battery charging)
 - Variables that can be used with the `-t`/`--template` argument:
-	    `left`, `leftbar`, `status`
-- Default template: `Batt: <left>%`
+	    `left`, `leftbar`, `timeleft`, `watts`, `acstatus`
+- Default template: `Batt: <watts>, <left>% / <timeleft>`
+- Example (note that you need "--" to separate regular monitor options from
+  Battery's specific ones):
+
+         Run BatteryP ["BAT0"]
+                      ["-t", "<acstatus><watts> (<left>%)",
+                       "-L", "10", "-H", "80", "-p", "3",
+                       "--", "-O", "<fc=green>On</fc> - ", "-o", "",
+                       "-L", "-15", "-H", "-5",
+                       "-l", "red", "-m", "blue", "-h", "green"]
+                      600
+  In the above example, the thresholds before the "--" separator
+  refer to the `<left>` field, while those after the separator affect
+  how `<watts>` is displayed.
 
 `TopProc Args RefreshRate`
 
 - aliases to `top`
-- Args: the argument list (see below)
+- Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `no`, `name1`, `cpu1`, `both1`, `mname1`, `mem1`, `mboth1`,
             `name2`, `cpu2`, `both2`, `mname2`, `mem2`, `mboth2`, ...
@@ -409,7 +427,7 @@ Monitors have default aliases.
 `TopMem Args RefreshRate`
 
 - aliases to `topmem`
-- Args: the argument list (see below)
+- Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `name1`, `mem1`, `both1`, `name2`, `mem2`, `both2`, ...
 - Default template: `<both1>`
@@ -424,7 +442,7 @@ Monitors have default aliases.
   where the template can contain <size>, <free>, <used>, <freep> or
   <usedp>, <freebar> or <usedbar> for total, free, used, free
   percentage and used percentage of the given file system capacity.
-- Args: the argument list (see above). `-t`/`--template` is ignored.
+- Args: default monitor arguments (see below). `-t`/`--template` is ignored.
 - Default template: none (you must specify a template for each file system).
 - Example:
 
@@ -438,7 +456,7 @@ Monitors have default aliases.
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain <total>, <read>, <write> for total,
   read and write speed, respectively.
-- Args: the argument list (see above). `-t`/`--template` is ignored.
+- Args: default monitor arguments (see below). `-t`/`--template` is ignored.
 - Default template: none (you must specify a template for each file system).
 - Example:
 
@@ -447,7 +465,7 @@ Monitors have default aliases.
 `Thermal Zone Args RefreshRate`
 
 - aliases to the Zone: so `Zone "THRM" []` can be used in template as `%THRM%`
-- Args: the argument list (see below)
+- Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `temp`
 - Default template: `Thm: <temp>C`
@@ -460,7 +478,7 @@ Monitors have default aliases.
 `CpuFreq Args RefreshRate`
 
 - aliases to `cpufreq`
-- Args: the argument list (see below)
+- Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `cpu0`, `cpu1`, ..,  `cpuN`
 - Default template: `Freq: <cpu0>GHz`
@@ -473,7 +491,7 @@ Monitors have default aliases.
 `CoreTemp Args RefreshRate`
 
 - aliases to `coretemp`
-- Args: the argument list (see below)
+- Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `core0`, `core1`, ..,  `coreN`
 - Default template: `Temp: <core0>C`
@@ -489,7 +507,7 @@ Monitors have default aliases.
 - This monitor will only be compiled if you ask for it using the
   `with_mpd` flag. It needs [libmpd] 5.0 or later (available on Hackage).
 - aliases to `mpd`
-- Args: the argument list (see below). In addition you can provide
+- Args: default monitor arguments (see below). In addition you can provide
   `-P`, `-S` and `-Z`, with an string argument, to represent the
   playing, stopped and paused states in the `statei` template field,
   and `-h`, `-p` and `-x` for the host, port and password (default
@@ -739,11 +757,11 @@ code] or send mail to our [Mailing list].
 Credits
 =======
 
-xmobar [incorporates patches] from: Roman Cheplyaka, John Goerzen, Juraj
-Hercek, Tomas Janousek, Spencer Janssen, Krzysztof Kosciuszkiewicz,
-Lennart Kolmodin, Dmitry Kurochkin, Svein Ove, Jens Petersen, Andrew
-Sackville-West, Alexander Solovyov, Sergei Trofimovich, Jan
-Vornberger, Daniel Wagner and Norbert Zeh.
+xmobar [incorporates patches] from Roman Cheplyaka, John Goerzen,
+Juraj Hercek, Tomas Janousek, Spencer Janssen, Krzysztof
+Kosciuszkiewicz, Lennart Kolmodin, Dmitry Kurochkin, Svein Ove, Jens
+Petersen, Petr Rockai, Andrew Sackville-West, Alexander Solovyov,
+Sergei Trofimovich, Jan Vornberger, Daniel Wagner and Norbert Zeh.
 
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
 
