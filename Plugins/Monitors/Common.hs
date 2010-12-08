@@ -317,9 +317,8 @@ takeDigits d n =
     fromIntegral (round (n * fact) :: Int) / fact
   where fact = 10 ^ d
 
-showDigits :: Int -> Float -> String
-showDigits d n =
-    showFFloat (Just d) n ""
+showDigits :: (RealFloat a) => Int -> a -> String
+showDigits d n = showFFloat (Just d) n ""
 
 showWithUnits :: Int -> Int -> Float -> String
 showWithUnits d n x

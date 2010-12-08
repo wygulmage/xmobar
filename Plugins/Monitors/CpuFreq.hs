@@ -28,7 +28,8 @@ cpuFreqConfig = mkMConfig
                                                               -- replacements
 
 -- |
--- Function retrieves monitor string holding the cpu frequency (or frequencies)
+-- Function retrieves monitor string holding the cpu frequency (or
+-- frequencies)
 runCpuFreq :: [String] -> Monitor String
 runCpuFreq _ = do
     let dir = "/sys/devices/system/cpu"
@@ -36,7 +37,7 @@ runCpuFreq _ = do
         pattern = "cpu"
         divisor = 1e6 :: Double
         failureMessage = "CpuFreq: N/A"
-        fmt x | x < 1     = (show (round (x * 1000) :: Integer)) ++ "MHz"
-              | otherwise = (show x) ++ "GHz"
+        fmt x | x < 1     = show (round (x * 1000) :: Integer) ++ "MHz"
+              | otherwise = showDigits 1 x ++ "GHz"
     checkedDataRetrieval failureMessage dir file pattern (/divisor) fmt
 
