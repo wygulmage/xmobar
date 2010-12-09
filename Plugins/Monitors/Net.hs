@@ -28,7 +28,7 @@ interval = 500000
 
 netConfig :: IO MConfig
 netConfig = mkMConfig
-    "<dev>: <rx>|<tx>"      -- template
+    "<dev>: <rx>KB|<tx>KB"      -- template
     ["dev", "rx", "tx", "rxbar", "txbar"]     -- available replacements
 
 -- Given a list of indexes, take the indexed elements from a list.
@@ -64,10 +64,9 @@ netParser =
 
 formatNet :: Float -> Monitor (String, String)
 formatNet d = do
-    b <- showLogBar 0.8 d
-    x <- showWithColors f d
+    b <- showLogBar 0.6 d
+    x <- showWithColors (showDigits 1) d
     return (x, b)
-      where f s = showDigits 1 s ++ "Kb"
 
 printNet :: NetDev -> Monitor String
 printNet nd =

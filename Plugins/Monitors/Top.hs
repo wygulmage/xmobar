@@ -134,7 +134,7 @@ topProcesses tref scale = do
   atomicModifyIORef tref $ \(t0, c0) ->
     let scx = realToFrac (diffUTCTime c1 c0) * scale / 100
         ts = M.elems $ combineTimeInfos t0 t1
-        nts = map (\(nm, t) -> (nm, t / scx)) ts
+        nts = map (\(nm, t) -> (nm, min 100 (t / scx))) ts
     in ((t1, c1), (len, sortTop nts, sortTop mis))
 
 showTimeInfo :: TimeInfo -> Monitor [String]
