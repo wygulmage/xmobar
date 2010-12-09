@@ -13,12 +13,14 @@ features, like dynamic color management, output templates, and
 extensibility through plugins.
 
 [This is a screen shot] of Andrea's desktop with [xmonad] and xmobar.
-And [this] is xmobar running under [sawfish], with antialiased fonts.
+[This] is xmobar running under [sawfish], with antialiased fonts. And
+[this one] is my desktop with [xmonad] and two instances of xmobar.
 
 [xmonad]: http://xmonad.org
 [Ion3]: http://tuomov.iki.fi/software/
 [This is a screen shot]: http://haskell.org/sitewiki/images/a/ae/Arossato-config.png
-[this]: http://projects.haskell.org/xmobar/xmobar-sawfish.png
+[This]: http://projects.haskell.org/xmobar/xmobar-sawfish.png
+[this one]: http://projects.haskell.org/xmobar/xmobar-xmonad.png
 
 Installation
 ============
