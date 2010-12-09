@@ -370,8 +370,13 @@ Monitors have default aliases.
 - aliases to `multicpu`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
+	    `autototal`, `autobar`, `autouser`, `autonice`,
+	    `autosystem`, `autoidle`, `autototal%`, `autobar%`,
+	    `autouser%`, `autonice%`, `autosystem%`, `autoidle%`,
 	    `total`, `bar`, `user`, `nice`, `system`, `idle`,
 	    `total0`, `bar0`, `user0`, `nice0`, `system0`, `idle0`, ...
+- The auto* variables automatically detect the number of CPUs on the system
+  and displays one entry for each, with or without a trailing '%'.
 - Default template: `Cpu: <total>%`
 
 `Battery Args RefreshRate`
