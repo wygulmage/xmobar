@@ -16,13 +16,15 @@ module Plugins.Monitors.MultiCpu(multiCpuConfig, runMultiCpu) where
 
 import Plugins.Monitors.Common
 import qualified Data.ByteString.Lazy.Char8 as B
-import Data.List (isPrefixOf)
+import Data.List (isPrefixOf,intersperse,transpose)
 
 multiCpuConfig :: IO MConfig
 multiCpuConfig =
-  mkMConfig "Cpu: <total>%"
-            [ k ++ n | n <- "" : map show [0 :: Int ..]
-                     , k <- ["bar","total","user","nice","system","idle"]]
+  mkMConfig "Cpu: <total>%" $
+            map ("auto" ++) monitors
+            ++ [ k ++ n | n <- "" : map show [0 :: Int ..]
+                        , k <- monitors]
+    where monitors = ["bar","total","user","nice","system","idle"]
 
 
 cpuData :: IO [[Float]]
@@ -59,8 +61,20 @@ formatCpu xs
                       ps <- showPercentsWithColors (t:xs)
                       return (b:ps)
 
+splitEvery :: Int -> [a] -> [[a]]
+splitEvery _ [] = []
+splitEvery n l  = (take n l) : splitEvery n (drop n l)
+
+groupData :: [String] -> [[String]]
+groupData = transpose . tail . splitEvery 6
+
+formatAutoCpus :: [String] -> Monitor [String]
+formatAutoCpus [] = return $ replicate 6 ""
+formatAutoCpus xs = return $ map concat . map (intersperse " ") $ groupData xs
+
 runMultiCpu :: [String] -> Monitor String
 runMultiCpu _ =
   do c <- io parseCpuData
      l <- formatMultiCpus c
-     parseTemplate l
+     a <- formatAutoCpus l
+     parseTemplate (a ++ l)
