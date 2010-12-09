@@ -22,7 +22,6 @@ multiCpuConfig :: IO MConfig
 multiCpuConfig =
   mkMConfig "Cpu: <total>%" $
             map ("auto" ++) monitors
-            ++ map ((++ "%") . ("auto" ++)) monitors
             ++ [ k ++ n | n <- "" : map show [0 :: Int ..]
                         , k <- monitors]
     where monitors = ["bar","total","user","nice","system","idle"]
@@ -73,17 +72,9 @@ formatAutoCpus :: [String] -> Monitor [String]
 formatAutoCpus [] = return $ replicate 6 ""
 formatAutoCpus xs = return $ map concat . map (intersperse " ") $ groupData xs
 
-formatAutoCpusPercents :: [String] -> Monitor [String]
-formatAutoCpusPercents [] = return $ replicate 6 ""
-formatAutoCpusPercents xs = return $ map concat . map (intersperse " ") $ withPercents groups
-  where groups = groupData xs
-        withPercents [] = []
-        withPercents (y:ys) = y : (map (map (++ "%")) (tail ys))
-
 runMultiCpu :: [String] -> Monitor String
 runMultiCpu _ =
   do c <- io parseCpuData
      l <- formatMultiCpus c
      a <- formatAutoCpus l
-     p <- formatAutoCpusPercents l
-     parseTemplate (a ++ p ++ l)
+     parseTemplate (a ++ l)
