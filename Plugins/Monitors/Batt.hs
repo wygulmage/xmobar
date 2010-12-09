@@ -4,7 +4,7 @@
 -- Copyright   :  (c) Andrea Rossato, 2010 Petr Rockai, 2010 Jose A Ortega
 -- License     :  BSD-style (see LICENSE)
 --
--- Maintainer  :  Andrea Rossato <andrea.rossato@unibz.it>
+-- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
 -- Stability   :  unstable
 -- Portability :  unportable
 --

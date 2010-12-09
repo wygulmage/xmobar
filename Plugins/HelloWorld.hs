@@ -3,12 +3,12 @@
 -- Module      :  Plugins.HelloWorld
 -- Copyright   :  (c) Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
--- 
--- Maintainer  :  Andrea Rossato <andrea.rossato@unibz.it>
+--
+-- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
 -- Stability   :  unstable
 -- Portability :  unportable
 --
--- A plugin example for Xmobar, a text based status bar 
+-- A plugin example for Xmobar, a text based status bar
 --
 -----------------------------------------------------------------------------
 

@@ -3,8 +3,8 @@
 -- Module      :  Plugins.Monitors.Weather
 -- Copyright   :  (c) Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
--- 
--- Maintainer  :  Andrea Rossato <andrea.rossato@unibz.it>
+--
+-- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
 -- Stability   :  unstable
 -- Portability :  unportable
 --
@@ -90,8 +90,8 @@ pPressure = do manyTill anyChar $ char '('
                return $ read s
 
 parseData :: Parser [WeatherInfo]
-parseData = 
-    do st <- getAllBut "," 
+parseData =
+    do st <- getAllBut ","
        space
        ss <- getAllBut "("
        skipRestOfLine >> getAllBut "/"

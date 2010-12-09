@@ -4,7 +4,7 @@
 -- Copyright   :  (c) John Goerzen
 -- License     :  BSD-style (see LICENSE)
 --
--- Maintainer  :  Andrea Rossato <andrea.rossato@unibz.it>
+-- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
 -- Stability   :  unstable
 -- Portability :  unportable
 --
@@ -31,7 +31,7 @@ instance Exec CommandReader where
         hSetBinaryMode hstdout False
         hSetBuffering hstdout LineBuffering
         forever ph (hGetLineSafe hstdout >>= cb)
-        where forever ph a = 
+        where forever ph a =
                   do a
                      ec <- getProcessExitCode ph
                      case ec of

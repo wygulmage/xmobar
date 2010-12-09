@@ -6,7 +6,7 @@
 -- Copyright   :  (c) Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
--- Maintainer  :  Andrea Rossato <andrea.rossato@unitn.it>
+-- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
 -- Stability   :  unstable
 -- Portability :  unportable
 --
