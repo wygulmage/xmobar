@@ -17,7 +17,6 @@
 module Plugins.Monitors.Top (startTop, topMemConfig, runTopMem) where
 
 import Plugins.Monitors.Common
-import Plugins.Monitors.Mem (usedMem)
 
 import Control.Exception (SomeException, handle)
 import System.Directory
@@ -95,12 +94,13 @@ meminfos = handleProcesses meminfo
 
 showMeminfo :: Float -> Meminfo -> Monitor [String]
 showMeminfo scale (nm, rss) =
-  showInfo nm (showWithUnits 2 1 rss) (rss / (1024 * scale))
+  showInfo nm (showWithUnits 2 1 rss) (100 * rss / scale)
 
 runTopMem :: [String] -> Monitor String
 runTopMem _ = do
   ps <- io meminfos
-  pstr <- mapM (showMeminfo 1) $ sortTop ps
+  let !tm = sum (map snd ps)
+  pstr <- mapM (showMeminfo tm) $ sortTop ps
   parseTemplate $ concat pstr
 
 type Pid = Int
@@ -140,17 +140,17 @@ topProcesses tref scale = do
 showTimeInfo :: TimeInfo -> Monitor [String]
 showTimeInfo (n, t) = showInfo n (showDigits 1 t) t
 
-runTop :: TimesRef -> Float -> Float -> [String] -> Monitor String
-runTop tref scale mscale _ = do
+runTop :: TimesRef -> Float -> [String] -> Monitor String
+runTop tref scale _ = do
   (no, ps, ms) <- io $ topProcesses tref scale
   pstr <- mapM showTimeInfo ps
-  mstr <- mapM (showMeminfo mscale) ms
+  let !tm = sum (map snd ms)
+  mstr <- mapM (showMeminfo tm) ms
   parseTemplate $! show no : concat (zipWith (++) pstr mstr)
 
 startTop :: [String] -> Int -> (String -> IO ()) -> IO ()
 startTop a r cb = do
   cr <- getSysVar ClockTick
-  m <- usedMem
   c <- getCurrentTime
   tref <- newIORef (M.empty, c)
-  runM a topConfig (runTop tref (fromIntegral cr) m) r cb
+  runM a topConfig (runTop tref (fromIntegral cr)) r cb

@@ -422,7 +422,11 @@ Monitors have default aliases.
 `TopProc Args RefreshRate`
 
 - aliases to `top`
-- Args: default monitor arguments (see below)
+- Args: default monitor arguments (see below). The low and high
+  thresholds (`-L` and `-H`) denote, for memory entries, the percent
+  of the process memory over the total amount of memory currently in
+  use and, for cpu entries, the activity percentage (i.e., the value
+  of `cpuN`, which takes values between 0 and 100).
 - Variables that can be used with the `-t`/`--template` argument:
 	    `no`, `name1`, `cpu1`, `both1`, `mname1`, `mem1`, `mboth1`,
             `name2`, `cpu2`, `both2`, `mname2`, `mem2`, `mboth2`, ...
@@ -435,7 +439,9 @@ Monitors have default aliases.
 `TopMem Args RefreshRate`
 
 - aliases to `topmem`
-- Args: default monitor arguments (see below)
+- Args: default monitor arguments (see below). The low and high
+  thresholds (`-L` and `-H`) denote the percent of the process memory
+  over the total amount of memory currently in use.
 - Variables that can be used with the `-t`/`--template` argument:
 	    `name1`, `mem1`, `both1`, `name2`, `mem2`, `both2`, ...
 - Default template: `<both1>`
