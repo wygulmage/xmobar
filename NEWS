@@ -8,7 +8,8 @@ list] and uses a new [source code repository].
 
 Many thanks to Andrea Rossato, xombar's author and maintainer so far,
 for creating xmobar in the first place, and for giving me the chance
-to become its maintainer.
+to become its maintainer. And a big thanks to Ben Boeckel, Petr Rockai
+and Norbert Zeh for their patches.
 
 [website]: http://projects.haskell.org/xmobar/
 [mailing list]: http://projects.haskell.org/cgi-bin/mailman/listinfo/xmobar

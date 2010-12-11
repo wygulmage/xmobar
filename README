@@ -316,7 +316,7 @@ Monitors have default aliases.
 
 `Weather StationID Args RefreshRate`
 
-- aliases to the Station ID: so `Weather "LIPB" []` can be used in template as `%LIPB%`
+- Aliases to the Station ID: so `Weather "LIPB" []` can be used in template as `%LIPB%`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `station`, `stationState`, `year`, `month`, `day`, `hour`,
@@ -328,7 +328,7 @@ Monitors have default aliases.
 
 `Network Interface Args RefreshRate`
 
-- aliases to the interface name: so `Network "eth0" []` can be used as
+- Aliases to the interface name: so `Network "eth0" []` can be used as
   `%eth0%`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
@@ -337,7 +337,7 @@ Monitors have default aliases.
 
 `Wireless Interface Args RefreshRate`
 
-- aliases to the interface name with the suffix "wi": thus, `Wirelss
+- Aliases to the interface name with the suffix "wi": thus, `Wirelss
   "wlan0" []` can be used as `%wlan0wi%`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
@@ -349,7 +349,7 @@ Monitors have default aliases.
 
 `Memory Args RefreshRate`
 
-- aliases to `memory`
+- Aliases to `memory`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
              `total`, `free`, `buffer`, `cache`, `rest`, `used`,
@@ -358,7 +358,7 @@ Monitors have default aliases.
 
 `Swap Args RefreshRate`
 
-- aliases to `swap`
+- Aliases to `swap`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `total`, `used`, `free`, `usedratio`
@@ -366,7 +366,7 @@ Monitors have default aliases.
 
 `Cpu Args RefreshRate`
 
-- aliases to `cpu`
+- Aliases to `cpu`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `total`, `bar`, `user`, `nice`, `system`, `idle`
@@ -374,7 +374,7 @@ Monitors have default aliases.
 
 `MultiCpu Args RefreshRate`
 
-- aliases to `multicpu`
+- Aliases to `multicpu`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `autototal`, `autobar`, `autouser`, `autonice`,
@@ -391,7 +391,7 @@ Monitors have default aliases.
 
 `BatteryP Dirs Args RefreshRate`
 
-- aliases to `battery`
+- Aliases to `battery`
 - Dirs: list of directories in /proc/acpi/battery/ directory where to
   look for the `state` and `info` files. Example:
   `["BAT0","BAT1","BAT2"]`. Only the first 3 directories will be
@@ -424,7 +424,7 @@ Monitors have default aliases.
 
 `TopProc Args RefreshRate`
 
-- aliases to `top`
+- Aliases to `top`
 - Args: default monitor arguments (see below). The low and high
   thresholds (`-L` and `-H`) denote, for memory entries, the percent
   of the process memory over the total amount of memory currently in
@@ -441,7 +441,7 @@ Monitors have default aliases.
 
 `TopMem Args RefreshRate`
 
-- aliases to `topmem`
+- Aliases to `topmem`
 - Args: default monitor arguments (see below). The low and high
   thresholds (`-L` and `-H`) denote the percent of the process memory
   over the total amount of memory currently in use.
@@ -454,7 +454,7 @@ Monitors have default aliases.
 
 `DiskU Disks Args RefreshRate`
 
-- aliases to `disku`
+- Aliases to `disku`
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain <size>, <free>, <used>, <freep> or
   <usedp>, <freebar> or <usedbar> for total, free, used, free
@@ -469,7 +469,7 @@ Monitors have default aliases.
 
 `DiskIO Disks Args RefreshRate`
 
-- aliases to `diskio`
+- Aliases to `diskio`
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain <total>, <read>, <write> for total,
   read and write speed, respectively.
@@ -481,7 +481,7 @@ Monitors have default aliases.
 
 `Thermal Zone Args RefreshRate`
 
-- aliases to the Zone: so `Zone "THRM" []` can be used in template as `%THRM%`
+- Aliases to the Zone: so `Zone "THRM" []` can be used in template as `%THRM%`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `temp`
@@ -494,7 +494,7 @@ Monitors have default aliases.
 
 `CpuFreq Args RefreshRate`
 
-- aliases to `cpufreq`
+- Aliases to `cpufreq`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `cpu0`, `cpu1`, ..,  `cpuN`
@@ -507,7 +507,7 @@ Monitors have default aliases.
 
 `CoreTemp Args RefreshRate`
 
-- aliases to `coretemp`
+- Aliases to `coretemp`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `core0`, `core1`, ..,  `coreN`
@@ -523,7 +523,7 @@ Monitors have default aliases.
 
 - This monitor will only be compiled if you ask for it using the
   `with_mpd` flag. It needs [libmpd] 5.0 or later (available on Hackage).
-- aliases to `mpd`
+- Aliases to `mpd`
 - Args: default monitor arguments (see below). In addition you can provide
   `-P`, `-S` and `-Z`, with an string argument, to represent the
   playing, stopped and paused states in the `statei` template field,
@@ -545,7 +545,7 @@ Monitors have default aliases.
 
 `Mail Args`
 
-- aliases to `Mail`
+- Aliases to `Mail`
 - Args: list of maildirs in form
   `[("name1","path1"),("name2","path2")]`. Paths may start with a '~'
   to expand to the user's home directory.
@@ -578,6 +578,14 @@ Monitors have default aliases.
 
          Run MBox [("I ", "inbox", "red"), ("O ", "~/foo/mbox", "")]
                   ["-d", "/var/mail/", "-p", " "] "mbox"
+
+`XPropertyLog PropName`
+
+- Aliases to `PropName`
+- Reads the X property named by `PropName` (a string) and displays its
+  value. The [xmonadpropwrite script] in xmobar's distribution can be
+  used to set the given property from the output of any other program
+  or script.
 
 ## Monitor Plugins Commands Arguments
 
@@ -642,13 +650,41 @@ can be used in the output template as `%mydate%`
 
 ## Other Plugins
 
-`Date Args Alias RefreshRate`
-
 `StdinReader`
+
+- Aliases to StdinReader
+- Displays any text received by xmobar on its standard input.
+
+`Date Format Alias RefreshRate`
+
+- Format is a time format string, as accepted by the standard UNIX
+  utility `date`.
 
 `CommandReader "/path/to/program" Alias`
 
+- Runs the given program, and displays its standard output.
+
 `PipeReader "/path/to/pipe" Alias`
+
+- Reads its displayed output from the given pipe.
+
+`XMonadLog`
+
+- Aliases to XMonadLog
+- Displays information from xmonad's `_XMONAD_LOG`. You can set this
+  property by using `xmonadPropLog` as your log hook in xmonad's
+  configuration, as in the following example (more info [here]):
+
+        main = do
+          spawn "xmobar"
+          xmonad $ defaultConfig {
+            logHook = dynamicLogString defaultPP >>= xmonadPropLog
+          }
+   This plugin can be used as a somewhat lighter (resource-wise)
+   alternative to `StdinReader`. It also allows you to (re)start
+   xmobar outside xmonad.
+
+[here]: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Hooks-DynamicLog.html
 
 Plugins
 =======
