@@ -18,15 +18,14 @@ import Prelude hiding (catch)
 import Plugins
 import Plugins.Utils (changeLoop, expandHome)
 
-import Control.Monad
+import Control.Monad (when)
 import Control.Concurrent.STM
 import Control.Exception (SomeException, handle, evaluate)
 
-import System.Directory
-import System.FilePath
 import System.Console.GetOpt
-import System.INotify
-
+import System.Directory (doesDirectoryExist, doesFileExist)
+import System.FilePath ((</>))
+import System.INotify (Event(..), EventVariety(..), initINotify, addWatch)
 
 import qualified Data.ByteString.Lazy.Char8 as B
 
@@ -65,35 +64,35 @@ data MBox = MBox [(String, FilePath, String)] [String] String
 
 instance Exec MBox where
   alias (MBox _ _ a) = a
-  start (MBox ms args _) cb = do
+  start (MBox boxes args _) cb = do
 
-    opts <- parseOptions args -- $ words args
+    opts <- parseOptions args
     let dir = oDir opts
         allb = oAll opts
         pref = oPrefix opts
         suff = oSuffix opts
         uniq = oUniq opts
+        names = map (\(t, _, _) -> t) boxes
+        colors = map (\(_, _, c) -> c) boxes
 
     dirExists <- doesDirectoryExist dir
-    let ts = map (\(t, _, _) -> t) ms
-        sec (_, f, _) = f
-        md = if dirExists then (dir </>) . sec else sec
-        fs = map md ms
-        cs = map (\(_, _, c) -> c) ms
-        ev = [CloseWrite]
 
-    xfs <- mapM expandHome fs
-    vs <- replicateM (length xfs) (newTVarIO ("", 0 :: Int))
+    let extractPath (_, f, _) = if dirExists then dir </> f else f
+        events = [CloseWrite]
+
     i <- initINotify
-
-    forM_ (zip xfs vs) $ \(f, v) -> do
-      exists <- doesFileExist f
-      n <- if exists then countMails f else return (-1)
-      atomically $ writeTVar v (f, n)
-      when exists $ addWatch i ev f (handleNotification v) >> return ()
+    vs <- mapM (\m -> do
+                   f <- expandHome $ extractPath m
+                   exists <- doesFileExist f
+                   n <- if exists then countMails f else return (-1)
+                   v <- newTVarIO (f, n)
+                   when exists $
+                     addWatch i events f (handleNotification v) >> return ()
+                   return v)
+                boxes
 
     changeLoop (mapM (fmap snd . readTVar) vs) $ \ns ->
-      let s = unwords [ showC uniq m n c | (m, n, c) <- zip3 ts ns cs
+      let s = unwords [ showC uniq m n c | (m, n, c) <- zip3 names ns colors
                                          , allb || n > 0 ]
       in cb (if null s then "" else pref ++ s ++ suff)
 
