@@ -408,8 +408,13 @@ showPercentBar v x = do
 showLogBar :: Float -> Float -> Monitor String
 showLogBar f v = do
   h <- fromIntegral `fmap` getConfigValue high
+  l <- fromIntegral `fmap` getConfigValue low
   bw <- fromIntegral `fmap` getConfigValue barWidth
-  showPercentBar v $ f + logBase 10 (v / h) / bw
+  let [ll, hh] = sort [l, h]
+      choose x | x == 0.0 = 0
+               | x <= ll = 1 / bw
+               | otherwise = f + logBase 2 (x / hh) / bw
+  showPercentBar v $ choose v
 
 -- $threads
 

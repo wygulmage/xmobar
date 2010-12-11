@@ -64,7 +64,7 @@ netParser =
 
 formatNet :: Float -> Monitor (String, String)
 formatNet d = do
-    b <- showLogBar 0.6 d
+    b <- showLogBar 0.9 d
     x <- showWithColors (showDigits 1) d
     return (x, b)
 
