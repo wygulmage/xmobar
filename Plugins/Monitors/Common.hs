@@ -248,7 +248,7 @@ getAfterString :: String -> Parser String
 getAfterString s =
     do { try $ manyTill skipRestOfLine $ string s
        ; manyTill anyChar newline
-       } <|> return ("<" ++ s ++ " not found!>")
+       } <|> return ""
 
 skipTillString :: String -> Parser String
 skipTillString s =

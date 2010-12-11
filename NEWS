@@ -35,6 +35,8 @@ _New features_
     Rockai).
   - Mail plugin expands paths starting with "~/" (Ben Boeckel). Ditto
     MBox.
+  - Weather monitor now skips not retrieved fields, instead of
+    displaying a long error message.
   - New compilation flag, `all_extensions`.
   - Documentation and website updates.
 
