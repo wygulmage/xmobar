@@ -547,6 +547,7 @@ Monitors have default aliases.
 - This plugin requires inotify support in your linux kernel and the
   [hinotify] package. To activate, pass `--flags="with_inotify"`
   during compilation.
+- Paths may start with a '~' to expand to the user's home directory.
 
 `MBox Mboxes Opts Alias`
 
