@@ -21,6 +21,7 @@ import Control.Monad
 import Control.Concurrent.STM
 
 import System.Directory
+import System.Environment
 import System.FilePath
 import System.INotify
 
@@ -37,9 +38,10 @@ instance Exec Mail where
         vs <- mapM (const $ newTVarIO S.empty) ms
 
         let ts = map fst ms
-            ds = map ((</> "new") . snd) ms
+            rs = map ((</> "new") . snd) ms
             ev = [Move, MoveIn, MoveOut, Create, Delete]
 
+        ds <- mapM expandHome rs
         i <- initINotify
         zipWithM_ (\d v -> addWatch i ev d (handle v)) ds vs
 
@@ -55,6 +57,10 @@ instance Exec Mail where
 
 modifyTVar :: TVar a -> (a -> a) -> STM ()
 modifyTVar v f = readTVar v >>= writeTVar v . f
+
+expandHome :: FilePath -> IO FilePath
+expandHome ('~':'/':path) = getEnv "HOME" >>= return . flip (</>) path
+expandHome p              = return p
 
 handle :: TVar (Set String) -> Event -> IO ()
 handle v e = atomically $ modifyTVar v $ case e of
