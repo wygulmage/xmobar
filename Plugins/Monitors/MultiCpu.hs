@@ -50,7 +50,7 @@ percent b a = if tot > 0 then map (/ tot) $ take 4 dif else [0, 0, 0, 0]
         tot = foldr (+) 0 dif
 
 formatMultiCpus :: [[Float]] -> Monitor [String]
-formatMultiCpus [] = showPercentsWithColors $ replicate 15 0.0
+formatMultiCpus [] = return $ repeat ""
 formatMultiCpus xs = fmap concat $ mapM formatCpu xs
 
 formatCpu :: [Float] -> Monitor [String]
