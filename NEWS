@@ -1,0 +1,54 @@
+% xmobar - Release notes
+% Jose A. Ortega Ruiz
+
+## Version 0.12 (Dec 12, 2010)
+
+xmobar has a new [maintainer], a new [website], a new [mailing
+list] and uses a new [source code repository].
+
+Many thanks to Andrea Rossato, xombar's author and maintainer so far,
+for creating xmobar in the first place, and for giving me the chance
+to become its maintainer.
+
+[website]: http://projects.haskell.org/xmobar/
+[mailing list]: http://projects.haskell.org/cgi-bin/mailman/listinfo/xmobar
+[source code repository]: https://github.com/jaor/xmobar
+[maintainer]: http://hacks-galore.org/jao/
+
+_New features_
+
+  - Window borders: configuration options `border` and `borderColor`
+    allow drawing borders around xmobar's window.
+  - MPD: updated to libmpd 1.5. New fields `ppos` (playlist position)
+    and `remaining` (remaining time). New configuration options to
+    specify MPD's host, user name and password.
+  - New Monitor option (`-P`) to enable displaying the `%` sign in
+    percentages; the sign is now never included by default.
+  - New 'run once' commands, by specifying a 0 refresh rate in `Run
+    Com` ([issue 26]).
+  - Battery monitor: new `watts` and `timeleft` fields (Petr Rockai),
+    and specific arguments to control coloring and thresholds of the
+    former.
+  - MultiCPU monitor: new `auto*` fields that automatically detect all
+    present CPUs (Ben Boeckel).
+  - CpuFreq monitor uses just one decimal digit for GHz values (Petr
+    Rockai).
+  - New compilation flag, `all_extensions`.
+  - Documentation and website updates.
+
+_Bug fixes_
+
+  - [issue 23]: Wireless monitor is now compatible with iwlib 29.
+  - [issue 24]: Swap monitor's used ratio display fixed.
+  - [issue 25]: Percentages only include `%` if requested using `-P`.
+  - [issue 31]: MPD monitor now respects `-W` argument.
+  - Fixes in CPU frequency formatting, string alignment and colour
+    boxes in monitors (Norbert Zeh).
+  - TopMem and TopProc now use the `-L` and `-H` options correctly for
+    memory template fields.
+
+[issue 23]: http://code.google.com/p/xmobar/issues/detail?id=23
+[issue 24]: http://code.google.com/p/xmobar/issues/detail?id=24
+[issue 25]: http://code.google.com/p/xmobar/issues/detail?id=25
+[issue 26]: http://code.google.com/p/xmobar/issues/detail?id=26
+[issue 31]: http://code.google.com/p/xmobar/issues/detail?id=31

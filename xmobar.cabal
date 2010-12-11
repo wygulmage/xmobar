@@ -11,6 +11,7 @@ description: 	    Xmobar is a minimalistic text based status bar.
 category:           System
 license:            BSD3
 license-file:       LICENSE
+extra-source-files: README, NEWS
 author:             Andrea Rossato
 maintainer:         Jose A. Ortega Ruiz <jao@gnu.org>
 cabal-version:      >= 1.6

@@ -12,10 +12,13 @@ xmobar was inspired by the [Ion3] status bar, and supports similar
 features, like dynamic color management, output templates, and
 extensibility through plugins.
 
+This page documents xmobar 0.12 (see [release notes]).
+
 [This is a screen shot] of Andrea's desktop with [xmonad] and xmobar.
 [This] is xmobar running under [sawfish], with antialiased fonts. And
 [this one] is my desktop with [xmonad] and two instances of xmobar.
 
+[release notes]: http://projects.haskell.org/xmobar/releases.html
 [xmonad]: http://xmonad.org
 [Ion3]: http://tuomov.iki.fi/software/
 [This is a screen shot]: http://haskell.org/sitewiki/images/a/ae/Arossato-config.png
