@@ -28,7 +28,7 @@ cpuData = do s <- B.readFile "/proc/stat"
 
 cpuParser :: B.ByteString -> [Float]
 cpuParser =
-    map (read . B.unpack) . tail . B.words . flip (!!) 0 . B.lines
+    map (read . B.unpack) . tail . B.words . head . B.lines
 
 parseCPU :: IO [Float]
 parseCPU =
@@ -39,7 +39,7 @@ parseCPU =
        return percent
 
 formatCpu :: [Float] -> Monitor [String]
-formatCpu [] = return [""]
+formatCpu [] = return $ repeat ""
 formatCpu xs = do
   let t = foldr (+) 0 $ take 3 xs
   b <- showPercentBar (100 * t) t
