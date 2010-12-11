@@ -33,6 +33,8 @@ _New features_
     present CPUs (Ben Boeckel).
   - CpuFreq monitor uses just one decimal digit for GHz values (Petr
     Rockai).
+  - Mail plugin expands paths starting with "~/" (Ben Boeckel). Ditto
+    MBox.
   - New compilation flag, `all_extensions`.
   - Documentation and website updates.
 
@@ -46,6 +48,7 @@ _Bug fixes_
     boxes in monitors (Norbert Zeh).
   - TopMem and TopProc now use the `-L` and `-H` options correctly for
     memory template fields.
+  - MBox skips non-existent mbox paths instead of hanging.
 
 [issue 23]: http://code.google.com/p/xmobar/issues/detail?id=23
 [issue 24]: http://code.google.com/p/xmobar/issues/detail?id=24

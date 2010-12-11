@@ -546,11 +546,12 @@ Monitors have default aliases.
 `Mail Args`
 
 - aliases to `Mail`
-- Args: list of maildirs in form `[("name1","path1"),("name2","path2")]`
+- Args: list of maildirs in form
+  `[("name1","path1"),("name2","path2")]`. Paths may start with a '~'
+  to expand to the user's home directory.
 - This plugin requires inotify support in your linux kernel and the
   [hinotify] package. To activate, pass `--flags="with_inotify"`
   during compilation.
-- Paths may start with a '~' to expand to the user's home directory.
 
 `MBox Mboxes Opts Alias`
 
@@ -566,15 +567,16 @@ Monitors have default aliases.
                       of displayed mail coints
    -s suffix --suffix suffix  a string giving a suffix for the list
                       of displayed mail coints
+- Paths may start with a '~' to expand to the user's home directory.
 - This plugin requires inotify support in your linux kernel and the
   [hinotify] package. To activate, pass `--flags="with_inotify"`
   during compilation.
 - Example. The following command look for mails in `/var/mail/inbox`
-  and `/foo/mbox`, and will put a space in front of the printed string
+  and `~/foo/mbox`, and will put a space in front of the printed string
   (when it's not empty); it can be used in the template with the alias
   `mbox`:
 
-         Run MBox [("I ", "inbox", "red"), ("O ", "/foo/mbox", "")]
+         Run MBox [("I ", "inbox", "red"), ("O ", "~/foo/mbox", "")]
                   ["-d", "/var/mail/", "-p", " "] "mbox"
 
 ## Monitor Plugins Commands Arguments

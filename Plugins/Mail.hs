@@ -16,12 +16,12 @@ module Plugins.Mail where
 
 import Prelude hiding (catch)
 import Plugins
+import Plugins.Utils (expandHome, changeLoop)
 
 import Control.Monad
 import Control.Concurrent.STM
 
 import System.Directory
-import System.Environment
 import System.FilePath
 import System.INotify
 
@@ -58,10 +58,6 @@ instance Exec Mail where
 modifyTVar :: TVar a -> (a -> a) -> STM ()
 modifyTVar v f = readTVar v >>= writeTVar v . f
 
-expandHome :: FilePath -> IO FilePath
-expandHome ('~':'/':path) = fmap (</> path) (getEnv "HOME")
-expandHome p              = return p
-
 handle :: TVar (Set String) -> Event -> IO ()
 handle v e = atomically $ modifyTVar v $ case e of
     Created  {} -> create
@@ -72,13 +68,3 @@ handle v e = atomically $ modifyTVar v $ case e of
  where
     delete = S.delete (filePath e)
     create = S.insert (filePath e)
-
-changeLoop :: Eq a => STM a -> (a -> IO ()) -> IO ()
-changeLoop s f = atomically s >>= go
- where
-    go old = do
-        f old
-        go =<< atomically (do
-            new <- s
-            guard (new /= old)
-            return new)
