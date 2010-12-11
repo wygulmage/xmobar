@@ -400,7 +400,7 @@ Monitors have default aliases.
     - `-O`: string for AC "on" status (default: "On")
     - `-o`: string for AC "off" status (default: "Off")
     - `-L`: low power (`watts`) threshold (default: -12)
-    - `-H`: high power threshold (defualt: -10)
+    - `-H`: high power threshold (default: -10)
     - `-l`: color to display power lower than the `-L` threshold
     - `-m`: color to display power lower than the `-H` threshold
     - `-h`: color to display power highter than the `-H` threshold
