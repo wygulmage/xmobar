@@ -45,12 +45,12 @@ instance Exec Mail where
         i <- initINotify
         zipWithM_ (\d v -> addWatch i ev d (handle v)) ds vs
 
-        forM (zip ds vs) $ \(d, v) -> do
+        forM_ (zip ds vs) $ \(d, v) -> do
             s <- fmap (S.fromList . filter (not . isPrefixOf "."))
                     $ getDirectoryContents d
             atomically $ modifyTVar v (S.union s)
 
-        changeLoop (mapM (fmap S.size . readTVar) vs) $ \ns -> do
+        changeLoop (mapM (fmap S.size . readTVar) vs) $ \ns ->
             cb . unwords $ [m ++ ":" ++  show n
                                     | (m, n) <- zip ts ns
                                     , n /= 0 ]
@@ -59,7 +59,7 @@ modifyTVar :: TVar a -> (a -> a) -> STM ()
 modifyTVar v f = readTVar v >>= writeTVar v . f
 
 expandHome :: FilePath -> IO FilePath
-expandHome ('~':'/':path) = getEnv "HOME" >>= return . flip (</>) path
+expandHome ('~':'/':path) = fmap (</> path) (getEnv "HOME")
 expandHome p              = return p
 
 handle :: TVar (Set String) -> Event -> IO ()
