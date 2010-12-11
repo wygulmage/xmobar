@@ -88,13 +88,13 @@ instance Exec MBox where
 
     forM_ (zip xfs vs) $ \(f, v) -> do
       exists <- doesFileExist f
-      n <- if exists then countMails f else return 0
+      n <- if exists then countMails f else return (-1)
       atomically $ writeTVar v (f, n)
       when exists $ addWatch i ev f (handleNotification v) >> return ()
 
     changeLoop (mapM (fmap snd . readTVar) vs) $ \ns ->
       let s = unwords [ showC uniq m n c | (m, n, c) <- zip3 ts ns cs
-                                         , allb || n /= 0 ]
+                                         , allb || n > 0 ]
       in cb (if null s then "" else pref ++ s ++ suff)
 
 showC :: Bool -> String -> Int -> String -> String
