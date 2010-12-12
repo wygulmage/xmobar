@@ -16,7 +16,7 @@ module Plugins.Monitors.MultiCpu(multiCpuConfig, runMultiCpu) where
 
 import Plugins.Monitors.Common
 import qualified Data.ByteString.Lazy.Char8 as B
-import Data.List (isPrefixOf,intersperse,transpose,unfoldr)
+import Data.List (isPrefixOf, transpose, unfoldr)
 
 multiCpuConfig :: IO MConfig
 multiCpuConfig =
@@ -71,7 +71,7 @@ groupData = transpose . tail . splitEvery 6
 
 formatAutoCpus :: [String] -> Monitor [String]
 formatAutoCpus [] = return $ replicate 6 ""
-formatAutoCpus xs = return $ map concat . map (intersperse " ") $ groupData xs
+formatAutoCpus xs = return $ map unwords (groupData xs)
 
 runMultiCpu :: [String] -> Monitor String
 runMultiCpu _ =
