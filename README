@@ -321,7 +321,7 @@ Monitors have default aliases.
   thresholds refer to the number of days.
 - Variables that can be used with the `-t`/`--template` argument:
   `days`, `hours`, `minutes`, `seconds`. The total uptime is the
-  sum of all those fields. You can set the `-P` argument to "True"
+  sum of all those fields. You can set the `-S` argument to "True"
   to add units to the display of those numeric fields.
 - Default template: `Up: <days>d <hours>h <minutes>m`
 
@@ -343,7 +343,10 @@ Monitors have default aliases.
   `%eth0%`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
-	    `dev`, `rx`, `tx`, `rxbar`, `txbar`
+  `dev`, `rx`, `tx`, `rxbar`, `txbar`. Reception and transmission
+  rates (`rx` and `tx`) are displayed in Kbytes per second, and you
+  can set the `-S` to "True" to make them displayed with units (the
+  string "Kb/s").
 - Default template: `<dev>: <rx>KB|<tx>KB`
 
 `Wireless Interface Args RefreshRate`
@@ -608,7 +611,8 @@ These are the arguments that can be used for internal commands in the
     -h color number     --high=color number         Color for the high threshold: es "#FF0000"
     -n color number     --normal=color number       Color for the normal threshold: es "#00FF00"
     -l color number     --low=color number          Color for the low threshold: es "#0000FF"
-    -P True/False       --percent=True/False        Use % to display percents (default: True)
+    -P True/False       --suffix=True/False         Use % to display percents (default: False)
+    -S True/False       --suffix=True/False         Display optional suffixes (default: False)
     -p number           --ppad=number               Pad percentages to given width
     -m number           --minwidth=number           Minimum field width
     -M number           --maxwidth=number           Maximum field width

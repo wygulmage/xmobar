@@ -23,6 +23,9 @@ _New features_
   - New monitor, `Uptime`, showing the system uptime.
   - New monitor argument (`-P`) to enable displaying the `%` sign in
     percentages; the sign is now never included by default.
+  - New monitor argument (`-S`) to enable displaying suffixes in some
+    cases: equivalent to `-P` for percentages and used by Uptime and
+    Network to control units display.
   - New 'run once' commands, by specifying a 0 refresh rate in `Run
     Com` ([issue 26]).
   - MPD monitor: updated to libmpd 1.5. New fields `ppos` (playlist

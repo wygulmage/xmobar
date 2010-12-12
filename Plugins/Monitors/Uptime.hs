@@ -35,7 +35,7 @@ secsPerDay = 24 * 3600
 uptime :: Monitor [String]
 uptime = do
   t <- io readUptime
-  u <- getConfigValue usePercent
+  u <- getConfigValue useSuffix
   let tsecs = floor t
       secs = tsecs `mod` secsPerDay
       days = tsecs `quot` secsPerDay

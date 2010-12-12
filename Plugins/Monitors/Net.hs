@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Plugins.Monitors.Net where
+module Plugins.Monitors.Net (netConfig, runNet) where
 
 import Plugins.Monitors.Common
 import qualified Data.ByteString.Lazy.Char8 as B
@@ -64,8 +64,10 @@ netParser =
 
 formatNet :: Float -> Monitor (String, String)
 formatNet d = do
+    s <- getConfigValue useSuffix
+    let str = if s then (++"Kb/s") . showDigits 1 else showDigits 1
     b <- showLogBar 0.9 d
-    x <- showWithColors (showDigits 1) d
+    x <- showWithColors str d
     return (x, b)
 
 printNet :: NetDev -> Monitor String
