@@ -298,8 +298,8 @@ date plugin. These plugins install the following internal commands:
 `Weather`, `Network`, `Wireless` (optional), `Memory`, `Swap`, `Cpu`,
 `MultiCpu`, `Battery`, `TopProc`, `TopMem`, `DiskU`, `DiskIO`,
 `Thermal`, `CpuFreq`, `CoreTemp`, `MPD` (optional), `Mail` (optional),
-`MBox` (optional), `Date`, `StdinReader`, `CommandReader`, and
-`PipeReader`.
+`MBox` (optional), `Date`, `Uptime`, `StdinReader`, `CommandReader`,
+and `PipeReader`.
 
 To remove them see below Installing/Removing a Plugin
 
@@ -657,8 +657,12 @@ can be used in the output template as `%mydate%`
 
 `Date Format Alias RefreshRate`
 
-- Format is a time format string, as accepted by the standard UNIX
-  utility `date`.
+- Format is a time format string, as accepted by the standard ISO C
+  `strftime` function (or Haskell's `formatCalendarTime`).
+
+`Uptime Alias RefreshRate`
+
+- Shows system uptime.
 
 `CommandReader "/path/to/program" Alias`
 

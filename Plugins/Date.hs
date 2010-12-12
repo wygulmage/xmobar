@@ -16,7 +16,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Plugins.Date where
+module Plugins.Date (Date(..)) where
 
 import Plugins
 
