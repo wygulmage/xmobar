@@ -23,7 +23,7 @@ import Control.Concurrent.STM
 import Control.Exception (SomeException, handle, evaluate)
 
 import System.Console.GetOpt
-import System.Directory (doesDirectoryExist, doesFileExist)
+import System.Directory (doesFileExist)
 import System.FilePath ((</>))
 import System.INotify (Event(..), EventVariety(..), initINotify, addWatch)
 
@@ -67,22 +67,18 @@ instance Exec MBox where
   start (MBox boxes args _) cb = do
 
     opts <- parseOptions args
-    let dir = oDir opts
-        allb = oAll opts
-        pref = oPrefix opts
-        suff = oSuffix opts
+    let showAll = oAll opts
+        prefix = oPrefix opts
+        suffix = oSuffix opts
         uniq = oUniq opts
         names = map (\(t, _, _) -> t) boxes
         colors = map (\(_, _, c) -> c) boxes
-
-    dirExists <- doesDirectoryExist dir
-
-    let extractPath (_, f, _) = if dirExists then dir </> f else f
+        extractPath (_, f, _) = expandHome $ oDir opts </> f
         events = [CloseWrite]
 
     i <- initINotify
-    vs <- mapM (\m -> do
-                   f <- expandHome $ extractPath m
+    vs <- mapM (\b -> do
+                   f <- extractPath b
                    exists <- doesFileExist f
                    n <- if exists then countMails f else return (-1)
                    v <- newTVarIO (f, n)
@@ -93,8 +89,8 @@ instance Exec MBox where
 
     changeLoop (mapM (fmap snd . readTVar) vs) $ \ns ->
       let s = unwords [ showC uniq m n c | (m, n, c) <- zip3 names ns colors
-                                         , allb || n > 0 ]
-      in cb (if null s then "" else pref ++ s ++ suff)
+                                         , showAll || n > 0 ]
+      in cb (if null s then "" else prefix ++ s ++ suffix)
 
 showC :: Bool -> String -> Int -> String -> String
 showC u m n c =
