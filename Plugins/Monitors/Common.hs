@@ -158,7 +158,7 @@ options =
     , Option "n"  ["normal"]   (ReqArg NormalColor "color number"  )  "Color for the normal threshold: ex \"#00FF00\""
     , Option "l"  ["low"]      (ReqArg LowColor "color number"     )  "Color for the low threshold: ex \"#0000FF\""
     , Option "t"  ["template"] (ReqArg Template "output template"  )  "Output template."
-    , Option "PS" ["suffix"]   (ReqArg UseSuffix "True/False"      )  "Use % to display percents or other suffixes."
+    , Option "S"  ["suffix"]   (ReqArg UseSuffix "True/False"      )  "Use % to display percents or other suffixes."
     , Option "p"  ["ppad"]     (ReqArg PercentPad "percent padding")  "Minimum percentage width."
     , Option "m"  ["minwidth"] (ReqArg MinWidth "minimum width"    )  "Minimum field width"
     , Option "M"  ["maxwidth"] (ReqArg MaxWidth "maximum width"    )  "Maximum field width"
