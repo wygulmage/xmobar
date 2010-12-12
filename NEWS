@@ -20,8 +20,8 @@ _New features_
 
   - Window borders: configuration options `border` and `borderColor`
     allow drawing borders around xmobar's window.
-  - New plugin, `Uptime`, showing the system uptime.
-  - New Monitor option (`-P`) to enable displaying the `%` sign in
+  - New monitor, `Uptime`, showing the system uptime.
+  - New monitor argument (`-P`) to enable displaying the `%` sign in
     percentages; the sign is now never included by default.
   - New 'run once' commands, by specifying a 0 refresh rate in `Run
     Com` ([issue 26]).

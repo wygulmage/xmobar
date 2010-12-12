@@ -314,6 +314,17 @@ installed by default.
 Each monitor has an `alias` to be used in the output template.
 Monitors have default aliases.
 
+`Uptime Args RefreshRate`
+
+- Aliases to `uptime`
+- Args: default monitor arguments (see below). The low and high
+  thresholds refer to the number of days.
+- Variables that can be used with the `-t`/`--template` argument:
+  `days`, `hours`, `minutes`, `seconds`. The total uptime is the
+  sum of all those fields. You can set the `-P` argument to "True"
+  to add units to the display of those numeric fields.
+- Default template: `Up: <days>d <hours>h <minutes>m`
+
 `Weather StationID Args RefreshRate`
 
 - Aliases to the Station ID: so `Weather "LIPB" []` can be used in template as `%LIPB%`
@@ -659,10 +670,6 @@ can be used in the output template as `%mydate%`
 
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
-
-`Uptime Alias RefreshRate`
-
-- Shows system uptime.
 
 `CommandReader "/path/to/program" Alias`
 

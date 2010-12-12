@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- |
--- Module      : Plugins.Uptime
+-- Module      : Plugins.Monitors.Uptime
 -- Copyright   : (c) 2010 Jose Antonio Ortega Ruiz
 -- License     : BSD3-style (see LICENSE)
 --
@@ -15,19 +15,15 @@
 ------------------------------------------------------------------------------
 
 
-module Plugins.Uptime (Uptime(..)) where
+module Plugins.Monitors.Uptime (uptimeConfig, runUptime) where
 
-import Plugins
+import Plugins.Monitors.Common
 
 import qualified Data.ByteString.Lazy.Char8 as B
 
-data Uptime = Uptime String Int
-    deriving (Read, Show)
-
-instance Exec Uptime where
-    alias (Uptime a _) = a
-    run   (Uptime _ _) = uptime
-    rate  (Uptime _ r) = r
+uptimeConfig :: IO MConfig
+uptimeConfig = mkMConfig "Up <days>d <hours>h <minutes>m"
+                         ["days", "hours", "minutes", "seconds"]
 
 readUptime :: IO Float
 readUptime =
@@ -36,16 +32,19 @@ readUptime =
 secsPerDay :: Integer
 secsPerDay = 24 * 3600
 
-uptime :: IO String
+uptime :: Monitor [String]
 uptime = do
-  t <- readUptime
+  t <- io readUptime
+  u <- getConfigValue usePercent
   let tsecs = floor t
       secs = tsecs `mod` secsPerDay
       days = tsecs `quot` secsPerDay
-      hrs = secs `quot` 3600
+      hours = secs `quot` 3600
       mins = (secs `mod` 3600) `div` 60
-      dstr | days == 0 = ""
-           | otherwise = show days ++ "d "
-      str x | x < 10 = '0':show x
-            | otherwise = show x
-  return $ dstr ++ str hrs ++ ":" ++ str mins
+      ss = secs `mod` 60
+      str x s = if u then show x ++ s else show x
+  mapM (`showWithColors'` days)
+       [str days "d", str hours "h", str mins "m", str ss "s"]
+
+runUptime :: [String] -> Monitor String
+runUptime _ = uptime >>= parseTemplate
