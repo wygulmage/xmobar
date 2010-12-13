@@ -606,26 +606,100 @@ Monitors have default aliases.
 These are the arguments that can be used for internal commands in the
 `commands` configuration option:
 
-    -H number           --High=number               The high threshold
-    -L number           --Low=number                The low threshold
-    -h color number     --high=color number         Color for the high threshold: es "#FF0000"
-    -n color number     --normal=color number       Color for the normal threshold: es "#00FF00"
-    -l color number     --low=color number          Color for the low threshold: es "#0000FF"
-    -S True/False       --suffix=True/False         Display optional suffixes, such as % (default: False)
-    -p number           --ppad=number               Pad percentages to given width
-    -m number           --minwidth=number           Minimum field width
-    -M number           --maxwidth=number           Maximum field width
-    -w number           --width=number              Fixed field width
-    -c chars            --padchars=chars            Chars used (cyclically) for padding
-    -a ["r" or "l"]     --align=["r" or "l"]        Pad alignment (right/left)
-    -b chars            --bback=chars               Chars used to draw bar backgrounds (default ":")
-    -f chars            --bfore=chars               Chars used to draw bar foregrounds (default "#")
-    -W number           --bwidth=number             Bar width (default 10)
-    -t output template  --template=output template  Output template of the command.
+- `-t` _string_  Output template
+    - Template for the monitor output. Field names must be enclosed
+      between pointy brackets (`<foo>`) and will be substituted by the
+      computed values. You can also specify a foreground color for a
+      region bracketing it between `<fc=color>` and `</fc>`. The rest
+      of the template is output verbatim.
+    - Long option: `--template`
+    - Default value: per monitor (see above).
+- `-H` _number_ The high threshold.
+    - Numerical values higher than _number_ will be displayed with the
+      color specified by `-h` (see below).
+    - Long option: `--High`
+    - Default value: 66
+- `-L` _number_ The low threshold.
+    - Numerical values higher than _number_ and lower than the high
+      threshold will be displayed with the color specified by `-m`
+      (see below). Values lower than _number_ will use the `-l` color.
+    - Long option: `--Low` - Default value: 80
+    - Default value: 33
+- `-h` _color_  High threshold color.
+    - Color for displaying values above the high threshold. _color_ can
+      be either a name (e.g. "blue") or an hexadecimal RGB (e.g.
+      "#FF0000").
+    - Long option: `--high`
+    - Default: none (use the default foreground).
+- `-n` _color_  Color for 'normal' values
+    - Color used for values greater than the low threshold but lower
+      than the high one.
+    - Long option: `--normal`
+    - Default: none (use the default foreground).
+- `-l` _color_  The low threshold color
+    - Color for displaying values below the low threshold.
+    - Long option: `--low`
+    - Default: none (use the default foreground).
+- `-S` _boolean_ Display optional suffixes
+    - When set to a true designator ("True", "Yes" or "On"), optional
+      value suffixes such as the '%' symbol or optional units will be
+      displayed.
+    - Long option: `--suffix`
+    - Default: False.
+- `-p` _number_ Percentages padding
+    - Width, in number of digits, for quantities representing
+      percentages. For instance `-p 3` means that all percentages
+      in the monitor will be represented using 3 digits.
+    - Long option: `--ppad`
+    - Default value: 0 (don't pad)
+- `-m` _number_ Minimum field width
+    - Minimum width, in number of characters, of the fields in the
+      monitor template. Values whose printed representation is shorter
+      than this value will be padded using the padding characters
+      given by the `-c` option with the alignment specified by `-a`
+      (see below).
+    - Long option: `--minwidth`
+    - Default: 0
+- `-M` _number_ Maximum field width
+    - Maximum width, in number of characters, of the fields in the
+      monitor template. Values whose printed representation is longer
+      than this value will be truncated.
+    - Long option: `--maxwidth`
+    - Default: 0 (no maximum width)
+- `-w` _number_ Fixed field width
+    - All fields will be set to this width, padding or truncating as
+      needed.
+    - Long option: `--width`
+    - Default: 0 (variable width)
+- `-c` _string_
+    - Characters used for padding. The characters of _string_ are used
+      cyclically. E.g., with `-P +- -w 6`, a field with value "foo"
+      will be represented as "+-+foo".
+    - Long option: `--padchars`
+    - Default value: " "
+- `-a` r|l Field alignment
+    - Whether to use right (r) or left (l) alignment of field values
+      when padding.
+    - Long option: `--align`
+    - Default value: r (padding to the left)
+- `-b` _string_ Bar background
+    - Characters used, cyclically, to draw the background of bars.
+      For instance, if you set this option to "\/", an empty bar will
+      look like this: "\/\/\/\/\/".
+    - Long option: `--bback`
+    - Default value: ":"
+- `-f` _string_ Bar foreground
+    - Characters used, cyclically, to draw the foreground of bars.
+    - Long option: `--bfore`
+    - Default value: "#"
+- `-W` _number_ Bar width
+    - Total number of characters used to draw bars.
+    - Long option: `--bwidth`
+    - Default value: 10
 
 Commands' arguments must be set as a list. E.g.:
 
-    Run Weather "EGPF" ["-t","<station>: <tempC>C"] 36000
+    Run Weather "EGPF" ["-t", "<station>: <tempC>C"] 36000
 
 In this case xmobar will run the weather monitor, getting information
 for the weather station ID EGPF (Glasgow Airport, as a homage to GHC)
@@ -673,6 +747,7 @@ can be used in the output template as `%mydate%`
 
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
+- Sample usage: `Run Date "%a %b %_d %Y <fc=#ee9a00>%H:%M:%S</fc>" "date" 10`
 
 `CommandReader "/path/to/program" Alias`
 
@@ -694,9 +769,9 @@ can be used in the output template as `%mydate%`
           xmonad $ defaultConfig {
             logHook = dynamicLogString defaultPP >>= xmonadPropLog
           }
-   This plugin can be used as a somewhat lighter (resource-wise)
-   alternative to `StdinReader`. It also allows you to (re)start
-   xmobar outside xmonad.
+   This plugin can be used as a sometimes more convenient alternative
+   to `StdinReader`. For it instance, allows you to (re)start xmobar
+   outside xmonad.
 
 [here]: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Hooks-DynamicLog.html
 
