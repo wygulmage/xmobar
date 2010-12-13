@@ -684,8 +684,8 @@ These are the arguments that can be used for internal commands in the
     - Default value: r (padding to the left)
 - `-b` _string_ Bar background
     - Characters used, cyclically, to draw the background of bars.
-      For instance, if you set this option to "\/", an empty bar will
-      look like this: "\/\/\/\/\/".
+      For instance, if you set this option to "·.", an empty bar will
+      look like this: `·.·.·.·.·.`
     - Long option: `--bback`
     - Default value: ":"
 - `-f` _string_ Bar foreground
