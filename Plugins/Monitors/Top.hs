@@ -19,15 +19,16 @@ module Plugins.Monitors.Top (startTop, topMemConfig, runTopMem) where
 import Plugins.Monitors.Common
 
 import Control.Exception (SomeException, handle)
-import System.Directory
-import System.FilePath
-import System.IO
-import System.Posix.Unistd (getSysVar, SysVar(ClockTick))
-import Foreign.C.Types
+import Data.IORef (IORef, newIORef, atomicModifyIORef)
 import Data.List (sortBy)
 import Data.Ord (comparing)
-import Data.IORef
-import Data.Time.Clock
+import Data.Time.Clock (UTCTime, getCurrentTime, diffUTCTime)
+import System.Directory (getDirectoryContents)
+import System.FilePath ((</>))
+import System.IO (IOMode(ReadMode), hGetLine, withFile)
+import System.Posix.Unistd (SysVar(ClockTick), getSysVar)
+
+import Foreign.C.Types
 
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as M
@@ -133,8 +134,8 @@ topProcesses tref scale = do
   c1 <- getCurrentTime
   atomicModifyIORef tref $ \(t0, c0) ->
     let scx = realToFrac (diffUTCTime c1 c0) * scale / 100
-        -- c0 and c1 can be equal, for instance, if we come back from sleep
-        !scx' = if scx > 0 then scx else (scale / 100)
+        -- c0 and c1 can be equal, for instance, if we tweak the clock
+        !scx' = if scx > 0 then scx else scale / 100
         ts = M.elems $ combineTimeInfos t0 t1
         nts = map (\(nm, t) -> (nm, min 100 (t / scx'))) ts
     in ((t1, c1), (len, sortTop nts, sortTop mis))
