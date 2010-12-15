@@ -95,13 +95,16 @@ meminfos = handleProcesses meminfo
 
 showMeminfo :: Float -> Meminfo -> Monitor [String]
 showMeminfo scale (nm, rss) =
-  showInfo nm (showWithUnits 2 1 rss) (100 * rss / scale)
+  showInfo nm (showWithUnits 2 1 rss) (100 * rss / sc)
+  where sc = if scale > 0 then scale else 100
+
+showMeminfos :: [Meminfo] -> Monitor [[String]]
+showMeminfos ms = mapM (showMeminfo tm) $ sortTop ms
+  where tm = sum (map snd ms)
 
 runTopMem :: [String] -> Monitor String
 runTopMem _ = do
-  ps <- io meminfos
-  let !tm = sum (map snd ps)
-  pstr <- mapM (showMeminfo tm) $ sortTop ps
+  pstr <- io meminfos >>= showMeminfos
   parseTemplate $ concat pstr
 
 type Pid = Int
@@ -138,7 +141,7 @@ topProcesses tref scale = do
         !scx' = if scx > 0 then scx else scale / 100
         ts = M.elems $ combineTimeInfos t0 t1
         nts = map (\(nm, t) -> (nm, min 100 (t / scx'))) ts
-    in ((t1, c1), (len, sortTop nts, sortTop mis))
+    in ((t1, c1), (len, sortTop nts, mis))
 
 showTimeInfo :: TimeInfo -> Monitor [String]
 showTimeInfo (n, t) = showInfo n (showDigits 1 t) t
@@ -147,8 +150,7 @@ runTop :: TimesRef -> Float -> [String] -> Monitor String
 runTop tref scale _ = do
   (no, ps, ms) <- io $ topProcesses tref scale
   pstr <- mapM showTimeInfo ps
-  let !tm = sum (map snd ms)
-  mstr <- mapM (showMeminfo tm) ms
+  mstr <- showMeminfos ms
   parseTemplate $! show no : concat (zipWith (++) pstr mstr)
 
 startTop :: [String] -> Int -> (String -> IO ()) -> IO ()
