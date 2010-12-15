@@ -73,7 +73,7 @@ instance Exec Command where
                           cb $ "Could not execute command " ++ prog
 
 
--- | Work arount to the Int max bound: since threadDelay takes an Int, it
+-- | Work around to the Int max bound: since threadDelay takes an Int, it
 -- is not possible to set a thread delay grater than about 45 minutes.
 -- With a little recursion we solve the problem.
 tenthSeconds :: Int -> IO ()

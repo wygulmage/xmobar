@@ -103,11 +103,11 @@ instance Exec Monitors where
     start (Cpu        a r) = runM a          cpuConfig      runCpu        r
     start (MultiCpu   a r) = runM a          multiCpuConfig runMultiCpu   r
     start (Battery    a r) = runM a          battConfig     runBatt       r
-    start (BatteryP s a r) = runM a          battConfig    (runBatt' s)   r
+    start (BatteryP s a r) = runM a          battConfig     (runBatt' s)  r
     start (CpuFreq    a r) = runM a          cpuFreqConfig  runCpuFreq    r
     start (CoreTemp   a r) = runM a          coreTempConfig runCoreTemp   r
-    start (DiskU    s a r) = runM a          diskUConfig   (runDiskU s)   r
-    start (DiskIO   s a r) = runM a          diskIOConfig  (runDiskIO s)  r
+    start (DiskU    s a r) = runM a          diskUConfig    (runDiskU s)  r
+    start (DiskIO   s a r) = runM a          diskIOConfig   (runDiskIO s) r
     start (TopMem     a r) = runM a          topMemConfig   runTopMem     r
     start (Uptime     a r) = runM a          uptimeConfig   runUptime     r
     start (TopProc    a r) = startTop a r
