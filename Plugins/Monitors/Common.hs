@@ -206,10 +206,9 @@ doConfigOptions (o:oo) =
 
 runM :: [String] -> IO MConfig -> ([String] -> Monitor String) -> Int
         -> (String -> IO ()) -> IO ()
-runM args conf action r cb = loop
+runM args conf action r cb = handle (cb . showException) loop
   where ac = doArgs args action
-        runAc c = handle (return . showException) (runReaderT ac c)
-        loop = conf >>= runAc >>= cb >> tenthSeconds r >> loop
+        loop = conf >>= runReaderT ac >>= cb >> tenthSeconds r >> loop
 
 showException :: SomeException -> String
 showException = ("error: "++) . show . flip asTypeOf undefined
@@ -327,8 +326,8 @@ showWithUnits d n x
 padString :: Int -> Int -> String -> Bool -> String -> String
 padString mnw mxw pad pr s =
   let len = length s
-      rmin = if mnw == 0 then 1 else mnw
-      rmax = if mxw == 0 then max len rmin else mxw
+      rmin = if mnw <= 0 then 1 else mnw
+      rmax = if mxw <= 0 then max len rmin else mxw
       (rmn, rmx) = if rmin <= rmax then (rmin, rmax) else (rmax, rmin)
       rlen = min (max rmn len) rmx
   in if rlen < len then
