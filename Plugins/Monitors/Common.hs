@@ -185,41 +185,37 @@ doConfigOptions (o:oo) =
     do let next = doConfigOptions oo
            nz s = let x = read s in max 0 x
            bool = (`elem` ["True", "true", "Yes", "yes", "On", "on"])
-       case o of
-         High         h -> setConfigValue (read h) high >> next
-         Low          l -> setConfigValue (read l) low >> next
-         HighColor   hc -> setConfigValue (Just hc) highColor >> next
-         NormalColor nc -> setConfigValue (Just nc) normalColor >> next
-         LowColor    lc -> setConfigValue (Just lc) lowColor >> next
-         Template     t -> setConfigValue t template >> next
-         PercentPad   p -> setConfigValue (nz p) ppad >> next
-         MinWidth    mn -> setConfigValue (nz mn) minWidth >> next
-         MaxWidth    mx -> setConfigValue (nz mx) maxWidth >> next
-         Width        w -> setConfigValue (nz w) minWidth >>
-                           setConfigValue (nz w) maxWidth >> next
-         PadChars    pc -> setConfigValue pc padChars >> next
-         PadAlign    a -> setConfigValue ("r" `isPrefixOf` a) padRight >> next
-         BarBack     bb -> setConfigValue bb barBack >> next
-         BarFore     bf -> setConfigValue bf barFore >> next
-         BarWidth    bw -> setConfigValue (nz bw) barWidth >> next
-         UseSuffix   up -> setConfigValue (bool up) useSuffix >> next
+       (case o of
+          High        h -> setConfigValue (read h) high
+          Low         l -> setConfigValue (read l) low
+          HighColor   c -> setConfigValue (Just c) highColor
+          NormalColor c -> setConfigValue (Just c) normalColor
+          LowColor    c -> setConfigValue (Just c) lowColor
+          Template    t -> setConfigValue t template
+          PercentPad  p -> setConfigValue (nz p) ppad
+          MinWidth    w -> setConfigValue (nz w) minWidth
+          MaxWidth    w -> setConfigValue (nz w) maxWidth
+          Width       w -> setConfigValue (nz w) minWidth >>
+                           setConfigValue (nz w) maxWidth
+          PadChars    s -> setConfigValue s padChars
+          PadAlign    a -> setConfigValue ("r" `isPrefixOf` a) padRight
+          BarBack     s -> setConfigValue s barBack
+          BarFore     s -> setConfigValue s barFore
+          BarWidth    w -> setConfigValue (nz w) barWidth
+          UseSuffix   u -> setConfigValue (bool u) useSuffix) >> next
 
 runM :: [String] -> IO MConfig -> ([String] -> Monitor String) -> Int
         -> (String -> IO ()) -> IO ()
-runM args conf action r cb = go
-    where go = do
-            c <- conf
-            let ac = doArgs args action
-                he = return . (++) "error: " . show . flip asTypeOf (undefined::SomeException)
-            s <- handle he $ runReaderT ac c
-            cb s
-            tenthSeconds r
-            go
+runM args conf action r cb = loop
+  where ac = doArgs args action
+        runAc c = handle (return . showException) (runReaderT ac c)
+        loop = conf >>= runAc >>= cb >> tenthSeconds r >> loop
+
+showException :: SomeException -> String
+showException = ("error: "++) . show . flip asTypeOf undefined
 
 io :: IO a -> Monitor a
 io = liftIO
-
-
 
 -- $parsers
 
