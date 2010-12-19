@@ -19,8 +19,8 @@ module Plugins.Monitors.Top (startTop, topMemConfig, runTopMem) where
 import Plugins.Monitors.Common
 
 import Control.Exception (SomeException, handle)
-import Data.IORef (IORef, newIORef, atomicModifyIORef)
-import Data.List (sortBy)
+import Data.IORef (IORef, newIORef, readIORef, writeIORef)
+import Data.List (sortBy, foldl')
 import Data.Ord (comparing)
 import Data.Time.Clock (UTCTime, getCurrentTime, diffUTCTime)
 import System.Directory (getDirectoryContents)
@@ -30,11 +30,11 @@ import System.Posix.Unistd (SysVar(ClockTick), getSysVar)
 
 import Foreign.C.Types
 
-import Data.IntMap (IntMap)
-import qualified Data.IntMap as M
+maxEntries :: Int
+maxEntries = 10
 
 intStrs :: [String]
-intStrs = map show [(1::Int) ..]
+intStrs = map show [1..maxEntries]
 
 topMemConfig :: IO MConfig
 topMemConfig = mkMConfig "<both1>"
@@ -64,19 +64,22 @@ showInfo nm sms mms = do
   both <- showWithColors' (rnm ++ " " ++ sms) mms
   return [nm, mstr, both]
 
+ignoreErrors :: IO [String] -> IO [String]
+ignoreErrors = handle returnEmpty
+  where returnEmpty = const (return []) :: SomeException -> IO [String]
+
 processes :: IO [FilePath]
-processes = fmap (filter isPid) (getDirectoryContents "/proc")
-  where isPid = all (`elem` ['0'..'9'])
+processes = ignoreErrors $ fmap (filter isPid) (getDirectoryContents "/proc")
+  where isPid = (`elem` ['0'..'9']) . head
 
 getProcessData :: FilePath -> IO [String]
 getProcessData pidf =
-  handle (const (return []) :: SomeException -> IO [String])
-         (withFile ("/proc" </> pidf </> "stat") ReadMode readWords)
+  ignoreErrors $ withFile ("/proc" </> pidf </> "stat") ReadMode readWords
   where readWords = fmap words . hGetLine
 
 handleProcesses :: ([String] -> a) -> IO [a]
 handleProcesses f =
-  fmap (foldr (\p ps -> if p == [] then ps else f p : ps) [])
+  fmap (foldl' (\a p -> if null p then a else f p : a) [])
        (processes >>= mapM getProcessData)
 
 processName :: [String] -> String
@@ -110,7 +113,7 @@ runTopMem _ = do
 type Pid = Int
 type TimeInfo = (String, Float)
 type TimeEntry = (Pid, TimeInfo)
-type Times = IntMap TimeInfo
+type Times = [TimeEntry]
 type TimesRef = IORef (Times, UTCTime)
 
 timeMemEntry :: [String] -> (TimeEntry, Meminfo)
@@ -125,37 +128,46 @@ timeMemEntries = handleProcesses timeMemEntry
 
 timeMemInfos :: IO (Times, [Meminfo], Int)
 timeMemInfos =
-  fmap (\x -> (M.fromList . map fst $ x, map snd x, length x)) timeMemEntries
+  fmap (\x -> (sortPids $ map fst x, map snd x, length x)) timeMemEntries
+  where sortPids =  sortBy (comparing fst)
 
-combineTimeInfos :: Times -> Times -> Times
-combineTimeInfos t0 t1 = M.intersectionWith timeDiff t1 t0
-  where timeDiff (n, x1) (_, x0) = (n, x1 - x0)
+combine :: Times -> Times -> Times
+combine _ [] = []
+combine [] t = t
+combine l@((p0, (n0, t0)):xs) r@((p1, (n1, t1)):ys)
+  | p0 == p1 = (p0, (n0, t1 - t0)) : combine xs ys
+  | p0 < p1 = combine xs r
+  | otherwise = (p1, (n1, t1)) : combine l ys
 
 topProcesses :: TimesRef -> Float -> IO (Int, [TimeInfo], [Meminfo])
 topProcesses tref scale = do
-  (t1, mis, len) <- timeMemInfos
+  (t0, c0) <- readIORef tref
+  (t1', mis, len) <- timeMemInfos
   c1 <- getCurrentTime
-  atomicModifyIORef tref $ \(t0, c0) ->
-    let scx = realToFrac (diffUTCTime c1 c0) * scale / 100
-        -- c0 and c1 can be equal, for instance, if we tweak the clock
-        !scx' = if scx > 0 then scx else scale / 100
-        ts = M.elems $ combineTimeInfos t0 t1
-        nts = map (\(nm, t) -> (nm, min 100 (t / scx'))) ts
-    in ((t1, c1), (len, sortTop nts, mis))
+  let !t1 = t1'
+  writeIORef tref (t1, c1)
+  let scx = realToFrac (diffUTCTime c1 c0) * scale
+      -- c0 and c1 can be equal, for instance, if we tweak the clock
+      !scx' = if scx > 0 then scx else scale
+      ts = combine t0 t1
+      nts = map (\(_, (nm, t)) -> (nm, min 100 (t / scx'))) ts
+  return (len, sortTop nts, mis)
 
 showTimeInfo :: TimeInfo -> Monitor [String]
-showTimeInfo (n, t) = showInfo n (showDigits 1 t) t
+showTimeInfo (n, t) = showInfo n (showDigits 0 t) t
 
 runTop :: TimesRef -> Float -> [String] -> Monitor String
 runTop tref scale _ = do
   (no, ps, ms) <- io $ topProcesses tref scale
   pstr <- mapM showTimeInfo ps
   mstr <- showMeminfos ms
-  parseTemplate $! show no : concat (zipWith (++) pstr mstr)
+  let !pstr' = take maxEntries pstr
+      !mstr' = take maxEntries mstr
+  parseTemplate $! show no : concat (zipWith (++) pstr' mstr')
 
 startTop :: [String] -> Int -> (String -> IO ()) -> IO ()
 startTop a r cb = do
   cr <- getSysVar ClockTick
   c <- getCurrentTime
-  tref <- newIORef (M.empty, c)
-  runM a topConfig (runTop tref (fromIntegral cr)) r cb
+  tref <- newIORef ([], c)
+  runM a topConfig (runTop tref (fromIntegral cr / 100)) r cb
