@@ -52,6 +52,21 @@ foreign import ccall "unistd.h getpagesize"
 pageSize :: Float
 pageSize = fromIntegral c_getpagesize / 1024
 
+processes :: IO [FilePath]
+processes = fmap (filter isPid) (getDirectoryContents "/proc")
+  where isPid = (`elem` ['0'..'9']) . head
+
+getProcessData :: FilePath -> IO [String]
+getProcessData pidf =
+  handle ign $ withFile ("/proc" </> pidf </> "stat") ReadMode readWords
+  where readWords = fmap words . hGetLine
+        ign = const (return []) :: SomeException -> IO [String]
+
+handleProcesses :: ([String] -> a) -> IO [a]
+handleProcesses f =
+  fmap (foldl' (\a p -> if null p then a else f p : a) [])
+       (processes >>= mapM getProcessData)
+
 showInfo :: String -> String -> Float -> Monitor [String]
 showInfo nm sms mms = do
   mnw <- getConfigValue maxWidth
@@ -64,50 +79,32 @@ showInfo nm sms mms = do
   both <- showWithColors' (rnm ++ " " ++ sms) mms
   return [nm, mstr, both]
 
-ignoreErrors :: IO [String] -> IO [String]
-ignoreErrors = handle returnEmpty
-  where returnEmpty = const (return []) :: SomeException -> IO [String]
-
-processes :: IO [FilePath]
-processes = ignoreErrors $ fmap (filter isPid) (getDirectoryContents "/proc")
-  where isPid = (`elem` ['0'..'9']) . head
-
-getProcessData :: FilePath -> IO [String]
-getProcessData pidf =
-  ignoreErrors $ withFile ("/proc" </> pidf </> "stat") ReadMode readWords
-  where readWords = fmap words . hGetLine
-
-handleProcesses :: ([String] -> a) -> IO [a]
-handleProcesses f =
-  fmap (foldl' (\a p -> if null p then a else f p : a) [])
-       (processes >>= mapM getProcessData)
-
 processName :: [String] -> String
 processName = drop 1 . init . (!!1)
 
 sortTop :: [(a, Float)] -> [(a, Float)]
 sortTop =  sortBy (flip (comparing snd))
 
-type Meminfo = (String, Float)
+type MemInfo = (String, Float)
 
-meminfo :: [String] -> Meminfo
+meminfo :: [String] -> MemInfo
 meminfo fs = (processName fs, pageSize * read (fs!!23))
 
-meminfos :: IO [Meminfo]
+meminfos :: IO [MemInfo]
 meminfos = handleProcesses meminfo
 
-showMeminfo :: Float -> Meminfo -> Monitor [String]
-showMeminfo scale (nm, rss) =
+showMemInfo :: Float -> MemInfo -> Monitor [String]
+showMemInfo scale (nm, rss) =
   showInfo nm (showWithUnits 2 1 rss) (100 * rss / sc)
   where sc = if scale > 0 then scale else 100
 
-showMeminfos :: [Meminfo] -> Monitor [[String]]
-showMeminfos ms = mapM (showMeminfo tm) $ sortTop ms
+showMemInfos :: [MemInfo] -> Monitor [[String]]
+showMemInfos ms = mapM (showMemInfo tm) $ sortTop ms
   where tm = sum (map snd ms)
 
 runTopMem :: [String] -> Monitor String
 runTopMem _ = do
-  pstr <- io meminfos >>= showMeminfos
+  pstr <- io meminfos >>= showMemInfos
   parseTemplate $ concat pstr
 
 type Pid = Int
@@ -116,17 +113,17 @@ type TimeEntry = (Pid, TimeInfo)
 type Times = [TimeEntry]
 type TimesRef = IORef (Times, UTCTime)
 
-timeMemEntry :: [String] -> (TimeEntry, Meminfo)
+timeMemEntry :: [String] -> (TimeEntry, MemInfo)
 timeMemEntry fs = ((p, (n, t)), (n, r))
   where p = read (head fs)
         n = processName fs
         t = read (fs!!13) + read (fs!!14)
         (_, r) = meminfo fs
 
-timeMemEntries :: IO [(TimeEntry, Meminfo)]
+timeMemEntries :: IO [(TimeEntry, MemInfo)]
 timeMemEntries = handleProcesses timeMemEntry
 
-timeMemInfos :: IO (Times, [Meminfo], Int)
+timeMemInfos :: IO (Times, [MemInfo], Int)
 timeMemInfos = fmap res timeMemEntries
   where res x = (sortBy (comparing fst) $ map fst x, map snd x, length x)
 
@@ -138,7 +135,7 @@ combine l@((p0, (n0, t0)):ls) r@((p1, (n1, t1)):rs)
   | p0 < p1 = combine ls r
   | otherwise = (p1, (n1, t1)) : combine l rs
 
-topProcesses :: TimesRef -> Float -> IO (Int, [TimeInfo], [Meminfo])
+topProcesses :: TimesRef -> Float -> IO (Int, [TimeInfo], [MemInfo])
 topProcesses tref scale = do
   (t0, c0) <- readIORef tref
   (t1', mis, len) <- timeMemInfos
@@ -150,16 +147,19 @@ topProcesses tref scale = do
       !scx' = if scx > 0 then scx else scale
       ts = combine t0 t1
       nts = map (\(_, (nm, t)) -> (nm, min 100 (t / scx'))) ts
-  return (len, sortTop nts, mis)
+  return (len, nts, mis)
 
 showTimeInfo :: TimeInfo -> Monitor [String]
 showTimeInfo (n, t) = showInfo n (showDigits 0 t) t
 
+showTimeInfos :: [TimeInfo] -> Monitor [[String]]
+showTimeInfos = mapM showTimeInfo . sortTop
+
 runTop :: TimesRef -> Float -> [String] -> Monitor String
 runTop tref scale _ = do
   (no, ps, ms) <- io $ topProcesses tref scale
-  pstr <- mapM showTimeInfo ps
-  mstr <- showMeminfos ms
+  pstr <- showTimeInfos ps
+  mstr <- showMemInfos ms
   parseTemplate $ show no : concat (zipWith (++) pstr mstr) ++ repeat "N/A"
 
 startTop :: [String] -> Int -> (String -> IO ()) -> IO ()
