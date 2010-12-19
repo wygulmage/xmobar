@@ -127,17 +127,16 @@ timeMemEntries :: IO [(TimeEntry, Meminfo)]
 timeMemEntries = handleProcesses timeMemEntry
 
 timeMemInfos :: IO (Times, [Meminfo], Int)
-timeMemInfos =
-  fmap (\x -> (sortPids $ map fst x, map snd x, length x)) timeMemEntries
-  where sortPids =  sortBy (comparing fst)
+timeMemInfos = fmap res timeMemEntries
+  where res x = (sortBy (comparing fst) $ map fst x, map snd x, length x)
 
 combine :: Times -> Times -> Times
 combine _ [] = []
-combine [] t = t
-combine l@((p0, (n0, t0)):xs) r@((p1, (n1, t1)):ys)
-  | p0 == p1 = (p0, (n0, t1 - t0)) : combine xs ys
-  | p0 < p1 = combine xs r
-  | otherwise = (p1, (n1, t1)) : combine l ys
+combine [] ts = ts
+combine l@((p0, (n0, t0)):ls) r@((p1, (n1, t1)):rs)
+  | p0 == p1 = (p0, (n0, t1 - t0)) : combine ls rs
+  | p0 < p1 = combine ls r
+  | otherwise = (p1, (n1, t1)) : combine l rs
 
 topProcesses :: TimesRef -> Float -> IO (Int, [TimeInfo], [Meminfo])
 topProcesses tref scale = do
@@ -161,9 +160,7 @@ runTop tref scale _ = do
   (no, ps, ms) <- io $ topProcesses tref scale
   pstr <- mapM showTimeInfo ps
   mstr <- showMeminfos ms
-  let !pstr' = take maxEntries pstr
-      !mstr' = take maxEntries mstr
-  parseTemplate $! show no : concat (zipWith (++) pstr' mstr')
+  parseTemplate $ show no : concat (zipWith (++) pstr mstr) ++ repeat "N/A"
 
 startTop :: [String] -> Int -> (String -> IO ()) -> IO ()
 startTop a r cb = do
