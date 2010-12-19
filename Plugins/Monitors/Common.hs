@@ -47,6 +47,8 @@ module Plugins.Monitors.Common (
                        , takeDigits
                        , showDigits
                        , floatToPercent
+                       , parseFloat
+                       , parseInt
                        , stringParser
                        -- * Threaded Actions
                        -- $thread
@@ -334,6 +336,16 @@ padString mnw mxw pad pr s =
        take rlen s
      else let ps = take (rlen - len) (cycle pad)
           in if pr then s ++ ps else ps ++ s
+
+parseFloat :: String -> Float
+parseFloat s = case readFloat s of
+  (v, _):_ -> v
+  _ -> 0
+
+parseInt :: String -> Int
+parseInt s = case readDec s of
+  (v, _):_ -> v
+  _ -> 0
 
 floatToPercent :: Float -> Monitor String
 floatToPercent n =

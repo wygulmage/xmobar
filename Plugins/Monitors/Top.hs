@@ -64,7 +64,7 @@ getProcessData pidf =
 
 handleProcesses :: ([String] -> a) -> IO [a]
 handleProcesses f =
-  fmap (foldl' (\a p -> if null p then a else f p : a) [])
+  fmap (foldl' (\a p -> if length p < 15 then a else f p : a) [])
        (processes >>= mapM getProcessData)
 
 showInfo :: String -> String -> Float -> Monitor [String]
@@ -82,13 +82,13 @@ showInfo nm sms mms = do
 processName :: [String] -> String
 processName = drop 1 . init . (!!1)
 
-sortTop :: [(a, Float)] -> [(a, Float)]
+sortTop :: [(String, Float)] -> [(String, Float)]
 sortTop =  sortBy (flip (comparing snd))
 
 type MemInfo = (String, Float)
 
 meminfo :: [String] -> MemInfo
-meminfo fs = (processName fs, pageSize * read (fs!!23))
+meminfo fs = (processName fs, pageSize * parseFloat (fs!!23))
 
 meminfos :: IO [MemInfo]
 meminfos = handleProcesses meminfo
@@ -115,9 +115,9 @@ type TimesRef = IORef (Times, UTCTime)
 
 timeMemEntry :: [String] -> (TimeEntry, MemInfo)
 timeMemEntry fs = ((p, (n, t)), (n, r))
-  where p = read (head fs)
+  where p = parseInt (head fs)
         n = processName fs
-        t = read (fs!!13) + read (fs!!14)
+        t = parseFloat (fs!!13) + parseFloat (fs!!14)
         (_, r) = meminfo fs
 
 timeMemEntries :: IO [(TimeEntry, MemInfo)]
@@ -128,25 +128,24 @@ timeMemInfos = fmap res timeMemEntries
   where res x = (sortBy (comparing fst) $ map fst x, map snd x, length x)
 
 combine :: Times -> Times -> Times
-combine _ [] = []
-combine [] ts = ts
+combine ts [] = length ts `seq` []
+combine [] ts = length ts `seq` ts
 combine l@((p0, (n0, t0)):ls) r@((p1, (n1, t1)):rs)
-  | p0 == p1 = (p0, (n0, t1 - t0)) : combine ls rs
-  | p0 < p1 = combine ls r
+  | p0 == p1 && n0 == n1 = (p0, (n0, t1 - t0)) : combine ls rs
+  | p0 <= p1 = combine ls r
   | otherwise = (p1, (n1, t1)) : combine l rs
 
 topProcesses :: TimesRef -> Float -> IO (Int, [TimeInfo], [MemInfo])
 topProcesses tref scale = do
   (t0, c0) <- readIORef tref
-  (t1', mis, len) <- timeMemInfos
+  (t1, mis, len) <- timeMemInfos
   c1 <- getCurrentTime
-  let !t1 = t1'
-  writeIORef tref (t1, c1)
   let scx = realToFrac (diffUTCTime c1 c0) * scale
       -- c0 and c1 can be equal, for instance, if we tweak the clock
       !scx' = if scx > 0 then scx else scale
       ts = combine t0 t1
       nts = map (\(_, (nm, t)) -> (nm, min 100 (t / scx'))) ts
+  writeIORef tref (t1, c1)
   return (len, nts, mis)
 
 showTimeInfo :: TimeInfo -> Monitor [String]
