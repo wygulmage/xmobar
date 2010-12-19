@@ -99,12 +99,13 @@ showMemInfo scale (nm, rss) =
   where sc = if scale > 0 then scale else 100
 
 showMemInfos :: [MemInfo] -> Monitor [[String]]
-showMemInfos ms = mapM (showMemInfo tm) $ sortTop ms
+showMemInfos ms = mapM (showMemInfo tm) ms
   where tm = sum (map snd ms)
 
 runTopMem :: [String] -> Monitor String
 runTopMem _ = do
-  pstr <- io meminfos >>= showMemInfos
+  mis <- io meminfos
+  pstr <- showMemInfos (sortTop mis)
   parseTemplate $ concat pstr
 
 type Pid = Int
@@ -128,12 +129,18 @@ timeMemInfos = fmap res timeMemEntries
   where res x = (sortBy (comparing fst) $ map fst x, map snd x, length x)
 
 combine :: Times -> Times -> Times
-combine ts [] = length ts `seq` []
-combine [] ts = length ts `seq` ts
+combine _ [] = []
+combine [] ts = ts
 combine l@((p0, (n0, t0)):ls) r@((p1, (n1, t1)):rs)
   | p0 == p1 && n0 == n1 = (p0, (n0, t1 - t0)) : combine ls rs
   | p0 <= p1 = combine ls r
   | otherwise = (p1, (n1, t1)) : combine l rs
+
+take' :: Int -> [a] -> [a]
+take' m l = let !r = tk m l in length l `seq` r
+  where tk 0 _ = []
+        tk _ [] = []
+        tk n (x:xs) = let !r = tk (n - 1) xs in x : r
 
 topProcesses :: TimesRef -> Float -> IO (Int, [TimeInfo], [MemInfo])
 topProcesses tref scale = do
@@ -141,18 +148,19 @@ topProcesses tref scale = do
   (t1, mis, len) <- timeMemInfos
   c1 <- getCurrentTime
   let scx = realToFrac (diffUTCTime c1 c0) * scale
-      -- c0 and c1 can be equal, for instance, if we tweak the clock
       !scx' = if scx > 0 then scx else scale
-      ts = combine t0 t1
-      nts = map (\(_, (nm, t)) -> (nm, min 100 (t / scx'))) ts
-  writeIORef tref (t1, c1)
-  return (len, nts, mis)
+      nts = map (\(_, (nm, t)) -> (nm, min 100 (t / scx'))) (combine t0 t1)
+      !t1' = take' (length t1) t1
+      !nts' = take' maxEntries (sortTop nts)
+      !mis' = take' maxEntries (sortTop mis)
+  writeIORef tref (t1', c1)
+  return (len, nts', mis')
 
 showTimeInfo :: TimeInfo -> Monitor [String]
 showTimeInfo (n, t) = showInfo n (showDigits 0 t) t
 
 showTimeInfos :: [TimeInfo] -> Monitor [[String]]
-showTimeInfos = mapM showTimeInfo . sortTop
+showTimeInfos = mapM showTimeInfo
 
 runTop :: TimesRef -> Float -> [String] -> Monitor String
 runTop tref scale _ = do
@@ -166,4 +174,6 @@ startTop a r cb = do
   cr <- getSysVar ClockTick
   c <- getCurrentTime
   tref <- newIORef ([], c)
-  runM a topConfig (runTop tref (fromIntegral cr / 100)) r cb
+  let scale = fromIntegral cr / 100
+  _ <- topProcesses tref scale
+  runM a topConfig (runTop tref scale) r cb
