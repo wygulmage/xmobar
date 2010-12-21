@@ -21,22 +21,19 @@ import Data.List (isPrefixOf, transpose, unfoldr)
 multiCpuConfig :: IO MConfig
 multiCpuConfig =
   mkMConfig "Cpu: <total>%" $
-            map ("auto" ++) monitors
-            ++ [ k ++ n | n <- "" : map show [0 :: Int ..]
-                        , k <- monitors]
+            ["auto" ++ k | k <- monitors] ++
+            [ k ++ n     | n <- "" : map show [0 :: Int ..]
+                         , k <- monitors]
     where monitors = ["bar","total","user","nice","system","idle"]
 
 
 cpuData :: IO [[Float]]
-cpuData = do s <- B.readFile "/proc/stat"
-             return $ cpuParser s
-
-cpuParser :: B.ByteString -> [[Float]]
-cpuParser = map parseList . cpuLists
-  where cpuLists = takeWhile isCpu . map B.words . B.lines
+cpuData = parse `fmap` B.readFile "/proc/stat"
+  where parse = map parseList . cpuLists
+        cpuLists = takeWhile isCpu . map B.words . B.lines
         isCpu (w:_) = "cpu" `isPrefixOf` B.unpack w
         isCpu _ = False
-        parseList = map (read . B.unpack) . tail
+        parseList = map (parseFloat . B.unpack) . tail
 
 parseCpuData :: IO [[Float]]
 parseCpuData =
@@ -62,9 +59,7 @@ formatCpu xs
                       return (b:ps)
 
 splitEvery :: (Eq a) => Int -> [a] -> [[a]]
-splitEvery n = unfoldr (\x -> if x == []
-                              then Nothing
-                              else Just $ splitAt n x)
+splitEvery n = unfoldr (\x -> if null x then Nothing else Just $ splitAt n x)
 
 groupData :: [String] -> [[String]]
 groupData = transpose . tail . splitEvery 6
@@ -78,4 +73,4 @@ runMultiCpu _ =
   do c <- io parseCpuData
      l <- formatMultiCpus c
      a <- formatAutoCpus l
-     parseTemplate (a ++ l)
+     parseTemplate $ a ++ l
