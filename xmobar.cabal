@@ -47,8 +47,9 @@ flag all_extensions
   default: False
 
 executable xmobar
+    hs-source-dirs:     src
     main-is:            Main.hs
-    other-modules:      Xmobar, Config, Parsers, Commands, XUtil, StatFS, Runnable, Plugins
+    other-modules:      Xmobar, Config, Parsers, Commands, XUtil, StatFS, Runnable, Plugins, Plugins.Monitors
     ghc-prof-options:   -prof -auto-all
 
     if true
