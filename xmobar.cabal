@@ -19,6 +19,11 @@ build-type:         Simple
 
 data-files:         xmobar.config-sample
 
+source-repository head
+  type:      git
+  location:  git://github.com/jaor/xmobar.git
+  branch:    master
+
 flag small_base
   description: Choose the new smaller, split-up base package.
 
@@ -49,7 +54,18 @@ flag all_extensions
 executable xmobar
     hs-source-dirs:     src
     main-is:            Main.hs
-    other-modules:      Xmobar, Config, Parsers, Commands, XUtil, StatFS, Runnable, Plugins, Plugins.Monitors
+    other-modules:
+      Xmobar, Config, Parsers, Commands, XUtil, StatFS, Runnable,
+      Plugins, Plugins.CommandReader, Plugins.Date, Plugins.EWMH,
+      Plugins.PipeReader, Plugins.StdinReader, Plugins.XMonadLog,
+      Plugins.Utils, Plugins.Monitors, Plugins.Monitors.Batt,
+      Plugins.Monitors.Common, Plugins.Monitors.CoreCommon,
+      Plugins.Monitors.CoreTemp, Plugins.Monitors.CpuFreq,
+      Plugins.Monitors.Cpu, Plugins.Monitors.Disk, Plugins.Monitors.Mem,
+      Plugins.Monitors.MultiCpu, Plugins.Monitors.Net,
+      Plugins.Monitors.Swap, Plugins.Monitors.Thermal, Plugins.Monitors.Top,
+      Plugins.Monitors.Uptime, Plugins.Monitors.Weather
+
     ghc-prof-options:   -prof -auto-all
 
     if true
@@ -79,13 +95,15 @@ executable xmobar
 
     if flag(with_inotify) || flag(all_extensions)
        build-depends: hinotify
+       other-modules: Plugins.Mail, Plugins.MBox
        cpp-options: -DINOTIFY
 
     if flag(with_iwlib) || flag(all_extensions)
        extra-libraries: iw
-       other-modules: IWlib
+       other-modules: IWlib, Plugins.Monitors.Wireless
        cpp-options: -DIWLIB
 
     if flag(with_mpd) || flag(all_extensions)
        build-depends: libmpd >= 0.5
+       other-modules: Plugins.Monitors.MPD
        cpp-options: -DLIBMPD
