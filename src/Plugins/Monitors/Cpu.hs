@@ -39,7 +39,7 @@ parseCPU =
        return percent
 
 formatCpu :: [Float] -> Monitor [String]
-formatCpu [] = return $ repeat ""
+formatCpu [] = return $ replicate 6 ""
 formatCpu xs = do
   let t = foldr (+) 0 $ take 3 xs
   b <- showPercentBar (100 * t) t
