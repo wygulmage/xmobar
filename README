@@ -6,7 +6,7 @@ About
 
 xmobar is a minimalistic, text based, status bar. It was originally
 designed and implemented by Andrea Rossato to work with [xmonad],
-but it's actually window-manager-agnostic.
+but it's actually usable with any window-manager.
 
 xmobar was inspired by the [Ion3] status bar, and supports similar
 features, like dynamic color management, output templates, and
@@ -127,7 +127,9 @@ Configuration
 
 ## Quick Start
 
-See [xmobar.config-sample] for an example.
+See [samples/xmobar.config] for an example.
+
+[samples/xmobar.config]: http://github.com/jaor/xmobar/raw/master/samples/xmobar.config
 
 For the output template:
 
@@ -836,13 +838,14 @@ configuration options.
 This requires importing your plugin into `Config.hs` and adding your
 type to the type list in the type signature of `Config.runnableTypes`.
 
-For a very basic example see `Plugins/HelloWorld.hs` or the other
-plugins that are distributed with xmobar.
+For a very basic example see `samples/Plugins/HelloWorld.hs` or the
+other plugins that are distributed with xmobar.
 
 ## Installing/Removing a Plugin
 
 Installing a plugin should require 3 steps. Here we are going to
-install the HelloWorld plugin that comes with xmobar:
+install the HelloWorld plugin that comes with xmobar, assuming that
+you copied it to `src/Plugins`:
 
 1. import the plugin module in `Config.hs`, by adding:
 
@@ -974,4 +977,3 @@ Copyright &copy; 2010 Jose Antonio Ortega Ruiz
 [libmpd]: http://hackage.haskell.org/package/libmpd/
 [sawfish]: http://sawfish.wikia.com/
 [utf8-string]: http://hackage.haskell.org/package/utf8-string/
-[xmobar.config-sample]: http://github.com/jaor/xmobar/raw/master/xmobar.config-sample

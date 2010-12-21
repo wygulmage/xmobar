@@ -11,13 +11,10 @@ description: 	    Xmobar is a minimalistic text based status bar.
 category:           System
 license:            BSD3
 license-file:       LICENSE
-extra-source-files: README, NEWS
 author:             Andrea Rossato
 maintainer:         Jose A. Ortega Ruiz <jao@gnu.org>
 cabal-version:      >= 1.6
 build-type:         Simple
-
-data-files:         xmobar.config-sample
 
 source-repository head
   type:      git
@@ -50,6 +47,11 @@ flag with_mpd
 flag all_extensions
   description: Includes all optional extensions.
   default: False
+
+data-files:         samples/xmobar.config
+extra-source-files: README, NEWS,
+                    samples/Plugins/helloworld.config,
+                    samples/Plugins/HelloWorld.hs
 
 executable xmobar
     hs-source-dirs:     src
