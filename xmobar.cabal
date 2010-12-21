@@ -16,6 +16,11 @@ maintainer:         Jose A. Ortega Ruiz <jao@gnu.org>
 cabal-version:      >= 1.6
 build-type:         Simple
 
+data-files:         samples/xmobar.config
+extra-source-files: README, NEWS,
+                    samples/Plugins/helloworld.config,
+                    samples/Plugins/HelloWorld.hs
+
 source-repository head
   type:      git
   location:  git://github.com/jaor/xmobar.git
@@ -47,11 +52,6 @@ flag with_mpd
 flag all_extensions
   description: Includes all optional extensions.
   default: False
-
-data-files:         samples/xmobar.config
-extra-source-files: README, NEWS,
-                    samples/Plugins/helloworld.config,
-                    samples/Plugins/HelloWorld.hs
 
 executable xmobar
     hs-source-dirs:     src
