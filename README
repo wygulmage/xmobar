@@ -43,17 +43,28 @@ bells and whistles, use:
 
 ## From source
 
-If you don't have `cabal-install` installed, you can get its source
-from [Github]:
+If you don't have `cabal-install` installed, you can get xmobar's
+source code in a variety of ways:
 
+  - From [Hackage]. Just download [xmobar-0.12.tar.gz] from xmobar's
+    hackage page.
+  - From [Github]. You can also obtain a tarball in [Github's
+    downloads page]. You'll find there links to each tagged release.
+  - From the bleeding edge repo. If you prefer to live dangerously,
+    just get the latest and greatest (and buggiest, i guess) using
+    git:
         git clone git://github.com/jaor/xmobar
 
-To install simply run:
+[xmobar-0.12.tar.gz]: http://hackage.haskell.org/packages/archive/xmobar/0.12/xmobar-0.12.tar.gz
+[Github's downloads page]: https://github.com/jaor/xmobar/downloads
 
-        tar xvfz xmobar-0.9
-        cd xmobar-0.9
+To install simply run (if needed):
 
-Then run the configure script:
+        tar xvfz xmobar-0.12
+        cd xmobar-0.12
+
+If you have cabal installed, you can now use it from within xmobar's
+source tree. Otherwise, run the configure script:
 
         runhaskell Setup.lhs configure
 
@@ -62,6 +73,9 @@ Then run the configure script:
 
         # To enable both XFT and UTF-8 support run:
         runhaskell Setup.lhs configure --flags="with_xft"
+
+        # To enable all extensions
+        runhaskell Setup.lhs configure --flags="all_extensions"
 
 Now you can build the source:
 
