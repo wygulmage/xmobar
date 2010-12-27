@@ -265,8 +265,8 @@ drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
     -- resync
     io $ sync       d True
 
-drawBorder :: Border -> Display -> Drawable -> GC -> Pixel -> Dimension
-           -> Dimension -> IO ()
+drawBorder :: Border -> Display -> Drawable -> GC -> Pixel
+              -> Dimension -> Dimension -> IO ()
 drawBorder b d p gc c wi ht =  case b of
   NoBorder -> return ()
   TopB       -> drawBorder (TopBM 0) d p gc c w h
@@ -275,8 +275,8 @@ drawBorder b d p gc c wi ht =  case b of
   TopBM m    -> sf >> drawLine d p gc 0 (fi m) (fi w) 0
   BottomBM m -> let rw = (fi h) - (fi m) in
                  sf >> drawLine d p gc 0 rw (fi w) rw
-  FullBM m   -> let rm = fi m; mp = fi m in
-                 sf >> drawRectangle d p gc mp mp (w - rm) (h - rm)
+  FullBM m   -> let pad = 2 * fi m; mp = fi m in
+                 sf >> drawRectangle d p gc mp mp (w - pad) (h - pad)
   where sf = setForeground d gc c
         (w, h) = (wi - 1, ht - 1)
 
