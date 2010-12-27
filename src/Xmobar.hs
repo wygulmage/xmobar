@@ -145,32 +145,32 @@ createWin d fs c = do
 
 setPosition :: XPosition -> [Rectangle] -> Dimension -> (Rectangle,Bool)
 setPosition p rs ht =
-    case p' of
-    Top                -> (Rectangle rx          ry      rw      h     , True)
-    TopW a i           -> (Rectangle (ax a i  )  ry     (nw i )  h     , True)
-    TopSize a i ch     -> (Rectangle (ax a i  )  ry     (nw i ) (mh ch), True)
-    Bottom             -> (Rectangle rx          ny      rw      h     , True)
-    BottomW a i        -> (Rectangle (ax a i  )  ny     (nw i )  h     , True)
-    BottomSize a i ch  -> (Rectangle (ax a i  )  ny     (nw i ) (mh ch), True)
-    Static cx cy cw ch -> (Rectangle (fi cx   ) (fi cy) (fi cw) (fi ch), True)
-    OnScreen _ p''     -> setPosition p'' [scr] ht
-    where
-      (scr@(Rectangle rx ry rw rh), p') =
-        case p of OnScreen i x -> (fromMaybe (head rs) $ safeIndex i rs, x)
-                  _            -> (head rs, p)
-      ny       = ry + fi (rh - ht)
-      center i = rx + (fi $ div (remwid i) 2)
-      right  i = rx + (fi $ remwid i)
-      remwid i = rw - pw (fi i)
-      ax L     = const rx
-      ax R     = right
-      ax C     = center
-      pw i     = rw * (min 100 i) `div` 100
-      nw       = fi . pw . fi
-      h        = fi ht
-      mh h'    = max (fi h') h
-
-      safeIndex i = lookup i . zip [0..]
+  case p' of
+    Top -> (Rectangle rx ry rw h, True)
+    TopW a i -> (Rectangle (ax a i) ry (nw i) h, True)
+    TopSize a i ch -> (Rectangle (ax a i) ry (nw i) (mh ch), True)
+    Bottom -> (Rectangle rx ny rw h, True)
+    BottomW a i -> (Rectangle (ax a i) ny (nw i) h, True)
+    BottomSize a i ch  -> (Rectangle (ax a i) (ny' ch) (nw i) (mh ch), True)
+    Static cx cy cw ch -> (Rectangle (fi cx) (fi cy) (fi cw) (fi ch), True)
+    OnScreen _ p'' -> setPosition p'' [scr] ht
+  where
+    (scr@(Rectangle rx ry rw rh), p') =
+      case p of OnScreen i x -> (fromMaybe (head rs) $ safeIndex i rs, x)
+                _ -> (head rs, p)
+    ny       = ry + fi (rh - ht)
+    center i = rx + (fi $ div (remwid i) 2)
+    right  i = rx + (fi $ remwid i)
+    remwid i = rw - pw (fi i)
+    ax L     = const rx
+    ax R     = right
+    ax C     = center
+    pw i     = rw * (min 100 i) `div` 100
+    nw       = fi . pw . fi
+    h        = fi ht
+    mh h'    = max (fi h') h
+    ny' h'   = ry + fi (rh - mh h')
+    safeIndex i = lookup i . zip [0..]
 
 setProperties :: Rectangle -> Config -> Display -> Window -> [Rectangle] -> IO ()
 setProperties r c d w srs = do
