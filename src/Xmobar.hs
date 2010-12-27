@@ -83,7 +83,7 @@ eventLoop xc@(XConf d _ w fs c) v = block $ do
     -- interrupt the drawing thread every time a var is updated
     checker t tvar ov = do
       nval <- atomically $ do
-              nv <- fmap concat $ mapM readTVar (map snd v)
+              nv <- fmap concat $ mapM (readTVar . snd) v
               guard (nv /= ov)
               writeTVar tvar nv
               return nv
@@ -159,8 +159,8 @@ setPosition p rs ht =
       case p of OnScreen i x -> (fromMaybe (head rs) $ safeIndex i rs, x)
                 _ -> (head rs, p)
     ny       = ry + fi (rh - ht)
-    center i = rx + (fi $ div (remwid i) 2)
-    right  i = rx + (fi $ remwid i)
+    center i = rx + fi (div (remwid i) 2)
+    right  i = rx + fi (remwid i)
     remwid i = rw - pw (fi i)
     ax L     = const rx
     ax R     = right
@@ -273,7 +273,7 @@ drawBorder b d p gc c wi ht =  case b of
   BottomB    -> drawBorder (BottomBM 0) d p gc c w h
   FullB      -> drawBorder (FullBM 0) d p gc c w h
   TopBM m    -> sf >> drawLine d p gc 0 (fi m) (fi w) 0
-  BottomBM m -> let rw = (fi h) - (fi m) in
+  BottomBM m -> let rw = fi h - fi m in
                  sf >> drawLine d p gc 0 rw (fi w) rw
   FullBM m   -> let pad = 2 * fi m; mp = fi m in
                  sf >> drawRectangle d p gc mp mp (w - pad) (h - pad)
@@ -296,7 +296,7 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
                                C -> (remWidth + offs) `div` 2
                                R -> remWidth
                                L -> offs
-      (fc,bc)              = case (break (==',') c) of
+      (fc,bc)              = case break (==',') c of
                                (f,',':b) -> (f, b           )
                                (f,    _) -> (f, bgColor conf)
   withColors d [bc] $ \[bc'] -> do
