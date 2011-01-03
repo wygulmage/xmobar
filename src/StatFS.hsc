@@ -27,7 +27,7 @@ import Data.ByteString.Char8 (pack)
 # include <sys/param.h>
 # include <sys/mount.h>
 #else
-#include <sys/vfs.h>
+# include <sys/vfs.h>
 #endif
 
 data FileSystemStats = FileSystemStats {
@@ -47,7 +47,7 @@ data FileSystemStats = FileSystemStats {
 
 data CStatfs
 
-#if defined(__FreeBSD__)
+#if defined (__FreeBSD__)
 foreign import ccall unsafe "sys/mount.h statfs"
 #else
 foreign import ccall unsafe "sys/vfs.h statfs64"
