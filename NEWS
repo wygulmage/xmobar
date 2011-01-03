@@ -1,6 +1,16 @@
 % xmobar - Release notes
 % Jose A. Ortega Ruiz
 
+## Version 0.12.1
+
+_Bug fixes_
+
+  - [issue 27]: `BottomSize` placement now respects its width argument.
+  - Text is now correctly centered vertically.
+  - `FullBM` border spec fixed.
+
+[issue 27]: http://code.google.com/p/xmobar/issues/detail?id=27
+
 ## Version 0.12 (Dec 24, 2010)
 
 xmobar has a new [maintainer], a new [website], a new [mailing
