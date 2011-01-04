@@ -6,10 +6,13 @@
 _Bug fixes_
 
   - [issue 27]: `BottomSize` placement now respects its width argument.
+  - [issue 36]: Battery monitor now supports non-standard locations of
+    the `/sys/class/power_supply/AC/online` file.
   - Text is now correctly centered vertically.
   - `FullBM` border spec fixed.
 
 [issue 27]: http://code.google.com/p/xmobar/issues/detail?id=27
+[issue 36]: http://code.google.com/p/xmobar/issues/detail?id=36
 
 ## Version 0.12 (Dec 24, 2010)
 
