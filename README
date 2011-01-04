@@ -435,7 +435,8 @@ Monitors have default aliases.
     - `-m`: color to display power lower than the `-H` threshold
     - `-h`: color to display power highter than the `-H` threshold
     - `-p`: color to display positive power (battery charging)
-    - `-f`: file `/sys/class/power_supply` with AC info (default: AC/online)
+    - `-f`: file in `/sys/class/power_supply` with AC info (default:
+      "AC/online")
 - Variables that can be used with the `-t`/`--template` argument:
 	    `left`, `leftbar`, `timeleft`, `watts`, `acstatus`
 - Default template: `Batt: <watts>, <left>% / <timeleft>`

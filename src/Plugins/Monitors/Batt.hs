@@ -76,10 +76,10 @@ battConfig = mkMConfig
        ["leftbar", "left", "acstatus", "timeleft", "watts"] -- replacements
 
 data Files = Files
-  { f_full :: String
-  , f_now :: String
-  , f_voltage :: String
-  , f_current :: String
+  { fFull :: String
+  , fNow :: String
+  , fVoltage :: String
+  , fCurrent :: String
   } | NoFiles
 
 data Battery = Battery
@@ -98,10 +98,10 @@ batteryFiles bat =
        (_, True) -> files "/energy"
        _ -> NoFiles
   where prefix = base ++ "/" ++ bat
-        files ch = Files { f_full = prefix ++ ch ++ "_full"
-                         , f_now = prefix ++ ch ++ "_now"
-                         , f_current = prefix ++ "/current_now"
-                         , f_voltage = prefix ++ "/voltage_now" }
+        files ch = Files { fFull = prefix ++ ch ++ "_full"
+                         , fNow = prefix ++ ch ++ "_now"
+                         , fCurrent = prefix ++ "/current_now"
+                         , fVoltage = prefix ++ "/voltage_now" }
 
 haveAc :: FilePath -> IO Bool
 haveAc f = do
@@ -114,10 +114,10 @@ haveAc f = do
 readBattery :: Files -> IO Battery
 readBattery NoFiles = return $ Battery 0 0 0 0
 readBattery files =
-    do a <- grab $ f_full files -- microwatthours
-       b <- grab $ f_now files
-       c <- grab $ f_voltage files -- microvolts
-       d <- grab $ f_current files -- microwatts (huh!)
+    do a <- grab $ fFull files -- microwatthours
+       b <- grab $ fNow files
+       c <- grab $ fVoltage files -- microvolts
+       d <- grab $ fCurrent files -- microwatts (huh!)
        return $ Battery (3600 * a / 1000000) -- wattseconds
                         (3600 * b / 1000000) -- wattseconds
                         (c / 1000000) -- volts
