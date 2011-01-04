@@ -1,7 +1,8 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Batt
--- Copyright   :  (c) Andrea Rossato, 2010 Petr Rockai, 2010 Jose A Ortega
+-- Copyright   :  (c) 2010 Andrea Rossato, Petr Rockai
+--                (c) 2010, 2011 Jose A Ortega
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
@@ -16,6 +17,7 @@ module Plugins.Monitors.Batt ( battConfig, runBatt, runBatt' ) where
 
 import qualified Data.ByteString.Lazy.Char8 as B
 import Plugins.Monitors.Common
+import System.FilePath ((</>))
 import System.Posix.Files (fileExist)
 import System.Console.GetOpt
 
@@ -28,6 +30,7 @@ data BattOpts = BattOpts
   , highWColor :: Maybe String
   , lowThreshold :: Float
   , highThreshold :: Float
+  , onlineFile :: FilePath
   }
 
 defaultOpts :: BattOpts
@@ -40,6 +43,7 @@ defaultOpts = BattOpts
   , highWColor = Nothing
   , lowThreshold = -12
   , highThreshold = -10
+  , onlineFile = "AC/online"
   }
 
 options :: [OptDescr (BattOpts -> BattOpts)]
@@ -52,6 +56,7 @@ options =
   , Option "h" ["high"] (ReqArg (\x o -> o { highWColor = Just x }) "") ""
   , Option "L" ["lowt"] (ReqArg (\x o -> o { lowThreshold = read x }) "") ""
   , Option "H" ["hight"] (ReqArg (\x o -> o { highThreshold = read x }) "") ""
+  , Option "f" ["online"] (ReqArg (\x o -> o { onlineFile = x }) "") ""
   ]
 
 parseOpts :: [String] -> IO BattOpts
@@ -98,12 +103,13 @@ batteryFiles bat =
                          , f_current = prefix ++ "/current_now"
                          , f_voltage = prefix ++ "/voltage_now" }
 
-haveAc :: IO (Maybe Bool)
-haveAc = do know <- fileExist $ base ++ "/AC/online"
-            if know
-               then do s <- B.unpack `fmap` catRead (base ++ "/AC/online")
-                       return $ Just $ s == "1\n"
-               else return Nothing
+haveAc :: FilePath -> IO Bool
+haveAc f = do
+  know <- fileExist ofile
+  if know
+    then fmap ((== "1\n") . B.unpack) (catRead ofile)
+    else return False
+  where ofile = base </> f
 
 readBattery :: Files -> IO Battery
 readBattery NoFiles = return $ Battery 0 0 0 0
@@ -121,17 +127,13 @@ readBattery files =
 readBatteries :: BattOpts -> [Files] -> IO Result
 readBatteries opts bfs =
     do bats <- mapM readBattery (take 3 bfs)
-       ac' <- haveAc
-       let ac = (ac' == Just True)
-           sign = if ac then 1 else -1
+       ac <- haveAc (onlineFile opts)
+       let sign = if ac then 1 else -1
            left = sum (map now bats) / sum (map full bats)
            watts = sign * sum (map voltage bats) * sum (map current bats)
            time = if watts == 0 then 0 else sum $ map time' bats -- negate sign
            time' b = (if ac then full b - now b else now b) / (sign * watts)
-           acstr = case ac' of
-             Nothing -> "?"
-             Just True -> onString opts
-             Just False -> offString opts
+           acstr = if ac then onString opts else offString opts
        return $ if isNaN left then NA else Result left watts time acstr
 
 runBatt :: [String] -> Monitor String
