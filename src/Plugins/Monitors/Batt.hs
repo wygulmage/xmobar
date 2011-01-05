@@ -67,8 +67,8 @@ parseOpts argv =
 
 data Result = Result Float Float Float String | NA
 
-base :: String
-base = "/sys/class/power_supply"
+sysDir :: FilePath
+sysDir = "/sys/class/power_supply"
 
 battConfig :: IO MConfig
 battConfig = mkMConfig
@@ -91,25 +91,25 @@ data Battery = Battery
 
 batteryFiles :: String -> IO Files
 batteryFiles bat =
-  do is_charge <- fileExist $ prefix ++ "/charge_now"
-     is_energy <- fileExist $ prefix ++ "/energy_now"
+  do is_charge <- fileExist $ prefix </> "charge_now"
+     is_energy <- fileExist $ prefix </> "energy_now"
      return $ case (is_charge, is_energy) of
-       (True, _) -> files "/charge"
-       (_, True) -> files "/energy"
+       (True, _) -> files "charge"
+       (_, True) -> files "energy"
        _ -> NoFiles
-  where prefix = base ++ "/" ++ bat
-        files ch = Files { fFull = prefix ++ ch ++ "_full"
-                         , fNow = prefix ++ ch ++ "_now"
-                         , fCurrent = prefix ++ "/current_now"
-                         , fVoltage = prefix ++ "/voltage_now" }
+  where prefix = sysDir </> bat
+        files ch = Files { fFull = prefix </> ch ++ "_full"
+                         , fNow = prefix </> ch ++ "_now"
+                         , fCurrent = prefix </> "current_now"
+                         , fVoltage = prefix </> "voltage_now" }
 
 haveAc :: FilePath -> IO Bool
 haveAc f = do
-  know <- fileExist ofile
-  if know
+  exists <- fileExist ofile
+  if exists
     then fmap ((== "1\n") . B.unpack) (catRead ofile)
     else return False
-  where ofile = base </> f
+  where ofile = sysDir </> f
 
 readBattery :: Files -> IO Battery
 readBattery NoFiles = return $ Battery 0 0 0 0
@@ -131,7 +131,7 @@ readBatteries opts bfs =
        let sign = if ac then 1 else -1
            left = sum (map now bats) / sum (map full bats)
            watts = sign * sum (map voltage bats) * sum (map current bats)
-           time = if watts == 0 then 0 else sum $ map time' bats -- negate sign
+           time = if watts == 0 then 0 else sum $ map time' bats
            time' b = (if ac then full b - now b else now b) / (sign * watts)
            acstr = if ac then onString opts else offString opts
        return $ if isNaN left then NA else Result left watts time acstr
