@@ -3,15 +3,23 @@
 
 ## Version 0.12.1
 
+_Incompatible changes_
+
+  - The `Mail` plugin now takes a second parameter (a string)
+    specifying its alias.
+
 _Bug fixes_
 
-  - [issue 27]: `BottomSize` placement now respects its width argument.
-  - [issue 36]: Battery monitor now supports non-standard locations of
-    the `/sys/class/power_supply/AC/online` file.
   - Text is now correctly centered vertically.
   - `FullBM` border spec fixed.
+  - [issue 27]: `BottomSize` placement now respects its width argument.
+  - [issue 28]: Compilation in Mac OS X fixed.
+  - [issue 30]: `Mail` plugin can be specified anywhere in commands list.
+  - [issue 36]: Battery monitor now supports non-standard locations of
+    the `/sys/class/power_supply/AC/online` file.
 
 [issue 27]: http://code.google.com/p/xmobar/issues/detail?id=27
+[issue 28]: http://code.google.com/p/xmobar/issues/detail?id=28
 [issue 36]: http://code.google.com/p/xmobar/issues/detail?id=36
 
 ## Version 0.12 (Dec 24, 2010)
