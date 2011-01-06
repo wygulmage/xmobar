@@ -575,15 +575,20 @@ Monitors have default aliases.
                   "<composer> <title> (<album>) <track>/<plength> <statei> ",
                   "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
 
-`Mail Args`
+`Mail Args Alias`
 
-- Aliases to `Mail`
 - Args: list of maildirs in form
-  `[("name1","path1"),("name2","path2")]`. Paths may start with a '~'
+  `[("name1","path1"),...]`. Paths may start with a '~'
   to expand to the user's home directory.
 - This plugin requires inotify support in your linux kernel and the
   [hinotify] package. To activate, pass `--flags="with_inotify"`
   during compilation.
+- Example:
+
+         Run Mail [("inbox", "~/var/mail/inbox"),
+                   ("lists", "~/var/mail/lists")]
+                  "mail"
+
 
 `MBox Mboxes Opts Alias`
 

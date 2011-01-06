@@ -30,11 +30,12 @@ import Data.Set (Set)
 import qualified Data.Set as S
 
 -- | A list of mail box names and paths to maildirs.
-data Mail = Mail [(String, FilePath)]
+data Mail = Mail [(String, FilePath)] String
     deriving (Read, Show)
 
 instance Exec Mail where
-    start (Mail ms) cb = do
+    alias (Mail _ a) = a
+    start (Mail ms _) cb = do
         vs <- mapM (const $ newTVarIO S.empty) ms
 
         let ts = map fst ms
