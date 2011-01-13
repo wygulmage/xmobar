@@ -120,6 +120,10 @@ Otherwise, you'll need to install them yourself.
      headers in your system (e.g., install `libiw-dev` in Debian-based
      systems).
 
+`with_alsa`
+:    Support for ALSA sound cards. Enables the Volume plugin. Requires the
+     [alsa-mixer] package.
+
 `all_extensions`
 :    Enables all the extensions above.
 
@@ -616,6 +620,18 @@ Monitors have default aliases.
          Run MBox [("I ", "inbox", "red"), ("O ", "~/foo/mbox", "")]
                   ["-d", "/var/mail/", "-p", " "] "mbox"
 
+`Volume Mixer Element Args RefreshRate`
+
+- Aliases to the mixer name and element name separated by a colon. Thus,
+  `Volume "default" "Master" [] 10` can be used as `%default:Master`.
+- Args: default monitor arguments (see below)
+- Variables that can be used with the `-t`/`--template` argument:
+            `vol`, `db`, `on`, `off`
+- Default template: `Vol: <volume>% <fc=green><on></fc><fc=red><off></fc>`
+- Requires the package [alsa-mixer] installed in your system. In addition,
+  to activate this plugin you must pass `--flags="with_alsa"` during
+  compilation.
+
 `XPropertyLog PropName`
 
 - Aliases to `PropName`
@@ -998,3 +1014,4 @@ Copyright &copy; 2010 Jose Antonio Ortega Ruiz
 [libmpd]: http://hackage.haskell.org/package/libmpd/
 [sawfish]: http://sawfish.wikia.com/
 [utf8-string]: http://hackage.haskell.org/package/utf8-string/
+[alsa-mixer]: http://hackage.haskell.org/package/alsa-mixer
