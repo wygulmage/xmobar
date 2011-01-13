@@ -623,10 +623,26 @@ Monitors have default aliases.
 `Volume Mixer Element Args RefreshRate`
 
 - Aliases to the mixer name and element name separated by a colon. Thus,
-  `Volume "default" "Master" [] 10` can be used as `%default:Master`.
-- Args: default monitor arguments (see below)
+  `Volume "default" "Master" [] 10` can be used as `%default:Master%`.
+- Args: default monitor arguments (see below). Also accepts:
+    - `-O` _string_ On string
+        - The string used in place of `<status>` when the mixer element
+          is on.
+        - Long option: `--on`
+    - `-o` _string_ Off string
+        - The string used in place of `<status>` when the mixer element
+          is off.
+        - Long option: `--off`
+    - `-C` _color_ On color
+        - The color to be used for `<status>` when the mixer element is on.
+        - Long option: `--onc`
+    - `-c` _color_ Off color
+        - The color to be used for `<status>` when the mixer element is off.
+        - Long option: `--offc`
+    - `--highd` _number_ High threshold for dB
+    - `--lowd` _number_ Low threshold for dB
 - Variables that can be used with the `-t`/`--template` argument:
-            `vol`, `db`, `on`, `off`
+            `vol`, `dB`, `status`
 - Default template: `Vol: <volume>% <fc=green><on></fc><fc=red><off></fc>`
 - Requires the package [alsa-mixer] installed in your system. In addition,
   to activate this plugin you must pass `--flags="with_alsa"` during
