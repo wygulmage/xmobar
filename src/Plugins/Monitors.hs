@@ -38,6 +38,9 @@ import Plugins.Monitors.Wireless
 #ifdef LIBMPD
 import Plugins.Monitors.MPD
 #endif
+#ifdef ALSA
+import Plugins.Monitors.Volume
+#endif
 
 data Monitors = Weather  Station    Args Rate
               | Network  Interface  Args Rate
@@ -60,6 +63,9 @@ data Monitors = Weather  Station    Args Rate
 #endif
 #ifdef LIBMPD
               | MPD      Args       Rate
+#endif
+#ifdef ALSA
+              | Volume   String     String Args Rate
 #endif
                 deriving (Show,Read,Eq)
 
@@ -95,6 +101,9 @@ instance Exec Monitors where
 #ifdef LIBMPD
     alias (MPD        _ _) = "mpd"
 #endif
+#ifdef ALSA
+    alias (Volume m c _ _) = m ++ ":" ++ c
+#endif
     start (Weather  s a r) = runM (a ++ [s]) weatherConfig  runWeather    r
     start (Network  i a r) = runM (a ++ [i]) netConfig      runNet        r
     start (Thermal  z a r) = runM (a ++ [z]) thermalConfig  runThermal    r
@@ -116,4 +125,7 @@ instance Exec Monitors where
 #endif
 #ifdef LIBMPD
     start (MPD        a r) = runM a          mpdConfig      runMPD        r
+#endif
+#ifdef ALSA
+    start (Volume m c a r) = runM a          volumeConfig  (runVolume m c) r
 #endif
