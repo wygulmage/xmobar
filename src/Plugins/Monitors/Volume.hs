@@ -93,10 +93,16 @@ runVolume mixerName controlName argv = do
         switchControl = fromJust $ maybe (playback $ switch control) Just
                                          (common $ switch control)
     (lo, hi) <- io $ getRange volumeControl
-    val <- liftM fromJust $ io $ getChannel FrontLeft $ value volumeControl
-    db <- liftM fromJust $ io $ getChannel FrontLeft $ dB volumeControl
-    sw <- liftM fromJust $ io $ getChannel FrontLeft $ switchControl
-    p <- formatVol val lo hi
-    d <- formatDb opts $ fromIntegral db / 100.0
-    s <- formatSwitch opts sw
+    val <- io $ getChannel FrontLeft $ value volumeControl
+    db <- io $ getChannel FrontLeft $ dB volumeControl
+    sw <- io $ getChannel FrontLeft $ switchControl
+    p <- case val of
+             Just x -> formatVol x lo hi
+             Nothing -> formatVol hi lo hi
+    d <- case db of
+             Just x -> formatDb opts $ fromIntegral x / 100.0
+             Nothing -> formatDb opts 0.0
+    s <- case sw of
+             Just x -> formatSwitch opts x
+             Nothing -> formatSwitch opts True
     parseTemplate $ [ p, d, s ] 
