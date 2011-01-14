@@ -555,6 +555,34 @@ Monitors have default aliases.
                        "-L", "40", "-H", "60",
                        "-l", "lightblue", "-n", "gray90", "-h", "red"] 50
 
+`Volume Mixer Element Args RefreshRate`
+
+- Aliases to the mixer name and element name separated by a colon. Thus,
+  `Volume "default" "Master" [] 10` can be used as `%default:Master%`.
+- Args: default monitor arguments (see below). Also accepts:
+    - `-O` _string_ On string
+        - The string used in place of `<status>` when the mixer element
+          is on.
+        - Long option: `--on`
+    - `-o` _string_ Off string
+        - The string used in place of `<status>` when the mixer element
+          is off.
+        - Long option: `--off`
+    - `-C` _color_ On color
+        - The color to be used for `<status>` when the mixer element is on.
+        - Long option: `--onc`
+    - `-c` _color_ Off color
+        - The color to be used for `<status>` when the mixer element is off.
+        - Long option: `--offc`
+    - `--highd` _number_ High threshold for dB
+    - `--lowd` _number_ Low threshold for dB
+- Variables that can be used with the `-t`/`--template` argument:
+            `volume`, `dB`, `status`
+- Default template: `Vol: <volume>% <status>`
+- Requires the package [alsa-mixer] installed in your system. In addition,
+  to activate this plugin you must pass `--flags="with_alsa"` during
+  compilation.
+
 `MPD Args RefreshRate`
 
 - This monitor will only be compiled if you ask for it using the
@@ -619,34 +647,6 @@ Monitors have default aliases.
 
          Run MBox [("I ", "inbox", "red"), ("O ", "~/foo/mbox", "")]
                   ["-d", "/var/mail/", "-p", " "] "mbox"
-
-`Volume Mixer Element Args RefreshRate`
-
-- Aliases to the mixer name and element name separated by a colon. Thus,
-  `Volume "default" "Master" [] 10` can be used as `%default:Master%`.
-- Args: default monitor arguments (see below). Also accepts:
-    - `-O` _string_ On string
-        - The string used in place of `<status>` when the mixer element
-          is on.
-        - Long option: `--on`
-    - `-o` _string_ Off string
-        - The string used in place of `<status>` when the mixer element
-          is off.
-        - Long option: `--off`
-    - `-C` _color_ On color
-        - The color to be used for `<status>` when the mixer element is on.
-        - Long option: `--onc`
-    - `-c` _color_ Off color
-        - The color to be used for `<status>` when the mixer element is off.
-        - Long option: `--offc`
-    - `--highd` _number_ High threshold for dB
-    - `--lowd` _number_ Low threshold for dB
-- Variables that can be used with the `-t`/`--template` argument:
-            `volume`, `dB`, `status`
-- Default template: `Vol: <volume>% <fc=green><on></fc><fc=red><off></fc>`
-- Requires the package [alsa-mixer] installed in your system. In addition,
-  to activate this plugin you must pass `--flags="with_alsa"` during
-  compilation.
 
 `XPropertyLog PropName`
 
@@ -962,7 +962,8 @@ xmobar [incorporates patches] from Ben Boeckel, Roman Cheplyaka, John
 Goerzen, Juraj Hercek, Tomas Janousek, Spencer Janssen, Krzysztof
 Kosciuszkiewicz, Lennart Kolmodin, Dmitry Kurochkin, Svein Ove, Jens
 Petersen, Petr Rockai, Andrew Sackville-West, Alexander Solovyov,
-Sergei Trofimovich, Jan Vornberger, Daniel Wagner and Norbert Zeh.
+Thomas Tuegel, Sergei Trofimovich, Jan Vornberger, Daniel Wagner and
+Norbert Zeh.
 
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
 
@@ -1015,7 +1016,7 @@ more details.
 
 Copyright &copy; 2007-2010 Andrea Rossato
 
-Copyright &copy; 2010 Jose Antonio Ortega Ruiz
+Copyright &copy; 2010-2011 Jose Antonio Ortega Ruiz
 
 [Github]: http://github.com/jaor/xmobar/
 [Github page]: http://github.com/jaor/xmobar

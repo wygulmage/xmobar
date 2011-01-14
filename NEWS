@@ -3,6 +3,11 @@
 
 ## Version 0.12.1
 
+_New features_
+
+  - New `Volume` monitor displaying soundcard information using ALSA,
+    by Thomas Tuegel.
+
 _Incompatible changes_
 
   - The `Mail` plugin now takes a second parameter (a string)
