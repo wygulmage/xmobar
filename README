@@ -642,7 +642,7 @@ Monitors have default aliases.
     - `--highd` _number_ High threshold for dB
     - `--lowd` _number_ Low threshold for dB
 - Variables that can be used with the `-t`/`--template` argument:
-            `vol`, `dB`, `status`
+            `volume`, `dB`, `status`
 - Default template: `Vol: <volume>% <fc=green><on></fc><fc=red><off></fc>`
 - Requires the package [alsa-mixer] installed in your system. In addition,
   to activate this plugin you must pass `--flags="with_alsa"` during
