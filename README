@@ -317,9 +317,9 @@ standard input reader, an Unix named pipe reader, and a configurable
 date plugin. These plugins install the following internal commands:
 `Weather`, `Network`, `Wireless` (optional), `Memory`, `Swap`, `Cpu`,
 `MultiCpu`, `Battery`, `TopProc`, `TopMem`, `DiskU`, `DiskIO`,
-`Thermal`, `CpuFreq`, `CoreTemp`, `MPD` (optional), `Mail` (optional),
-`MBox` (optional), `Date`, `Uptime`, `StdinReader`, `CommandReader`,
-and `PipeReader`.
+`Thermal`, `CpuFreq`, `CoreTemp`, `Volume` (optional), `MPD`
+(optional), `Mail` (optional), `MBox` (optional), `Date`, `Uptime`,
+`StdinReader`, `CommandReader`, and `PipeReader`.
 
 To remove them see below Installing/Removing a Plugin
 
@@ -562,20 +562,22 @@ Monitors have default aliases.
 - Args: default monitor arguments (see below). Also accepts:
     - `-O` _string_ On string
         - The string used in place of `<status>` when the mixer element
-          is on.
+          is on. Defaults to "[on]".
         - Long option: `--on`
     - `-o` _string_ Off string
         - The string used in place of `<status>` when the mixer element
-          is off.
+          is off. Defaults to "[off]".
         - Long option: `--off`
     - `-C` _color_ On color
-        - The color to be used for `<status>` when the mixer element is on.
+        - The color to be used for `<status>` when the mixer element
+          is on. Defaults to "green".
         - Long option: `--onc`
     - `-c` _color_ Off color
-        - The color to be used for `<status>` when the mixer element is off.
+        - The color to be used for `<status>` when the mixer element
+          is off. Defaults to "red".
         - Long option: `--offc`
-    - `--highd` _number_ High threshold for dB
-    - `--lowd` _number_ Low threshold for dB
+    - `--highd` _number_ High threshold for dB. Defaults to -5.0.
+    - `--lowd` _number_ Low threshold for dB. Defaults to -30.0.
 - Variables that can be used with the `-t`/`--template` argument:
             `volume`, `dB`, `status`
 - Default template: `Vol: <volume>% <status>`
