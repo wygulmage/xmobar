@@ -21,7 +21,8 @@ import Sound.ALSA.Mixer
 import System.Console.GetOpt
 
 volumeConfig :: IO MConfig
-volumeConfig = mkMConfig "Vol: <volume>% <status>" ["volume","dB","status"]
+volumeConfig = mkMConfig "Vol: <volume>% <status>"
+                         ["volume", "volumebar", "dB","status"]
 
 
 data VolumeOpts = VolumeOpts
@@ -66,8 +67,12 @@ percent v' lo' hi' = (v - lo) / (hi - lo)
         hi = fromIntegral hi'
 
 formatVol :: Integer -> Integer -> Integer -> Monitor String
-formatVol v lo hi =
+formatVol lo hi v =
     showPercentWithColors $ percent v lo hi
+
+formatVolBar :: Integer -> Integer -> Integer -> Monitor String
+formatVolBar lo hi v =
+    showPercentBar (100 * x) x where x = percent v lo hi
 
 switchHelper :: VolumeOpts
              -> (VolumeOpts -> Maybe String)
@@ -85,12 +90,13 @@ formatSwitch opts False = switchHelper opts offColor offString
 colorHelper :: Maybe String -> String
 colorHelper = maybe "" (\c -> "<fc=" ++ c ++ ">")
 
-formatDb :: VolumeOpts -> Float -> Monitor String
-formatDb opts db = do
+formatDb :: VolumeOpts -> Integer -> Monitor String
+formatDb opts dbi = do
     h <- getConfigValue highColor
     m <- getConfigValue normalColor
     l <- getConfigValue lowColor
-    let digits = showDigits 0 db
+    let db = fromIntegral dbi / 100.0
+        digits = showDigits 0 db
         startColor | db >= highDbThresh opts = colorHelper h
                    | db < lowDbThresh opts = colorHelper l
                    | otherwise = colorHelper m
@@ -106,17 +112,13 @@ runVolume mixerName controlName argv = do
                                          (common $ volume control)
         switchControl = fromJust $ maybe (playback $ switch control) Just
                                          (common $ switch control)
+        maybeNA = maybe (return "N/A")
     (lo, hi) <- io $ getRange volumeControl
     val <- io $ getChannel FrontLeft $ value volumeControl
     db <- io $ getChannel FrontLeft $ dB volumeControl
     sw <- io $ getChannel FrontLeft switchControl
-    p <- case val of
-             Just x -> formatVol x lo hi
-             Nothing -> formatVol hi lo hi
-    d <- case db of
-             Just x -> formatDb opts $ fromIntegral x / 100.0
-             Nothing -> formatDb opts 0.0
-    s <- case sw of
-             Just x -> formatSwitch opts x
-             Nothing -> formatSwitch opts True
-    parseTemplate [ p, d, s ]
+    p <- maybeNA (formatVol lo hi) val
+    b <- maybeNA (formatVolBar lo hi) val
+    d <- maybeNA (formatDb opts) db
+    s <- maybeNA (formatSwitch opts) sw
+    parseTemplate [p, b, d, s]
