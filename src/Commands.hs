@@ -41,9 +41,7 @@ class Show e => Exec e where
     run _      = return ""
     start :: e -> (String -> IO ()) -> IO ()
     start e cb = go
-        where go = do
-                run e >>= cb
-                tenthSeconds (rate e) >> go
+        where go = run e >>= cb >> tenthSeconds (rate e) >> go
 
 data Command = Com Program Args Alias Rate
                deriving (Show,Read,Eq)
