@@ -20,6 +20,10 @@ import Plugins.Monitors.Common
 import Sound.ALSA.Mixer
 import System.Console.GetOpt
 
+volumeConfig :: IO MConfig
+volumeConfig = mkMConfig "Vol: <volume>% <status>" ["volume","dB","status"]
+
+
 data VolumeOpts = VolumeOpts
     { onString :: String
     , offString :: String
@@ -60,10 +64,6 @@ percent v' lo' hi' = (v - lo) / (hi - lo)
   where v = fromIntegral v'
         lo = fromIntegral lo'
         hi = fromIntegral hi'
-
-volumeConfig :: IO MConfig
-volumeConfig = mkMConfig "Vol: <volume>% <status>"
-                         ["volume","dB","status"]
 
 formatVol :: Integer -> Integer -> Integer -> Monitor String
 formatVol v lo hi =
