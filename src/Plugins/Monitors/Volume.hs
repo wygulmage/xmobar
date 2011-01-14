@@ -14,7 +14,7 @@
 
 module Plugins.Monitors.Volume (runVolume, volumeConfig) where
 
-import Control.Monad ( liftM )
+import Control.Monad ( liftM, mplus )
 import Data.Maybe
 import Plugins.Monitors.Common
 import Sound.ALSA.Mixer
@@ -108,9 +108,9 @@ runVolume :: String -> String -> [String] -> Monitor String
 runVolume mixerName controlName argv = do
     opts <- io $ parseOpts argv
     control <- liftM fromJust $ io $ getControlByName mixerName controlName
-    let volumeControl = fromJust $ maybe (playback $ volume control) Just
+    let volumeControl = fromJust $ mplus (playback $ volume control)
                                          (common $ volume control)
-        switchControl = fromJust $ maybe (playback $ switch control) Just
+        switchControl = fromJust $ mplus (playback $ switch control)
                                          (common $ switch control)
         maybeNA = maybe (return "N/A")
     (lo, hi) <- io $ getRange volumeControl
