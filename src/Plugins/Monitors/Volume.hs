@@ -1,3 +1,17 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Plugins.Monitors.Volume
+-- Copyright   :  (c) 2011 Thomas Tuegel
+-- License     :  BSD-style (see LICENSE)
+--
+-- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
+-- Stability   :  unstable
+-- Portability :  unportable
+--
+-- A monitor for ALSA soundcards
+--
+-----------------------------------------------------------------------------
+
 module Plugins.Monitors.Volume (runVolume, volumeConfig) where
 
 import Control.Monad ( liftM )
@@ -60,9 +74,9 @@ switchHelper :: VolumeOpts
              -> (VolumeOpts -> String)
              -> Monitor String
 switchHelper opts cHelp strHelp = return $
-    (colorHelper $ cHelp opts)
+    colorHelper (cHelp opts)
     ++ strHelp opts
-    ++ (maybe "" (const "</fc>") $ cHelp opts)
+    ++ maybe "" (const "</fc>") (cHelp opts)
 
 formatSwitch :: VolumeOpts -> Bool -> Monitor String
 formatSwitch opts True = switchHelper opts onColor onString
@@ -95,7 +109,7 @@ runVolume mixerName controlName argv = do
     (lo, hi) <- io $ getRange volumeControl
     val <- io $ getChannel FrontLeft $ value volumeControl
     db <- io $ getChannel FrontLeft $ dB volumeControl
-    sw <- io $ getChannel FrontLeft $ switchControl
+    sw <- io $ getChannel FrontLeft switchControl
     p <- case val of
              Just x -> formatVol x lo hi
              Nothing -> formatVol hi lo hi
@@ -105,4 +119,4 @@ runVolume mixerName controlName argv = do
     s <- case sw of
              Just x -> formatSwitch opts x
              Nothing -> formatSwitch opts True
-    parseTemplate $ [ p, d, s ] 
+    parseTemplate [ p, d, s ]
