@@ -73,22 +73,26 @@ data WakeUp = WakeUp deriving (Show,Typeable)
 instance Exception WakeUp
 
 -- | The event loop
-eventLoop :: XConf -> [(Maybe ThreadId, TVar String)] -> IO ()
+eventLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> IO ()
 eventLoop xc@(XConf d _ w fs c) v = block $ do
     tv <- atomically $ newTVar []
     t  <- myThreadId
-    ct <- forkIO (checker t tv "" `catch` \(SomeException _) -> return ())
+    ct <- forkIO (checker t tv [] `catch` \(SomeException _) -> return ())
     go tv ct
  where
     -- interrupt the drawing thread every time a var is updated
     checker t tvar ov = do
       nval <- atomically $ do
-              nv <- fmap concat $ mapM (readTVar . snd) v
+              nv <- mapM concatV v
               guard (nv /= ov)
               writeTVar tvar nv
               return nv
       throwTo t WakeUp
       checker t tvar nval
+
+    concatV xs = do
+      s <- mapM (readTVar . snd) xs
+      return $ concat s
 
     -- Continuously wait for a timer interrupt or an expose event
     go tv ct = do
@@ -217,21 +221,13 @@ getStaticStrutValues (Static cx cy cw ch) rwh
           xe = xs + cw
 getStaticStrutValues _ _ = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-updateWin :: TVar String -> X ()
+updateWin :: TVar [String] -> X ()
 updateWin v = do
   xc <- ask
+  s <- io $ atomically $ readTVar v
   let (conf,rec) = (config &&& rect) xc
-      [lc,rc]    = if length (alignSep conf) == 2
-                   then alignSep conf
-                   else alignSep defaultConfig
-  i <- io $ atomically $ readTVar v
-  let def     = [i,[],[]]
-      [l,c,r] = case break (==lc) i of
-                  (le,_:re) -> case break (==rc) re of
-                                 (ce,_:ri) -> [le,ce,ri]
-                                 _         -> def
-                  _         -> def
-  ps <- io $ mapM (parseString conf) [l,c,r]
+      l:c:r:_ = s ++ repeat ""
+  ps <- io $ mapM (parseString conf) [l, c, r]
   drawInWin rec ps
 
 -- $print

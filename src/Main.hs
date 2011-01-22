@@ -60,10 +60,25 @@ main = do
   doOpts civ o
   conf  <- readIORef civ
   fs    <- initFont d (font conf)
-  cl    <- parseTemplate conf (template conf)
-  vars  <- mapM startCommand cl
+  cls   <- mapM (parseTemplate conf) (splitTemplate conf)
+  vars  <- mapM (mapM startCommand) cls
   (r,w) <- createWin d fs conf
   eventLoop (XConf d r w fs conf) vars
+
+-- | Splits the template in its parts
+splitTemplate :: Config -> [String]
+splitTemplate conf =
+  case break (==l) t of
+    (le,_:re) -> case break (==r) re of
+                   (ce,_:ri) -> [le, ce, ri]
+                   _         -> def
+    _         -> def
+  where [l, r] = if length (alignSep conf) == 2
+                 then alignSep conf
+                 else alignSep defaultConfig
+        t = template conf
+        def = [t, "", ""]
+
 
 -- | Reads the configuration files or quits with an error
 readConfig :: FilePath -> IO (Config,[String])

@@ -17,12 +17,16 @@ _Bug fixes_
 
   - Text is now correctly centered vertically.
   - `FullBM` border spec fixed.
+  - [issue 14]: `StdinReader` and other plugins accepting external
+    input don't get confused anymore when characters from `alignSep`
+    appear in their input.
   - [issue 27]: `BottomSize` placement now respects its width argument.
   - [issue 28]: Compilation in Mac OS X fixed.
   - [issue 30]: `Mail` plugin can be specified anywhere in commands list.
   - [issue 36]: Battery monitor now supports non-standard locations of
     the `/sys/class/power_supply/AC/online` file.
 
+[issue 14]: http://code.google.com/p/xmobar/issues/detail?id=14
 [issue 27]: http://code.google.com/p/xmobar/issues/detail?id=27
 [issue 28]: http://code.google.com/p/xmobar/issues/detail?id=28
 [issue 30]: http://code.google.com/p/xmobar/issues/detail?id=30

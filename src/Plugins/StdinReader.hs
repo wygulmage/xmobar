@@ -26,7 +26,8 @@ data StdinReader = StdinReader
 
 instance Exec StdinReader where
     start StdinReader cb = do
-        cb =<< catch (hGetLineSafe stdin) (\(SomeException e) -> do hPrint stderr e; return "")
+        cb =<< catch (hGetLineSafe stdin)
+                     (\(SomeException e) -> do hPrint stderr e; return "")
         eof <- hIsEOF stdin
         if eof
             then exitImmediately ExitSuccess
