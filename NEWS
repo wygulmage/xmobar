@@ -5,18 +5,16 @@
 
 _New features_
 
-  - New `Volume` monitor displaying soundcard information using ALSA,
-    by Thomas Tuegel.
+  - New `Volume` monitor displaying ALSA soundcards information, by
+    Thomas Tuegel.
 
 _Incompatible changes_
 
   - The `Mail` plugin now takes a second parameter (a string)
-    specifying its alias.
+    specifying its alias. As a side-effect, this solves [issue 30].
 
 _Bug fixes_
 
-  - Text is now correctly centered vertically.
-  - `FullBM` border spec fixed.
   - [issue 14]: `StdinReader` and other plugins accepting external
     input don't get confused anymore when characters from `alignSep`
     appear in their input.
@@ -25,6 +23,8 @@ _Bug fixes_
   - [issue 30]: `Mail` plugin can be specified anywhere in commands list.
   - [issue 36]: Battery monitor now supports non-standard locations of
     the `/sys/class/power_supply/AC/online` file.
+  - Text is now correctly centered vertically.
+  - `FullBM` border spec fixed.
 
 [issue 14]: http://code.google.com/p/xmobar/issues/detail?id=14
 [issue 27]: http://code.google.com/p/xmobar/issues/detail?id=27

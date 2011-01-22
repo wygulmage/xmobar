@@ -827,7 +827,7 @@ can be used in the output template as `%mydate%`
             logHook = dynamicLogString defaultPP >>= xmonadPropLog
           }
    This plugin can be used as a sometimes more convenient alternative
-   to `StdinReader`. For it instance, allows you to (re)start xmobar
+   to `StdinReader`. For instance, it allows you to (re)start xmobar
    outside xmonad.
 
 [here]: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Hooks-DynamicLog.html
