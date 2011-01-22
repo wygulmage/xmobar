@@ -74,7 +74,7 @@ instance Exception WakeUp
 
 -- | The event loop
 eventLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> IO ()
-eventLoop xc@(XConf d _ w fs c) v = block $ do
+eventLoop xc@(XConf d _ w fs c) vs = block $ do
     tv <- atomically $ newTVar []
     t  <- myThreadId
     ct <- forkIO (checker t tv [] `catch` \(SomeException _) -> return ())
@@ -83,16 +83,14 @@ eventLoop xc@(XConf d _ w fs c) v = block $ do
     -- interrupt the drawing thread every time a var is updated
     checker t tvar ov = do
       nval <- atomically $ do
-              nv <- mapM concatV v
+              nv <- mapM concatV vs
               guard (nv /= ov)
               writeTVar tvar nv
               return nv
       throwTo t WakeUp
       checker t tvar nval
 
-    concatV xs = do
-      s <- mapM (readTVar . snd) xs
-      return $ concat s
+    concatV = fmap concat . mapM (readTVar . snd)
 
     -- Continuously wait for a timer interrupt or an expose event
     go tv ct = do
@@ -108,7 +106,7 @@ eventLoop xc@(XConf d _ w fs c) v = block $ do
                       killThread ct
                       destroyWindow d w
                       (r',w') <- createWin d fs c
-                      eventLoop (XConf d r' w' fs c) v
+                      eventLoop (XConf d r' w' fs c) vs
 
     handle tvar _ (ExposeEvent {}) = runX xc (updateWin tvar)
 
