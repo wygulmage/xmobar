@@ -654,9 +654,11 @@ Monitors have default aliases.
 
 - Aliases to `PropName`
 - Reads the X property named by `PropName` (a string) and displays its
-  value. The [xmonadpropwrite script] in xmobar's distribution can be
-  used to set the given property from the output of any other program
-  or script.
+  value. The [samples/xmonadpropwrite.hs script] in xmobar's
+  distribution can be used to set the given property from the output
+  of any other program or script.
+
+[samples/xmonadpropwrite.hs script]: https://github.com/jaor/xmobar/raw/master/samples/xmonadpropwrite.hs
 
 ## Monitor Plugins Commands Arguments
 
