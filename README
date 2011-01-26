@@ -666,9 +666,10 @@ These are the arguments that can be used for internal commands in the
 - `-t` _string_  Output template
     - Template for the monitor output. Field names must be enclosed
       between pointy brackets (`<foo>`) and will be substituted by the
-      computed values. You can also specify a foreground color for a
-      region bracketing it between `<fc=color>` and `</fc>`. The rest
-      of the template is output verbatim.
+      computed values. You can also specify the foreground (and
+      optionally, background) color for a region by bracketing it
+      between `<fc=fgcolor>` (or `<fc=fgcolor,bgcolor>`) and
+      `</fc>`. The rest of the template is output verbatim.
     - Long option: `--template`
     - Default value: per monitor (see above).
 - `-H` _number_ The high threshold.
