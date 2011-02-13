@@ -28,7 +28,7 @@ _Bug fixes_
   - [issue 40]: Battery monitor now supports the new power_now, that
     replaces current_now in linux kernels for v. 2.36 and above.
   - [issue 42]: More accurate net monitor rates.
-  - Cpu and MultiCpu monitors are also more accurate now.
+  - DiskIO, Cpu and MultiCpu monitors are also more accurate now.
   - Text is now correctly centered vertically.
   - `FullBM` border spec fixed.
 
