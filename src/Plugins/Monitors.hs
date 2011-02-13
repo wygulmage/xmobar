@@ -105,7 +105,7 @@ instance Exec Monitors where
     alias (Volume m c _ _) = m ++ ":" ++ c
 #endif
     start (Weather  s a r) = runM (a ++ [s]) weatherConfig  runWeather    r
-    start (Network  i a r) = runM (a ++ [i]) netConfig      runNet        r
+    start (Network  i a r) = startNet i a r
     start (Thermal  z a r) = runM (a ++ [z]) thermalConfig  runThermal    r
     start (Memory     a r) = runM a          memConfig      runMem        r
     start (Swap       a r) = runM a          swapConfig     runSwap       r

@@ -25,6 +25,7 @@ _Bug fixes_
   - [issue 30]: `Mail` plugin can be specified anywhere in commands list.
   - [issue 36]: Battery monitor now supports non-standard locations of
     the `/sys/class/power_supply/AC/online` file.
+  - [issue 42]: More accurate net monitor rates.
   - Text is now correctly centered vertically.
   - `FullBM` border spec fixed.
 
@@ -34,6 +35,7 @@ _Bug fixes_
 [issue 30]: http://code.google.com/p/xmobar/issues/detail?id=30
 [issue 36]: http://code.google.com/p/xmobar/issues/detail?id=36
 [issue 38]: http://code.google.com/p/xmobar/issues/detail?id=38
+[issue 42]: http://code.google.com/p/xmobar/issues/detail?id=42
 
 ## Version 0.12 (Dec 24, 2010)
 
