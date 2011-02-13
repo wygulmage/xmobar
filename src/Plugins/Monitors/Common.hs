@@ -1,14 +1,15 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Common
--- Copyright   :  (c) Andrea Rossato
+-- Copyright   :  (c) 2010, 2011 Jose Antonio Ortega Ruiz
+--                (c) 2007-2010 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
 -- Stability   :  unstable
 -- Portability :  unportable
 --
--- Utilities for creating monitors for Xmobar
+-- Utilities used by xmobar's monitors
 --
 -----------------------------------------------------------------------------
 
