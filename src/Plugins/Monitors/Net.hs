@@ -1,7 +1,8 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Net
--- Copyright   :  (c) Andrea Rossato
+-- Copyright   :  (c) 2011 Jose Antonio Ortega Ruiz
+--                (c) 2007-2010 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
@@ -12,7 +13,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Plugins.Monitors.Net (netConfig, startNet) where
+module Plugins.Monitors.Net (startNet) where
 
 import Plugins.Monitors.Common
 
