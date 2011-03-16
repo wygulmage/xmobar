@@ -40,9 +40,6 @@ defaultOpts = MOpts
   { mPlaying = ">>"
   , mStopped = "><"
   , mPaused = "||"
-  , mHost = "127.0.0.1"
-  , mPort = 6600
-  , mPassword = ""
   }
 
 options :: [OptDescr (MOpts -> MOpts)]
@@ -50,15 +47,12 @@ options =
   [ Option "P" ["playing"] (ReqArg (\x o -> o { mPlaying = x }) "") ""
   , Option "S" ["stopped"] (ReqArg (\x o -> o { mStopped = x }) "") ""
   , Option "Z" ["paused"] (ReqArg (\x o -> o { mPaused = x }) "") ""
-  , Option "h" ["host"] (ReqArg (\x o -> o { mHost = x }) "") ""
-  , Option "p" ["port"] (ReqArg (\x o -> o { mPort = read x }) "") ""
-  , Option "x" ["password"] (ReqArg (\x o -> o { mPassword = x }) "") ""
   ]
 
 runMPD :: [String] -> Monitor String
 runMPD args = do
   opts <- io $ mopts args
-  let mpd = M.withMPDEx (mHost opts) (mPort opts) (mPassword opts)
+  let mpd = M.withMPD
   status <- io $ mpd M.status
   song <- io $ mpd M.currentSong
   s <- parseMPD status song opts
