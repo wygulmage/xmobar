@@ -30,9 +30,6 @@ data MOpts = MOpts
   { mPlaying :: String
   , mStopped :: String
   , mPaused :: String
-  , mHost :: String
-  , mPort :: Integer
-  , mPassword :: String
   }
 
 defaultOpts :: MOpts
