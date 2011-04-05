@@ -101,7 +101,7 @@ readBright files =
 		maxVal <- grab $ (fMax files)
 		return $ (currVal / maxVal) 
 	where
-		grab = fmap (read . B.unpack) . B.readFile
+		grab f = catch (fmap (read . B.unpack) $ B.readFile f)(\_ -> return 0)
 
 
 showHorizontalBar :: Float -> Monitor String
