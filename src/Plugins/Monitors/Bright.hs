@@ -53,7 +53,7 @@ sysDir = "/sys/class/backlight/"
 
 brightConfig :: IO MConfig
 brightConfig = mkMConfig
-		"<percent>%" -- template
+		"<percent>" -- template
 		["hbar", "percent", "bar"] -- replacements
 
 data Files = Files

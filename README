@@ -689,7 +689,7 @@ Monitors have default aliases.
        max_brigtness)
 - Variables that can be used with the `-t`/`--template` argument:
 	    `hbar`, `percent`, `bar`
-- Default template: `<percent>%`
+- Default template: `<percent>`
 - Example:
 
        Run Brightness ["-t", "<bar>"] 60
