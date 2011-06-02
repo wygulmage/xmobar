@@ -3,6 +3,10 @@
 
 ## Version 0.14
 
+_New features_
+
+  - New monitor brightness monitor, courtesy of Martin Perner.
+
 _Bug fixes_
 
   - [issue 50]: `MPD` monitor now works with libmpd 0.6.
