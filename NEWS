@@ -1,6 +1,14 @@
 % xmobar - Release notes
 % Jose A. Ortega Ruiz
 
+## Version 0.14
+
+_Bug fixes_
+
+  - [issue 50]: `MPD` monitor now works with libmpd 0.6.
+
+[issue 50]: http://code.google.com/p/xmobar/issues/detail?id=14
+
 ## Version 0.13 (March 28, 2011)
 
 _New features_
