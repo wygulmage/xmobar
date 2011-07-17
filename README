@@ -683,6 +683,8 @@ Monitors have default aliases.
   distribution can be used to set the given property from the output
   of any other program or script.
 
+[samples/xmonadpropwrite.hs script]: https://github.com/jaor/xmobar/raw/master/samples/xmonadpropwrite.hs
+
 `Brightness Args RefreshRate`
 
 - Aliases to `bright`
@@ -700,8 +702,19 @@ Monitors have default aliases.
 
        Run Brightness ["-t", "<bar>"] 60
 
+`Kbd Opts`
 
-[samples/xmonadpropwrite.hs script]: https://github.com/jaor/xmobar/raw/master/samples/xmonadpropwrite.hs
+- Registers to XKB/X11-Events and output the currently active keyboard layout.
+  Supports replacement of layoutnames.
+- Aliases to `kbd`
+- Opts
+	- `-e`: String displayed on an error while accessing X (default: "Err")
+	- `-s`: Search string, can be used multiple times (optional)
+	- `-r`: Replacement string, one for every Search should be given (optional)
+- Example:
+
+		Run Kbd [] ["-s", "us(dvorak)", "-r", "DV", "-s", "us", "-r", "US"] "kbd"
+
 
 ## Monitor Plugins Commands Arguments
 
