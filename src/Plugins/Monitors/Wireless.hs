@@ -25,10 +25,9 @@ runWireless :: [String] -> Monitor String
 runWireless (iface:_) = do
   wi <- io $ getWirelessInfo iface
   let essid = wiEssid wi
-      qlty = wiQuality wi
-      fqlty = fromIntegral qlty
+      qlty = fromIntegral $ wiQuality wi
       e = if essid == "" then "N/A" else essid
-  q <- if qlty >= 0 then showWithColors show qlty else showWithPadding ""
-  qb <- showPercentBar fqlty (fqlty / 100)
+  q <- if qlty >= 0 then showPercentWithColors (qlty/100) else showWithPadding ""
+  qb <- showPercentBar qlty (qlty / 100)
   parseTemplate [e, q, qb]
 runWireless _ = return ""

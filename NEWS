@@ -10,13 +10,15 @@ _New features_
 
 _Bug fixes_
 
+  - [issue 48]: The <quality> field of Wireless behaves like a percentage.
   - [issue 50]: `MPD` monitor now works with libmpd 0.6.
   - Template sections without fields are now correctly displayed.
   - Catch errors when reading battery status (Ben Boeckel).
   - Compilation issues with ghc 7.x (Sergei Trofimovich).
   - Fixes for CoreTemp monitor in new kernels (Norbert Zeh).
 
-[issue 50]: http://code.google.com/p/xmobar/issues/detail?id=14
+[issue 48]: http://code.google.com/p/xmobar/issues/detail?id=48
+[issue 50]: http://code.google.com/p/xmobar/issues/detail?id=50
 
 ## Version 0.13 (March 28, 2011)
 
