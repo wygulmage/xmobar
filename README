@@ -713,7 +713,7 @@ Monitors have default aliases.
 	- `-r`: Replacement string, one for every Search should be given (optional)
 - Example:
 
-		Run Kbd [] ["-s", "us(dvorak)", "-r", "DV", "-s", "us", "-r", "US"] "kbd"
+		Run Kbd ["-s", "us(dvorak)", "-r", "DV", "-s", "us", "-r", "US"]
 
 
 ## Monitor Plugins Commands Arguments
