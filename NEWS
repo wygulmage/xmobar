@@ -10,6 +10,7 @@ _New features_
 _Bug fixes_
 
   - [issue 50]: `MPD` monitor now works with libmpd 0.6.
+  - Template sections without fields are now correctly displayed.
 
 [issue 50]: http://code.google.com/p/xmobar/issues/detail?id=14
 

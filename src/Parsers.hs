@@ -87,7 +87,7 @@ templateParser = many . templateStringParser
 parseTemplate :: Config -> String -> IO [(Runnable,String,String)]
 parseTemplate c s =
     do str <- case parse (templateParser c) "" s of
-                Left _  -> return [("","","")]
+                Left _  -> return [("", s, "")]
                 Right x -> return x
        let cl = map alias (commands c)
            m  = Map.fromList $ zip cl (commands c)

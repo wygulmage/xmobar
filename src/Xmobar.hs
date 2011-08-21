@@ -120,7 +120,7 @@ eventLoop xc@(XConf d _ w fs c) vs = block $ do
 startCommand :: (Runnable,String,String) -> IO (Maybe ThreadId, TVar String)
 startCommand (com,s,ss)
     | alias com == "" = do var <- atomically $ newTVar is
-                           atomically $ writeTVar var "Could not parse the template"
+                           atomically $ writeTVar var (s ++ ss)
                            return (Nothing,var)
     | otherwise       = do var <- atomically $ newTVar is
                            let cb str = atomically $ writeTVar var (s ++ str ++ ss)
