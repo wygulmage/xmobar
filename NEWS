@@ -7,6 +7,7 @@ _New features_
 
   - New brightness monitor, courtesy of Martin Perner.
   - New DateZone plugin, for localized datetimes, also by Martin.
+  - Cpu monitor now also reports `iowait` field ([issue 55]).
 
 _Bug fixes_
 
@@ -19,6 +20,7 @@ _Bug fixes_
 
 [issue 48]: http://code.google.com/p/xmobar/issues/detail?id=48
 [issue 50]: http://code.google.com/p/xmobar/issues/detail?id=50
+[issue 55]: http://code.google.com/p/xmobar/issues/detail?id=55
 
 ## Version 0.13 (March 28, 2011)
 

@@ -407,7 +407,7 @@ Monitors have default aliases.
 - Aliases to `cpu`
 - Args: default monitor arguments (see below)
 - Variables that can be used with the `-t`/`--template` argument:
-	    `total`, `bar`, `user`, `nice`, `system`, `idle`
+	    `total`, `bar`, `user`, `nice`, `system`, `idle`, `iowait`
 - Default template: `Cpu: <total>%`
 
 `MultiCpu Args RefreshRate`
