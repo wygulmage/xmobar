@@ -5,12 +5,16 @@
 
 _New features_
 
-  - New monitor brightness monitor, courtesy of Martin Perner.
+  - New brightness monitor, courtesy of Martin Perner.
+  - New DateZone plugin, for localized datetimes, also by Martin.
 
 _Bug fixes_
 
   - [issue 50]: `MPD` monitor now works with libmpd 0.6.
   - Template sections without fields are now correctly displayed.
+  - Catch errors when reading battery status (Ben Boeckel).
+  - Compilation issues with ghc 7.x (Sergei Trofimovich).
+  - Fixes for CoreTemp monitor in new kernels (Norbert Zeh).
 
 [issue 50]: http://code.google.com/p/xmobar/issues/detail?id=14
 
