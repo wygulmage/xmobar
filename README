@@ -707,13 +707,12 @@ Monitors have default aliases.
 - Registers to XKB/X11-Events and output the currently active keyboard layout.
   Supports replacement of layoutnames.
 - Aliases to `kbd`
-- Opts
-	- `-e`: String displayed on an error while accessing X (default: "Err")
-	- `-s`: Search string, can be used multiple times (optional)
-	- `-r`: Replacement string, one for every Search should be given (optional)
+- Opts is a list of tuple:
+    -  first element of the tuple is the search string
+    -  second element of the tuple is the corresponding replacement
 - Example:
 
-		Run Kbd ["-s", "us(dvorak)", "-r", "DV", "-s", "us", "-r", "US"]
+		Run Kbd [("us(dvorak)", "DV"), ("us", "US")]
 
 
 ## Monitor Plugins Commands Arguments

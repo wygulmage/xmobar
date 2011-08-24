@@ -10,9 +10,8 @@ import Foreign.C.String
 import Plugins
 import Control.Monad (forever)
 import XUtil (nextEvent')
-import Data.List (isPrefixOf, elemIndex)
+import Data.List (isPrefixOf, findIndex)
 import Data.Maybe (fromJust)
-import System.Console.GetOpt
 
 #include <X11/XKBlib.h>
 #include <X11/extensions/XKB.h>
@@ -285,45 +284,20 @@ xkbSymbolsNameMask = #const XkbSymbolsNameMask
 xkbGroupNamesMask :: CUInt
 xkbGroupNamesMask = #const XkbGroupNamesMask
 
-data KbdOpts = KbdOpts
-	{ errorString :: String
-	, src :: [String]
-    , rpl :: [String]
-	}
-
-defaultOpts :: KbdOpts
-defaultOpts = KbdOpts
-	{ errorString = "Err"
-	, src = []
-	, rpl = []
-	}
-
-options :: [OptDescr (KbdOpts -> KbdOpts)]
-options =
-	[ Option ['e'] ["error"] (ReqArg (\x o -> o { errorString = x }) "") ""
-	, Option ['s'] ["src"] (ReqArg (\x o -> o { src = [x] ++ src o }) "") ""
-	, Option ['r'] ["rpl"] (ReqArg (\x o -> o { rpl = [x] ++ rpl o }) "") ""
-	]
-
-parseOpts :: [String] -> IO KbdOpts
-parseOpts argv =
-	case getOpt Permute options argv of
-		(o, _, []) -> return $ foldr id defaultOpts o
-		(_, _, errs) -> ioError . userError $ concat errs
-
+type KbdOpts = [(String, String)]
 
 -- gets the layout string
-getLayoutStr :: KbdOpts -> Display -> IO String
-getLayoutStr opts dpy =  do
+getLayoutStr :: Display -> IO String
+getLayoutStr dpy =  do
         kbdDescPtr <- xkbAllocKeyboard
         status <- xkbGetNames dpy xkbSymbolsNameMask kbdDescPtr
-        str <- getLayoutStr' opts status dpy kbdDescPtr
+        str <- getLayoutStr' status dpy kbdDescPtr
         xkbFreeNames kbdDescPtr xkbGroupNamesMask 1
         xkbFreeKeyboard kbdDescPtr 0 1
         return str
 
-getLayoutStr' :: KbdOpts -> Status -> Display -> (Ptr XkbDescRec) -> IO String
-getLayoutStr' opts st dpy kbdDescPtr =
+getLayoutStr' :: Status -> Display -> (Ptr XkbDescRec) -> IO String
+getLayoutStr' st dpy kbdDescPtr =
         if st == 0 then -- Success
             do
             kbdDesc <- peek kbdDescPtr
@@ -333,7 +307,7 @@ getLayoutStr' opts st dpy kbdDescPtr =
             return str
         else -- Behaviour on error
             do
-            return (errorString opts)
+                return "Error while requesting layout!"
 
 
 -- 'Bad' prefixes of layouts
@@ -365,34 +339,29 @@ split (c:cs) delim
 -- 
 -- if not found, return string unchanged
 searchReplaceLayout :: KbdOpts -> String -> String
-searchReplaceLayout opts s = let c = elemIndex s (src opts) in
+searchReplaceLayout opts s = let c = findIndex (\x -> fst x == s) opts in
     case c of
         Nothing -> s
         x -> let i = (fromJust x) in
-            if i >= length (rpl opts) then
-                s
-            else
-                (rpl opts)!!i
+            snd $ opts!!i
 
 -- returns the active layout
 getKbdLay :: Display -> KbdOpts -> IO String
 getKbdLay dpy opts = do
-        lay <- getLayoutStr opts dpy
+        lay <- getLayoutStr dpy
         curLay <- getKbdLayout dpy
         return $ searchReplaceLayout opts $ (splitLayout lay)!!(curLay)
 
 
 
-data Kbd = Kbd [String]
+data Kbd = Kbd [(String, String)]
 	deriving (Read, Show)
 
 instance Exec Kbd where
 	alias (Kbd _) = "kbd"
-	start (Kbd s) cb = do
+	start (Kbd opts) cb = do
 
         dpy <- openDisplay ""
-        -- parse parameters
-        opts <- parseOpts s
 
         -- initial set of layout
         cb =<< (getKbdLay dpy opts)
