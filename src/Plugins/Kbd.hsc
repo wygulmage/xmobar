@@ -1,4 +1,17 @@
 {-# LANGUAGE ScopedTypeVariables, ForeignFunctionInterface, MultiParamTypeClasses, DeriveDataTypeable, FlexibleInstances, PatternGuards #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Plugins.Kbd
+-- Copyright   :  (c) Martin Perner
+-- License     :  BSD-style (see LICENSE)
+--
+-- Maintainer  :  Martin Perner <martin@perner.cc>
+-- Stability   :  unstable
+-- Portability :  unportable
+--
+-- A keyboard layout indicator for Xmobar
+--
+-----------------------------------------------------------------------------
 
 module Plugins.Kbd where
 
