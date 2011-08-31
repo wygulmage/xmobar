@@ -23,7 +23,7 @@ module Xmobar
     , startCommand
     -- * Window Management
     -- $window
-    , createWin, updateWin
+    , createWin, updateWin, enableXRandrEventListen
     -- * Printing
     -- $print
     , drawInWin, printStrings
@@ -60,6 +60,7 @@ type X = ReaderT XConf IO
 -- | The ReaderT inner component
 data XConf =
     XConf { display :: Display
+          , xrrDspy :: Display --  display used for XRandr events
           , rect    :: Rectangle
           , window  :: Window
           , fontS   :: XFont
@@ -75,7 +76,7 @@ instance Exception WakeUp
 
 -- | The event loop
 eventLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> IO ()
-eventLoop xc@(XConf d _ w fs c) vs = block $ do
+eventLoop xc@(XConf d xrrD _ w fs c) vs = block $ do
     tv <- atomically $ newTVar []
     t  <- myThreadId
     ct <- forkIO (checker t tv [] `catch` \(SomeException _) -> return ())
@@ -101,16 +102,24 @@ eventLoop xc@(XConf d _ w fs c) vs = block $ do
       go tv ct
 
     -- event hanlder
-    handle _ _ (ConfigureEvent {}) = return ()
+    handle _ ct (ConfigureEvent {}) = recreateWindow ct
 
-    handle tvar _ (ExposeEvent {}) = runX xc (updateWin tvar)
+    handle tvar ct (ExposeEvent {}) = block $ do
+          --  check if there are XRandr events pending
+          num <- pending xrrD
+          if num == 0 then
+              --  if no pending events, make a update
+              runX xc (updateWin tvar)
+           else
+              recreateWindow ct
 
-    --  this catches the RRScreenChangeNotify
-    handle _ ct _  = block $ do
-                      killThread ct
-                      destroyWindow d w
-                      (r',w') <- createWin d fs c
-                      eventLoop (XConf d r' w' fs c) vs
+    handle _ _ _  = return ()
+
+    recreateWindow ct = do
+              killThread ct
+              destroyWindow d w
+              (r',w') <- createWin d fs c
+              eventLoop (XConf d xrrD r' w' fs c) vs
 
 -- $command
 
@@ -129,6 +138,14 @@ startCommand (com,s,ss)
 
 -- $window
 
+-- | The function to enable notifications from XRandr
+enableXRandrEventListen :: Display -> IO ()
+enableXRandrEventListen d = do
+  let dflt = defaultScreen d
+  rootw <- rootWindow d dflt
+  --  RRScreenChangeNotifyMask has the same value as keyPressMask
+  xrrSelectInput  d rootw keyPressMask
+
 -- | The function to create the initial window
 createWin :: Display -> XFont -> Config -> IO (Rectangle,Window)
 createWin d fs c = do
@@ -139,8 +156,7 @@ createWin d fs c = do
   let ht    = as + ds + 4
       (r,o) = setPosition (position c) srs (fi ht)
   win <- newWindow  d (defaultScreenOfDisplay d) rootw r o
-  --  RRScreenChangeNotifyMask has the same value as keyPressMask
-  xrrSelectInput    d rootw keyPressMask
+  selectInput       d win (exposureMask .|. structureNotifyMask)
   setProperties r c d win srs
   when (lowerOnStart c) (lowerWindow d win)
   mapWindow         d win
