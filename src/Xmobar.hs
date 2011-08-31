@@ -101,20 +101,12 @@ eventLoop xc@(XConf d _ w fs c) vs = block $ do
       go tv ct
 
     -- event hanlder
-    handle _ ct (ConfigureEvent {ev_window = win}) = do
-      rootw <- rootWindow d (defaultScreen d)
-      putStrLn "Configure"
-      when (win == rootw) $ block $ do
-                      killThread ct
-                      destroyWindow d w
-                      (r',w') <- createWin d fs c
-                      eventLoop (XConf d r' w' fs c) vs
+    handle _ _ (ConfigureEvent {}) = return ()
 
     handle tvar _ (ExposeEvent {}) = runX xc (updateWin tvar)
 
     --  this catches the RRScreenChangeNotify
     handle _ ct _  = block $ do
-                      putStrLn "ScreenChange"
                       killThread ct
                       destroyWindow d w
                       (r',w') <- createWin d fs c
@@ -147,9 +139,8 @@ createWin d fs c = do
   let ht    = as + ds + 4
       (r,o) = setPosition (position c) srs (fi ht)
   win <- newWindow  d (defaultScreenOfDisplay d) rootw r o
-  selectInput       d win (exposureMask .|. structureNotifyMask)
   --  RRScreenChangeNotifyMask has the same value as keyPressMask
-  xrrSelectInput    d rootw (keyPressMask)
+  xrrSelectInput    d rootw keyPressMask
   setProperties r c d win srs
   when (lowerOnStart c) (lowerWindow d win)
   mapWindow         d win
