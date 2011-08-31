@@ -17,9 +17,9 @@ _Bug fixes_
   - Catch errors when reading battery status (Ben Boeckel).
   - Compilation issues with ghc 7.x (Sergei Trofimovich).
   - Fixes for CoreTemp monitor in new kernels (Norbert Zeh).
-  - Fixes for pulseaudio problems in volume monitor (Martin Perner).
-  - Fixes for parsing of 'Run XMonadProp'-alike entries in config file
-   (Martin).
+  - Fix for pulseaudio problems in volume monitor (Martin Perner).
+  - Fix for parsing errors when a `Run` entry ended in an array
+    (Martin).
 
 [issue 48]: http://code.google.com/p/xmobar/issues/detail?id=48
 [issue 50]: http://code.google.com/p/xmobar/issues/detail?id=50
