@@ -18,12 +18,13 @@ module Xmobar
       -- $main
       X , XConf (..), runX
     , eventLoop
+    , setupSignalHandler
     -- * Program Execution
     -- $command
     , startCommand
     -- * Window Management
     -- $window
-    , createWin, updateWin, enableXRandrEventListen
+    , createWin, updateWin
     -- * Printing
     -- $print
     , drawInWin, printStrings
@@ -42,7 +43,9 @@ import Control.Exception hiding (handle)
 import Data.Bits
 import Data.Maybe(fromMaybe)
 import Data.Typeable (Typeable)
+import Foreign
 import System.Posix.Process (getProcessID)
+import System.Posix.Signals
 
 import Config
 import Parsers
@@ -60,7 +63,6 @@ type X = ReaderT XConf IO
 -- | The ReaderT inner component
 data XConf =
     XConf { display :: Display
-          , xrrDspy :: Display --  display used for XRandr events
           , rect    :: Rectangle
           , window  :: Window
           , fontS   :: XFont
@@ -74,52 +76,97 @@ runX xc f = runReaderT f xc
 data WakeUp = WakeUp deriving (Show,Typeable)
 instance Exception WakeUp
 
+data SignalType = Wakeup | Reposition | ChangeScreen
+
 -- | The event loop
-eventLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> IO ()
-eventLoop xc@(XConf d xrrD _ w fs c) vs = block $ do
+eventLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> MVar SignalType -> [Rectangle] -> IO ()
+eventLoop xcfg@(XConf d _ w fs _) vs signal screeninfo = do
     tv <- atomically $ newTVar []
-    t  <- myThreadId
-    ct <- forkIO (checker t tv [] `catch` \(SomeException _) -> return ())
-    go tv ct
- where
+    tsrs <- atomically $ newTVar screeninfo
+    _ <- forkIO (checker tv [] `catch` \(SomeException _) -> putStrLn "Oh Noez checker" >> return ())
+    _ <- forkOS (eventer tsrs `catch` \(SomeException _) -> putStrLn "Oh Noez eventer" >>return ())
+    go tv xcfg tsrs
+  where
     -- interrupt the drawing thread every time a var is updated
-    checker t tvar ov = do
+    checker tvar ov = do
       nval <- atomically $ do
               nv <- mapM concatV vs
               guard (nv /= ov)
               writeTVar tvar nv
               return nv
-      throwTo t WakeUp
-      checker t tvar nval
+      putMVar signal Wakeup
+      checker tvar nval
 
     concatV = fmap concat . mapM (readTVar . snd)
 
+    eventer tsrs =
+      alloca $ \ptrEventBase ->
+      alloca $ \ptrErrorBase ->
+      allocaXEvent $ \e -> do
+        _ <- xrrQueryExtension d ptrEventBase ptrErrorBase
+        xrrEventBase <- peek ptrEventBase
+        forever $ do
+          nextEvent d e
+          ev <- getEvent e
+          case ev of
+            ConfigureEvent {} -> sendRepos
+            ExposeEvent {} -> putMVar signal Wakeup
+            _ ->
+              --  keyPressMask is the same value as RRScreenChangeNotify
+              when ( (fromIntegral (ev_event_type ev) - xrrEventBase) == fromIntegral keyPressMask) sendRepos
+       where
+         sendRepos = do
+           srs <- getScreenInfo d
+           atomically $ writeTVar tsrs srs
+           putMVar signal Reposition
+
+
     -- Continuously wait for a timer interrupt or an expose event
-    go tv ct = do
-      catch (unblock $ allocaXEvent $ \e ->
-                 handle tv ct =<< (nextEvent' d e >> getEvent e))
-            (\WakeUp -> runX xc (updateWin tv) >> return ())
-      go tv ct
+    go tv xc@(XConf _ _ _ _ cfg) tsrs = do
+      typ <- takeMVar signal
+      case typ of
+        Wakeup -> do
+          runX xc (updateWin tv)
+          go tv xc tsrs
+        Reposition -> do
+          ncfg <- reposWindow cfg
+          go tv ncfg tsrs
+        ChangeScreen ->
+          case position cfg of
+            OnScreen n o -> do
+              srs <- readTVarIO tsrs
+              if n == length srs then do
+                  ncfg <- reposWindow (cfg {position = OnScreen 1 o})
+                  go tv ncfg tsrs
+                else do
+                  ncfg <- reposWindow (cfg {position = OnScreen (n+1) o})
+                  go tv ncfg tsrs
+            o -> do
+              ncfg <- reposWindow (cfg {position = OnScreen 1 o})
+              go tv ncfg tsrs
+      where
+        reposWindow rcfg = do
+          srs <- readTVarIO tsrs
+          r' <- repositionWin d w fs rcfg srs
+          return (XConf d r' w fs rcfg)
 
-    -- event hanlder
-    handle _ ct (ConfigureEvent {}) = recreateWindow ct
+-- | Signal handling
+setupSignalHandler :: IO (MVar SignalType)
+setupSignalHandler = do
+   tid   <- newEmptyMVar
+   installHandler sigUSR1 (Catch $ updatePosHandler tid) Nothing
+   installHandler sigHUP (Catch $ changeScreenHandler tid) Nothing
+   return tid
 
-    handle tvar ct (ExposeEvent {}) = block $ do
-          --  check if there are XRandr events pending
-          num <- pending xrrD
-          if num == 0 then
-              --  if no pending events, make a update
-              runX xc (updateWin tvar)
-           else
-              recreateWindow ct
+updatePosHandler :: MVar SignalType -> IO ()
+updatePosHandler sig = do
+   putMVar sig Reposition
+   return ()
 
-    handle _ _ _  = return ()
-
-    recreateWindow ct = do
-              killThread ct
-              destroyWindow d w
-              (r',w') <- createWin d fs c
-              eventLoop (XConf d xrrD r' w' fs c) vs
+changeScreenHandler :: MVar SignalType -> IO ()
+changeScreenHandler sig = do
+   putMVar sig ChangeScreen
+   return ()
 
 -- $command
 
@@ -138,16 +185,8 @@ startCommand (com,s,ss)
 
 -- $window
 
--- | The function to enable notifications from XRandr
-enableXRandrEventListen :: Display -> IO ()
-enableXRandrEventListen d = do
-  let dflt = defaultScreen d
-  rootw <- rootWindow d dflt
-  --  RRScreenChangeNotifyMask has the same value as keyPressMask
-  xrrSelectInput  d rootw keyPressMask
-
 -- | The function to create the initial window
-createWin :: Display -> XFont -> Config -> IO (Rectangle,Window)
+createWin :: Display -> XFont -> Config -> IO (Rectangle,Window,[Rectangle])
 createWin d fs c = do
   let dflt = defaultScreen d
   srs     <- getScreenInfo d
@@ -156,11 +195,23 @@ createWin d fs c = do
   let ht    = as + ds + 4
       (r,o) = setPosition (position c) srs (fi ht)
   win <- newWindow  d (defaultScreenOfDisplay d) rootw r o
+  --  keyPressMask is the same value as RRScreenChangeNotify
+  xrrSelectInput    d rootw keyPressMask
   selectInput       d win (exposureMask .|. structureNotifyMask)
   setProperties r c d win srs
   when (lowerOnStart c) (lowerWindow d win)
   mapWindow         d win
-  return (r,win)
+  return (r,win, srs)
+
+-- | Updates the size and position of the window
+repositionWin :: Display -> Window -> XFont -> Config -> [Rectangle] -> IO (Rectangle)
+repositionWin d win fs c srs = do
+  (as,ds) <- textExtents fs "0"
+  let ht    = as + ds + 4
+      (r,_) = setPosition (position c) srs (fi ht)
+  moveResizeWindow d win (rect_x r) (rect_y r) (rect_width r) (rect_height r)
+  setProperties r c d win srs
+  return r
 
 setPosition :: XPosition -> [Rectangle] -> Dimension -> (Rectangle,Bool)
 setPosition p rs ht =
