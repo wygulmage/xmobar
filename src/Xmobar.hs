@@ -102,13 +102,14 @@ eventLoop xcfg@(XConf d _ w fs _) vs = do
       alloca $ \ptrEventBase ->
       alloca $ \ptrErrorBase ->
       allocaXEvent $ \e -> do
-        _ <- xrrQueryExtension d ptrEventBase ptrErrorBase
-        xrrEventBase <- peek ptrEventBase
 
         dpy <- openDisplay ""
-        --  keyPressMask is the same value as RRScreenChangeNotify
+        --  keyPressMask is the same value as RRScreenChangeNotifyMask
         xrrSelectInput    dpy (defaultRootWindow dpy) keyPressMask
         selectInput       dpy w (exposureMask .|. structureNotifyMask)
+
+        _ <- xrrQueryExtension dpy ptrEventBase ptrErrorBase
+        xrrEventBase <- peek ptrEventBase
 
         forever $ do
           nextEvent dpy e
@@ -117,8 +118,8 @@ eventLoop xcfg@(XConf d _ w fs _) vs = do
             ConfigureEvent {} -> putMVar signal Reposition
             ExposeEvent {} -> putMVar signal Wakeup
             _ ->
-              --  keyPressMask is the same value as RRScreenChangeNotify
-              when ( (fromIntegral (ev_event_type ev) - xrrEventBase) == fromIntegral keyPressMask)
+              --  0 is the value of RRScreenChangeNotify
+              when ( (fromIntegral (ev_event_type ev) - xrrEventBase) == 0)
                    $ putMVar signal Reposition
 
 
