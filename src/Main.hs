@@ -57,8 +57,7 @@ main = do
   cls   <- mapM (parseTemplate conf) (splitTemplate conf)
   vars  <- mapM (mapM startCommand) cls
   (r,w) <- createWin d fs conf
-  sig   <- setupSignalHandler
-  eventLoop (XConf d r w fs conf) vars sig
+  eventLoop (XConf d r w fs conf) vars
 
 -- | Splits the template in its parts
 splitTemplate :: Config -> [String]

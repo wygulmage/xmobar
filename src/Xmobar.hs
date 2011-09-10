@@ -18,7 +18,6 @@ module Xmobar
       -- $main
       X , XConf (..), runX
     , eventLoop
-    , setupSignalHandler
     -- * Program Execution
     -- $command
     , startCommand
@@ -79,26 +78,27 @@ instance Exception WakeUp
 data SignalType = Wakeup | Reposition | ChangeScreen
 
 -- | The event loop
-eventLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> MVar SignalType -> IO ()
-eventLoop xcfg@(XConf d _ w fs _) vs signal = do
+eventLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> IO ()
+eventLoop xcfg@(XConf d _ w fs _) vs = do
     tv <- atomically $ newTVar []
-    _ <- forkIO (checker tv [] `catch` \(SomeException _) -> putStrLn "Oh Noez checker" >> return ())
-    _ <- forkOS (eventer `catch` \(SomeException _) -> putStrLn "Oh Noez eventer" >>return ())
-    go tv xcfg
+    sig <- setupSignalHandler
+    _ <- forkIO (checker tv [] sig `catch` \(SomeException _) -> putStrLn "Oh Noez checker" >> return ())
+    _ <- forkOS (eventer sig `catch` \(SomeException _) -> putStrLn "Oh Noez eventer" >>return ())
+    go tv xcfg sig
   where
     -- interrupt the drawing thread every time a var is updated
-    checker tvar ov = do
+    checker tvar ov signal = do
       nval <- atomically $ do
               nv <- mapM concatV vs
               guard (nv /= ov)
               writeTVar tvar nv
               return nv
       putMVar signal Wakeup
-      checker tvar nval
+      checker tvar nval signal
 
     concatV = fmap concat . mapM (readTVar . snd)
 
-    eventer =
+    eventer signal =
       alloca $ \ptrEventBase ->
       alloca $ \ptrErrorBase ->
       allocaXEvent $ \e -> do
@@ -123,12 +123,12 @@ eventLoop xcfg@(XConf d _ w fs _) vs signal = do
 
 
     -- Continuously wait for a timer interrupt or an expose event
-    go tv xc@(XConf _ _ _ _ cfg) = do
+    go tv xc@(XConf _ _ _ _ cfg) signal = do
       typ <- takeMVar signal
       case typ of
         Wakeup -> do
           runX xc (updateWin tv)
-          go tv xc
+          go tv xc signal
         Reposition -> reposWindow cfg
         ChangeScreen ->
           case position cfg of
@@ -143,7 +143,7 @@ eventLoop xcfg@(XConf d _ w fs _) vs signal = do
       where
         reposWindow rcfg = do
           r' <- repositionWin d w fs rcfg
-          go tv (XConf d r' w fs rcfg)
+          go tv (XConf d r' w fs rcfg) signal
 
 -- | Signal handling
 setupSignalHandler :: IO (MVar SignalType)
