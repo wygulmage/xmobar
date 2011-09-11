@@ -82,8 +82,8 @@ eventLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> IO ()
 eventLoop xcfg@(XConf d _ w fs _) vs = do
     tv <- atomically $ newTVar []
     sig <- setupSignalHandler
-    _ <- forkIO (checker tv [] sig `catch` \(SomeException _) -> putStrLn "Oh Noez checker" >> return ())
-    _ <- forkOS (eventer sig `catch` \(SomeException _) -> putStrLn "Oh Noez eventer" >>return ())
+    _ <- forkIO (checker tv [] sig `catch` \(SomeException _) -> putStrLn "Thread checker failed" >> return ())
+    _ <- forkOS (eventer sig `catch` \(SomeException _) -> putStrLn "Thread eventer failed" >> return ())
     go tv xcfg sig
   where
     -- interrupt the drawing thread every time a var is updated
@@ -135,7 +135,7 @@ eventLoop xcfg@(XConf d _ w fs _) vs = do
           case position cfg of
             OnScreen n o -> do
               srs <- getScreenInfo d
-              if n == length srs then do
+              if n == length srs then
                   reposWindow (cfg {position = OnScreen 1 o})
                 else
                   reposWindow (cfg {position = OnScreen (n+1) o})
