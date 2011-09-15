@@ -144,6 +144,14 @@ or
 
 if you have the default configuration file saved as `~/.xmobarrc`
 
+### Signal Handling
+
+Since 0.14 xmobar reacts to SIGHUP and SIGUSR1:
+
+- After receiving SIGHUP xmobar moves its position to the next screen.
+
+- After receiving SIGUSR1 xmobar repositions it self on the current screen.
+
 Configuration
 =============
 
