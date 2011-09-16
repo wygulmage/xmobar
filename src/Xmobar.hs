@@ -150,8 +150,8 @@ eventLoop xcfg@(XConf d _ w fs _) vs = do
 setupSignalHandler :: IO (MVar SignalType)
 setupSignalHandler = do
    tid   <- newEmptyMVar
-   installHandler sigUSR1 (Catch $ updatePosHandler tid) Nothing
-   installHandler sigHUP (Catch $ changeScreenHandler tid) Nothing
+   installHandler sigUSR2 (Catch $ updatePosHandler tid) Nothing
+   installHandler sigUSR1 (Catch $ changeScreenHandler tid) Nothing
    return tid
 
 updatePosHandler :: MVar SignalType -> IO ()
