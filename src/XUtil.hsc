@@ -1,8 +1,8 @@
--- {-# OPTIONS -fglasgow-exts #-}
+{-# LANGUAGE ForeignFunctionInterface #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  XUtil
--- Copyright   :  (C) 2007 Andrea Rossato
+-- Copyright   :  (C) 2007, 2011 Andrea Rossato
 -- License     :  BSD3
 --
 -- Maintainer  :  andrea.rossato@unitn.it
@@ -28,12 +28,15 @@ module XUtil
     , fi
     , withColors
     , DynPixel(..)
+    , xrrSelectInput
+    , xrrQueryExtension
     ) where
 
 import Control.Concurrent
 import Control.Monad.Trans
 import Data.IORef
 import Foreign
+import Foreign.C.Types
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import qualified Graphics.X11.Xlib as Xlib (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
@@ -257,3 +260,12 @@ setupLocale = withCString "" (setlocale $ #const LC_ALL) >> return ()
 setupLocale :: IO ()
 setupLocale = return ()
 #endif
+
+--  XRRSelectInput
+#include <X11/extensions/Xrandr.h>
+foreign import ccall unsafe "X11/extensions/Xrandr.h XRRSelectInput"
+  xrrSelectInput :: Display -> Window -> EventMask -> IO ()
+
+--  XRRQueryExtension
+foreign import ccall unsafe "X11/extensions/Xrandr.h XRRQueryExtension"
+  xrrQueryExtension :: Display -> Ptr CInt -> Ptr CInt -> IO (Bool)
