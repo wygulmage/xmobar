@@ -17,7 +17,7 @@ module Xmobar
     ( -- * Main Stuff
       -- $main
       X , XConf (..), runX
-    , eventLoop
+    , startLoop
     -- * Program Execution
     -- $command
     , startCommand
@@ -77,27 +77,16 @@ instance Exception WakeUp
 
 data SignalType = Wakeup | Reposition | ChangeScreen
 
--- | The event loop
-eventLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> IO ()
-eventLoop xcfg@(XConf d _ w fs _) vs = do
+-- | Starts the main event loop and threads
+startLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> IO ()
+startLoop xcfg@(XConf _ _ w _ _) vs = do
     tv <- atomically $ newTVar []
     sig <- setupSignalHandler
-    _ <- forkIO (checker tv [] sig `catch` \(SomeException _) -> putStrLn "Thread checker failed" >> return ())
+    _ <- forkIO (checker tv [] vs sig `catch` \(SomeException _) -> putStrLn "Thread checker failed" >> return ())
     _ <- forkOS (eventer sig `catch` \(SomeException _) -> putStrLn "Thread eventer failed" >> return ())
-    go tv xcfg sig
+    eventLoop tv xcfg sig
   where
-    -- interrupt the drawing thread every time a var is updated
-    checker tvar ov signal = do
-      nval <- atomically $ do
-              nv <- mapM concatV vs
-              guard (nv /= ov)
-              writeTVar tvar nv
-              return nv
-      putMVar signal Wakeup
-      checker tvar nval signal
-
-    concatV = fmap concat . mapM (readTVar . snd)
-
+    -- Reacts on events from X
     eventer signal =
       alloca $ \ptrEventBase ->
       alloca $ \ptrErrorBase ->
@@ -122,29 +111,52 @@ eventLoop xcfg@(XConf d _ w fs _) vs = do
               when ( (fromIntegral (ev_event_type ev) - xrrEventBase) == 0)
                    $ putMVar signal Reposition
 
+-- | Send signal to eventLoop every time a var is updated
+checker :: TVar [String] -> [String] -> [[(Maybe ThreadId, TVar String)]] -> MVar SignalType -> IO ()
+checker tvar ov vs signal = do
+      nval <- atomically $ do
+              nv <- mapM concatV vs
+              guard (nv /= ov)
+              writeTVar tvar nv
+              return nv
+      putMVar signal Wakeup
+      checker tvar nval vs signal
+    where
+      concatV = fmap concat . mapM (readTVar . snd)
 
-    -- Continuously wait for a timer interrupt or an expose event
-    go tv xc@(XConf _ _ _ _ cfg) signal = do
+
+-- | Continuously wait for a signal from a thread or a interrupt handler
+eventLoop :: TVar [String] -> XConf -> MVar SignalType -> IO ()
+eventLoop tv xc@(XConf d _ w fs cfg) signal = do
       typ <- takeMVar signal
       case typ of
-        Wakeup -> do
-          runX xc (updateWin tv)
-          go tv xc signal
-        Reposition -> reposWindow cfg
-        ChangeScreen ->
-          case position cfg of
+         Wakeup -> do
+            runX xc (updateWin tv)
+            eventLoop tv xc signal
+
+         Reposition ->
+            reposWindow cfg
+
+         ChangeScreen -> do
+            ncfg <- updateConfigPosition cfg
+            reposWindow ncfg
+
+    where
+        reposWindow rcfg = do
+          r' <- repositionWin d w fs rcfg
+          eventLoop tv (XConf d r' w fs rcfg) signal
+
+        updateConfigPosition ocfg =
+          case position ocfg of
             OnScreen n o -> do
               srs <- getScreenInfo d
               if n == length srs then
-                  reposWindow (cfg {position = OnScreen 1 o})
+                  return (ocfg {position = OnScreen 1 o})
                 else
-                  reposWindow (cfg {position = OnScreen (n+1) o})
+                  return (ocfg {position = OnScreen (n+1) o})
             o ->
-              reposWindow (cfg {position = OnScreen 1 o})
-      where
-        reposWindow rcfg = do
-          r' <- repositionWin d w fs rcfg
-          go tv (XConf d r' w fs rcfg) signal
+              return (ocfg {position = OnScreen 1 o})
+
 
 -- | Signal handling
 setupSignalHandler :: IO (MVar SignalType)
