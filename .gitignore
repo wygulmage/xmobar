@@ -6,3 +6,5 @@
 /src/IWlib.hs
 /src/StatFS.hs
 /src/XUtil.hs
+/web/index.html
+/web/releases.html
