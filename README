@@ -125,8 +125,8 @@ Otherwise, you'll need to install them yourself.
      [alsa-mixer] package.
 
 `with_datezone`
-:    Support for localized times. Enables the DateZone plugin. Requires
-     [timezone-olson] and [timezone-series] package.
+:    Support for other timezones. Enables the DateZone and DateZoneL plugin.
+     Requires [timezone-olson] and [timezone-series] package.
 
 `all_extensions`
 :    Enables all the extensions above.
@@ -872,7 +872,7 @@ can be used in the output template as `%mydate%`
   `strftime` function (or Haskell's `formatCalendarTime`).
 - Sample usage: `Run Date "%a %b %_d %Y <fc=#ee9a00>%H:%M:%S</fc>" "date" 10`
 
-`Date Format Alias Zone RefreshRate`
+`DateZone Format Alias Zone RefreshRate`
 
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
@@ -881,6 +881,24 @@ can be used in the output template as `%mydate%`
 - Sample usage:
   `Run DateZone "<fc=#ee9a00>%H:%M:%S</fc>" "viennaDate" "Europa/Vienna" 10`
 
+`DateL Format Locale Alias RefreshRate`
+
+- Behaves as Date but localizes the output
+- If Locale is "" the default locale of the system is used, otherwise the given
+  locale
+- As this plugin calls `setlocale`, there can only be one locale used, besides
+  English (default of Haskell, used in Date and DateZone) with DateL and
+  DateZoneL. If multiple plugin instances, with different locales, are used
+  the result is a race condition, but consistent between all plugins.
+- Usage with system locale:
+  `Run DateL "%B" "" "date" 10`
+- Usage with german locale:
+  `Run DateL "%B" "de_DE.UTF-8" "date" 10`
+
+`DateZoneL Format Locale Alias Zone RefreshRate`
+
+- Behaves as DateZone but localizes the output
+- Please check DateL for information's about Locale
 
 `CommandReader "/path/to/program" Alias`
 
@@ -1109,4 +1127,7 @@ Copyright &copy; 2010-2011 Jose Antonio Ortega Ruiz
 [libmpd]: http://hackage.haskell.org/package/libmpd/
 [sawfish]: http://sawfish.wikia.com/
 [utf8-string]: http://hackage.haskell.org/package/utf8-string/
+[alsa-core]: http://hackage.haskell.org/package/alsa-core
 [alsa-mixer]: http://hackage.haskell.org/package/alsa-mixer
+[timezone-olson]: http://hackage.haskell.org/package/timezone-olson
+[timezone-series]: http://hackage.haskell.org/package/timezone-series
