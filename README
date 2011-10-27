@@ -125,7 +125,7 @@ Otherwise, you'll need to install them yourself.
      [alsa-mixer] package.
 
 `with_datezone`
-:    Support for other timezones. Enables the DateZone and DateZoneL plugin.
+:    Support for other timezones. Enables the DateZone plugin.
      Requires [timezone-olson] and [timezone-series] package.
 
 `all_extensions`
@@ -872,33 +872,18 @@ can be used in the output template as `%mydate%`
   `strftime` function (or Haskell's `formatCalendarTime`).
 - Sample usage: `Run Date "%a %b %_d %Y <fc=#ee9a00>%H:%M:%S</fc>" "date" 10`
 
-`DateZone Format Alias Zone RefreshRate`
+`DateZone Format Locale Zone Alias RefreshRate`
 
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
-- Zone is the name of the TimeZone. Assumes that the tz database is stored in
-  /usr/share/zoneinfo/
-- Sample usage:
-  `Run DateZone "<fc=#ee9a00>%H:%M:%S</fc>" "viennaDate" "Europa/Vienna" 10`
-
-`DateL Format Locale Alias RefreshRate`
-
-- Behaves as Date but localizes the output
 - If Locale is "" the default locale of the system is used, otherwise the given
-  locale
-- As this plugin calls `setlocale`, there can only be one locale used, besides
-  English (default of Haskell, used in Date and DateZone) with DateL and
-  DateZoneL. If multiple plugin instances, with different locales, are used
-  the result is a race condition, but consistent between all plugins.
-- Usage with system locale:
-  `Run DateL "%B" "" "date" 10`
-- Usage with german locale:
-  `Run DateL "%B" "de_DE.UTF-8" "date" 10`
-
-`DateZoneL Format Locale Alias Zone RefreshRate`
-
-- Behaves as DateZone but localizes the output
-- Please check DateL for information's about Locale
+  locale. If there are more instances of DateZone, using "" as input for Locacle
+  is not recommended.
+- Zone is the name of the TimeZone. It is assumed that the tz database is stored
+  in /usr/share/zoneinfo/. If "" is given as Zone, the default system time is
+  used.
+- Sample usage:
+  `Run DateZone "<fc=#ee9a00>%H:%M:%S</fc>" "GMT+1" "Europe/Vienna" "viennaTime" 10`
 
 `CommandReader "/path/to/program" Alias`
 

@@ -77,7 +77,7 @@ executable xmobar
       Plugins.Monitors.Swap, Plugins.Monitors.Thermal,
       Plugins.Monitors.ThermalZone, Plugins.Monitors.Top,
       Plugins.Monitors.Uptime, Plugins.Monitors.Weather,
-      Plugins.Monitors.Bright, Plugins.DateL, Plugins.DateZoneL
+      Plugins.Monitors.Bright
 
     ghc-prof-options:   -prof -auto-all
 

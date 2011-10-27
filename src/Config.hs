@@ -27,7 +27,6 @@ import Commands
 import {-# SOURCE #-} Runnable
 import Plugins.Monitors
 import Plugins.Date
-import Plugins.DateL
 import Plugins.PipeReader
 import Plugins.CommandReader
 import Plugins.StdinReader
@@ -42,7 +41,6 @@ import Plugins.MBox
 
 #ifdef DATEZONE
 import Plugins.DateZone
-import Plugins.DateZoneL
 #endif
 
 -- $config
@@ -115,12 +113,12 @@ infixr :*:
 -- the 'Runnable.Runnable' Read instance. To install a plugin just add
 -- the plugin's type to the list of types (separated by ':*:') appearing in
 -- this function's type signature.
-runnableTypes :: Command :*: Monitors :*: Date :*: DateL :*: PipeReader :*: CommandReader :*: StdinReader :*: XMonadLog :*: EWMH :*: Kbd :*:
+runnableTypes :: Command :*: Monitors :*: Date :*: PipeReader :*: CommandReader :*: StdinReader :*: XMonadLog :*: EWMH :*: Kbd :*:
 #ifdef INOTIFY
                  Mail :*: MBox :*:
 #endif
 #ifdef DATEZONE
-                 DateZone :*: DateZoneL :*:
+                 DateZone :*:
 #endif
                  ()
 runnableTypes = undefined
