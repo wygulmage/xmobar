@@ -22,6 +22,7 @@ _Bug fixes_
   - Fix for pulseaudio problems in volume monitor (Martin Perner).
   - Fix for parsing errors when a `Run` entry ended in an array
     (Martin).
+  - Fixed compilation in OpenBSD (Ivo van der Sangen).
 
 [issue 48]: http://code.google.com/p/xmobar/issues/detail?id=48
 [issue 50]: http://code.google.com/p/xmobar/issues/detail?id=50

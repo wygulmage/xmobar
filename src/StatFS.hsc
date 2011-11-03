@@ -23,7 +23,11 @@ import Foreign.C.String
 import Data.ByteString (useAsCString)
 import Data.ByteString.Char8 (pack)
 
-#if defined (__FreeBSD__) || defined (__APPLE__)
+#if  defined (__FreeBSD__) || defined (__OpenBSD__) ||  defined (__APPLE__)
+#define IS_BSD_SYSTEM
+#endif
+
+#ifdef IS_BSD_SYSTEM
 # include <sys/param.h>
 # include <sys/mount.h>
 #else
@@ -47,7 +51,7 @@ data FileSystemStats = FileSystemStats {
 
 data CStatfs
 
-#if defined (__FreeBSD__) || defined (__APPLE__)
+#ifdef IS_BSD_SYSTEM
 foreign import ccall unsafe "sys/mount.h statfs"
 #else
 foreign import ccall unsafe "sys/vfs.h statfs64"
