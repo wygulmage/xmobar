@@ -15,11 +15,13 @@
 
 module Plugins.Monitors.Batt ( battConfig, runBatt, runBatt' ) where
 
-import qualified Data.ByteString.Lazy.Char8 as B
+import Control.Exception (SomeException, handle)
 import Plugins.Monitors.Common
 import System.FilePath ((</>))
 import System.Posix.Files (fileExist)
 import System.Console.GetOpt
+
+import qualified Data.ByteString.Lazy.Char8 as B
 
 data BattOpts = BattOpts
   { onString :: String
@@ -107,11 +109,9 @@ batteryFiles bat =
 
 haveAc :: FilePath -> IO Bool
 haveAc f = do
-  exists <- fileExist ofile
-  if exists
-    then fmap ((== "1\n") . B.unpack) (B.readFile ofile)
-    else return False
+  handle onError (fmap ((== "1\n") . B.unpack) (B.readFile ofile))
   where ofile = sysDir </> f
+        onError = const (return False) :: SomeException -> IO Bool
 
 readBattery :: Files -> IO Battery
 readBattery NoFiles = return $ Battery 0 0 0 0
@@ -124,7 +124,8 @@ readBattery files =
                         (3600 * b / 1000000) -- wattseconds
                         (c / 1000000) -- volts
                         (if c > 0 then (d / c) else -1) -- amperes
-    where grab f = catch (fmap (read . B.unpack) $ B.readFile f) (\_ -> return 0)
+    where grab f = handle onError (fmap (read . B.unpack) $ B.readFile f)
+          onError = const (return 0) :: SomeException -> IO Float
 
 readBatteries :: BattOpts -> [Files] -> IO Result
 readBatteries opts bfs =
