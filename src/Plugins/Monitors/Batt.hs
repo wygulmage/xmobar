@@ -13,11 +13,14 @@
 --
 -----------------------------------------------------------------------------
 
+{-# LANGUAGE BangPatterns #-}
+
 module Plugins.Monitors.Batt ( battConfig, runBatt, runBatt' ) where
 
 import Control.Exception (SomeException, handle)
 import Plugins.Monitors.Common
 import System.FilePath ((</>))
+import System.IO (IOMode(ReadMode), hGetLine, withFile)
 import System.Posix.Files (fileExist)
 import System.Console.GetOpt
 
@@ -85,17 +88,21 @@ data Files = Files
   } | NoFiles
 
 data Battery = Battery
-  { full :: Float
-  , now :: Float
-  , voltage :: Float
-  , current :: Float
+  { full :: !Float
+  , now :: !Float
+  , voltage :: !Float
+  , current :: !Float
   }
+
+safeFileExist :: String -> IO Bool
+safeFileExist f = handle noErrors $ fileExist f
+  where noErrors = const (return False) :: SomeException -> IO Bool
 
 batteryFiles :: String -> IO Files
 batteryFiles bat =
-  do is_charge <- fileExist $ prefix </> "charge_now"
-     is_energy <- fileExist $ prefix </> "energy_now"
-     is_current <- fileExist $ prefix </> "current_now"
+  do is_charge <- safeFileExist $ prefix </> "charge_now"
+     is_energy <- safeFileExist $ prefix </> "energy_now"
+     is_current <- safeFileExist $ prefix </> "current_now"
      let cf = if is_current then "current_now" else "power_now"
      return $ case (is_charge, is_energy) of
        (True, _) -> files "charge" cf
@@ -108,10 +115,9 @@ batteryFiles bat =
                             , fVoltage = prefix </> "voltage_now" }
 
 haveAc :: FilePath -> IO Bool
-haveAc f = do
-  handle onError (fmap ((== "1\n") . B.unpack) (B.readFile ofile))
-  where ofile = sysDir </> f
-        onError = const (return False) :: SomeException -> IO Bool
+haveAc f =
+  handle onError $ withFile (sysDir </> f) ReadMode (fmap (== "1") . hGetLine)
+  where onError = const (return False) :: SomeException -> IO Bool
 
 readBattery :: Files -> IO Battery
 readBattery NoFiles = return $ Battery 0 0 0 0
@@ -125,7 +131,7 @@ readBattery files =
                         (c / 1000000) -- volts
                         (if c > 0 then (d / c) else -1) -- amperes
     where grab f = handle onError (fmap (read . B.unpack) $ B.readFile f)
-          onError = const (return 0) :: SomeException -> IO Float
+          onError = const (return (-1)) :: SomeException -> IO Float
 
 readBatteries :: BattOpts -> [Files] -> IO Result
 readBatteries opts bfs =
