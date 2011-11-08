@@ -157,20 +157,20 @@ runBatt' bfs args = do
       do l <- fmtPercent x
          parseTemplate (l ++ s:[fmtTime $ floor t, fmtWatts w opts])
     NA -> return "N/A"
- where fmtPercent :: Float -> Monitor [String]
-       fmtPercent x = do
-         p <- showPercentWithColors x
-         b <- showPercentBar (100 * x) x
-         return [b, p]
-       fmtWatts x o = color x o $ showDigits 1 x ++ "W"
-       fmtTime :: Integer -> String
-       fmtTime x = hours ++ ":" ++ if length minutes == 2
-                                   then minutes else '0' : minutes
-         where hours = show (x `div` 3600)
-               minutes = show ((x `mod` 3600) `div` 60)
-       maybeColor Nothing _ = ""
-       maybeColor (Just c) str = "<fc=" ++ c ++ ">" ++ str ++ "</fc>"
-       color x o | x >= 0 = maybeColor (posColor o)
-                 | x >= highThreshold o = maybeColor (highWColor o)
-                 | x >= lowThreshold o = maybeColor (mediumWColor o)
-                 | otherwise = maybeColor (lowWColor o)
+  where fmtPercent :: Float -> Monitor [String]
+        fmtPercent x = do
+          p <- showPercentWithColors x
+          b <- showPercentBar (100 * x) x
+          return [b, p]
+        fmtWatts x o = color x o $ showDigits 1 x ++ "W"
+        fmtTime :: Integer -> String
+        fmtTime x = hours ++ ":" ++ if length minutes == 2
+                                    then minutes else '0' : minutes
+          where hours = show (x `div` 3600)
+                minutes = show ((x `mod` 3600) `div` 60)
+        maybeColor Nothing _ = ""
+        maybeColor (Just c) str = "<fc=" ++ c ++ ">" ++ str ++ "</fc>"
+        color x o | x >= 0 = maybeColor (posColor o)
+                  | x >= highThreshold o = maybeColor (highWColor o)
+                  | x >= lowThreshold o = maybeColor (mediumWColor o)
+                  | otherwise = maybeColor (lowWColor o)
