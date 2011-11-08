@@ -24,8 +24,6 @@ import System.IO (IOMode(ReadMode), hGetLine, withFile)
 import System.Posix.Files (fileExist)
 import System.Console.GetOpt
 
-import qualified Data.ByteString.Lazy.Char8 as B
-
 data BattOpts = BattOpts
   { onString :: String
   , offString :: String
@@ -130,7 +128,7 @@ readBattery files =
                         (3600 * b / 1000000) -- wattseconds
                         (c / 1000000) -- volts
                         (if c > 0 then (d / c) else -1) -- amperes
-    where grab f = handle onError (fmap (read . B.unpack) $ B.readFile f)
+    where grab f = handle onError $ withFile f ReadMode (fmap read . hGetLine)
           onError = const (return (-1)) :: SomeException -> IO Float
 
 readBatteries :: BattOpts -> [Files] -> IO Result
