@@ -877,13 +877,13 @@ can be used in the output template as `%mydate%`
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
 - If Locale is "" the default locale of the system is used, otherwise the given
-  locale. If there are more instances of DateZone, using "" as input for Locacle
+  locale. If there are more instances of DateZone, using "" as input for Locale
   is not recommended.
 - Zone is the name of the TimeZone. It is assumed that the tz database is stored
   in /usr/share/zoneinfo/. If "" is given as Zone, the default system time is
   used.
 - Sample usage:
-  `Run DateZone "<fc=#ee9a00>%H:%M:%S</fc>" "GMT+1" "Europe/Vienna" "viennaTime" 10`
+  `Run DateZone "%a %H:%M:%S" "de_DE.UTF-8" "Europe/Vienna" "viennaTime" 10`
 
 `CommandReader "/path/to/program" Alias`
 
