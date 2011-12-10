@@ -13,7 +13,8 @@ _New features_
     guessed it.
   - Cpu monitor now also reports `iowait` field ([issue 55]).
   - Battery monitor: the full charge file is now settable in the
-    monitor arguments (olpc systems use charge_full_design; see [issue 62]).
+    monitor arguments (olpc systems use `charge_full_design`; see
+    [issue 62]).
 
 _Bug fixes_
 

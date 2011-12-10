@@ -13,7 +13,6 @@ extensibility through plugins.
 
 This page documents xmobar 0.14 (see [release notes]).
 
-[This is a screen shot] of Andrea's desktop with [xmonad] and xmobar.
 [This screenshot] shows xmobar running under [sawfish], with
 antialiased fonts. And [this one] is my desktop with [xmonad] and two
 instances of xmobar.
@@ -1022,17 +1021,24 @@ To remove the system monitor plugin:
 
 3. rebuild xmobar.
 
-Credits
-=======
+Authors and credits
+===================
 
-xmobar [incorporates patches] by Ben Boeckel, Roman Cheplyaka, John
-Goerzen, Juraj Hercek, Tomas Janousek, Spencer Janssen, Lennart
-Kolmodin, Krzysztof Kosciuszkiewicz, Dmitry Kurochkin, Svein Ove,
-Martin Perner, Jens Petersen, Petr Rockai, Andrew Sackville-West,
-Alexander Solovyov, Sergei Trofimovich, Thomas Tuegel, Jan Vornberger,
-Daniel Wagner and Norbert Zeh.
+Andrea Rossato originally designed and implemented xmobar up to
+version 0.11.1. Since then, it is maintained and developed by [Jose
+Antonio Ortega Ruiz](http://hacks-galore.org/jao/), with the help of
+the greater Haskell community.
+
+In particular, xmobar [incorporates patches] by Ben Boeckel, Roman
+Cheplyaka, John Goerzen, Juraj Hercek, Tomas Janousek, Spencer
+Janssen, Lennart Kolmodin, Krzysztof Kosciuszkiewicz, Dmitry
+Kurochkin, Svein Ove, Martin Perner, Jens Petersen, Petr Rockai,
+Andrew Sackville-West, Alexander Solovyov, Sergei Trofimovich, Thomas
+Tuegel, Jan Vornberger, Daniel Wagner and Norbert Zeh.
 
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
+
+## Thanks
 
 __Andrea Rossato__:
 
@@ -1065,15 +1071,8 @@ Useful links
 [this tutorial]: http://www.haskell.org/haskellwiki/X_window_programming_in_Haskell
 [sawflibs]: http://github.com/jaor/sawflibs
 
-Author
-======
-
-Andrea Rossato originally designed and implemented xmobar up to
-version 0.11.1. Since then, it is maintained by [Jose Antonio Ortega
-Ruiz](http://hacks-galore.org/jao/).
-
-Legal
-=====
+License
+=======
 
 This software is released under a BSD-style license. See [LICENSE] for
 more details.
