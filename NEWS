@@ -11,11 +11,15 @@ _New features_
   - New keyboard layout monitor (Kbd).  Yes, by Martin.
   - Rewrite of the event handling ([issue 53], [issue 57]), also by Martin.
   - Cpu monitor now also reports `iowait` field ([issue 55]).
+  - Battery monitor: the full charge file is now settable in the
+    monitor arguments (olpc systems use charge_full_design; see [issue 62]).
 
 _Bug fixes_
 
+  - [issue 45]: Fix for crashes with AC status changes in battery monitor.
   - [issue 48]: The <quality> field of Wireless behaves like a percentage.
-  - [issue 50]: `MPD` monitor now works with libmpd 0.6.
+  - [issue 50]/[issue 61]: `MPD` monitor now works with libmpd 0.6.
+  - [issue 60]: Fixes for crashes on power resume for battery monitor.
   - Template sections without fields are now correctly displayed.
   - Catch errors when reading battery status (Ben Boeckel).
   - Compilation issues with ghc 7.x (Sergei Trofimovich).
@@ -25,11 +29,15 @@ _Bug fixes_
     (Martin).
   - Fixed compilation in OpenBSD (Ivo van der Sangen).
 
+[issue 45]: http://code.google.com/p/xmobar/issues/detail?id=45
 [issue 48]: http://code.google.com/p/xmobar/issues/detail?id=48
 [issue 50]: http://code.google.com/p/xmobar/issues/detail?id=50
 [issue 53]: http://code.google.com/p/xmobar/issues/detail?id=53
 [issue 55]: http://code.google.com/p/xmobar/issues/detail?id=55
 [issue 57]: http://code.google.com/p/xmobar/issues/detail?id=57
+[issue 60]: http://code.google.com/p/xmobar/issues/detail?id=60
+[issue 61]: http://code.google.com/p/xmobar/issues/detail?id=61
+[issue 62]: http://code.google.com/p/xmobar/issues/detail?id=62
 
 ## Version 0.13 (March 28, 2011)
 

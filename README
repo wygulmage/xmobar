@@ -319,13 +319,8 @@ swap monitor plugin, with default options, every second.
 The only internal available command is `Com` (see below Executing
 External Commands). All other commands are provided by plugins. xmobar
 comes with some plugins, providing a set of system monitors, a
-standard input reader, an Unix named pipe reader, and a configurable
-date plugin. These plugins install the following internal commands:
-`Weather`, `Network`, `Wireless` (optional), `Memory`, `Swap`, `Cpu`,
-`MultiCpu`, `Battery`, `TopProc`, `TopMem`, `DiskU`, `DiskIO`,
-`Thermal`, `ThermalZone`, `CpuFreq`, `CoreTemp`, `Volume` (optional),
-`MPD` (optional), `Mail` (optional), `MBox` (optional), `Date`,
-`Uptime`, `StdinReader`, `CommandReader`, and `PipeReader`.
+standard input reader, an Unix named pipe reader, a configurable date
+plugin, and much more: we list all available plugins below.
 
 To remove them see below Installing/Removing a Plugin
 
@@ -447,6 +442,10 @@ Monitors have default aliases.
     - `-p`: color to display positive power (battery charging)
     - `-f`: file in `/sys/class/power_supply` with AC info (default:
       "AC/online")
+    - `-c`: file in `/sys/class/power/<BAT>/` with full charge
+    information (default: "charge_full"; for instance, olpc systems
+    use "charge_full_design")
+
 - Variables that can be used with the `-t`/`--template` argument:
 	    `left`, `leftbar`, `timeleft`, `watts`, `acstatus`
 - Default template: `Batt: <watts>, <left>% / <timeleft>`
@@ -458,7 +457,8 @@ Monitors have default aliases.
                        "-L", "10", "-H", "80", "-p", "3",
                        "--", "-O", "<fc=green>On</fc> - ", "-o", "",
                        "-L", "-15", "-H", "-5",
-                       "-l", "red", "-m", "blue", "-h", "green"]
+                       "-l", "red", "-m", "blue", "-h", "green",
+                       "-c", "charge_full_design"]
                       600
   In the above example, the thresholds before the "--" separator
   refer to the `<left>` field, while those after the separator affect
