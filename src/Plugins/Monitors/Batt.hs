@@ -34,6 +34,7 @@ data BattOpts = BattOpts
   , lowThreshold :: Float
   , highThreshold :: Float
   , onlineFile :: FilePath
+  , chargeFile :: FilePath
   }
 
 defaultOpts :: BattOpts
@@ -47,6 +48,7 @@ defaultOpts = BattOpts
   , lowThreshold = -12
   , highThreshold = -10
   , onlineFile = "AC/online"
+  , chargeFile = "charge_full"
   }
 
 options :: [OptDescr (BattOpts -> BattOpts)]
@@ -60,6 +62,7 @@ options =
   , Option "L" ["lowt"] (ReqArg (\x o -> o { lowThreshold = read x }) "") ""
   , Option "H" ["hight"] (ReqArg (\x o -> o { highThreshold = read x }) "") ""
   , Option "f" ["online"] (ReqArg (\x o -> o { onlineFile = x }) "") ""
+  , Option "c" ["charge"] (ReqArg (\x o -> o { chargeFile = x }) "") ""
   ]
 
 parseOpts :: [String] -> IO BattOpts
@@ -96,8 +99,8 @@ safeFileExist :: String -> IO Bool
 safeFileExist f = handle noErrors $ fileExist f
   where noErrors = const (return False) :: SomeException -> IO Bool
 
-batteryFiles :: String -> IO Files
-batteryFiles bat =
+batteryFiles :: String -> String -> IO Files
+batteryFiles charge_file bat =
   do is_charge <- safeFileExist $ prefix </> "charge_now"
      is_energy <- safeFileExist $ prefix </> "energy_now"
      is_current <- safeFileExist $ prefix </> "current_now"
@@ -107,7 +110,7 @@ batteryFiles bat =
        (_, True) -> files "energy" cf
        _ -> NoFiles
   where prefix = sysDir </> bat
-        files ch cf = Files { fFull = prefix </> ch ++ "_full"
+        files ch cf = Files { fFull = prefix </> charge_file
                             , fNow = prefix </> ch ++ "_now"
                             , fCurrent = prefix </> cf
                             , fVoltage = prefix </> "voltage_now" }
@@ -151,7 +154,7 @@ runBatt = runBatt' ["BAT0","BAT1","BAT2"]
 runBatt' :: [String] -> [String] -> Monitor String
 runBatt' bfs args = do
   opts <- io $ parseOpts args
-  c <- io $ readBatteries opts =<< mapM batteryFiles bfs
+  c <- io $ readBatteries opts =<< mapM (batteryFiles (chargeFile opts)) bfs
   case c of
     Result x w t s ->
       do l <- fmtPercent x
