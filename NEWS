@@ -1,6 +1,11 @@
 % xmobar - Release notes
 % Jose A. Ortega Ruiz
 
+## Version 0.14.1 (Dec 11, 2011)
+
+A quick upgrade to 0.14 (which see) with more precise versions for
+build dependencies.
+
 ## Version 0.14 (Dec 10, 2011)
 
 _New features_
