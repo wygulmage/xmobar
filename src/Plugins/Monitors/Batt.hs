@@ -86,8 +86,7 @@ data Files = Files
 data Battery = Battery
   { full :: !Float
   , now :: !Float
-  , voltage :: !Float
-  , current :: !Float
+  , power :: !Float
   }
 
 safeFileExist :: String -> String -> IO Bool
@@ -119,16 +118,14 @@ haveAc f =
   where onError = const (return False) :: SomeException -> IO Bool
 
 readBattery :: Files -> IO Battery
-readBattery NoFiles = return $ Battery 0 0 0 0
+readBattery NoFiles = return $ Battery 0 0 0
 readBattery files =
-    do a <- grab $ fFull files -- microwatthours
+    do a <- grab $ fFull files
        b <- grab $ fNow files
-       c <- grab $ fVoltage files -- microvolts
-       d <- grab $ fCurrent files -- microwatts (huh!)
-       return $ Battery (3600 * a / 1000000) -- wattseconds
-                        (3600 * b / 1000000) -- wattseconds
-                        (c / 1000000) -- volts
-                        (if c > 0 then d / c else -1) -- amperes
+       d <- grab $ fCurrent files
+       return $ Battery (3600 * a / 1e5) -- wattseconds
+                        (3600 * b / 1e5) -- wattseconds
+                        (d / 1e5) -- watts
     where grab f = handle onError $ withFile f ReadMode (fmap read . hGetLine)
           onError = const (return (-1)) :: SomeException -> IO Float
 
@@ -139,7 +136,7 @@ readBatteries opts bfs =
        let sign = if ac then 1 else -1
            ft = sum (map full bats)
            left = if ft > 0 then sum (map now bats) / ft else 0
-           watts = sign * sum (map voltage bats) * sum (map current bats)
+           watts = sign * sum (map power bats)
            time = if watts == 0 then 0 else sum $ map time' bats
            mwatts = if watts == 0 then 1 else sign * watts
            time' b = (if ac then full b - now b else now b) / mwatts

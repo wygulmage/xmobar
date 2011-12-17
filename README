@@ -427,7 +427,7 @@ Monitors have default aliases.
 
 - Aliases to `battery`
 - Dirs: list of directories in `/sys/class/power_supply/` where to
-  look for the `state` and `info` files of each battery. Example:
+  look for the ACPI files of each battery. Example:
   `["BAT0","BAT1","BAT2"]`. Only the first 3 directories will be
   searched.
 - Args: default monitor arguments (see below), plus the following specif ones:
