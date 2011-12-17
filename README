@@ -426,8 +426,8 @@ Monitors have default aliases.
 `BatteryP Dirs Args RefreshRate`
 
 - Aliases to `battery`
-- Dirs: list of directories in `/sys/class/power/` directory where to
-  look for the `state` and `info` files. Example:
+- Dirs: list of directories in `/sys/class/power_supply/` where to
+  look for the `state` and `info` files of each battery. Example:
   `["BAT0","BAT1","BAT2"]`. Only the first 3 directories will be
   searched.
 - Args: default monitor arguments (see below), plus the following specif ones:
@@ -441,9 +441,6 @@ Monitors have default aliases.
     - `-p`: color to display positive power (battery charging)
     - `-f`: file in `/sys/class/power_supply` with AC info (default:
       "AC/online")
-    - `-c`: file in `/sys/class/power/<BAT>/` with full charge
-    information (default: "charge_full"; for instance, olpc systems
-    use "charge_full_design")
 
 - Variables that can be used with the `-t`/`--template` argument:
 	    `left`, `leftbar`, `timeleft`, `watts`, `acstatus`
@@ -456,8 +453,7 @@ Monitors have default aliases.
                        "-L", "10", "-H", "80", "-p", "3",
                        "--", "-O", "<fc=green>On</fc> - ", "-o", "",
                        "-L", "-15", "-H", "-5",
-                       "-l", "red", "-m", "blue", "-h", "green",
-                       "-c", "charge_full_design"]
+                       "-l", "red", "-m", "blue", "-h", "green"]
                       600
   In the above example, the thresholds before the "--" separator
   refer to the `<left>` field, while those after the separator affect

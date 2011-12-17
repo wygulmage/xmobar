@@ -1,10 +1,16 @@
 % xmobar - Release notes
-% Jose A. Ortega Ruiz
 
-## Version 0.14.1 (Dec 11, 2011)
+## Version 0.15
 
-A quick upgrade to 0.14 (which see) with more precise versions for
-build dependencies.
+_Incompatible changes_
+
+  - `Batt` monitor no longer uses `-c` to specify the charge file: it
+    should figure things out by itself.
+
+_Bug fixes_
+
+  - Stricter build dependencies versioning in cabal file.
+  - [issue 64]: display of `watts` in `Batt` monitor fixed.
 
 ## Version 0.14 (Dec 10, 2011)
 
