@@ -209,7 +209,7 @@ createWin d fs c = do
   return (r,win)
 
 -- | Updates the size and position of the window
-repositionWin :: Display -> Window -> XFont -> Config -> IO (Rectangle)
+repositionWin :: Display -> Window -> XFont -> Config -> IO Rectangle
 repositionWin d win fs c = do
   srs     <- getScreenInfo d
   (as,ds) <- textExtents fs "0"
@@ -267,7 +267,7 @@ setProperties r c d w srs = do
   getProcessID >>= changeProperty32 d w p c1 propModeReplace . return . fromIntegral
 
 getRootWindowHeight :: [Rectangle] -> Int
-getRootWindowHeight srs = foldr1 max (map getMaxScreenYCoord srs)
+getRootWindowHeight srs = maximum (map getMaxScreenYCoord srs)
   where
     getMaxScreenYCoord sr = fi (rect_y sr) + fi (rect_height sr)
 
@@ -365,8 +365,7 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
   let (conf,d)             = (config &&& display) r
       Rectangle _ _ wid ht = rect r
       totSLen              = foldr (\(_,_,len) -> (+) len) 0 sl
-      fntsize              = fi (as + ds)
-      valign               = fi ht - 1 - (fi ht - fntsize) `div` 2
+      valign               = (fi ht `div` 2) + (fi (as + ds) `div` 3)
       remWidth             = fi wid - fi totSLen
       offset               = case a of
                                C -> (remWidth + offs) `div` 2
