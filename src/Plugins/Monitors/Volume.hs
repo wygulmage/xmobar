@@ -97,8 +97,9 @@ formatDb opts dbi = do
     h <- getConfigValue highColor
     m <- getConfigValue normalColor
     l <- getConfigValue lowColor
+    d <- getConfigValue decDigits
     let db = fromIntegral dbi / 100.0
-        digits = showDigits 0 db
+        digits = showDigits d db
         startColor | db >= highDbThresh opts = colorHelper h
                    | db < lowDbThresh opts = colorHelper l
                    | otherwise = colorHelper m

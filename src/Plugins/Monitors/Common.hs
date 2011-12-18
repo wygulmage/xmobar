@@ -78,6 +78,7 @@ data MConfig =
        , template    :: IORef String
        , export      :: IORef [String]
        , ppad        :: IORef Int
+       , decDigits   :: IORef Int
        , minWidth    :: IORef Int
        , maxWidth    :: IORef Int
        , padChars    :: IORef String
@@ -120,6 +121,7 @@ mkMConfig tmpl exprts =
        t  <- newIORef tmpl
        e  <- newIORef exprts
        p  <- newIORef 0
+       d  <- newIORef 0
        mn <- newIORef 0
        mx <- newIORef 0
        pc <- newIORef " "
@@ -128,7 +130,7 @@ mkMConfig tmpl exprts =
        bf <- newIORef "#"
        bw <- newIORef 10
        up <- newIORef False
-       return $ MC nc l lc h hc t e p mn mx pc pr bb bf bw up
+       return $ MC nc l lc h hc t e p d mn mx pc pr bb bf bw up
 
 data Opts = HighColor String
           | NormalColor String
@@ -137,6 +139,7 @@ data Opts = HighColor String
           | High String
           | Template String
           | PercentPad String
+          | DecDigits String
           | MinWidth String
           | MaxWidth String
           | Width String
@@ -149,27 +152,27 @@ data Opts = HighColor String
 
 options :: [OptDescr Opts]
 options =
-    [ Option "H"  ["High"]     (ReqArg High "number"               )  "The high threshold"
-    , Option "L"  ["Low"]      (ReqArg Low "number"                )  "The low threshold"
-    , Option "h"  ["high"]     (ReqArg HighColor "color number"    )  "Color for the high threshold: ex \"#FF0000\""
-    , Option "n"  ["normal"]   (ReqArg NormalColor "color number"  )  "Color for the normal threshold: ex \"#00FF00\""
-    , Option "l"  ["low"]      (ReqArg LowColor "color number"     )  "Color for the low threshold: ex \"#0000FF\""
-    , Option "t"  ["template"] (ReqArg Template "output template"  )  "Output template."
-    , Option "S"  ["suffix"]   (ReqArg UseSuffix "True/False"      )  "Use % to display percents or other suffixes."
-    , Option "p"  ["ppad"]     (ReqArg PercentPad "percent padding")  "Minimum percentage width."
-    , Option "m"  ["minwidth"] (ReqArg MinWidth "minimum width"    )  "Minimum field width"
-    , Option "M"  ["maxwidth"] (ReqArg MaxWidth "maximum width"    )  "Maximum field width"
-    , Option "w"  ["width"]    (ReqArg Width "fixed width"         )  "Fixed field width"
-    , Option "c"  ["padchars"] (ReqArg PadChars "padding chars"    )  "Characters to use for padding"
-    , Option "a"  ["align"]    (ReqArg PadAlign "padding alignment")  "'l' for left padding, 'r' for right"
-    , Option "b"  ["bback"]    (ReqArg BarBack "bar background"    )  "Characters used to draw bar backgrounds"
-    , Option "f"  ["bfore"]    (ReqArg BarFore "bar foreground"    )  "Characters used to draw bar foregrounds"
-    , Option "W"  ["bwidth"]   (ReqArg BarWidth "bar width"        )  "Bar width"
+    [
+      Option "H"  ["High"] (ReqArg High "number") "The high threshold"
+    , Option "L"  ["Low"] (ReqArg Low "number") "The low threshold"
+    , Option "h"  ["high"] (ReqArg HighColor "color number") "Color for the high threshold: ex \"#FF0000\""
+    , Option "n"  ["normal"] (ReqArg NormalColor "color number") "Color for the normal threshold: ex \"#00FF00\""
+    , Option "l"  ["low"] (ReqArg LowColor "color number") "Color for the low threshold: ex \"#0000FF\""
+    , Option "t"  ["template"] (ReqArg Template "output template") "Output template."
+    , Option "S"  ["suffix"] (ReqArg UseSuffix "True/False") "Use % to display percents or other suffixes."
+    , Option "d"  ["ddigits"] (ReqArg DecDigits "decimal digits") "Number of decimal digits to display."
+    , Option "p"  ["ppad"] (ReqArg PercentPad "percent padding") "Minimum percentage width."
+    , Option "m"  ["minwidth"] (ReqArg MinWidth "minimum width") "Minimum field width"
+    , Option "M"  ["maxwidth"] (ReqArg MaxWidth "maximum width") "Maximum field width"
+    , Option "w"  ["width"] (ReqArg Width "fixed width") "Fixed field width"
+    , Option "c"  ["padchars"] (ReqArg PadChars "padding chars") "Characters to use for padding"
+    , Option "a"  ["align"] (ReqArg PadAlign "padding alignment") "'l' for left padding, 'r' for right"
+    , Option "b"  ["bback"] (ReqArg BarBack "bar background") "Characters used to draw bar backgrounds"
+    , Option "f"  ["bfore"] (ReqArg BarFore "bar foreground") "Characters used to draw bar foregrounds"
+    , Option "W"  ["bwidth"] (ReqArg BarWidth "bar width") "Bar width"
     ]
 
-doArgs :: [String]
-       -> ([String] -> Monitor String)
-       -> Monitor String
+doArgs :: [String] -> ([String] -> Monitor String) -> Monitor String
 doArgs args action =
     case getOpt Permute options args of
       (o, n, [])   -> do doConfigOptions o
@@ -190,6 +193,7 @@ doConfigOptions (o:oo) =
           LowColor    c -> setConfigValue (Just c) lowColor
           Template    t -> setConfigValue t template
           PercentPad  p -> setConfigValue (nz p) ppad
+          DecDigits   d -> setConfigValue (nz d) decDigits
           MinWidth    w -> setConfigValue (nz w) minWidth
           MaxWidth    w -> setConfigValue (nz w) maxWidth
           Width       w -> setConfigValue (nz w) minWidth >>

@@ -74,7 +74,8 @@ netParser =
 formatNet :: Float -> Monitor (String, String)
 formatNet d = do
     s <- getConfigValue useSuffix
-    let str = if s then (++"Kb/s") . showDigits 1 else showDigits 1
+    dd <- getConfigValue decDigits
+    let str = if s then (++"Kb/s") . showDigits dd else showDigits dd
     b <- showLogBar 0.9 d
     x <- showWithColors str d
     return (x, b)

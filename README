@@ -764,6 +764,10 @@ These are the arguments that can be used for internal commands in the
       in the monitor will be represented using 3 digits.
     - Long option: `--ppad`
     - Default value: 0 (don't pad)
+- `-d` _number_ Decimal digits
+    - Number of digits after the decimal period to use in float values.
+    - Long option: `--ddigits`
+    - Default value: 0 (display only integer part)
 - `-m` _number_ Minimum field width
     - Minimum width, in number of characters, of the fields in the
       monitor template. Values whose printed representation is shorter

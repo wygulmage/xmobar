@@ -151,17 +151,18 @@ runBatt' bfs args = do
   opts <- io $ parseOpts args
   c <- io $ readBatteries opts =<< mapM batteryFiles bfs
   suffix <- getConfigValue useSuffix
+  d <- getConfigValue decDigits
   case c of
     Result x w t s ->
       do l <- fmtPercent x
-         parseTemplate (l ++ s:[fmtTime $ floor t, fmtWatts w opts suffix])
+         parseTemplate (l ++ s:[fmtTime $ floor t, fmtWatts w opts suffix d])
     NA -> return "N/A"
   where fmtPercent :: Float -> Monitor [String]
         fmtPercent x = do
           p <- showPercentWithColors x
           b <- showPercentBar (100 * x) x
           return [b, p]
-        fmtWatts x o s = color x o $ showDigits 1 x ++ (if s then "W" else "")
+        fmtWatts x o s d = color x o $ showDigits d x ++ (if s then "W" else "")
         fmtTime :: Integer -> String
         fmtTime x = hours ++ ":" ++ if length minutes == 2
                                     then minutes else '0' : minutes
@@ -170,6 +171,6 @@ runBatt' bfs args = do
         maybeColor Nothing str = str
         maybeColor (Just c) str = "<fc=" ++ c ++ ">" ++ str ++ "</fc>"
         color x o | x >= 0 = maybeColor (posColor o)
-                  | x >= highThreshold o = maybeColor (highWColor o)
-                  | x >= lowThreshold o = maybeColor (mediumWColor o)
+                  | -x >= highThreshold o = maybeColor (highWColor o)
+                  | -x >= lowThreshold o = maybeColor (mediumWColor o)
                   | otherwise = maybeColor (lowWColor o)

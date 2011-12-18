@@ -42,10 +42,11 @@ parseMEM =
        return [(tot - free) / tot, tot, tot - free, free]
 
 formatSwap :: [Float] -> Monitor [String]
-formatSwap (r:xs) =
-     do other <- mapM (showWithColors (showDigits 2)) xs
-        ratio <- showPercentWithColors r
-        return $ ratio:other
+formatSwap (r:xs) = do
+  d <- getConfigValue decDigits
+  other <- mapM (showWithColors (showDigits d)) xs
+  ratio <- showPercentWithColors r
+  return $ ratio:other
 formatSwap _ = return $ replicate 4 "N/A"
 
 runSwap :: [String] -> Monitor String

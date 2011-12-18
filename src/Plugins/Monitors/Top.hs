@@ -158,7 +158,8 @@ topProcesses tref scale = do
   return (len, nts', mis')
 
 showTimeInfo :: TimeInfo -> Monitor [String]
-showTimeInfo (n, t) = showInfo n (showDigits 0 t) t
+showTimeInfo (n, t) =
+  getConfigValue decDigits >>= \d -> showInfo n (showDigits d t) t
 
 showTimeInfos :: [TimeInfo] -> Monitor [[String]]
 showTimeInfos = mapM showTimeInfo
