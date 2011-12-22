@@ -1115,6 +1115,8 @@ Copyright &copy; 2010-2011 Jose Antonio Ortega Ruiz
 [iwlib]: http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html
 [hinotify]: http://hackage.haskell.org/package/hinotify/
 [libmpd]: http://hackage.haskell.org/package/libmpd/
+[dbus-core]: http://hackage.haskell.org/package/dbus-core
+[text]: http://hackage.haskell.org/package/text
 [sawfish]: http://sawfish.wikia.com/
 [utf8-string]: http://hackage.haskell.org/package/utf8-string/
 [alsa-core]: http://hackage.haskell.org/package/alsa-core
