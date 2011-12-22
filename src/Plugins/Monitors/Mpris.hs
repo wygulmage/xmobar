@@ -44,7 +44,7 @@ instance MprisVersion MprisVersion1 where
     getMetadataReply MprisVersion1 c p = do
         player <- getProxy MprisVersion1 c p
         C.call player "org.freedesktop.MediaPlayer" "GetMetadata" []
-    fieldsList MprisVersion1 = [ "album", "artist", "arturl", "time", "title", "tracknumber" ]
+    fieldsList MprisVersion1 = [ "album", "artist", "arturl", "mtime", "title", "tracknumber" ]
 
 data MprisVersion2 = MprisVersion2
 instance MprisVersion MprisVersion2 where
@@ -116,7 +116,7 @@ makeList version md = map getStr (fieldsList version) where
                             TypeString -> fromVar v
                             TypeInt32 -> let num = fromVar v in
                                           case str of
-                                           "time" -> formatTime num
+                                           "mtime" -> formatTime (num `div` 1000)
                                            "tracknumber" -> printf "%02d" num
                                            "mpris:length" -> formatTime (num `div` 1000000)
                                            "xesam:trackNumber" -> printf "%02d" num
