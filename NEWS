@@ -9,6 +9,7 @@ _Incompatible changes_
 
 _New features_
 
+  - New MPRIS (version 1 and 2) monitor, by Artem Tarasov.
   - New monitor option `-d` to specify the number of decimal places to
     display for float numbers.  Defaults to 0. See [issue 58].
 
