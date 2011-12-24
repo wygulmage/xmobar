@@ -23,7 +23,7 @@ import Foreign.C.String
 import Data.ByteString (useAsCString)
 import Data.ByteString.Char8 (pack)
 
-#if  defined (__FreeBSD__) || defined (__OpenBSD__) ||  defined (__APPLE__)
+#if  defined (__FreeBSD__) || defined (__OpenBSD__) ||  defined (__APPLE__) || defined (__DragonFly__)
 #define IS_BSD_SYSTEM
 #endif
 
