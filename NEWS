@@ -15,8 +15,10 @@ _New features_
 _Bug fixes_
 
   - Stricter build dependencies versioning in cabal file.
+  - [issue 56]: vertical alignment of text improved.
   - [issue 64]: display of `watts` in `Batt` monitor fixed.
 
+[issue 56]: http://code.google.com/p/xmobar/issues/detail?id=56
 [issue 58]: http://code.google.com/p/xmobar/issues/detail?id=58
 [issue 64]: http://code.google.com/p/xmobar/issues/detail?id=64
 
