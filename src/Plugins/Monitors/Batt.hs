@@ -123,9 +123,9 @@ readBattery files =
     do a <- grab $ fFull files
        b <- grab $ fNow files
        d <- grab $ fCurrent files
-       return $ Battery (3600 * a / 1e5) -- wattseconds
-                        (3600 * b / 1e5) -- wattseconds
-                        (d / 1e5) -- watts
+       return $ Battery (3600 * a / 1e6) -- wattseconds
+                        (3600 * b / 1e6) -- wattseconds
+                        (d / 1e6) -- watts
     where grab f = handle onError $ withFile f ReadMode (fmap read . hGetLine)
           onError = const (return (-1)) :: SomeException -> IO Float
 
