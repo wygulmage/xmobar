@@ -18,10 +18,12 @@ _Bug fixes_
   - Stricter build dependencies versioning in cabal file.
   - [issue 56]: vertical alignment of text improved.
   - [issue 64]: display of `watts` in `Batt` monitor fixed.
+  - [issue 67]: compilation in DragonFly.
 
 [issue 56]: http://code.google.com/p/xmobar/issues/detail?id=56
 [issue 58]: http://code.google.com/p/xmobar/issues/detail?id=58
 [issue 64]: http://code.google.com/p/xmobar/issues/detail?id=64
+[issue 67]: http://code.google.com/p/xmobar/issues/detail?id=67
 
 ## Version 0.14 (Dec 10, 2011)
 
