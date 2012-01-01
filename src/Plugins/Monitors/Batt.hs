@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Batt
--- Copyright   :  (c) 2010, 2011 Jose A Ortega
+-- Copyright   :  (c) 2010, 2011, 2012 Jose A Ortega
 --                (c) 2010 Andrea Rossato, Petr Rockai
 -- License     :  BSD-style (see LICENSE)
 --
@@ -32,6 +32,7 @@ data BattOpts = BattOpts
   , lowThreshold :: Float
   , highThreshold :: Float
   , onlineFile :: FilePath
+  , scale :: Float
   }
 
 defaultOpts :: BattOpts
@@ -45,6 +46,7 @@ defaultOpts = BattOpts
   , lowThreshold = -12
   , highThreshold = -10
   , onlineFile = "AC/online"
+  , scale = 1e6
   }
 
 options :: [OptDescr (BattOpts -> BattOpts)]
@@ -58,6 +60,7 @@ options =
   , Option "L" ["lowt"] (ReqArg (\x o -> o { lowThreshold = read x }) "") ""
   , Option "H" ["hight"] (ReqArg (\x o -> o { highThreshold = read x }) "") ""
   , Option "f" ["online"] (ReqArg (\x o -> o { onlineFile = x }) "") ""
+  , Option "s" ["scale"] (ReqArg (\x o -> o {scale = read x}) "") ""
   ]
 
 parseOpts :: [String] -> IO BattOpts
@@ -117,21 +120,21 @@ haveAc f =
   handle onError $ withFile (sysDir </> f) ReadMode (fmap (== "1") . hGetLine)
   where onError = const (return False) :: SomeException -> IO Bool
 
-readBattery :: Files -> IO Battery
-readBattery NoFiles = return $ Battery 0 0 0
-readBattery files =
+readBattery :: Float -> Files -> IO Battery
+readBattery _ NoFiles = return $ Battery 0 0 0
+readBattery sc files =
     do a <- grab $ fFull files
        b <- grab $ fNow files
        d <- grab $ fCurrent files
-       return $ Battery (3600 * a / 1e6) -- wattseconds
-                        (3600 * b / 1e6) -- wattseconds
-                        (d / 1e6) -- watts
+       return $ Battery (3600 * a / sc) -- wattseconds
+                        (3600 * b / sc) -- wattseconds
+                        (d / sc) -- watts
     where grab f = handle onError $ withFile f ReadMode (fmap read . hGetLine)
           onError = const (return (-1)) :: SomeException -> IO Float
 
 readBatteries :: BattOpts -> [Files] -> IO Result
 readBatteries opts bfs =
-    do bats <- mapM readBattery (take 3 bfs)
+    do bats <- mapM (readBattery (scale opts)) (take 3 bfs)
        ac <- haveAc (onlineFile opts)
        let sign = if ac then 1 else -1
            ft = sum (map full bats)
