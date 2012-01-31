@@ -20,6 +20,8 @@ _Bug fixes_
   - [issue 56]: vertical alignment of text improved.
   - [issue 64]: display of `watts` in `Batt` monitor fixed.
   - [issue 67]: compilation in DragonFly.
+  - DiskIO works also when device path in mtab are symbolic links
+    to the real device file.
 
 [issue 56]: http://code.google.com/p/xmobar/issues/detail?id=56
 [issue 58]: http://code.google.com/p/xmobar/issues/detail?id=58

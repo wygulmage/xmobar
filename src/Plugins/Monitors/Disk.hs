@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Disk
--- Copyright   :  (c) 2010, 2011 Jose A Ortega Ruiz
+-- Copyright   :  (c) 2010, 2011, 2012 Jose A Ortega Ruiz
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A Ortega Ruiz <jao@gnu.org>
@@ -21,7 +21,8 @@ import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 
 import Control.Monad (zipWithM)
 import qualified Data.ByteString.Lazy.Char8 as B
-import Data.List (isPrefixOf, find, intercalate)
+import Data.List (isPrefixOf, find)
+import System.Directory (canonicalizePath)
 
 diskIOConfig :: IO MConfig
 diskIOConfig = mkMConfig "" ["total", "read", "write",
@@ -38,13 +39,15 @@ type DevDataRef = IORef [(DevName, [Float])]
 mountedDevices :: [String] -> IO [(DevName, Path)]
 mountedDevices req = do
   s <- B.readFile "/etc/mtab"
-  return (parse s)
+  parse `fmap` mapM canon (devs s)
   where
-    parse = map undev . filter isDev . map (firstTwo . B.words) . B.lines
+    canon (d, p) = do {d' <- canonicalizePath d; return (d', p)}
+    devs =  filter isDev . map (firstTwo . B.words) . B.lines
+    parse = map undev . filter isReq
     firstTwo (a:b:_) = (B.unpack a, B.unpack b)
     firstTwo _ = ("", "")
-    isDev (d, p) = "/dev/" `isPrefixOf` d &&
-                   (p `elem` req || drop 5 d `elem` req)
+    isDev (d, _) = "/dev/" `isPrefixOf` d
+    isReq (d, p) = p `elem` req || drop 5 d `elem` req
     undev (d, f) = (drop 5 d, f)
 
 diskData :: IO [(DevName, [Float])]
@@ -118,7 +121,7 @@ runDiskIO dref disks _ = do
   mounted <- io $ mountedDevices (map fst disks)
   dat <- io $ mountedData dref (map fst mounted)
   strs <- mapM runDiskIO' $ devTemplates disks mounted dat
-  return $ intercalate " " strs
+  return $ unwords strs
 
 startDiskIO :: [(String, String)] ->
                [String] -> Int -> (String -> IO ()) -> IO ()
@@ -145,4 +148,4 @@ runDiskU :: [(String, String)] -> [String] -> Monitor String
 runDiskU disks _ = do
   devs <- io $ mountedDevices (map fst disks)
   strs <- mapM (\(d, p) -> runDiskU' (findTempl d p disks) p) devs
-  return $ intercalate " " strs
+  return $ unwords strs
