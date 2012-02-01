@@ -27,7 +27,8 @@ runWireless (iface:_) = do
   let essid = wiEssid wi
       qlty = fromIntegral $ wiQuality wi
       e = if essid == "" then "N/A" else essid
+  ep <- showWithPadding e
   q <- if qlty >= 0 then showPercentWithColors (qlty/100) else showWithPadding ""
   qb <- showPercentBar qlty (qlty / 100)
-  parseTemplate [e, q, qb]
+  parseTemplate [ep, q, qb]
 runWireless _ = return ""

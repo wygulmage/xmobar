@@ -10,7 +10,7 @@ _Incompatible changes_
 _New features_
 
   - Dependency on GHC's threaded runtime has been eliminated.
-  - New MPRIS (version 1 and 2) monitor, by Artem Tarasov.
+  - New MPRIS (versions 1 and 2) monitor, by Artem Tarasov.
   - New monitor option `-d` to specify the number of decimal places to
     display for float numbers.  Defaults to 0. See [issue 58].
 
@@ -22,6 +22,7 @@ _Bug fixes_
   - [issue 67]: compilation in DragonFly.
   - DiskIO works also when device path in mtab are symbolic links
     to the real device file.
+  - Wireless monitor honours padding settings for ESSID names.
 
 [issue 56]: http://code.google.com/p/xmobar/issues/detail?id=56
 [issue 58]: http://code.google.com/p/xmobar/issues/detail?id=58
