@@ -102,5 +102,5 @@ showTime t = int2str minutes ++ ":" ++ int2str seconds
   where minutes = t `div` 60
         seconds = t `mod` 60
 
-int2str :: (Num a, Ord a) => a -> String
+int2str :: (Show a, Num a, Ord a) => a -> String
 int2str x = if x < 10 then '0':sx else sx where sx = show x
