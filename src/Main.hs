@@ -172,6 +172,6 @@ doOpts conf (o:oo) =
     where readCom c str =
               case readStr str of
                 [x] -> Right x
-                _   -> Left "xmobar: cannot read list of commands specified with the -" ++ c:" option\n"
+                _   -> Left ("xmobar: cannot read list of commands specified with the -" ++ c:" option\n")
           readStr str =
               [x | (x,t) <- reads str, ("","") <- lex t]
