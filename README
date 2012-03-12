@@ -706,6 +706,10 @@ Monitors have default aliases.
 
 [samples/xmonadpropwrite.hs script]: https://github.com/jaor/xmobar/raw/master/samples/xmonadpropwrite.hs
 
+`NamedXPropertyLog PropName Alias`
+
+- Same as XPropertyLog, but a custom alias can be specified.
+
 `Brightness Args RefreshRate`
 
 - Aliases to `bright`
