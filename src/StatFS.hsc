@@ -58,7 +58,7 @@ foreign import ccall unsafe "sys/vfs.h statfs64"
 #endif
   c_statfs :: CString -> Ptr CStatfs -> IO CInt
 
-toI :: CLong -> Integer
+toI :: CULong -> Integer
 toI = toInteger
 
 getFileSystemStats :: String -> IO (Maybe FileSystemStats)
