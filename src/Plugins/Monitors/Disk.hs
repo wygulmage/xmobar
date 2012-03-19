@@ -83,8 +83,7 @@ fsStats path = do
     Nothing -> return [-1, -1, -1]
     Just f -> let tot = fsStatByteCount f
                   free = fsStatBytesAvailable f
-                  used = fsStatBytesUsed f
-              in return [tot, free, used]
+              in return [tot, free, (tot - free)]
 
 speedToStr :: Float -> String
 speedToStr = showWithUnits 2 1
