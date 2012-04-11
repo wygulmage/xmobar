@@ -5,10 +5,12 @@
 _Incompatible changes_
 
   - `Batt` monitor no longer uses `-c` to specify the charge file: it
-    should figure things out by itself.
+    should figure things out by itself (cf. [issue 69]).
 
 _New features_
 
+  - New command line option, `-C`, that allows *adding* commands to
+    those specified in the configuration file (Ben Boeckel).
   - Dependency on GHC's threaded runtime has been eliminated.
   - New MPRIS (versions 1 and 2) monitor, by Artem Tarasov.
   - New monitor option `-d` to specify the number of decimal places to
@@ -19,6 +21,7 @@ _Bug fixes_
   - Stricter build dependencies versioning in cabal file.
   - [issue 56]: vertical alignment of text improved.
   - [issue 64]: display of `watts` in `Batt` monitor fixed.
+  - [issue 69]: miscellaneous battery reporting issues.
   - [issue 67]: compilation in DragonFly.
   - DiskIO works also when device path in mtab are symbolic links
     to the real device file.
@@ -28,6 +31,7 @@ _Bug fixes_
 [issue 58]: http://code.google.com/p/xmobar/issues/detail?id=58
 [issue 64]: http://code.google.com/p/xmobar/issues/detail?id=64
 [issue 67]: http://code.google.com/p/xmobar/issues/detail?id=67
+[issue 69]: http://code.google.com/p/xmobar/issues/detail?id=69
 
 ## Version 0.14 (Dec 10, 2011)
 
