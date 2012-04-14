@@ -106,7 +106,7 @@ printNet nd =
                      (tx, tb) <- formatNet t
                      parseTemplate [d,rx,tx,rb,tb]
             Down -> return ""
-         NA -> return "N/A"
+         NA -> return ""
 
 parseNet :: NetDevRef -> String -> IO NetDev
 parseNet nref nd = do
