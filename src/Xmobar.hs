@@ -43,7 +43,6 @@ import Control.Exception hiding (handle)
 import Data.Bits
 import Data.Maybe(fromMaybe)
 import Data.Typeable (Typeable)
-import Foreign
 import System.Posix.Process (getProcessID)
 import System.Posix.Signals
 
