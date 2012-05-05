@@ -26,12 +26,14 @@ _Bug fixes_
   - DiskIO works also when device path in mtab are symbolic links
     to the real device file.
   - Wireless monitor honours padding settings for ESSID names.
+  - CoreTemp monitor fixed for newer kernels ([github #38]).
 
 [issue 56]: http://code.google.com/p/xmobar/issues/detail?id=56
 [issue 58]: http://code.google.com/p/xmobar/issues/detail?id=58
 [issue 64]: http://code.google.com/p/xmobar/issues/detail?id=64
 [issue 67]: http://code.google.com/p/xmobar/issues/detail?id=67
 [issue 69]: http://code.google.com/p/xmobar/issues/detail?id=69
+[github #38]: https://github.com/jaor/xmobar/issues/38
 
 ## Version 0.14 (Dec 10, 2011)
 
