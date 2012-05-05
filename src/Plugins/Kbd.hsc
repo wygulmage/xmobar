@@ -18,7 +18,7 @@ module Plugins.Kbd where
 import Graphics.X11.Xlib
 import Graphics.X11.Xlib.Extras
 import Foreign
-import Foreign.C.Types (CUInt,CULong,CInt,CUShort,CChar,CUChar)
+import Foreign.C.Types
 import Foreign.C.String
 import Plugins
 import Control.Monad (forever)
@@ -30,7 +30,7 @@ import Data.Maybe (fromJust)
 #include <X11/extensions/XKB.h>
 #include <X11/extensions/XKBstr.h>
 
--- 
+--
 -- Definition for XkbStaceRec and getKbdLayout taken from
 -- XMonad.Layout.XKBLayout
 --
@@ -110,7 +110,7 @@ data XkbKeyNameRec = XkbKeyNameRec {
 data XkbKeyAliasRec = XkbKeyAliasRec {
 	real  :: Ptr CChar, -- array
 	t_alias :: Ptr CChar  -- array
-} 
+}
 
 --
 -- the t_ before geometry is just because of name collisions
@@ -182,14 +182,14 @@ instance Storable XkbNamesRec where
         r_geometry <- (#peek XkbNamesRec, geometry) ptr
         r_symbols <- (#peek XkbNamesRec, symbols ) ptr
         r_types <- (#peek XkbNamesRec, types ) ptr
-        r_compat <- (#peek XkbNamesRec, compat ) ptr  
+        r_compat <- (#peek XkbNamesRec, compat ) ptr
         r_vmods <- (#peek XkbNamesRec,  vmods ) ptr
-        r_indicators <- (#peek XkbNamesRec, indicators ) ptr  
-        r_groups <- (#peek XkbNamesRec, groups ) ptr 
-        r_keys <- (#peek XkbNamesRec, keys ) ptr   
+        r_indicators <- (#peek XkbNamesRec, indicators ) ptr
+        r_groups <- (#peek XkbNamesRec, groups ) ptr
+        r_keys <- (#peek XkbNamesRec, keys ) ptr
         r_key_aliases <- (#peek XkbNamesRec, key_aliases  ) ptr
-        r_radio_groups <- (#peek XkbNamesRec, radio_groups  ) ptr 
-        r_phys_symbols <- (#peek XkbNamesRec, phys_symbols ) ptr  
+        r_radio_groups <- (#peek XkbNamesRec, radio_groups  ) ptr
+        r_phys_symbols <- (#peek XkbNamesRec, phys_symbols ) ptr
         r_num_keys <- (#peek XkbNamesRec,num_keys  ) ptr
         r_num_key_aliases <- (#peek XkbNamesRec, num_key_aliases  ) ptr
         r_num_rg <- (#peek XkbNamesRec, num_rg ) ptr
@@ -330,7 +330,7 @@ noLaySymbols = ["group", "inet", "ctr", "pc", "ctrl"]
 
 -- splits the layout string into the actual layouts
 splitLayout :: String -> [String]
-splitLayout s = splitLayout' noLaySymbols $ split s '+' 
+splitLayout s = splitLayout' noLaySymbols $ split s '+'
 
 splitLayout' :: [String] ->  [String] -> [String]
 --                  end of recursion, remove empty strings
@@ -349,7 +349,7 @@ split (c:cs) delim
 
 -- replaces input string if on search list (exact match) with corresponding
 -- element on replacement list.
--- 
+--
 -- if not found, return string unchanged
 searchReplaceLayout :: KbdOpts -> String -> String
 searchReplaceLayout opts s = let c = findIndex (\x -> fst x == s) opts in
@@ -394,4 +394,3 @@ instance Exec Kbd where
         return ()
 
 -- vim:ft=haskell:ts=4:shiftwidth=4:softtabstop=4:expandtab:foldlevel=20:
-
