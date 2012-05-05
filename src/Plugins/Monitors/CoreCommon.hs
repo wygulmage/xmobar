@@ -25,19 +25,10 @@ import Data.Maybe
 import Plugins.Monitors.Common
 import System.Directory
 
-#ifdef GHC6
-import Control.Monad.Reader
-
-instance (Monad f, Applicative f) => Applicative (ReaderT r f) where
-    pure a = ReaderT $ const (pure a)
-    f <*> a = ReaderT $ \r -> 
-              ((runReaderT f r) <*> (runReaderT a r))
-#endif
-
 checkedDataRetrieval :: (Ord a, Num a)
                      => String -> [String] -> Maybe (String, String -> Int)
                      -> (Double -> a) -> (a -> String) -> Monitor String
-checkedDataRetrieval msg path lbl trans fmt = liftM (maybe msg id) $
+checkedDataRetrieval msg path lbl trans fmt = liftM (fromMaybe msg) $
                                               retrieveData path lbl trans fmt
 
 retrieveData :: (Ord a, Num a)
