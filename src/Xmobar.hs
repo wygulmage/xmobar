@@ -82,8 +82,10 @@ startLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> IO ()
 startLoop xcfg@(XConf _ _ w _ _) vs = do
     tv <- atomically $ newTVar []
     sig <- setupSignalHandler
-    _ <- forkIO (checker tv [] vs sig `catch` \(SomeException _) -> putStrLn "Thread checker failed" >> return ())
-    _ <- forkIO (eventer sig `catch` \(SomeException _) -> putStrLn "Thread eventer failed" >> return ())
+    _ <- forkIO (checker tv [] vs sig `catch`
+                   \(SomeException _) -> void (putStrLn "Thread checker failed"))
+    _ <- forkIO (eventer sig `catch`
+                   \(SomeException _) -> void (putStrLn "Thread eventer failed"))
     eventLoop tv xcfg sig
   where
     -- Reacts on events from X
@@ -104,7 +106,11 @@ startLoop xcfg@(XConf _ _ w _ _) vs = do
             _ -> return ()
 
 -- | Send signal to eventLoop every time a var is updated
-checker :: TVar [String] -> [String] -> [[(Maybe ThreadId, TVar String)]] -> MVar SignalType -> IO ()
+checker :: TVar [String]
+           -> [String]
+           -> [[(Maybe ThreadId, TVar String)]]
+           -> MVar SignalType
+           -> IO ()
 checker tvar ov vs signal = do
       nval <- atomically $ do
               nv <- mapM concatV vs
@@ -233,7 +239,7 @@ setPosition p rs ht =
     ax L     = const rx
     ax R     = right
     ax C     = center
-    pw i     = rw * (min 100 i) `div` 100
+    pw i     = rw * min 100 i `div` 100
     nw       = fi . pw . fi
     h        = fi ht
     mh h'    = max (fi h') h
@@ -273,7 +279,7 @@ getStrutValues r@(Rectangle x y w h) p rwh =
     Bottom          -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
     BottomW _ _     -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
     BottomSize   {} -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
-    Static _ _ _ _  -> getStaticStrutValues p rwh
+    Static       {} -> getStaticStrutValues p rwh
     where st = fi y + fi h
           sb = rwh - fi y
           nx = fi x
