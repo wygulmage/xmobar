@@ -29,7 +29,7 @@ import Data.Int ( Int32, Int64 )
 import System.IO.Unsafe (unsafePerformIO)
 import qualified Data.Text as T
 
-import Control.Exception (try, evaluate)
+import Control.Exception (try)
 
 class MprisVersion a where
     getProxy :: a -> C.Client -> String -> IO C.Proxy
@@ -53,9 +53,9 @@ instance MprisVersion MprisVersion2 where
         C.proxy c (C.busName_ playerBusName) "/org/mpris/MediaPlayer2"
     getMetadataReply MprisVersion2 c p = do
         player <- getProxy MprisVersion2 c p
-        C.call player "org.freedesktop.DBus.Properties" 
-                      "Get" 
-                      (map (toVariant::String -> Variant) 
+        C.call player "org.freedesktop.DBus.Properties"
+                      "Get"
+                      (map (toVariant::String -> Variant)
                            ["org.mpris.MediaPlayer2.Player", "Metadata"]
                       )
     fieldsList MprisVersion2 = [ "xesam:album", "xesam:artist", "mpris:artUrl"
@@ -64,7 +64,7 @@ instance MprisVersion MprisVersion2 where
 
 mprisConfig :: IO MConfig
 mprisConfig = mkMConfig "<artist> - <title>"
-                [ "album", "artist", "arturl", "length" , "title", "tracknumber" 
+                [ "album", "artist", "arturl", "length" , "title", "tracknumber"
                 ]
 
 dbusClient :: C.Client
@@ -88,7 +88,7 @@ fromVar = fromJust . fromVariant
 
 unpackMetadata :: [Variant] -> [(String, Variant)]
 unpackMetadata [] = []
-unpackMetadata xs = ((map (\(k, v) -> (fromVar k, fromVar v))) . unpack . head) xs where 
+unpackMetadata xs = ((map (\(k, v) -> (fromVar k, fromVar v))) . unpack . head) xs where
                       unpack v = case variantType v of
                             TypeDictionary _ _ -> dictionaryItems $ fromVar v
                             TypeVariant -> unpack $ fromVar v
@@ -99,12 +99,12 @@ getMetadata :: (MprisVersion a) => a -> C.Client -> String -> IO [(String, Varia
 getMetadata version client player = do
     reply <- try (getMetadataReply version client player) ::
                             IO (Either ConnectionError [Variant])
-    return $ case reply of 
-                  Right metadata -> unpackMetadata metadata; 
+    return $ case reply of
+                  Right metadata -> unpackMetadata metadata;
                   Left _ -> []
 
 makeList :: (MprisVersion a) => a -> [(String, Variant)] -> [String]
-makeList version md = map getStr (fieldsList version) where 
+makeList version md = map getStr (fieldsList version) where
             formatTime n = (if hh == 0 then printf "%02d:%02d"
                                        else printf "%d:%02d:%02d" hh) mm ss
                            where hh = (n `div` 60) `div` 60
