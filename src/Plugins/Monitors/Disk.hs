@@ -19,6 +19,7 @@ import StatFS
 
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 
+import Control.Exception (SomeException, handle)
 import Control.Monad (zipWithM)
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.List (isPrefixOf, find)
@@ -80,10 +81,10 @@ fsStats :: String -> IO [Integer]
 fsStats path = do
   stats <- getFileSystemStats path
   case stats of
-    Nothing -> return [-1, -1, -1]
+    Nothing -> return [0, 0, 0]
     Just f -> let tot = fsStatByteCount f
                   free = fsStatBytesAvailable f
-              in return [tot, free, (tot - free)]
+              in return [tot, free, tot - free]
 
 speedToStr :: Float -> String
 speedToStr = showWithUnits 2 1
@@ -133,15 +134,17 @@ startDiskIO disks args rate cb = do
 runDiskU' :: String -> String -> Monitor String
 runDiskU' tmp path = do
   setConfigValue tmp template
-  fstats <- io $ fsStats path
-  let strs = map sizeToStr fstats
-      freep = (fstats !! 1) * 100 `div` head fstats
+  [total, free, diff] <-  io (handle ign $ fsStats path)
+  let strs = map sizeToStr [total, free, diff]
+      freep = if total > 0 then free * 100 `div` total else 0
       fr = fromIntegral freep / 100
   s <- zipWithM showWithColors' strs [100, freep, 100 - freep]
   sp <- showPercentsWithColors [fr, 1 - fr]
   fb <- showPercentBar (fromIntegral freep) fr
   ub <- showPercentBar (fromIntegral $ 100 - freep) (1 - fr)
   parseTemplate $ s ++ sp ++ [fb, ub]
+  where ign = const (return [0, 0, 0]) :: SomeException -> IO [Integer]
+
 
 runDiskU :: [(String, String)] -> [String] -> Monitor String
 runDiskU disks _ = do
