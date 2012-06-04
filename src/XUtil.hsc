@@ -2,10 +2,11 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  XUtil
--- Copyright   :  (C) 2007, 2011 Andrea Rossato
+-- Copyright   :  (C) 2007 Andrea Rossato
+--                (C) 2011, 2012 Jose Antonio Ortega Ruiz
 -- License     :  BSD3
 --
--- Maintainer  :  andrea.rossato@unitn.it
+-- Maintainer  :  jao@gnu.org
 -- Stability   :  unstable
 -- Portability :  unportable
 --
@@ -34,7 +35,7 @@ import Control.Concurrent
 import Control.Monad.Trans
 import Data.IORef
 import Foreign
-import Foreign.C.Types
+-- import Foreign.C.Types
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import qualified Graphics.X11.Xlib as Xlib (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras

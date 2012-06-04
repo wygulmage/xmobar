@@ -65,6 +65,10 @@ flag with_mpris
   description: MPRIS v1, v2 support
   default: False
 
+flag with_threaded
+  description: Use threaded runtime
+  default: False
+
 executable xmobar
     hs-source-dirs:     src
     main-is:            Main.hs
@@ -89,9 +93,12 @@ executable xmobar
        ghc-options: -funbox-strict-fields -Wall
        extra-libraries: Xrandr
 
-    -- Use --disable-optimization configure flag
-    -- if impl (ghc == 6.10.1) && arch (x86_64)
-    --    ghc-options: -O0
+    if flag(with_threaded)
+       -- -threaded is a workaround 100% CPU busy loop
+       -- (http://hackage.haskell.org/trac/ghc/ticket/4934)
+       -- See also comments in https://github.com/jaor/xmobar/pull/36
+       ghc-options: -threaded
+       cpp-options: -DTHREADED_RUNTIME
 
     if impl (ghc >= 6.12.1)
        ghc-options: -fno-warn-unused-do-bind

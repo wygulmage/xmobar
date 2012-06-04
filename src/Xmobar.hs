@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveDataTypeable, CPP #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Xmobar
@@ -84,7 +84,11 @@ startLoop xcfg@(XConf _ _ w _ _) vs = do
     sig <- setupSignalHandler
     _ <- forkIO (checker tv [] vs sig `catch`
                    \(SomeException _) -> void (putStrLn "Thread checker failed"))
+#ifdef THREADED_RUNTIME
+    _ <- forkOS (eventer sig `catch`
+#else
     _ <- forkIO (eventer sig `catch`
+#endif
                    \(SomeException _) -> void (putStrLn "Thread eventer failed"))
     eventLoop tv xcfg sig
   where
@@ -97,7 +101,11 @@ startLoop xcfg@(XConf _ _ w _ _) vs = do
         selectInput       dpy w (exposureMask .|. structureNotifyMask)
 
         forever $ do
+#ifdef THREADED_RUNTIME
+          nextEvent dpy e
+#else
           nextEvent' dpy e
+#endif
           ev <- getEvent e
           case ev of
             ConfigureEvent {} -> putMVar signal Reposition
