@@ -100,6 +100,10 @@ Extensions need additional libraries (listed below) that will be
 automatically downloaded and installed if you're using cabal install.
 Otherwise, you'll need to install them yourself.
 
+`with_threaded`
+:    Uses GHC's threaded runtime.  Use this option if xmobar enters a
+     high-CPU regime right after starting.
+
 `with_utf8`
 :    UTF-8 support. Requires the [utf8-string] package.
 
@@ -340,7 +344,7 @@ installed by default.
 Each monitor has an `alias` to be used in the output template.
 Monitors have default aliases.
 
-`Uptime Args RefreshRate`
+### `Uptime Args RefreshRate`
 
 - Aliases to `uptime`
 - Args: default monitor arguments (see below). The low and high
@@ -351,7 +355,7 @@ Monitors have default aliases.
   to add units to the display of those numeric fields.
 - Default template: `Up: <days>d <hours>h <minutes>m`
 
-`Weather StationID Args RefreshRate`
+### `Weather StationID Args RefreshRate`
 
 - Aliases to the Station ID: so `Weather "LIPB" []` can be used in template as `%LIPB%`
 - Args: default monitor arguments (see below)
@@ -363,7 +367,7 @@ Monitors have default aliases.
 - Requires `curl` in the `$PATH` to retrieve weather information from
   `http://weather.noaa.gov`
 
-`Network Interface Args RefreshRate`
+### `Network Interface Args RefreshRate`
 
 - Aliases to the interface name: so `Network "eth0" []` can be used as
   `%eth0%`
@@ -375,7 +379,7 @@ Monitors have default aliases.
   string "Kb/s").
 - Default template: `<dev>: <rx>KB|<tx>KB`
 
-`Wireless Interface Args RefreshRate`
+### `Wireless Interface Args RefreshRate`
 
 - Aliases to the interface name with the suffix "wi": thus, `Wirelss
   "wlan0" []` can be used as `%wlan0wi%`
@@ -387,7 +391,7 @@ Monitors have default aliases.
   installed in your system. In addition, to activate this plugin you
   must pass `--flags="with_iwlib"` during compilation.
 
-`Memory Args RefreshRate`
+### `Memory Args RefreshRate`
 
 - Aliases to `memory`
 - Args: default monitor arguments (see below)
@@ -396,7 +400,7 @@ Monitors have default aliases.
              `usedratio`, `usedbar`, `freebar`
 - Default template: `Mem: <usedratio>% (<cache>M)`
 
-`Swap Args RefreshRate`
+### `Swap Args RefreshRate`
 
 - Aliases to `swap`
 - Args: default monitor arguments (see below)
@@ -404,7 +408,7 @@ Monitors have default aliases.
 	    `total`, `used`, `free`, `usedratio`
 - Default template: `Swap: <usedratio>%`
 
-`Cpu Args RefreshRate`
+### `Cpu Args RefreshRate`
 
 - Aliases to `cpu`
 - Args: default monitor arguments (see below)
@@ -412,7 +416,7 @@ Monitors have default aliases.
 	    `total`, `bar`, `user`, `nice`, `system`, `idle`, `iowait`
 - Default template: `Cpu: <total>%`
 
-`MultiCpu Args RefreshRate`
+### `MultiCpu Args RefreshRate`
 
 - Aliases to `multicpu`
 - Args: default monitor arguments (see below)
@@ -425,11 +429,11 @@ Monitors have default aliases.
   and display one entry for each.
 - Default template: `Cpu: <total>%`
 
-`Battery Args RefreshRate`
+### `Battery Args RefreshRate`
 
 - Same as `BatteryP ["BAT0", "BAT1", "BAT2"] Args RefreshRate`.
 
-`BatteryP Dirs Args RefreshRate`
+### `BatteryP Dirs Args RefreshRate`
 
 - Aliases to `battery`
 - Dirs: list of directories in `/sys/class/power_supply/` where to
@@ -465,7 +469,7 @@ Monitors have default aliases.
   refer to the `<left>` field, while those after the separator affect
   how `<watts>` is displayed.
 
-`TopProc Args RefreshRate`
+### `TopProc Args RefreshRate`
 
 - Aliases to `top`
 - Args: default monitor arguments (see below). The low and high
@@ -482,7 +486,7 @@ Monitors have default aliases.
   maximum and/or minimum width, using the `-m`/`-M` arguments. `no` gives
   the total number of processes.
 
-`TopMem Args RefreshRate`
+### `TopMem Args RefreshRate`
 
 - Aliases to `topmem`
 - Args: default monitor arguments (see below). The low and high
@@ -495,7 +499,7 @@ Monitors have default aliases.
   processes (`bothn` displays both, and is useful to specify an
   overall maximum and/or minimum width, using the `-m`/`-M` arguments.
 
-`DiskU Disks Args RefreshRate`
+### `DiskU Disks Args RefreshRate`
 
 - Aliases to `disku`
 - Disks: list of pairs of the form (device or mount point, template),
@@ -510,7 +514,7 @@ Monitors have default aliases.
                ["-L", "20", "-H", "50", "-m", "1", "-p", "3",]
                20
 
-`DiskIO Disks Args RefreshRate`
+### `DiskIO Disks Args RefreshRate`
 
 - Aliases to `diskio`
 - Disks: list of pairs of the form (device or mount point, template),
@@ -522,7 +526,7 @@ Monitors have default aliases.
 
          Disks [("/", "<read> <write>"), ("sdb1", "<total>")] [] 10
 
-`ThermalZone Number Args RefreshRate`
+### `ThermalZone Number Args RefreshRate`
 
 - Aliases to "thermaln": so `ThermalZone 0 []` can be used in template
   as `%thermal0%`
@@ -538,7 +542,7 @@ Monitors have default aliases.
 
          Run ThermalZone 0 ["-t","<id>: <temp>C"] 30
 
-`Thermal Zone Args RefreshRate`
+#### `Thermal Zone Args RefreshRate`
 
 - **This plugin is deprecated. Use `ThermalZone` instead.**
 
@@ -554,7 +558,7 @@ Monitors have default aliases.
 
          Run Thermal "THRM" ["-t","iwl4965-temp: <temp>C"] 50
 
-`CpuFreq Args RefreshRate`
+### `CpuFreq Args RefreshRate`
 
 - Aliases to `cpufreq`
 - Args: default monitor arguments (see below)
@@ -567,7 +571,7 @@ Monitors have default aliases.
          Run CpuFreq ["-t", "Freq:<cpu0>|<cpu1>GHz", "-L", "0", "-H", "2",
                       "-l", "lightblue", "-n","white", "-h", "red"] 50
 
-`CoreTemp Args RefreshRate`
+### `CoreTemp Args RefreshRate`
 
 - Aliases to `coretemp`
 - Args: default monitor arguments (see below)
@@ -581,7 +585,7 @@ Monitors have default aliases.
                        "-L", "40", "-H", "60",
                        "-l", "lightblue", "-n", "gray90", "-h", "red"] 50
 
-`Volume Mixer Element Args RefreshRate`
+### `Volume Mixer Element Args RefreshRate`
 
 - Aliases to the mixer name and element name separated by a colon. Thus,
   `Volume "default" "Master" [] 10` can be used as `%default:Master%`.
@@ -613,7 +617,7 @@ Monitors have default aliases.
   system. In addition, to activate this plugin you must pass
   `--flags="with_alsa"` during compilation.
 
-`MPD Args RefreshRate`
+### `MPD Args RefreshRate`
 
 - This monitor will only be compiled if you ask for it using the
   `with_mpd` flag. It needs [libmpd] 5.0 or later (available on Hackage).
@@ -637,7 +641,8 @@ Monitors have default aliases.
                   "<composer> <title> (<album>) <track>/<plength> <statei> ",
                   "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
 
-`Mpris1 PlayerName Args RefreshRate`
+### `Mpris1 PlayerName Args RefreshRate`
+
 - Aliases to `mpris1`
 - Requires [dbus-core] and [text] packages.
   To activate, pass `--flags="with_mpris"` during compilation.
@@ -651,11 +656,12 @@ Monitors have default aliases.
          Run Mpris1 "clementine" ["-t",
                                   "<artist> - [<tracknumber>] <title>"] 10
 
-`Mpris2 PlayerName Args RefreshRate`
+### `Mpris2 PlayerName Args RefreshRate`
+
 - Just like Mpris1.
   Supposed to be used with mediaplayers which support MPRIS v2.
 
-`Mail Args Alias`
+### `Mail Args Alias`
 
 - Args: list of maildirs in form
   `[("name1","path1"),...]`. Paths may start with a '~'
@@ -669,8 +675,7 @@ Monitors have default aliases.
                    ("lists", "~/var/mail/lists")]
                   "mail"
 
-
-`MBox Mboxes Opts Alias`
+### `MBox Mboxes Opts Alias`
 
 - Mboxes a list of mbox files of the form `[("name", "path", "color")]`,
   where name is the displayed name, path the absolute or relative (to
@@ -696,7 +701,7 @@ Monitors have default aliases.
          Run MBox [("I ", "inbox", "red"), ("O ", "~/foo/mbox", "")]
                   ["-d", "/var/mail/", "-p", " "] "mbox"
 
-`XPropertyLog PropName`
+### `XPropertyLog PropName`
 
 - Aliases to `PropName`
 - Reads the X property named by `PropName` (a string) and displays its
@@ -706,11 +711,11 @@ Monitors have default aliases.
 
 [samples/xmonadpropwrite.hs script]: https://github.com/jaor/xmobar/raw/master/samples/xmonadpropwrite.hs
 
-`NamedXPropertyLog PropName Alias`
+### `NamedXPropertyLog PropName Alias`
 
 - Same as XPropertyLog, but a custom alias can be specified.
 
-`Brightness Args RefreshRate`
+### `Brightness Args RefreshRate`
 
 - Aliases to `bright`
 - Args: default monitor arguments (see below), plus the following specif ones:
@@ -727,7 +732,7 @@ Monitors have default aliases.
 
        Run Brightness ["-t", "<bar>"] 60
 
-`Kbd Opts`
+### `Kbd Opts`
 
 - Registers to XKB/X11-Events and output the currently active keyboard layout.
   Supports replacement of layoutnames.
@@ -1108,7 +1113,7 @@ more details.
 
 Copyright &copy; 2007-2010 Andrea Rossato
 
-Copyright &copy; 2010-2011 Jose Antonio Ortega Ruiz
+Copyright &copy; 2010-2012 Jose Antonio Ortega Ruiz
 
 [Github]: http://github.com/jaor/xmobar/
 [Github page]: http://github.com/jaor/xmobar

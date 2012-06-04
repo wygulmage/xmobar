@@ -1,6 +1,6 @@
 % xmobar - Release notes
 
-## Version 0.15
+## Version 0.15 (June 4, 2012)
 
 _Incompatible changes_
 
@@ -15,6 +15,9 @@ _New features_
   - New MPRIS (versions 1 and 2) monitor, by Artem Tarasov.
   - New monitor option `-d` to specify the number of decimal places to
     display for float numbers.  Defaults to 0. See [issue 58].
+  - New compilation option `--with_threaded`, to use GHC's threaded
+    runtime to compile xmobar.  Disabled by default (cf. discussion in
+    [github #36]).
 
 _Bug fixes_
 
@@ -33,6 +36,7 @@ _Bug fixes_
 [issue 64]: http://code.google.com/p/xmobar/issues/detail?id=64
 [issue 67]: http://code.google.com/p/xmobar/issues/detail?id=67
 [issue 69]: http://code.google.com/p/xmobar/issues/detail?id=69
+[github #36]: https://github.com/jaor/xmobar/issues/38
 [github #38]: https://github.com/jaor/xmobar/issues/38
 
 ## Version 0.14 (Dec 10, 2011)

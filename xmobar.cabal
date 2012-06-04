@@ -16,7 +16,7 @@ maintainer:         Jose A. Ortega Ruiz <jao@gnu.org>
 cabal-version:      >= 1.6
 build-type:         Simple
 
-extra-source-files: README, NEWS,
+extra-source-files: readme.md, news.md,
                     samples/xmobar.config, samples/xmonadpropwrite.hs
                     samples/Plugins/helloworld.config,
                     samples/Plugins/HelloWorld.hs
