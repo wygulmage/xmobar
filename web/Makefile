@@ -1,5 +1,5 @@
-index = ../README
-releases = ../NEWS
+index = ../readme.md
+releases = ../news.md
 css = xmobar.css
 images = xmobar-sawfish.png xmobar-xmonad.png
 remote = community.haskell.org:/srv/projects/xmobar/
