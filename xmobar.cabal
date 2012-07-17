@@ -146,7 +146,7 @@ executable xmobar
        cpp-options: -DIWLIB
 
     if flag(with_mpd) || flag(all_extensions)
-       build-depends: libmpd == 0.7.*
+       build-depends: libmpd >= 0.8 && < 0.9
        other-modules: Plugins.Monitors.MPD
        cpp-options: -DLIBMPD
 
