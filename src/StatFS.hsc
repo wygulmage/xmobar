@@ -79,5 +79,5 @@ getFileSystemStats path =
                        , fsStatByteCount = toI bcount * bpb
                        , fsStatBytesFree = toI bfree * bpb
                        , fsStatBytesAvailable = toI bavail * bpb
-                       , fsStatBytesUsed = toI (bcount - bavail) * bpb
+                       , fsStatBytesUsed = toI (max 0 (bcount - bavail)) * bpb
                        }
