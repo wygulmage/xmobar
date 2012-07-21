@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Plugins.Monitors.MPD ( mpdConfig, runMPD ) where
+module Plugins.Monitors.MPD ( mpdConfig, runMPD, mpdWait ) where
 
 import Plugins.Monitors.Common
 import System.Console.GetOpt
@@ -54,6 +54,10 @@ runMPD args = do
   song <- io $ mpd M.currentSong
   s <- parseMPD status song opts
   parseTemplate s
+
+mpdWait :: IO ()
+mpdWait = M.withMPD idle >> return ()
+  where idle = M.idle [M.PlayerS, M.MixerS]
 
 mopts :: [String] -> IO MOpts
 mopts argv =
