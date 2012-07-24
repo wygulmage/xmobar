@@ -1,5 +1,14 @@
 % xmobar - Release notes
 
+## Version 0.16
+
+_New features_
+
+  - New monitor AutoMPD, which uses asynchronous events to display MPD
+    status (thanks to Ben Boeckel).
+  - Dependencies updated to latest mtl and libmpd (thanks to Sergei
+    Trofimovich).
+
 ## Version 0.15 (June 4, 2012)
 
 _Incompatible changes_
