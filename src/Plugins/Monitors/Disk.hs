@@ -77,15 +77,6 @@ parseDev dat dev =
           dat' = if length xs > 6 then [sp, rSp, wSp] else [0, 0, 0]
       in (dev, dat')
 
-fsStats :: String -> IO [Integer]
-fsStats path = do
-  stats <- getFileSystemStats path
-  case stats of
-    Nothing -> return [0, 0, 0]
-    Just f -> let tot = fsStatByteCount f
-                  free = fsStatBytesAvailable f
-              in return [tot, free, tot - free]
-
 speedToStr :: Float -> String
 speedToStr = showWithUnits 2 1
 
@@ -130,6 +121,16 @@ startDiskIO disks args rate cb = do
   dref <- newIORef (map (\d -> (fst d, repeat 0)) mounted)
   _ <- mountedData dref (map fst mounted)
   runM args diskIOConfig (runDiskIO dref disks) rate cb
+
+fsStats :: String -> IO [Integer]
+fsStats path = do
+  stats <- getFileSystemStats path
+  case stats of
+    Nothing -> return [0, 0, 0]
+    Just f -> let tot = fsStatByteCount f
+                  free = fsStatBytesAvailable f
+                  used = fsStatBytesUsed f
+              in return [tot, free, used]
 
 runDiskU' :: String -> String -> Monitor String
 runDiskU' tmp path = do

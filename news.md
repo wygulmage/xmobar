@@ -4,10 +4,16 @@
 
 _New features_
 
-  - New monitor AutoMPD, which uses asynchronous events to display MPD
-    status (thanks to Ben Boeckel).
+  - New monitor `AutoMPD`, which uses asynchronous events to display
+    MPD status (thanks to Ben Boeckel).
   - Dependencies updated to latest mtl and libmpd (thanks to Sergei
     Trofimovich).
+
+_Bug fixes_
+
+  - `DiskU`, the disk usage monitor, works again correctly on Linux,
+    instead of randomly crashing every now and then, and reporting
+    wrong used size.
 
 ## Version 0.15 (June 4, 2012)
 

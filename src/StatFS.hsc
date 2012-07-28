@@ -54,7 +54,7 @@ data CStatfs
 #ifdef IS_BSD_SYSTEM
 foreign import ccall unsafe "sys/mount.h statfs"
 #else
-foreign import ccall unsafe "sys/vfs.h statfs64"
+foreign import ccall unsafe "sys/statvfs.h statvfs"
 #endif
   c_statfs :: CString -> Ptr CStatfs -> IO CInt
 
@@ -66,7 +66,7 @@ getFileSystemStats path =
   allocaBytes (#size struct statfs) $ \vfs ->
   useAsCString (pack path) $ \cpath -> do
     res <- c_statfs cpath vfs
-    if res == -1 then return Nothing
+    if res /= 0 then return Nothing
       else do
         bsize <- (#peek struct statfs, f_bsize) vfs
         bcount <- (#peek struct statfs, f_blocks) vfs
@@ -79,5 +79,5 @@ getFileSystemStats path =
                        , fsStatByteCount = toI bcount * bpb
                        , fsStatBytesFree = toI bfree * bpb
                        , fsStatBytesAvailable = toI bavail * bpb
-                       , fsStatBytesUsed = toI (max 0 (bcount - bavail)) * bpb
+                       , fsStatBytesUsed = toI (bcount - bfree) * bpb
                        }
