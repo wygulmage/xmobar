@@ -39,7 +39,7 @@ import Control.Arrow ((&&&))
 import Control.Monad.Reader
 import Control.Concurrent
 import Control.Concurrent.STM
-import Control.Exception hiding (handle)
+import Control.Exception (catch, SomeException(..))
 import Data.Bits
 
 import Config
@@ -69,11 +69,6 @@ data XConf =
 -- | Runs the ReaderT
 runX :: XConf -> X () -> IO ()
 runX xc f = runReaderT f xc
-
-data WakeUp = WakeUp deriving (Show,Typeable)
-instance Exception WakeUp
-
-data SignalType = Wakeup | Reposition | ChangeScreen
 
 -- | Starts the main event loop and threads
 startLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> IO ()
@@ -161,24 +156,6 @@ eventLoop tv xc@(XConf d _ w fs cfg) signal = do
             o ->
               return (ocfg {position = OnScreen 1 o})
 
-
--- | Signal handling
-setupSignalHandler :: IO (MVar SignalType)
-setupSignalHandler = do
-   tid   <- newEmptyMVar
-   installHandler sigUSR2 (Catch $ updatePosHandler tid) Nothing
-   installHandler sigUSR1 (Catch $ changeScreenHandler tid) Nothing
-   return tid
-
-updatePosHandler :: MVar SignalType -> IO ()
-updatePosHandler sig = do
-   putMVar sig Reposition
-   return ()
-
-changeScreenHandler :: MVar SignalType -> IO ()
-changeScreenHandler sig = do
-   putMVar sig ChangeScreen
-   return ()
 
 -- $command
 
