@@ -140,7 +140,18 @@ eventLoop tv xc@(XConf d _ w fs cfg) signal = do
             ncfg <- updateConfigPosition cfg
             reposWindow ncfg
 
+         Hide ->   hide
+         Reveal -> reveal
+         Toggle -> toggle
+
     where
+        hide   = hideWindow d w >> eventLoop tv xc signal
+        reveal = do
+            r' <- repositionWin d w fs cfg
+            showWindow d w
+            eventLoop tv (XConf d r' w fs cfg) signal
+        toggle = isMapped d w >>= \b -> if b then hide else reveal
+
         reposWindow rcfg = do
           r' <- repositionWin d w fs rcfg
           eventLoop tv (XConf d r' w fs rcfg) signal

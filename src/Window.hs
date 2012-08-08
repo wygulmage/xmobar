@@ -134,3 +134,18 @@ drawBorder b d p gc c wi ht =  case b of
                  sf >> drawRectangle d p gc mp mp (w - pad) (h - pad)
   where sf = setForeground d gc c
         (w, h) = (wi - 1, ht - 1)
+
+hideWindow :: Display -> Window -> IO ()
+hideWindow d w = do
+    a <- internAtom d "_NET_WM_STRUT_PARTIAL"    False
+    c <- internAtom d "CARDINAL"                 False
+    changeProperty32 d w a c propModeReplace $ replicate 12 0
+    unmapWindow d w
+    sync d False
+
+showWindow :: Display -> Window -> IO ()
+showWindow d w = mapWindow d w >> sync d False
+
+isMapped :: Display -> Window -> IO Bool
+isMapped d w = fmap ism $ getWindowAttributes d w
+    where ism (WindowAttributes { wa_map_state = wms }) = wms /= waIsUnmapped
