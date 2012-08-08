@@ -13,6 +13,10 @@ instance Exception WakeUp
 data SignalType = Wakeup
                 | Reposition
                 | ChangeScreen
+                | Hide
+                | Reveal
+                | Toggle
+    deriving (Read, Show)
 
 -- | Signal handling
 setupSignalHandler :: IO (MVar SignalType)
