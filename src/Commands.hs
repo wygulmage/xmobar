@@ -30,6 +30,8 @@ import Data.Char
 import System.Process
 import System.Exit
 import System.IO (hClose)
+
+import Signal
 import XUtil
 
 class Show e => Exec e where
@@ -42,6 +44,8 @@ class Show e => Exec e where
     start :: e -> (String -> IO ()) -> IO ()
     start e cb = go
         where go = run e >>= cb >> tenthSeconds (rate e) >> go
+    trigger :: e -> (Maybe SignalType -> IO ()) -> IO ()
+    trigger _ sh  = sh Nothing
 
 data Command = Com Program Args Alias Rate
                deriving (Show,Read,Eq)
