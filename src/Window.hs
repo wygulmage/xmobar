@@ -25,7 +25,6 @@ createWin d fs c = do
       (r,o) = setPosition (position c) srs (fi ht)
   win <- newWindow  d (defaultScreenOfDisplay d) rootw r o
   setProperties r c d win srs
-  when (lowerOnStart c) (lowerWindow d win)
   mapWindow         d win
   return (r,win)
 

@@ -71,10 +71,10 @@ runX :: XConf -> X () -> IO ()
 runX xc f = runReaderT f xc
 
 -- | Starts the main event loop and threads
-startLoop :: XConf -> [[(Maybe ThreadId, TVar String)]] -> IO ()
-startLoop xcfg@(XConf _ _ w _ _) vs = do
+startLoop :: XConf -> MVar SignalType -> [[(Maybe ThreadId, TVar String)]] -> IO ()
+startLoop xcfg@(XConf _ _ w _ conf) sig vs = do
     tv <- atomically $ newTVar []
-    sig <- setupSignalHandler
+    when (lowerOnStart conf) $ putMVar sig Hide
     _ <- forkIO (checker tv [] vs sig `catch`
                    \(SomeException _) -> void (putStrLn "Thread checker failed"))
 #ifdef THREADED_RUNTIME
@@ -156,19 +156,21 @@ eventLoop tv xc@(XConf d _ w fs cfg) signal = do
             o ->
               return (ocfg {position = OnScreen 1 o})
 
-
 -- $command
 
 -- | Runs a command as an independent thread and returns its thread id
 -- and the TVar the command will be writing to.
-startCommand :: (Runnable,String,String) -> IO (Maybe ThreadId, TVar String)
-startCommand (com,s,ss)
+startCommand :: MVar SignalType
+             -> (Runnable,String,String)
+             -> IO (Maybe ThreadId, TVar String)
+startCommand sig (com,s,ss)
     | alias com == "" = do var <- atomically $ newTVar is
                            atomically $ writeTVar var (s ++ ss)
                            return (Nothing,var)
     | otherwise       = do var <- atomically $ newTVar is
                            let cb str = atomically $ writeTVar var (s ++ str ++ ss)
                            h <- forkIO $ start com cb
+                           _ <- forkIO $ trigger com ( maybe (return ()) (putMVar sig) )
                            return (Just h,var)
     where is = s ++ "Updating..." ++ ss
 
