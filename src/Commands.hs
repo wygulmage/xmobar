@@ -35,14 +35,14 @@ import Signal
 import XUtil
 
 class Show e => Exec e where
-    alias :: e -> String
-    alias e    = takeWhile (not . isSpace) $ show e
-    rate  :: e -> Int
-    rate _     = 10
-    run   :: e -> IO String
-    run _      = return ""
-    start :: e -> (String -> IO ()) -> IO ()
-    start e cb = go
+    alias   :: e -> String
+    alias   e    = takeWhile (not . isSpace) $ show e
+    rate    :: e -> Int
+    rate    _    = 10
+    run     :: e -> IO String
+    run     _    = return ""
+    start   :: e -> (String -> IO ()) -> IO ()
+    start   e cb = go
         where go = run e >>= cb >> tenthSeconds (rate e) >> go
     trigger :: e -> (Maybe SignalType -> IO ()) -> IO ()
     trigger _ sh  = sh Nothing

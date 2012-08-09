@@ -36,7 +36,7 @@ import System.Environment
 import System.Posix.Files
 import Control.Monad (unless)
 
-import Signal (setupSignalHandler, SignalType(..))
+import Signal (setupSignalHandler)
 
 -- $main
 

@@ -18,18 +18,12 @@ import Control.Monad(forM_, when)
 import Control.Concurrent
 import Control.Concurrent.STM
 import System.IO
--- import System.IO.Unsafe(unsafePerformIO)
 
 import Plugins
 
 data BufferedPipeReader = BufferedPipeReader String [(Int, String)]
     deriving (Read, Show)
 
--- pipeState :: MVar String
--- pipeState = unsafePerformIO $ newMVar ""
-
--- pipe :: (String -> IO ()) -> Handle -> IO ()
--- pipe cb h = hGetLineSafe h >>= cb
 
 instance Exec BufferedPipeReader where
     alias ( BufferedPipeReader a _  )    = a

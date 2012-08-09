@@ -5,7 +5,6 @@ import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
 import Graphics.X11.Xinerama
 
-import Control.Monad.Reader
 import Data.Maybe(fromMaybe)
 import System.Posix.Process (getProcessID)
 
