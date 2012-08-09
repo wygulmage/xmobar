@@ -18,39 +18,48 @@ import Control.Monad(forM_, when)
 import Control.Concurrent
 import Control.Concurrent.STM
 import System.IO
+import System.IO.Unsafe(unsafePerformIO)
 
 import Plugins
+import Signal
 
-data BufferedPipeReader = BufferedPipeReader String [(Int, String)]
+data BufferedPipeReader = BufferedPipeReader String [(Int, Bool, String)]
     deriving (Read, Show)
 
+signal :: MVar SignalType
+signal = unsafePerformIO newEmptyMVar
 
 instance Exec BufferedPipeReader where
-    alias ( BufferedPipeReader a _  )    = a
-    start ( BufferedPipeReader _ ps ) cb = do
+    alias      ( BufferedPipeReader a _  )    = a
+
+    trigger br@( BufferedPipeReader _ _  ) sh =
+        takeMVar signal >>= sh . Just >> trigger br sh
+
+    start      ( BufferedPipeReader _ ps ) cb = do
 
         (chan, str, rst) <- initV
         forM_ ps $ \p -> forkIO $ reader p chan
         writer chan str rst
 
         where
-        initV :: IO ( TChan (Int, String), TVar String, TVar Bool )
+        initV :: IO ( TChan (Int, Bool, String), TVar String, TVar Bool )
         initV = atomically $ do
             tc <- newTChan
             ts <- newTVar ""
             tb <- newTVar False
             return (tc, ts, tb)
 
-        reader :: (Int, FilePath) -> TChan (Int, String) -> IO ()
-        reader p@(to, fp) tc = do
+        reader :: (Int, Bool, FilePath) -> TChan (Int, Bool, String) -> IO ()
+        reader p@(to, tg, fp) tc = do
             openFile fp ReadWriteMode >>= hGetLineSafe >>= \dt ->
-                atomically $ writeTChan tc (to, dt)
+                atomically $ writeTChan tc (to, tg, dt)
             reader p tc
 
-        writer :: TChan (Int, String) -> TVar String -> TVar Bool -> IO ()
+        writer :: TChan (Int, Bool, String) -> TVar String -> TVar Bool -> IO ()
         writer tc ts otb = do
-            (to, dt, ntb) <- update
+            (to, tg, dt, ntb) <- update
             cb dt
+            when tg $ putMVar signal Reveal
             when (to /= 0) $ sfork $ reset to ts ntb
             writer tc ts ntb
 
@@ -58,15 +67,16 @@ instance Exec BufferedPipeReader where
             sfork :: IO () -> IO ()
             sfork f = forkIO f >> return ()
 
-            update :: IO (Int, String, TVar Bool)
+            update :: IO (Int, Bool, String, TVar Bool)
             update = atomically $ do
-                (to, dt) <- readTChan tc
+                (to, tg, dt) <- readTChan tc
                 when (to == 0) $ writeTVar ts dt
                 writeTVar otb False
                 tb <- newTVar True
-                return (to, dt, tb)
+                return (to, tg, dt, tb)
 
         reset :: Int -> TVar String -> TVar Bool -> IO ()
         reset to ts tb = do
             threadDelay ( to * 100 * 1000 )
-            readTVarIO tb >>= flip when ( readTVarIO ts >>= cb )
+            readTVarIO tb >>=
+                flip when ( putMVar signal Hide >> readTVarIO ts >>= cb )
