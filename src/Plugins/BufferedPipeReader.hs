@@ -42,10 +42,10 @@ instance Exec BufferedPipeReader where
         writer chan str rst
 
         where
-        initV :: IO ( TChan (Int, Bool, String), TVar String, TVar Bool )
+        initV :: IO ( TChan (Int, Bool, String), TMVar String, TVar Bool )
         initV = atomically $ do
             tc <- newTChan
-            ts <- newTVar ""
+            ts <- newEmptyTMVar
             tb <- newTVar False
             return (tc, ts, tb)
 
@@ -55,7 +55,7 @@ instance Exec BufferedPipeReader where
                 atomically $ writeTChan tc (to, tg, dt)
             reader p tc
 
-        writer :: TChan (Int, Bool, String) -> TVar String -> TVar Bool -> IO ()
+        writer :: TChan (Int, Bool, String) -> TMVar String -> TVar Bool -> IO ()
         writer tc ts otb = do
             (to, tg, dt, ntb) <- update
             cb dt
@@ -70,13 +70,14 @@ instance Exec BufferedPipeReader where
             update :: IO (Int, Bool, String, TVar Bool)
             update = atomically $ do
                 (to, tg, dt) <- readTChan tc
-                when (to == 0) $ writeTVar ts dt
+                when (to == 0) $ tryPutTMVar ts dt >> return ()
                 writeTVar otb False
                 tb <- newTVar True
                 return (to, tg, dt, tb)
 
-        reset :: Int -> TVar String -> TVar Bool -> IO ()
+        reset :: Int -> TMVar String -> TVar Bool -> IO ()
         reset to ts tb = do
             threadDelay ( to * 100 * 1000 )
-            readTVarIO tb >>=
-                flip when ( putMVar signal Hide >> readTVarIO ts >>= cb )
+            readTVarIO tb >>= \b -> when b $ do
+                putMVar signal Hide
+                atomically (tryTakeTMVar ts) >>= maybe (return ()) cb
