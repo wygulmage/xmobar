@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveDataTypeable, CPP #-}
 
 module Signal where
 
@@ -6,6 +6,13 @@ import Data.Typeable (Typeable)
 import Control.Concurrent
 import Control.Exception hiding (handle)
 import System.Posix.Signals
+
+#ifdef DBUS
+import DBus (IsVariant(..))
+import Control.Monad ((>=>))
+
+import Plugins.Utils (safeHead)
+#endif
 
 data WakeUp = WakeUp deriving (Show,Typeable)
 instance Exception WakeUp
@@ -18,6 +25,15 @@ data SignalType = Wakeup
                 | Toggle
                 | TogglePersistent
     deriving (Read, Show)
+
+#ifdef DBUS
+instance IsVariant SignalType where
+    toVariant   = toVariant . show
+    fromVariant = fromVariant >=> parseSignalType
+#endif
+
+parseSignalType :: String -> Maybe SignalType
+parseSignalType = fmap fst . safeHead . reads
 
 -- | Signal handling
 setupSignalHandler :: IO (MVar SignalType)

@@ -16,18 +16,11 @@ module IPC.DBus ( runIPC ) where
 
 import DBus
 import DBus.Client
-import Control.Monad ((>=>), join, when)
+import Control.Monad (join, when)
 import Control.Concurrent
 
 import Signal
 import Plugins.Utils (safeHead)
-
-instance IsVariant SignalType where
-    toVariant   = toVariant . show
-    fromVariant = fromVariant >=> parseSignalType
-
-parseSignalType :: String -> Maybe SignalType
-parseSignalType = fmap fst . safeHead . reads
 
 busName :: BusName
 busName = busName_ "org.Xmobar.Control"
