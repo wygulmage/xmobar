@@ -20,10 +20,7 @@ import Control.Monad ((>=>), join, when)
 import Control.Concurrent
 
 import Signal
-
-safeHead :: [a] -> Maybe a
-safeHead    [] = Nothing
-safeHead (x:_) = Just x
+import Plugins.Utils (safeHead)
 
 instance IsVariant SignalType where
     toVariant   = toVariant . show
