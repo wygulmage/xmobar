@@ -145,11 +145,17 @@ eventLoop tv xc@(XConf d _ w fs cfg) signal = do
          Toggle -> toggle
 
     where
-        hide   = hideWindow d w >> eventLoop tv xc signal
-        reveal = do
-            r' <- repositionWin d w fs cfg
-            showWindow d w
-            eventLoop tv (XConf d r' w fs cfg) signal
+        isPersistent = not $ persistent cfg
+
+        hide   = when isPersistent (hideWindow d w) >> eventLoop tv xc signal
+
+        reveal = if isPersistent
+            then do
+                r' <- repositionWin d w fs cfg
+                showWindow d w
+                eventLoop tv (XConf d r' w fs cfg) signal
+            else eventLoop tv xc signal
+
         toggle = isMapped d w >>= \b -> if b then hide else reveal
 
         reposWindow rcfg = do
