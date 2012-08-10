@@ -144,6 +144,9 @@ eventLoop tv xc@(XConf d _ w fs cfg) signal = do
          Reveal -> reveal
          Toggle -> toggle
 
+         TogglePersistent -> eventLoop
+            tv xc { config = cfg { persistent = not $ persistent cfg } } signal
+
     where
         isPersistent = not $ persistent cfg
 

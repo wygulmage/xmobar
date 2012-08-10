@@ -16,6 +16,7 @@ data SignalType = Wakeup
                 | Hide
                 | Reveal
                 | Toggle
+                | TogglePersistent
     deriving (Read, Show)
 
 -- | Signal handling
