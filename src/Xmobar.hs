@@ -50,6 +50,10 @@ import Signal
 import Window
 import XUtil
 
+#ifdef DBUS
+import IPC.DBus
+#endif
+
 -- $main
 --
 -- The Xmobar data type and basic loops and functions.
@@ -191,6 +195,9 @@ startCommand sig (com,s,ss)
                            let cb str = atomically $ writeTVar var (s ++ str ++ ss)
                            h <- forkIO $ start com cb
                            _ <- forkIO $ trigger com ( maybe (return ()) (putMVar sig) )
+#ifdef DBUS
+                           runIPC sig
+#endif
                            return (Just h,var)
     where is = s ++ "Updating..." ++ ss
 
