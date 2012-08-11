@@ -8,6 +8,8 @@ _New features_
     MPD status (thanks to Ben Boeckel).
   - Dependencies updated to latest mtl and libmpd (thanks to Sergei
     Trofimovich).
+  - Dependencies on the deprecated dbus-core removed in favour of
+    dbus 0.10.
 
 _Bug fixes_
 
