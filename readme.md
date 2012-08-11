@@ -301,6 +301,30 @@ xmobar --help):
 
     Mail bug reports and suggestions to <xmobar@projects.haskell.org>
 
+## The DBus Interface
+
+xmobar can be controlled over dbus. All signals defined in [src/Signal.hs] as
+`data SignalType` can now be sent over dbus to xmobar.
+
+[src/Signal.hs]: https://github.com/jaor/xmobar/raw/master/src/Signal.hs
+
+- Bus Name: `org.Xmobar.Control`
+- Object Path: `/org/Xmobar/Control`
+- Member Name: Any of SignalType, e.g. `string:Reveal`
+- Interface Name: `org.Xmobar.Control`
+
+An example using the `dbus-send` command line utility:
+
+        dbus-send \
+            --session \
+            --dest=org.Xmobar.Control \
+            --type=method_call \
+            --print-reply \
+            '/org/Xmobar/Control' \
+            org.Xmobar.Control.SendSignal \
+            "string:Toggle"
+
+
 ## The Output Template
 
 The output template must contain at least one command. xmobar will
