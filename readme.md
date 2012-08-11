@@ -951,6 +951,35 @@ can be used in the output template as `%mydate%`
 
 - Reads its displayed output from the given pipe.
 
+`BufferedPipeReader  Alias [ (Timeout, Bool, "/path/to/pipe1")
+                           , (Timeout, Bool, "/path/to/pipe2")
+                           , ..
+                           ]`
+
+- Display data from multiple pipes.
+- Timeout (in tenth of seconds) is the value after which the previous content is
+  restored i.e. if there was already something from a previous pipe it will be
+  put on display again, overwriting the current status.
+- A pipe with Timout of 0 will be displayed permanently, just like `PipeReader`
+- The boolean option indicates whether new data for this pipe should make xmobar
+  appear (unhide, reveal). In this case, the Timeout additionally specifies when
+  the window should be hidden again. The output is restored in any case.
+- Use it for OSD like status bars e.g. for setting the volume or brightness:
+
+        Run BufferedPipeReader "bpr"
+            [ (  0, False, "/tmp/xmobar_window"  )
+            , ( 15,  True, "/tmp/xmobar_status"  )
+            ]
+
+  Have your window manager send window titles to `"/tmp/xmobar_window"`. They will
+  always be shown and not reveal your xmobar.
+  Sending some status information to `"/tmp/xmobar_status"` will reveal xmonad
+  for 1.5 seconds and temporarily overwrite the window titles.
+- Take a look at [samples/status.sh]
+
+[samples/status.sh]: http://github.com/jaor/xmobar/raw/master/samples/status.sh
+
+
 `XMonadLog`
 
 - Aliases to XMonadLog
