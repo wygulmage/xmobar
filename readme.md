@@ -121,7 +121,7 @@ Otherwise, you'll need to install them yourself.
 
 `with_mpris`
 :    Enables support for MPRIS v1/v2 protocol.
-     Requires the [dbus-core] and [text] packages.
+     Requires the [dbus] and [text] packages.
 
 `with_inotify`
 :    Support for inotify in modern linux kernels. This option is needed
@@ -644,7 +644,7 @@ Monitors have default aliases.
 ### `Mpris1 PlayerName Args RefreshRate`
 
 - Aliases to `mpris1`
-- Requires [dbus-core] and [text] packages.
+- Requires [dbus] and [text] packages.
   To activate, pass `--flags="with_mpris"` during compilation.
 - PlayerName: player supporting MPRIS v1 protocol, in lowercase.
 - Args: default monitor arguments.
@@ -1127,7 +1127,7 @@ Copyright &copy; 2010-2012 Jose Antonio Ortega Ruiz
 [iwlib]: http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html
 [hinotify]: http://hackage.haskell.org/package/hinotify/
 [libmpd]: http://hackage.haskell.org/package/libmpd/
-[dbus-core]: http://hackage.haskell.org/package/dbus-core
+[dbus]: http://hackage.haskell.org/package/dbus
 [text]: http://hackage.haskell.org/package/text
 [sawfish]: http://sawfish.wikia.com/
 [utf8-string]: http://hackage.haskell.org/package/utf8-string/
