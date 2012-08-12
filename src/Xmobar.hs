@@ -87,6 +87,9 @@ startLoop xcfg@(XConf _ _ w _ conf) sig vs = do
     _ <- forkIO (eventer sig `catch`
 #endif
                    \(SomeException _) -> void (putStrLn "Thread eventer failed"))
+#ifdef DBUS
+    runIPC sig
+#endif
     eventLoop tv xcfg sig
   where
     -- Reacts on events from X
@@ -195,9 +198,6 @@ startCommand sig (com,s,ss)
                            let cb str = atomically $ writeTVar var (s ++ str ++ ss)
                            h <- forkIO $ start com cb
                            _ <- forkIO $ trigger com ( maybe (return ()) (putMVar sig) )
-#ifdef DBUS
-                           runIPC sig
-#endif
                            return (Just h,var)
     where is = s ++ "Updating..." ++ ss
 
