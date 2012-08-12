@@ -14,10 +14,14 @@
 
 module IPC.DBus ( runIPC ) where
 
+import Prelude hiding (catch)
+
 import DBus
 import DBus.Client
 import Control.Monad (join, when)
 import Control.Concurrent
+import Control.Exception (catch)
+import System.IO (stderr, hPutStrLn)
 
 import Signal
 import Plugins.Utils (safeHead)
@@ -32,10 +36,14 @@ interfaceName :: InterfaceName
 interfaceName = interfaceName_ "org.Xmobar.Control"
 
 runIPC :: MVar SignalType -> IO ()
-runIPC mvst = do
-    client <- connectSession
-    requestName client busName [ nameDoNotQueue ]
-    export client objectPath [ sendSignalMethod mvst ]
+runIPC mvst = catch exportConnection printException
+    where
+    printException :: ClientError -> IO ()
+    printException = hPutStrLn stderr . clientErrorMessage
+    exportConnection = do
+        client <- connectSession
+        requestName client busName [ nameDoNotQueue ]
+        export client objectPath [ sendSignalMethod mvst ]
 
 sendSignalMethod :: MVar SignalType -> Method
 sendSignalMethod mvst = method interfaceName sendSignalName
