@@ -1,10 +1,6 @@
 #!/bin/sh
 
-
 STATUSPIPE="/tmp/xmobar_status_jrk"
-NORMAL='#eee8d5'
-MUTED='#cb4b16'
-FGCOLOR="#657b83"
 
 function isMuted () {
     # retrieve mute status
@@ -17,23 +13,35 @@ function getPercent () {
     echo "66"
 }
 
-
 function percentBar () {
-    local res= i=1
-    local percent=$( getPercent )
+    local i=1                   res=
+          normal=47             high=80
+          fgColor='#657b83'     mutedColor='#cb4b16'
+          lowColor='#859900'    midColor='#b58900'
+          highColor='#cb4b16'
 
-    if [ -n "$( isMuted )" ]; then
-        res="<fc=$MUTED>"
+          bar="$(echo -ne "\u2588")"
+          percent="$( getPercent )"
+          muted="$( isMuted )"
+
+    if [ -n "$muted" ]; then
+        res="<fc=$mutedColor>"
     else
-        res="<fc=$NORMAL>"
+        res="<fc=$lowColor>"
     fi
 
     while [ $i -lt $percent ]; do
-        res+='#'
+        if   [ $i -eq $normal -a -z "$muted" ]; then
+            res+="</fc><fc=$midColor>"
+        elif [ $i -eq $high   -a -z "$muted" ]; then
+            res+="</fc><fc=$highColor>"
+        fi
+
+        res+=$bar
         i=$((i+1))
     done
 
-    res+="</fc><fc=$FGCOLOR>"
+    res+="</fc><fc=$fgColor>"
 
     while [ $i -lt 100 ]; do
         res+='-'
@@ -42,6 +50,5 @@ function percentBar () {
 
     echo "$res</fc>"
 }
-
 
 echo "$( percentBar )" > "$STATUSPIPE"
