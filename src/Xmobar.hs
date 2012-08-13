@@ -78,7 +78,6 @@ runX xc f = runReaderT f xc
 startLoop :: XConf -> MVar SignalType -> [[(Maybe ThreadId, TVar String)]] -> IO ()
 startLoop xcfg@(XConf _ _ w _ conf) sig vs = do
     tv <- atomically $ newTVar []
-    when (lowerOnStart conf) $ putMVar sig Hide
     _ <- forkIO (checker tv [] vs sig `catch`
                    \(SomeException _) -> void (putStrLn "Thread checker failed"))
 #ifdef THREADED_RUNTIME

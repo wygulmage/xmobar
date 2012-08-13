@@ -221,9 +221,6 @@ Other configuration options:
 
 :         position = Top
 
-`lowerOnStart`
-:     When True the window is initially hidden (can be toggled)
-
 `persistent`
 :     When True the window status is fixed i.e. hiding or revealing is not
       possible. This option can be toggled at runtime.
