@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 STATUSPIPE="/tmp/xmobar_status_jrk"
 
