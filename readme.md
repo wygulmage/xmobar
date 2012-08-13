@@ -302,6 +302,10 @@ xmobar --help):
 
 xmobar can be controlled over dbus. All signals defined in [src/Signal.hs] as
 `data SignalType` can now be sent over dbus to xmobar.
+Due to current limitations of the implementation only one process of xmobar can
+aquire the dbus. This is handled in a FCFS manor, meaning that the first process
+will get the dbus interface. Other processes will run without further problems,
+yet have no dbus interface.
 
 [src/Signal.hs]: https://github.com/jaor/xmobar/raw/master/src/Signal.hs
 
