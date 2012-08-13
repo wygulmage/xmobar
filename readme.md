@@ -11,7 +11,7 @@ xmobar was inspired by the [Ion3] status bar, and supports similar
 features, like dynamic color management, output templates, and
 extensibility through plugins.
 
-This page documents xmobar 0.15 (see [release notes]).
+This page documents xmobar 0.16 (see [release notes]).
 
 [This screenshot] shows xmobar running under [sawfish], with
 antialiased fonts. And [this one] is my desktop with [xmonad] and two
@@ -52,25 +52,26 @@ bells and whistles, use:
 If you don't have `cabal-install` installed, you can get xmobar's
 source code in a variety of ways:
 
-  - From [Hackage]. Just download [xmobar-0.15.tar.gz] from xmobar's
+  - From [Hackage]. Just download the latest release from xmobar's
     hackage page.
   - From [Github]. You can also obtain a tarball in [Github's
     downloads page]. You'll find there links to each tagged release.
   - From the bleeding edge repo. If you prefer to live dangerously,
     just get the latest and greatest (and buggiest, i guess) using
     git:
+
         git clone git://github.com/jaor/xmobar
 
-[xmobar-0.15.tar.gz]: http://hackage.haskell.org/packages/archive/xmobar/0.15/xmobar-0.15.tar.gz
+
 [Github's downloads page]: https://github.com/jaor/xmobar/downloads
 
-To install simply run (if needed):
-
-        tar xvfz xmobar-0.15
-        cd xmobar-0.15
-
 If you have cabal installed, you can now use it from within xmobar's
-source tree. Otherwise, run the configure script:
+source tree:
+
+        cabal install -fall_extensions
+
+
+Otherwise, run the configure script:
 
         runhaskell Setup.lhs configure
 
