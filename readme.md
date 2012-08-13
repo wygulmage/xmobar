@@ -100,6 +100,10 @@ Extensions need additional libraries (listed below) that will be
 automatically downloaded and installed if you're using cabal install.
 Otherwise, you'll need to install them yourself.
 
+`with_dbus`
+:    Enables support for DBUS by making xmobar to publish a service on
+     the session bus.  Requires the [dbus] package.
+
 `with_threaded`
 :    Uses GHC's threaded runtime.  Use this option if xmobar enters a
      high-CPU regime right after starting.
@@ -300,13 +304,14 @@ xmobar --help):
 
 ## The DBus Interface
 
-xmobar can be controlled over dbus. All signals defined in
-[src/Signal.hs] as `data SignalType` can now be sent over dbus to
-xmobar.  Due to current limitations of the implementation only one
-process of xmobar can aquire the dbus. This is handled on a
-first-come-first-seved basis, meaning that the first process will get
-the dbus interface. Other processes will run without further problems,
-yet have no dbus interface.
+When compiled with the optional `with_dbus` flag, xmobar can be
+controlled over dbus. All signals defined in [src/Signal.hs] as `data
+SignalType` can now be sent over dbus to xmobar.  Due to current
+limitations of the implementation only one process of xmobar can
+aquire the dbus. This is handled on a first-come-first-seved basis,
+meaning that the first process will get the dbus interface. Other
+processes will run without further problems, yet have no dbus
+interface.
 
 [src/Signal.hs]: https://github.com/jaor/xmobar/raw/master/src/Signal.hs
 

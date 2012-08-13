@@ -58,19 +58,19 @@ flag with_alsa
   default: False
 
 flag with_datezone
-  description: Enables localized date support
+  description: Enables localized date support.
   default: False
 
 flag with_mpris
-  description: MPRIS v1, v2 support
+  description: MPRIS v1, v2 support.
   default: False
 
 flag with_dbus
-  description: Publish a Service on the Session Bus for controlling xmobar
+  description: Publish a service on the session bus for controlling xmobar.
   default: False
 
 flag with_threaded
-  description: Use threaded runtime
+  description: Use threaded runtime.
   default: False
 
 executable xmobar
