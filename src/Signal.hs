@@ -1,5 +1,21 @@
 {-# LANGUAGE DeriveDataTypeable, CPP #-}
 
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Signal
+-- Copyright   :  (c) Andrea Rosatto
+--             :  (c) Jose A. Ortega Ruiz
+--             :  (c) Jochen Keil
+-- License     :  BSD-style (see LICENSE)
+--
+-- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
+-- Stability   :  unstable
+-- Portability :  unportable
+--
+-- Signal handling, including DBUS when available
+--
+-----------------------------------------------------------------------------
+
 module Signal where
 
 import Data.Typeable (Typeable)

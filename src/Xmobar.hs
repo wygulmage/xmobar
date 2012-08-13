@@ -76,7 +76,7 @@ runX xc f = runReaderT f xc
 
 -- | Starts the main event loop and threads
 startLoop :: XConf -> MVar SignalType -> [[(Maybe ThreadId, TVar String)]] -> IO ()
-startLoop xcfg@(XConf _ _ w _ conf) sig vs = do
+startLoop xcfg@(XConf _ _ w _ _) sig vs = do
     tv <- atomically $ newTVar []
     _ <- forkIO (checker tv [] vs sig `catch`
                    \(SomeException _) -> void (putStrLn "Thread checker failed"))

@@ -1,3 +1,18 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Window
+-- Copyright   :  (c) 2011-12 Jose A. Ortega Ruiz
+--             :  (c) 2012 Jochen Keil
+-- License     :  BSD-style (see LICENSE)
+--
+-- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
+-- Stability   :  unstable
+-- Portability :  unportable
+--
+-- Window manipulation functions
+--
+-----------------------------------------------------------------------------
+
 module Window where
 
 import Prelude hiding (catch)
