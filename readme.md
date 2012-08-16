@@ -229,10 +229,14 @@ Other configuration options:
 `lowerOnStart`
 :     When True the window is sent the bottom of the window stack initially.
 
+`hideOnStart`
+:     When set to True the window is initially not mapped, i.e. hidden. It then
+      can be toggled manually (for example using the dbus interface) or
+      automatically (by a plugin) to make it reappear.
+
 `persistent`
 :     When True the window status is fixed i.e. hiding or revealing is not
       possible. This option can be toggled at runtime.
-
 
 `border`
 :     TopB, TopBM, BottomB, BottomBM, FullB, FullBM or NoBorder (default).
