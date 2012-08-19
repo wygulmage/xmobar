@@ -385,417 +385,25 @@ infrastructure. See below Writing a Plugin
 
 ## System Monitor Plugins
 
-This is the description of the system monitor plugins that are
-installed by default.
+This is the description of the system monitor plugins available in
+xmobar.  Some of them are only installed when an optional build option
+is set: we mention that fact, when needed, in their description.
 
 Each monitor has an `alias` to be used in the output template.
-Monitors have default aliases.
+Monitors have default aliases.  The sections below describe every
+monitor in turn, but before we provide a list of the configuration
+options (or *monitor arguments*) they all share.
 
-### `Uptime Args RefreshRate`
 
-- Aliases to `uptime`
-- Args: default monitor arguments (see below). The low and high
-  thresholds refer to the number of days.
-- Variables that can be used with the `-t`/`--template` argument:
-  `days`, `hours`, `minutes`, `seconds`. The total uptime is the
-  sum of all those fields. You can set the `-S` argument to "True"
-  to add units to the display of those numeric fields.
-- Default template: `Up: <days>d <hours>h <minutes>m`
+### Default Monitor Arguments
 
-### `Weather StationID Args RefreshRate`
+Monitors accept a common set of arguments, described in the first
+subsection below.  In additon, some monitors accept additional options
+that are specific to them.  When specifying the list of arguments in
+your configuration, the common options come first, followed by "--",
+followed by any monitor-specific options.
 
-- Aliases to the Station ID: so `Weather "LIPB" []` can be used in template as `%LIPB%`
-- Args: default monitor arguments (see below)
-- Variables that can be used with the `-t`/`--template` argument:
-	    `station`, `stationState`, `year`, `month`, `day`, `hour`,
-	    `wind`, `visibility`, `skyCondition`, `tempC`, `tempF`,
-	    `dewPoint`, `rh`, `pressure`
-- Default template: `<station>: <tempC>C, rh <rh>% (<hour>)`
-- Requires `curl` in the `$PATH` to retrieve weather information from
-  `http://weather.noaa.gov`
-
-### `Network Interface Args RefreshRate`
-
-- Aliases to the interface name: so `Network "eth0" []` can be used as
-  `%eth0%`
-- Args: default monitor arguments (see below)
-- Variables that can be used with the `-t`/`--template` argument:
-  `dev`, `rx`, `tx`, `rxbar`, `txbar`. Reception and transmission
-  rates (`rx` and `tx`) are displayed in Kbytes per second, and you
-  can set the `-S` to "True" to make them displayed with units (the
-  string "Kb/s").
-- Default template: `<dev>: <rx>KB|<tx>KB`
-
-### `Wireless Interface Args RefreshRate`
-
-- Aliases to the interface name with the suffix "wi": thus, `Wirelss
-  "wlan0" []` can be used as `%wlan0wi%`
-- Args: default monitor arguments (see below)
-- Variables that can be used with the `-t`/`--template` argument:
-            `essid`, `quality`, `qualitybar`
-- Default template: `<essid> <quality>`
-- Requires the C library [iwlib] (part of the wireless tools suite)
-  installed in your system. In addition, to activate this plugin you
-  must pass `--flags="with_iwlib"` during compilation.
-
-### `Memory Args RefreshRate`
-
-- Aliases to `memory`
-- Args: default monitor arguments (see below)
-- Variables that can be used with the `-t`/`--template` argument:
-             `total`, `free`, `buffer`, `cache`, `rest`, `used`,
-             `usedratio`, `usedbar`, `freebar`
-- Default template: `Mem: <usedratio>% (<cache>M)`
-
-### `Swap Args RefreshRate`
-
-- Aliases to `swap`
-- Args: default monitor arguments (see below)
-- Variables that can be used with the `-t`/`--template` argument:
-	    `total`, `used`, `free`, `usedratio`
-- Default template: `Swap: <usedratio>%`
-
-### `Cpu Args RefreshRate`
-
-- Aliases to `cpu`
-- Args: default monitor arguments (see below)
-- Variables that can be used with the `-t`/`--template` argument:
-	    `total`, `bar`, `user`, `nice`, `system`, `idle`, `iowait`
-- Default template: `Cpu: <total>%`
-
-### `MultiCpu Args RefreshRate`
-
-- Aliases to `multicpu`
-- Args: default monitor arguments (see below)
-- Variables that can be used with the `-t`/`--template` argument:
-	    `autototal`, `autobar`, `autouser`, `autonice`,
-	    `autosystem`, `autoidle`, `total`, `bar`, `user`, `nice`,
-	    `system`, `idle`, `total0`, `bar0`, `user0`, `nice0`,
-	    `system0`, `idle0`, ...
-  The auto* variables automatically detect the number of CPUs on the system
-  and display one entry for each.
-- Default template: `Cpu: <total>%`
-
-### `Battery Args RefreshRate`
-
-- Same as `BatteryP ["BAT0", "BAT1", "BAT2"] Args RefreshRate`.
-
-### `BatteryP Dirs Args RefreshRate`
-
-- Aliases to `battery`
-- Dirs: list of directories in `/sys/class/power_supply/` where to
-  look for the ACPI files of each battery. Example:
-  `["BAT0","BAT1","BAT2"]`. Only the first 3 directories will be
-  searched.
-- Args: default monitor arguments (see below), plus the following specif ones:
-    - `-O`: string for AC "on" status (default: "On")
-    - `-o`: string for AC "off" status (default: "Off")
-    - `-L`: low power (`watts`) threshold (default: -12)
-    - `-H`: high power threshold (default: -10)
-    - `-l`: color to display power lower than the `-L` threshold
-    - `-m`: color to display power lower than the `-H` threshold
-    - `-h`: color to display power highter than the `-H` threshold
-    - `-p`: color to display positive power (battery charging)
-    - `-f`: file in `/sys/class/power_supply` with AC info (default:
-      "AC/online")
-
-- Variables that can be used with the `-t`/`--template` argument:
-	    `left`, `leftbar`, `timeleft`, `watts`, `acstatus`
-- Default template: `Batt: <watts>, <left>% / <timeleft>`
-- Example (note that you need "--" to separate regular monitor options from
-  Battery's specific ones):
-
-         Run BatteryP ["BAT0"]
-                      ["-t", "<acstatus><watts> (<left>%)",
-                       "-L", "10", "-H", "80", "-p", "3",
-                       "--", "-O", "<fc=green>On</fc> - ", "-o", "",
-                       "-L", "-15", "-H", "-5",
-                       "-l", "red", "-m", "blue", "-h", "green"]
-                      600
-  In the above example, the thresholds before the "--" separator
-  refer to the `<left>` field, while those after the separator affect
-  how `<watts>` is displayed.
-
-### `TopProc Args RefreshRate`
-
-- Aliases to `top`
-- Args: default monitor arguments (see below). The low and high
-  thresholds (`-L` and `-H`) denote, for memory entries, the percent
-  of the process memory over the total amount of memory currently in
-  use and, for cpu entries, the activity percentage (i.e., the value
-  of `cpuN`, which takes values between 0 and 100).
-- Variables that can be used with the `-t`/`--template` argument:
-	    `no`, `name1`, `cpu1`, `both1`, `mname1`, `mem1`, `mboth1`,
-            `name2`, `cpu2`, `both2`, `mname2`, `mem2`, `mboth2`, ...
-- Default template: `<both1>`
-- Displays the name and cpu/mem usage of running processes (`bothn`
-  and `mboth` display both, and is useful to specify an overall
-  maximum and/or minimum width, using the `-m`/`-M` arguments. `no` gives
-  the total number of processes.
-
-### `TopMem Args RefreshRate`
-
-- Aliases to `topmem`
-- Args: default monitor arguments (see below). The low and high
-  thresholds (`-L` and `-H`) denote the percent of the process memory
-  over the total amount of memory currently in use.
-- Variables that can be used with the `-t`/`--template` argument:
-	    `name1`, `mem1`, `both1`, `name2`, `mem2`, `both2`, ...
-- Default template: `<both1>`
-- Displays the name and RSS (resident memory size) of running
-  processes (`bothn` displays both, and is useful to specify an
-  overall maximum and/or minimum width, using the `-m`/`-M` arguments.
-
-### `DiskU Disks Args RefreshRate`
-
-- Aliases to `disku`
-- Disks: list of pairs of the form (device or mount point, template),
-  where the template can contain <size>, <free>, <used>, <freep> or
-  <usedp>, <freebar> or <usedbar> for total, free, used, free
-  percentage and used percentage of the given file system capacity.
-- Args: default monitor arguments (see below). `-t`/`--template` is ignored.
-- Default template: none (you must specify a template for each file system).
-- Example:
-
-         DiskU [("/", "<used>/<size>"), ("sdb1", "<usedbar>")]
-               ["-L", "20", "-H", "50", "-m", "1", "-p", "3",]
-               20
-
-### `DiskIO Disks Args RefreshRate`
-
-- Aliases to `diskio`
-- Disks: list of pairs of the form (device or mount point, template),
-  where the template can contain <total>, <read>, <write> for total,
-  read and write speed, respectively.
-- Args: default monitor arguments (see below). `-t`/`--template` is ignored.
-- Default template: none (you must specify a template for each file system).
-- Example:
-
-         Disks [("/", "<read> <write>"), ("sdb1", "<total>")] [] 10
-
-### `ThermalZone Number Args RefreshRate`
-
-- Aliases to "thermaln": so `ThermalZone 0 []` can be used in template
-  as `%thermal0%`
-- Args: default monitor arguments (see below)
-- Variables that can be used with the `-t`/`--template` argument:
-	    `temp`
-- Default template: `<temp>C`
-- This plugin works only on sytems with devices having thermal zone.
-  Check directories in `/sys/class/thermal` for possible values of the
-  zone number (e.g., 0 corresponds to `thermal_zone0` in that
-  directory).
-- Example:
-
-         Run ThermalZone 0 ["-t","<id>: <temp>C"] 30
-
-#### `Thermal Zone Args RefreshRate`
-
-- **This plugin is deprecated. Use `ThermalZone` instead.**
-
-- Aliases to the Zone: so `Thermal "THRM" []` can be used in template
-  as `%THRM%`
-- Args: default monitor arguments (see below)
-- Variables that can be used with the `-t`/`--template` argument:
-	    `temp`
-- Default template: `Thm: <temp>C`
-- This plugin works only on sytems with devices having thermal zone.
-  Check directories in /proc/acpi/thermal_zone for possible values.
-- Example:
-
-         Run Thermal "THRM" ["-t","iwl4965-temp: <temp>C"] 50
-
-### `CpuFreq Args RefreshRate`
-
-- Aliases to `cpufreq`
-- Args: default monitor arguments (see below)
-- Variables that can be used with the `-t`/`--template` argument:
-	    `cpu0`, `cpu1`, ..,  `cpuN`
-- Default template: `Freq: <cpu0>GHz`
-- This monitor requires acpi_cpufreq module to be loaded in kernel
-- Example:
-
-         Run CpuFreq ["-t", "Freq:<cpu0>|<cpu1>GHz", "-L", "0", "-H", "2",
-                      "-l", "lightblue", "-n","white", "-h", "red"] 50
-
-### `CoreTemp Args RefreshRate`
-
-- Aliases to `coretemp`
-- Args: default monitor arguments (see below)
-- Variables that can be used with the `-t`/`--template` argument:
-	    `core0`, `core1`, ..,  `coreN`
-- Default template: `Temp: <core0>C`
-- This monitor requires coretemp module to be loaded in kernel
-- Example:
-
-         Run CoreTemp ["-t", "Temp:<core0>|<core1>C",
-                       "-L", "40", "-H", "60",
-                       "-l", "lightblue", "-n", "gray90", "-h", "red"] 50
-
-### `Volume Mixer Element Args RefreshRate`
-
-- Aliases to the mixer name and element name separated by a colon. Thus,
-  `Volume "default" "Master" [] 10` can be used as `%default:Master%`.
-- Args: default monitor arguments (see below). Also accepts:
-    - `-O` _string_ On string
-        - The string used in place of `<status>` when the mixer element
-          is on. Defaults to "[on]".
-        - Long option: `--on`
-    - `-o` _string_ Off string
-        - The string used in place of `<status>` when the mixer element
-          is off. Defaults to "[off]".
-        - Long option: `--off`
-    - `-C` _color_ On color
-        - The color to be used for `<status>` when the mixer element
-          is on. Defaults to "green".
-        - Long option: `--onc`
-    - `-c` _color_ Off color
-        - The color to be used for `<status>` when the mixer element
-          is off. Defaults to "red".
-        - Long option: `--offc`
-    - `--highd` _number_ High threshold for dB. Defaults to -5.0.
-    - `--lowd` _number_ Low threshold for dB. Defaults to -30.0.
-- Variables that can be used with the `-t`/`--template` argument:
-            `volume`, `volumebar`, `dB`, `status`
-- Note that `dB` might only return 0 on your system. This is known
-  to happen on systems with a pulseaudio backend.
-- Default template: `Vol: <volume>% <status>`
-- Requires the package [alsa-core] and [alsa-mixer] installed in your
-  system. In addition, to activate this plugin you must pass
-  `--flags="with_alsa"` during compilation.
-
-### `MPD Args RefreshRate`
-
-- This monitor will only be compiled if you ask for it using the
-  `with_mpd` flag. It needs [libmpd] 5.0 or later (available on Hackage).
-- Aliases to `mpd`
-- Args: default monitor arguments (see below). In addition you can provide
-  `-P`, `-S` and `-Z`, with an string argument, to represent the
-  playing, stopped and paused states in the `statei` template field.
-  The environment variables `MPD_HOST` and `MPD_PORT` are used to configure the
-  mpd server to communicate with.
-- Variables that can be used with the `-t`/`--template` argument:
-             `bar`, `state`, `statei`, `volume`, `length`
-             `lapsed`, `remaining`,
-             `plength` (playlist length), `ppos` (playlist position)
-             `name`, `artist`, `composer`, `performer`
-             `album`, `title`, `track`, `file`, `genre`
-- Default template: `MPD: <state>`
-- Example (note that you need "--" to separate regular monitor options from
-  MPD's specific ones):
-
-         Run MPD ["-t",
-                  "<composer> <title> (<album>) <track>/<plength> <statei> ",
-                  "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
-
-### `Mpris1 PlayerName Args RefreshRate`
-
-- Aliases to `mpris1`
-- Requires [dbus] and [text] packages.
-  To activate, pass `--flags="with_mpris"` during compilation.
-- PlayerName: player supporting MPRIS v1 protocol, in lowercase.
-- Args: default monitor arguments.
-- Variables that can be used with the `-t`/`--template` argument:
-            `album`, `artist`, `arturl`, `length`, `title`, `tracknumber`
-- Default template: `<artist> - <title>`
-- Example:
-
-         Run Mpris1 "clementine" ["-t",
-                                  "<artist> - [<tracknumber>] <title>"] 10
-
-### `Mpris2 PlayerName Args RefreshRate`
-
-- Just like Mpris1.
-  Supposed to be used with mediaplayers which support MPRIS v2.
-
-### `Mail Args Alias`
-
-- Args: list of maildirs in form
-  `[("name1","path1"),...]`. Paths may start with a '~'
-  to expand to the user's home directory.
-- This plugin requires inotify support in your linux kernel and the
-  [hinotify] package. To activate, pass `--flags="with_inotify"`
-  during compilation.
-- Example:
-
-         Run Mail [("inbox", "~/var/mail/inbox"),
-                   ("lists", "~/var/mail/lists")]
-                  "mail"
-
-### `MBox Mboxes Opts Alias`
-
-- Mboxes a list of mbox files of the form `[("name", "path", "color")]`,
-  where name is the displayed name, path the absolute or relative (to
-  BaseDir) path of the mbox file, and color the color to use to display
-  the mail count (use an empty string for the default).
-- Opts is a possibly empty list of options, as flags. Possible values:
-   -a  --all (no arg)  Show all mailboxes, even if empty.
-   -d dir  --dir dir a string giving the base directory where mbox files with
-                     a relative path live.
-   -p prefix --prefix prefix  a string giving a prefix for the list
-                      of displayed mail coints
-   -s suffix --suffix suffix  a string giving a suffix for the list
-                      of displayed mail coints
-- Paths may start with a '~' to expand to the user's home directory.
-- This plugin requires inotify support in your linux kernel and the
-  [hinotify] package. To activate, pass `--flags="with_inotify"`
-  during compilation.
-- Example. The following command look for mails in `/var/mail/inbox`
-  and `~/foo/mbox`, and will put a space in front of the printed string
-  (when it's not empty); it can be used in the template with the alias
-  `mbox`:
-
-         Run MBox [("I ", "inbox", "red"), ("O ", "~/foo/mbox", "")]
-                  ["-d", "/var/mail/", "-p", " "] "mbox"
-
-### `XPropertyLog PropName`
-
-- Aliases to `PropName`
-- Reads the X property named by `PropName` (a string) and displays its
-  value. The [samples/xmonadpropwrite.hs script] in xmobar's
-  distribution can be used to set the given property from the output
-  of any other program or script.
-
-[samples/xmonadpropwrite.hs script]: https://github.com/jaor/xmobar/raw/master/samples/xmonadpropwrite.hs
-
-### `NamedXPropertyLog PropName Alias`
-
-- Same as XPropertyLog, but a custom alias can be specified.
-
-### `Brightness Args RefreshRate`
-
-- Aliases to `bright`
-- Args: default monitor arguments (see below), plus the following specif ones:
-    - `-D`: directory in `/sys/class/backlight/` with files in it
-       (default: "acpi_video0")
-    - `-C`: file with the current brightness (default:
-       actual_brightness)
-    - `-M`: file with the maximum brightness (default:
-       max_brigtness)
-- Variables that can be used with the `-t`/`--template` argument:
-	    `hbar`, `percent`, `bar`
-- Default template: `<percent>`
-- Example:
-
-       Run Brightness ["-t", "<bar>"] 60
-
-### `Kbd Opts`
-
-- Registers to XKB/X11-Events and output the currently active keyboard layout.
-  Supports replacement of layoutnames.
-- Aliases to `kbd`
-- Opts is a list of tuple:
-    -  first element of the tuple is the search string
-    -  second element of the tuple is the corresponding replacement
-- Example:
-
-		Run Kbd [("us(dvorak)", "DV"), ("us", "US")]
-
-
-## Monitor Plugins Commands Arguments
-
-These are the arguments that can be used for internal commands in the
-`commands` configuration option:
+These are the options available for all monitors below:
 
 - `-t` _string_  Output template
     - Template for the monitor output. Field names must be enclosed
@@ -903,6 +511,412 @@ every hour (36000 tenth of seconds), with a template that will output
 something like:
 
     Glasgow Airport: 16.0C
+
+
+### `Uptime Args RefreshRate`
+
+- Aliases to `uptime`
+- Args: default monitor arguments. The low and high
+  thresholds refer to the number of days.
+- Variables that can be used with the `-t`/`--template` argument:
+  `days`, `hours`, `minutes`, `seconds`. The total uptime is the
+  sum of all those fields. You can set the `-S` argument to "True"
+  to add units to the display of those numeric fields.
+- Default template: `Up: <days>d <hours>h <minutes>m`
+
+### `Weather StationID Args RefreshRate`
+
+- Aliases to the Station ID: so `Weather "LIPB" []` can be used in template as `%LIPB%`
+- Args: default monitor arguments
+- Variables that can be used with the `-t`/`--template` argument:
+	    `station`, `stationState`, `year`, `month`, `day`, `hour`,
+	    `wind`, `visibility`, `skyCondition`, `tempC`, `tempF`,
+	    `dewPoint`, `rh`, `pressure`
+- Default template: `<station>: <tempC>C, rh <rh>% (<hour>)`
+- Requires `curl` in the `$PATH` to retrieve weather information from
+  `http://weather.noaa.gov`
+
+### `Network Interface Args RefreshRate`
+
+- Aliases to the interface name: so `Network "eth0" []` can be used as
+  `%eth0%`
+- Args: default monitor arguments
+- Variables that can be used with the `-t`/`--template` argument:
+  `dev`, `rx`, `tx`, `rxbar`, `txbar`. Reception and transmission
+  rates (`rx` and `tx`) are displayed in Kbytes per second, and you
+  can set the `-S` to "True" to make them displayed with units (the
+  string "Kb/s").
+- Default template: `<dev>: <rx>KB|<tx>KB`
+
+### `Wireless Interface Args RefreshRate`
+
+- Aliases to the interface name with the suffix "wi": thus, `Wirelss
+  "wlan0" []` can be used as `%wlan0wi%`
+- Args: default monitor arguments
+- Variables that can be used with the `-t`/`--template` argument:
+            `essid`, `quality`, `qualitybar`
+- Default template: `<essid> <quality>`
+- Requires the C library [iwlib] (part of the wireless tools suite)
+  installed in your system. In addition, to activate this plugin you
+  must pass `--flags="with_iwlib"` during compilation.
+
+### `Memory Args RefreshRate`
+
+- Aliases to `memory`
+- Args: default monitor arguments
+- Variables that can be used with the `-t`/`--template` argument:
+             `total`, `free`, `buffer`, `cache`, `rest`, `used`,
+             `usedratio`, `usedbar`, `freebar`
+- Default template: `Mem: <usedratio>% (<cache>M)`
+
+### `Swap Args RefreshRate`
+
+- Aliases to `swap`
+- Args: default monitor arguments
+- Variables that can be used with the `-t`/`--template` argument:
+	    `total`, `used`, `free`, `usedratio`
+- Default template: `Swap: <usedratio>%`
+
+### `Cpu Args RefreshRate`
+
+- Aliases to `cpu`
+- Args: default monitor arguments
+- Variables that can be used with the `-t`/`--template` argument:
+	    `total`, `bar`, `user`, `nice`, `system`, `idle`, `iowait`
+- Default template: `Cpu: <total>%`
+
+### `MultiCpu Args RefreshRate`
+
+- Aliases to `multicpu`
+- Args: default monitor arguments
+- Variables that can be used with the `-t`/`--template` argument:
+	    `autototal`, `autobar`, `autouser`, `autonice`,
+	    `autosystem`, `autoidle`, `total`, `bar`, `user`, `nice`,
+	    `system`, `idle`, `total0`, `bar0`, `user0`, `nice0`,
+	    `system0`, `idle0`, ...
+  The auto* variables automatically detect the number of CPUs on the system
+  and display one entry for each.
+- Default template: `Cpu: <total>%`
+
+### `Battery Args RefreshRate`
+
+- Same as `BatteryP ["BAT0", "BAT1", "BAT2"] Args RefreshRate`.
+
+### `BatteryP Dirs Args RefreshRate`
+
+- Aliases to `battery`
+- Dirs: list of directories in `/sys/class/power_supply/` where to
+  look for the ACPI files of each battery. Example:
+  `["BAT0","BAT1","BAT2"]`. Only the first 3 directories will be
+  searched.
+- Args: default monitor arguments, plus the following
+  specific ones:
+    - `-O`: string for AC "on" status (default: "On")
+    - `-o`: string for AC "off" status (default: "Off")
+    - `-L`: low power (`watts`) threshold (default: -12)
+    - `-H`: high power threshold (default: -10)
+    - `-l`: color to display power lower than the `-L` threshold
+    - `-m`: color to display power lower than the `-H` threshold
+    - `-h`: color to display power highter than the `-H` threshold
+    - `-p`: color to display positive power (battery charging)
+    - `-f`: file in `/sys/class/power_supply` with AC info (default:
+      "AC/online")
+  All this options, being specific to the monitor, are to be specified
+  after a `--` in the argument list (see example below).
+
+- Variables that can be used with the `-t`/`--template` argument:
+	    `left`, `leftbar`, `timeleft`, `watts`, `acstatus`
+- Default template: `Batt: <watts>, <left>% / <timeleft>`
+- Example (note that you need "--" to separate regular monitor options from
+  Battery's specific ones):
+
+         Run BatteryP ["BAT0"]
+                      ["-t", "<acstatus><watts> (<left>%)",
+                       "-L", "10", "-H", "80", "-p", "3",
+                       "--", "-O", "<fc=green>On</fc> - ", "-o", "",
+                       "-L", "-15", "-H", "-5",
+                       "-l", "red", "-m", "blue", "-h", "green"]
+                      600
+
+  In the above example, the thresholds before the "--" separator
+  affect only the `<left>` and `<leftbar>` fields, while those after
+  the separator affect how `<watts>` is displayed.
+
+### `TopProc Args RefreshRate`
+
+- Aliases to `top`
+- Args: default monitor arguments. The low and high
+  thresholds (`-L` and `-H`) denote, for memory entries, the percent
+  of the process memory over the total amount of memory currently in
+  use and, for cpu entries, the activity percentage (i.e., the value
+  of `cpuN`, which takes values between 0 and 100).
+- Variables that can be used with the `-t`/`--template` argument:
+	    `no`, `name1`, `cpu1`, `both1`, `mname1`, `mem1`, `mboth1`,
+            `name2`, `cpu2`, `both2`, `mname2`, `mem2`, `mboth2`, ...
+- Default template: `<both1>`
+- Displays the name and cpu/mem usage of running processes (`bothn`
+  and `mboth` display both, and is useful to specify an overall
+  maximum and/or minimum width, using the `-m`/`-M` arguments. `no` gives
+  the total number of processes.
+
+### `TopMem Args RefreshRate`
+
+- Aliases to `topmem`
+- Args: default monitor arguments. The low and high
+  thresholds (`-L` and `-H`) denote the percent of the process memory
+  over the total amount of memory currently in use.
+- Variables that can be used with the `-t`/`--template` argument:
+	    `name1`, `mem1`, `both1`, `name2`, `mem2`, `both2`, ...
+- Default template: `<both1>`
+- Displays the name and RSS (resident memory size) of running
+  processes (`bothn` displays both, and is useful to specify an
+  overall maximum and/or minimum width, using the `-m`/`-M` arguments.
+
+### `DiskU Disks Args RefreshRate`
+
+- Aliases to `disku`
+- Disks: list of pairs of the form (device or mount point, template),
+  where the template can contain <size>, <free>, <used>, <freep> or
+  <usedp>, <freebar> or <usedbar> for total, free, used, free
+  percentage and used percentage of the given file system capacity.
+- Args: default monitor arguments. `-t`/`--template` is ignored.
+- Default template: none (you must specify a template for each file system).
+- Example:
+
+         DiskU [("/", "<used>/<size>"), ("sdb1", "<usedbar>")]
+               ["-L", "20", "-H", "50", "-m", "1", "-p", "3",]
+               20
+
+### `DiskIO Disks Args RefreshRate`
+
+- Aliases to `diskio`
+- Disks: list of pairs of the form (device or mount point, template),
+  where the template can contain <total>, <read>, <write> for total,
+  read and write speed, respectively.
+- Args: default monitor arguments. `-t`/`--template` is ignored.
+- Default template: none (you must specify a template for each file system).
+- Example:
+
+         Disks [("/", "<read> <write>"), ("sdb1", "<total>")] [] 10
+
+### `ThermalZone Number Args RefreshRate`
+
+- Aliases to "thermaln": so `ThermalZone 0 []` can be used in template
+  as `%thermal0%`
+- Args: default monitor arguments
+- Variables that can be used with the `-t`/`--template` argument:
+	    `temp`
+- Default template: `<temp>C`
+- This plugin works only on sytems with devices having thermal zone.
+  Check directories in `/sys/class/thermal` for possible values of the
+  zone number (e.g., 0 corresponds to `thermal_zone0` in that
+  directory).
+- Example:
+
+         Run ThermalZone 0 ["-t","<id>: <temp>C"] 30
+
+#### `Thermal Zone Args RefreshRate`
+
+- **This plugin is deprecated. Use `ThermalZone` instead.**
+
+- Aliases to the Zone: so `Thermal "THRM" []` can be used in template
+  as `%THRM%`
+- Args: default monitor arguments
+- Variables that can be used with the `-t`/`--template` argument:
+	    `temp`
+- Default template: `Thm: <temp>C`
+- This plugin works only on sytems with devices having thermal zone.
+  Check directories in /proc/acpi/thermal_zone for possible values.
+- Example:
+
+         Run Thermal "THRM" ["-t","iwl4965-temp: <temp>C"] 50
+
+### `CpuFreq Args RefreshRate`
+
+- Aliases to `cpufreq`
+- Args: default monitor arguments
+- Variables that can be used with the `-t`/`--template` argument:
+	    `cpu0`, `cpu1`, ..,  `cpuN`
+- Default template: `Freq: <cpu0>GHz`
+- This monitor requires acpi_cpufreq module to be loaded in kernel
+- Example:
+
+         Run CpuFreq ["-t", "Freq:<cpu0>|<cpu1>GHz", "-L", "0", "-H", "2",
+                      "-l", "lightblue", "-n","white", "-h", "red"] 50
+
+### `CoreTemp Args RefreshRate`
+
+- Aliases to `coretemp`
+- Args: default monitor arguments
+- Variables that can be used with the `-t`/`--template` argument:
+	    `core0`, `core1`, ..,  `coreN`
+- Default template: `Temp: <core0>C`
+- This monitor requires coretemp module to be loaded in kernel
+- Example:
+
+         Run CoreTemp ["-t", "Temp:<core0>|<core1>C",
+                       "-L", "40", "-H", "60",
+                       "-l", "lightblue", "-n", "gray90", "-h", "red"] 50
+
+### `Volume Mixer Element Args RefreshRate`
+
+- Aliases to the mixer name and element name separated by a colon. Thus,
+  `Volume "default" "Master" [] 10` can be used as `%default:Master%`.
+- Args: default monitor arguments. Also accepts:
+    - `-O` _string_ On string
+        - The string used in place of `<status>` when the mixer element
+          is on. Defaults to "[on]".
+        - Long option: `--on`
+    - `-o` _string_ Off string
+        - The string used in place of `<status>` when the mixer element
+          is off. Defaults to "[off]".
+        - Long option: `--off`
+    - `-C` _color_ On color
+        - The color to be used for `<status>` when the mixer element
+          is on. Defaults to "green".
+        - Long option: `--onc`
+    - `-c` _color_ Off color
+        - The color to be used for `<status>` when the mixer element
+          is off. Defaults to "red".
+        - Long option: `--offc`
+    - `--highd` _number_ High threshold for dB. Defaults to -5.0.
+    - `--lowd` _number_ Low threshold for dB. Defaults to -30.0.
+- Variables that can be used with the `-t`/`--template` argument:
+            `volume`, `volumebar`, `dB`, `status`
+- Note that `dB` might only return 0 on your system. This is known
+  to happen on systems with a pulseaudio backend.
+- Default template: `Vol: <volume>% <status>`
+- Requires the package [alsa-core] and [alsa-mixer] installed in your
+  system. In addition, to activate this plugin you must pass
+  `--flags="with_alsa"` during compilation.
+
+### `MPD Args RefreshRate`
+
+- This monitor will only be compiled if you ask for it using the
+  `with_mpd` flag. It needs [libmpd] 5.0 or later (available on Hackage).
+- Aliases to `mpd`
+- Args: default monitor arguments. In addition you can provide
+  `-P`, `-S` and `-Z`, with an string argument, to represent the
+  playing, stopped and paused states in the `statei` template field.
+  The environment variables `MPD_HOST` and `MPD_PORT` are used to configure the
+  mpd server to communicate with.
+- Variables that can be used with the `-t`/`--template` argument:
+             `bar`, `state`, `statei`, `volume`, `length`
+             `lapsed`, `remaining`,
+             `plength` (playlist length), `ppos` (playlist position)
+             `name`, `artist`, `composer`, `performer`
+             `album`, `title`, `track`, `file`, `genre`
+- Default template: `MPD: <state>`
+- Example (note that you need "--" to separate regular monitor options from
+  MPD's specific ones):
+
+         Run MPD ["-t",
+                  "<composer> <title> (<album>) <track>/<plength> <statei> ",
+                  "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
+
+### `Mpris1 PlayerName Args RefreshRate`
+
+- Aliases to `mpris1`
+- Requires [dbus] and [text] packages.
+  To activate, pass `--flags="with_mpris"` during compilation.
+- PlayerName: player supporting MPRIS v1 protocol, in lowercase.
+- Args: default monitor arguments.
+- Variables that can be used with the `-t`/`--template` argument:
+            `album`, `artist`, `arturl`, `length`, `title`, `tracknumber`
+- Default template: `<artist> - <title>`
+- Example:
+
+         Run Mpris1 "clementine" ["-t",
+                                  "<artist> - [<tracknumber>] <title>"] 10
+
+### `Mpris2 PlayerName Args RefreshRate`
+
+- Just like Mpris1.
+  Supposed to be used with mediaplayers which support MPRIS v2.
+
+### `Mail Args Alias`
+
+- Args: list of maildirs in form
+  `[("name1","path1"),...]`. Paths may start with a '~'
+  to expand to the user's home directory.
+- This plugin requires inotify support in your linux kernel and the
+  [hinotify] package. To activate, pass `--flags="with_inotify"`
+  during compilation.
+- Example:
+
+         Run Mail [("inbox", "~/var/mail/inbox"),
+                   ("lists", "~/var/mail/lists")]
+                  "mail"
+
+### `MBox Mboxes Opts Alias`
+
+- Mboxes a list of mbox files of the form `[("name", "path", "color")]`,
+  where name is the displayed name, path the absolute or relative (to
+  BaseDir) path of the mbox file, and color the color to use to display
+  the mail count (use an empty string for the default).
+- Opts is a possibly empty list of options, as flags. Possible values:
+   -a  --all (no arg)  Show all mailboxes, even if empty.
+   -d dir  --dir dir a string giving the base directory where mbox files with
+                     a relative path live.
+   -p prefix --prefix prefix  a string giving a prefix for the list
+                      of displayed mail coints
+   -s suffix --suffix suffix  a string giving a suffix for the list
+                      of displayed mail coints
+- Paths may start with a '~' to expand to the user's home directory.
+- This plugin requires inotify support in your linux kernel and the
+  [hinotify] package. To activate, pass `--flags="with_inotify"`
+  during compilation.
+- Example. The following command look for mails in `/var/mail/inbox`
+  and `~/foo/mbox`, and will put a space in front of the printed string
+  (when it's not empty); it can be used in the template with the alias
+  `mbox`:
+
+         Run MBox [("I ", "inbox", "red"), ("O ", "~/foo/mbox", "")]
+                  ["-d", "/var/mail/", "-p", " "] "mbox"
+
+### `XPropertyLog PropName`
+
+- Aliases to `PropName`
+- Reads the X property named by `PropName` (a string) and displays its
+  value. The [samples/xmonadpropwrite.hs script] in xmobar's
+  distribution can be used to set the given property from the output
+  of any other program or script.
+
+[samples/xmonadpropwrite.hs script]: https://github.com/jaor/xmobar/raw/master/samples/xmonadpropwrite.hs
+
+### `NamedXPropertyLog PropName Alias`
+
+- Same as XPropertyLog, but a custom alias can be specified.
+
+### `Brightness Args RefreshRate`
+
+- Aliases to `bright`
+- Args: default monitor arguments, plus the following specif ones:
+    - `-D`: directory in `/sys/class/backlight/` with files in it
+       (default: "acpi_video0")
+    - `-C`: file with the current brightness (default:
+       actual_brightness)
+    - `-M`: file with the maximum brightness (default:
+       max_brigtness)
+- Variables that can be used with the `-t`/`--template` argument:
+	    `hbar`, `percent`, `bar`
+- Default template: `<percent>`
+- Example:
+
+       Run Brightness ["-t", "<bar>"] 60
+
+### `Kbd Opts`
+
+- Registers to XKB/X11-Events and output the currently active keyboard layout.
+  Supports replacement of layoutnames.
+- Aliases to `kbd`
+- Opts is a list of tuple:
+    -  first element of the tuple is the search string
+    -  second element of the tuple is the corresponding replacement
+- Example:
+
+		Run Kbd [("us(dvorak)", "DV"), ("us", "US")]
+
 
 ## Executing External Commands
 
