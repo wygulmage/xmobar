@@ -609,20 +609,19 @@ something like:
   look for the ACPI files of each battery. Example:
   `["BAT0","BAT1","BAT2"]`. Only the first 3 directories will be
   searched.
-- Args: default monitor arguments, plus the following
-  specific ones:
-    - `-O`: string for AC "on" status (default: "On")
-    - `-o`: string for AC "off" status (default: "Off")
-    - `-L`: low power (`watts`) threshold (default: -12)
-    - `-H`: high power threshold (default: -10)
-    - `-l`: color to display power lower than the `-L` threshold
-    - `-m`: color to display power lower than the `-H` threshold
-    - `-h`: color to display power highter than the `-H` threshold
-    - `-p`: color to display positive power (battery charging)
-    - `-f`: file in `/sys/class/power_supply` with AC info (default:
-      "AC/online")
-  All this options, being specific to the monitor, are to be specified
-  after a `--` in the argument list (see example below).
+- Args: default monitor arguments, plus the following specific ones
+  (these options, being specific to the monitor, are to be specified
+  after a `--` in the argument list):
+  - `-O`: string for AC "on" status (default: "On")
+  - `-o`: string for AC "off" status (default: "Off")
+  - `-L`: low power (`watts`) threshold (default: -12)
+  - `-H`: high power threshold (default: -10)
+  - `-l`: color to display power lower than the `-L` threshold
+  - `-m`: color to display power lower than the `-H` threshold
+  - `-h`: color to display power highter than the `-H` threshold
+  - `-p`: color to display positive power (battery charging)
+  - `-f`: file in `/sys/class/power_supply` with AC info (default:
+    "AC/online")
 
 - Variables that can be used with the `-t`/`--template` argument:
 	    `left`, `leftbar`, `timeleft`, `watts`, `acstatus`
