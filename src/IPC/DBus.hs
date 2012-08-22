@@ -19,7 +19,7 @@ import Prelude hiding (catch)
 import DBus
 import DBus.Client
 import Control.Monad (when)
-import Control.Concurrent
+import Control.Concurrent.STM
 import Control.Exception (catch)
 import System.IO (stderr, hPutStrLn)
 
@@ -34,7 +34,7 @@ objectPath = objectPath_ "/org/Xmobar/Control"
 interfaceName :: InterfaceName
 interfaceName = interfaceName_ "org.Xmobar.Control"
 
-runIPC :: MVar SignalType -> IO ()
+runIPC :: TMVar SignalType -> IO ()
 runIPC mvst = catch exportConnection printException
     where
     printException :: ClientError -> IO ()
@@ -44,7 +44,7 @@ runIPC mvst = catch exportConnection printException
         requestName client busName [ nameDoNotQueue ]
         export client objectPath [ sendSignalMethod mvst ]
 
-sendSignalMethod :: MVar SignalType -> Method
+sendSignalMethod :: TMVar SignalType -> Method
 sendSignalMethod mvst = method interfaceName sendSignalName
     (signature_ [variantType $ toVariant $ (undefined :: SignalType)])
     (signature_ [])
@@ -60,4 +60,4 @@ sendSignalMethod mvst = method interfaceName sendSignalName
         return ( replyReturn [] )
 
     sendSignal :: Maybe SignalType -> IO ()
-    sendSignal = maybe (return ()) (putMVar mvst)
+    sendSignal = maybe (return ()) (atomically . putTMVar mvst)
