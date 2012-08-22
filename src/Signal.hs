@@ -36,9 +36,9 @@ instance Exception WakeUp
 data SignalType = Wakeup
                 | Reposition
                 | ChangeScreen
-                | Hide
-                | Reveal
-                | Toggle
+                | Hide   Int
+                | Reveal Int
+                | Toggle Int
                 | TogglePersistent
     deriving (Read, Show)
 
