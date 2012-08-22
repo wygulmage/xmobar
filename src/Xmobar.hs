@@ -146,9 +146,9 @@ eventLoop tv xc@(XConf d _ w fs cfg) signal = do
             ncfg <- updateConfigPosition cfg
             reposWindow ncfg
 
-         Hide ->   hide
-         Reveal -> reveal
-         Toggle -> toggle
+         Hide   t -> hide   (t*100*1000)
+         Reveal t -> reveal (t*100*1000)
+         Toggle t -> toggle (t*100*1000)
 
          TogglePersistent -> eventLoop
             tv xc { config = cfg { persistent = not $ persistent cfg } } signal
@@ -156,16 +156,27 @@ eventLoop tv xc@(XConf d _ w fs cfg) signal = do
     where
         isPersistent = not $ persistent cfg
 
-        hide   = when isPersistent (hideWindow d w) >> eventLoop tv xc signal
+        hide t | t == 0    = do
+            when isPersistent $ hideWindow d w
+            eventLoop tv xc signal
+               | otherwise = do
+            void $ forkIO
+                 $ threadDelay t >> atomically (putTMVar signal $ Hide 0)
+            eventLoop tv xc signal
 
-        reveal = if isPersistent
-            then do
+        reveal t | t == 0 =
+            if isPersistent
+                then do
                 r' <- repositionWin d w fs cfg
                 showWindow d w
                 eventLoop tv (XConf d r' w fs cfg) signal
             else eventLoop tv xc signal
+                 | otherwise = do
+            void $ forkIO
+                 $ threadDelay t >> atomically (putTMVar signal $ Reveal 0)
+            eventLoop tv xc signal
 
-        toggle = isMapped d w >>= \b -> if b then hide else reveal
+        toggle t = isMapped d w >>= \b -> if b then hide t else reveal t
 
         reposWindow rcfg = do
           r' <- repositionWin d w fs rcfg

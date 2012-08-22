@@ -340,9 +340,10 @@ An example using the `dbus-send` command line utility:
             "string:Toggle"
 
 It is also possible to send multiple signals at once:
+
         # send to another screen, reveal and toggle the persistent flag
         dbus-send [..] \
-            "string:ChangeScreen" "string:Reveal" "string:TogglePersistent"
+            "string:ChangeScreen" "string:Reveal 0" "string:TogglePersistent"
 
 
 ## The Output Template
