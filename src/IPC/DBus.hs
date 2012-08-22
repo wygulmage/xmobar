@@ -18,13 +18,12 @@ import Prelude hiding (catch)
 
 import DBus
 import DBus.Client
-import Control.Monad (join, when)
+import Control.Monad (when)
 import Control.Concurrent
 import Control.Exception (catch)
 import System.IO (stderr, hPutStrLn)
 
 import Signal
-import Plugins.Utils (safeHead)
 
 busName :: BusName
 busName = busName_ "org.Xmobar.Control"
@@ -56,8 +55,8 @@ sendSignalMethod mvst = method interfaceName sendSignalName
 
     sendSignalMethodCall :: MethodCall -> IO Reply
     sendSignalMethodCall mc = do
-        when ( methodCallMember mc == sendSignalName ) $ sendSignal $
-            join $ safeHead $ map fromVariant $ methodCallBody mc
+        when ( methodCallMember mc == sendSignalName )
+             $ mapM_ (sendSignal . fromVariant) (methodCallBody mc)
         return ( replyReturn [] )
 
     sendSignal :: Maybe SignalType -> IO ()
