@@ -1048,6 +1048,11 @@ can be used in the output template as `%mydate%`
 
 - Reads its displayed output from the given pipe.
 
+`PipeReader2 "/path/to/pipe" Alias Default`
+
+- Reads its displayed output from the given pipe. Displays the default string
+  as long as the pipe is empty.
+
 `BufferedPipeReader  Alias [ (Timeout, Bool, "/path/to/pipe1")
                            , (Timeout, Bool, "/path/to/pipe2")
                            , ..
