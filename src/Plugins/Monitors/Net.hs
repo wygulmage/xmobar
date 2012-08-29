@@ -22,7 +22,7 @@ import Plugins.Monitors.Common
 
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.Time.Clock (UTCTime, getCurrentTime, diffUTCTime)
-import Control.Monad (forM, filterM, liftM)
+import Control.Monad (forM)
 
 import qualified Data.ByteString.Lazy.Char8 as B
 
@@ -129,11 +129,9 @@ parseNets = mapM (\(ref, i) -> parseNet ref i)
 
 runNets :: [(NetDevRef, String)] -> [String] -> Monitor String
 runNets refs _ = io (parseActive refs) >>= printNet
-    where parseActive refs = parseNets refs >>= return . selectActive
+    where parseActive refs' = parseNets refs' >>= return . selectActive
+          selectActive = maximum
 
-selectActive :: [NetDev] -> NetDev
-selectActive = maximum
-                   
 startNet :: String -> [String] -> Int -> (String -> IO ()) -> IO ()
 startNet i a r cb = do
   t0 <- getCurrentTime
