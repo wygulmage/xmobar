@@ -13,12 +13,16 @@
 --
 -----------------------------------------------------------------------------
 
-module Plugins.Monitors.Net (startNet) where
+module Plugins.Monitors.Net (
+                        startNet
+                      , startDynNet
+                      ) where
 
 import Plugins.Monitors.Common
 
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.Time.Clock (UTCTime, getCurrentTime, diffUTCTime)
+import Control.Monad (forM, filterM, liftM)
 
 import qualified Data.ByteString.Lazy.Char8 as B
 
@@ -27,6 +31,23 @@ data NetDev = NA
             | ND String Float Float deriving (Eq,Show,Read)
 
 type NetDevRef = IORef (NetDev, UTCTime)
+
+{- The more information available, the better.
+ - Note that names don't matter. Therefore, if only the names differ,
+ - a compare evaluates to EQ while (==) evaluates to False.
+ -}
+instance Ord NetDev where
+    compare NA NA              = EQ
+    compare NA _               = LT
+    compare _  NA              = GT
+    compare (NI _) (NI _)      = EQ
+    compare (NI _) (ND _ _ _)  = LT
+    compare (ND _ _ _) (NI _)  = GT
+    compare (ND _ x1 y1) (ND _ x2 y2) =
+        if downcmp /= EQ
+           then downcmp
+           else y1 `compare` y2
+      where downcmp = x1 `compare` x2
 
 netConfig :: IO MConfig
 netConfig = mkMConfig
@@ -103,9 +124,30 @@ parseNet nref nd = do
 runNet :: NetDevRef -> String -> [String] -> Monitor String
 runNet nref i _ = io (parseNet nref i) >>= printNet
 
+parseNets :: [(NetDevRef, String)] -> IO [NetDev]
+parseNets = mapM (\(ref, i) -> parseNet ref i)
+
+runNets :: [(NetDevRef, String)] -> [String] -> Monitor String
+runNets refs _ = io (parseActive refs) >>= printNet
+    where parseActive refs = parseNets refs >>= return . selectActive
+
+selectActive :: [NetDev] -> NetDev
+selectActive = maximum
+                   
 startNet :: String -> [String] -> Int -> (String -> IO ()) -> IO ()
 startNet i a r cb = do
   t0 <- getCurrentTime
   nref <- newIORef (NA, t0)
   _ <- parseNet nref i
   runM a netConfig (runNet nref i) r cb
+
+startDynNet :: [String] -> [String] -> Int -> (String -> IO ()) -> IO ()
+startDynNet is a r cb = do
+  refs <- forM is $ \i -> do
+            t <- getCurrentTime
+            nref <- newIORef (NA, t)
+            _ <- parseNet nref i
+            return (nref, i)
+  runM a netConfig (runNets refs) r cb
+
+-- TODO: Prelude.head: empty list
