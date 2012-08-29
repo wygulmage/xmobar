@@ -5,11 +5,9 @@
 _New features_
 
   - New monitor `AutoMPD`, which uses asynchronous events to display
-    MPD status, by Ben Boeckel).
+    MPD status (thanks to Ben Boeckel).
   - New monitor `BufferedPipeReader` displaying data from multiple
-    pipes, by Jochen Keil.
-  - New command line option `-d` (or `--dock`) to make xmobar start as
-    a docked application, by Arnout Engelen.
+    pipes (thanks to Jochen Keil).
   - DBUS support: Jochen implemented an extension for DBUS signal
     handling.
   - Hide/Reveal: one can send signals to xmobar and make it (un)hide
@@ -17,7 +15,7 @@ _New features_
   - Dependencies updated to latest mtl and libmpd (thanks to Sergei
     Trofimovich).
   - Dependencies on the deprecated dbus-core removed in favour of
-    dbus 0.10 (thanks to Jochen Keil).
+    dbus 0.10 (thanks to Jochen Keil)..
 
 _Bug fixes_
 
