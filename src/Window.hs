@@ -159,8 +159,7 @@ hideWindow d w = do
     a <- internAtom d "_NET_WM_STRUT_PARTIAL"    False
     c <- internAtom d "CARDINAL"                 False
     changeProperty32 d w a c propModeReplace $ replicate 12 0
-    unmapWindow d w
-    sync d False
+    unmapWindow d w >> sync d False
 
 showWindow :: Rectangle -> Config -> Display -> Window -> IO ()
 showWindow r cfg d w = do

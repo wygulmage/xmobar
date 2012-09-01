@@ -156,24 +156,22 @@ eventLoop tv xc@(XConf d r w fs cfg) signal = do
     where
         isPersistent = not $ persistent cfg
 
-        hide t | t == 0    = do
-            when isPersistent $ hideWindow d w
-            eventLoop tv xc signal
-               | otherwise = do
-            void $ forkIO
-                 $ threadDelay t >> atomically (putTMVar signal $ Hide 0)
-            eventLoop tv xc signal
-
-        reveal t | t == 0 =
-            if isPersistent
-                then do
-                showWindow r cfg d w
+        hide t
+            | t == 0 =
+                when isPersistent (hideWindow d w) >> eventLoop tv xc signal
+            | otherwise = do
+                void $ forkIO
+                     $ threadDelay t >> atomically (putTMVar signal $ Hide 0)
                 eventLoop tv xc signal
-            else eventLoop tv xc signal
-                 | otherwise = do
-            void $ forkIO
-                 $ threadDelay t >> atomically (putTMVar signal $ Reveal 0)
-            eventLoop tv xc signal
+
+        reveal t
+            | t == 0 = do
+                when isPersistent (showWindow r cfg d w)
+                eventLoop tv xc signal
+            | otherwise = do
+                void $ forkIO
+                     $ threadDelay t >> atomically (putTMVar signal $ Reveal 0)
+                eventLoop tv xc signal
 
         toggle t = do
             ismapped <- isMapped d w
