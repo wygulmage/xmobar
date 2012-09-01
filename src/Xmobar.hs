@@ -176,7 +176,10 @@ eventLoop tv xc@(XConf d _ w fs cfg) signal = do
                  $ threadDelay t >> atomically (putTMVar signal $ Reveal 0)
             eventLoop tv xc signal
 
-        toggle t = isMapped d w >>= \b -> if b then hide t else reveal t
+        toggle t = do
+            ismapped <- isMapped d w
+            atomically (putTMVar signal $ if ismapped then Hide t else Reveal t)
+            eventLoop tv xc signal
 
         reposWindow rcfg = do
           r' <- repositionWin d w fs rcfg
