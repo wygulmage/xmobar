@@ -132,7 +132,7 @@ checker tvar ov vs signal = do
 
 -- | Continuously wait for a signal from a thread or a interrupt handler
 eventLoop :: TVar [String] -> XConf -> TMVar SignalType -> IO ()
-eventLoop tv xc@(XConf d _ w fs cfg) signal = do
+eventLoop tv xc@(XConf d r w fs cfg) signal = do
       typ <- atomically $ takeTMVar signal
       case typ of
          Wakeup -> do
@@ -167,9 +167,8 @@ eventLoop tv xc@(XConf d _ w fs cfg) signal = do
         reveal t | t == 0 =
             if isPersistent
                 then do
-                r' <- repositionWin d w fs cfg
-                showWindow d w
-                eventLoop tv (XConf d r' w fs cfg) signal
+                showWindow r cfg d w
+                eventLoop tv xc signal
             else eventLoop tv xc signal
                  | otherwise = do
             void $ forkIO

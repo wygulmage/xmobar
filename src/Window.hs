@@ -162,8 +162,14 @@ hideWindow d w = do
     unmapWindow d w
     sync d False
 
-showWindow :: Display -> Window -> IO ()
-showWindow d w = mapWindow d w >> sync d False
+showWindow :: Rectangle -> Config -> Display -> Window -> IO ()
+showWindow r cfg d w = do
+    srs <- getScreenInfo d
+    a   <- internAtom d "_NET_WM_STRUT_PARTIAL"    False
+    c   <- internAtom d "CARDINAL"                 False
+    changeProperty32 d w a c propModeReplace $ map fi $
+        getStrutValues r (position cfg) (getRootWindowHeight srs)
+    mapWindow d w >> sync d False
 
 isMapped :: Display -> Window -> IO Bool
 isMapped d w = fmap ism $ getWindowAttributes d w
