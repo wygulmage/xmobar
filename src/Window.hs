@@ -96,8 +96,11 @@ setProperties r c d w srs = do
   setTextProperty d w "xmobar" wM_CLASS
   setTextProperty d w "xmobar" wM_NAME
 
-  changeProperty32 d w a1 c1 propModeReplace $ map fi $
-    getStrutValues r (position c) (getRootWindowHeight srs)
+  ismapped <- isMapped d w
+  changeProperty32 d w a1 c1 propModeReplace $
+    if ismapped
+        then map fi $ getStrutValues r (position c) (getRootWindowHeight srs)
+        else replicate 12 0
   changeProperty32 d w a2 c2 propModeReplace [fromIntegral v]
 
   getProcessID >>= changeProperty32 d w p c1 propModeReplace . return . fromIntegral
