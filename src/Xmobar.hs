@@ -148,7 +148,7 @@ eventLoop tv xc@(XConf d _ w fs cfg) signal = do
 
          Hide   t -> hide   (t*100*1000)
          Reveal t -> reveal (t*100*1000)
-         Toggle t -> toggle (t*100*1000)
+         Toggle t -> toggle t
 
          TogglePersistent -> eventLoop
             tv xc { config = cfg { persistent = not $ persistent cfg } } signal
