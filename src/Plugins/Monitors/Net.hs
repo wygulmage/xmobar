@@ -22,7 +22,9 @@ import Plugins.Monitors.Common
 
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.Time.Clock (UTCTime, getCurrentTime, diffUTCTime)
-import Control.Monad (forM)
+import Control.Monad (forM, filterM)
+import System.Directory (getDirectoryContents, doesFileExist)
+import System.FilePath ((</>))
 
 import qualified Data.ByteString.Lazy.Char8 as B
 
@@ -32,10 +34,9 @@ data NetDev = NA
 
 type NetDevRef = IORef (NetDev, UTCTime)
 
-{- The more information available, the better.
- - Note that names don't matter. Therefore, if only the names differ,
- - a compare evaluates to EQ while (==) evaluates to False.
- -}
+-- The more information available, the better.
+-- Note that names don't matter. Therefore, if only the names differ,
+-- a compare evaluates to EQ while (==) evaluates to False.
 instance Ord NetDev where
     compare NA NA              = EQ
     compare NA _               = LT
@@ -54,9 +55,18 @@ netConfig = mkMConfig
     "<dev>: <rx>KB|<tx>KB"      -- template
     ["dev", "rx", "tx", "rxbar", "txbar"]     -- available replacements
 
+operstateDir :: String -> FilePath
+operstateDir d = "/sys/class/net" </> d </> "operstate"
+
+existingDevs :: IO [String]
+existingDevs = getDirectoryContents "/sys/class/net" >>= filterM isDev
+  where isDev d | d `elem` excludes = return False
+                | otherwise = doesFileExist (operstateDir d)
+        excludes = [".", "..", "lo"]
+
 isUp :: String -> IO Bool
 isUp d = do
-  operstate <- B.readFile $ "/sys/class/net/" ++ d ++ "/operstate"
+  operstate <- B.readFile (operstateDir d)
   return $ "up" == (B.unpack . head . B.lines) operstate
 
 readNetDev :: [String] -> IO NetDev
@@ -139,13 +149,15 @@ startNet i a r cb = do
   _ <- parseNet nref i
   runM a netConfig (runNet nref i) r cb
 
-startDynNet :: [String] -> [String] -> Int -> (String -> IO ()) -> IO ()
-startDynNet is a r cb = do
-  refs <- forM is $ \i -> do
+startDynNet :: [String] -> Int -> (String -> IO ()) -> IO ()
+startDynNet a r cb = do
+  devs <- existingDevs
+  refs <- forM devs $ \d -> do
             t <- getCurrentTime
             nref <- newIORef (NA, t)
-            _ <- parseNet nref i
-            return (nref, i)
+            _ <- parseNet nref d
+            return (nref, d)
   runM a netConfig (runNets refs) r cb
 
 -- TODO: Prelude.head: empty list
+-- TODO: remember last active interface. 
