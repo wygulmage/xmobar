@@ -262,11 +262,7 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
   let (conf,d)             = (config &&& display) r
       Rectangle _ _ wid ht = rect r
       totSLen              = foldr (\(_,_,len) -> (+) len) 0 sl
-#ifdef XFT
-      valign               = (fi ht + fi (as + ds)) `div` 2
-#else
-      valign               = (fi ht `div` 2) + (fi (as + ds) `div` 3)
-#endif
+      valign               = ((fi ht + fi (as + ds)) `div` 2) - 1
       remWidth             = fi wid - fi totSLen
       offset               = case a of
                                C -> (remWidth + offs) `div` 2
