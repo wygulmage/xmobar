@@ -49,6 +49,7 @@ import Runnable
 import Signal
 import Window
 import XUtil
+import ColorCache
 
 #ifdef DBUS
 import IPC.DBus
@@ -262,7 +263,7 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
   let (conf,d)             = (config &&& display) r
       Rectangle _ _ wid ht = rect r
       totSLen              = foldr (\(_,_,len) -> (+) len) 0 sl
-      valign               = ((fi ht + fi (as + ds)) `div` 2) - 1
+      valign               = -1 + (fi ht + fi (as + ds)) `div` 2
       remWidth             = fi wid - fi totSLen
       offset               = case a of
                                C -> (remWidth + offs) `div` 2
@@ -271,8 +272,5 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
       (fc,bc)              = case break (==',') c of
                                (f,',':b) -> (f, b           )
                                (f,    _) -> (f, bgColor conf)
-  withColors d [bc] $ \[bc'] -> do
-    io $ setForeground d gc bc'
-    io $ fillRectangle d dr gc offset 0 (fi l) ht
   io $ printString d dr fontst gc fc bc offset valign s
   printStrings dr gc fontst (offs + l) a xs
