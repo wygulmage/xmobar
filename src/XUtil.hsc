@@ -2,8 +2,8 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  XUtil
--- Copyright   :  (C) 2007 Andrea Rossato
---                (C) 2011, 2012 Jose Antonio Ortega Ruiz
+-- Copyright   :  (C) 2011, 2012 Jose Antonio Ortega Ruiz
+--                (C) 2007 Andrea Rossato
 -- License     :  BSD3
 --
 -- Maintainer  :  jao@gnu.org
@@ -48,11 +48,11 @@ import qualified System.IO as UTF8 (readFile,hGetLine)
 #endif
 #if defined XFT
 import Data.List
-import Graphics.X11.Xft
+import MinXft
 import Graphics.X11.Xrender
 #endif
 
-import ColorCache (withColors)
+import ColorCache
 
 readFileSafe :: FilePath -> IO String
 #if defined XFT || defined UTF8
@@ -72,7 +72,7 @@ hGetLineSafe = hGetLine
 data XFont = Core FontStruct
            | Utf8 FontSet
 #ifdef XFT
-           | Xft  XftFont
+           | Xft  AXftFont
 #endif
 
 -- | When initFont gets a font name that starts with 'xft:' it switchs
@@ -118,11 +118,11 @@ initUtf8Font d s = do
             fallBack = const $ createFontSet d miscFixedFont
 
 #ifdef XFT
-initXftFont :: Display -> String -> IO XftFont
+initXftFont :: Display -> String -> IO AXftFont
 initXftFont d s = do
   setupLocale
-  f <- xftFontOpen d (defaultScreenOfDisplay d) (drop 4 s)
-  addFinalizer f (xftFontClose d f)
+  f <- openAXftFont d (defaultScreenOfDisplay d) (drop 4 s)
+  addFinalizer f (closeAXftFont d f)
   return f
 #endif
 
@@ -131,7 +131,7 @@ textWidth _   (Utf8 fs) s = return $ fi $ wcTextEscapement fs s
 textWidth _   (Core fs) s = return $ fi $ Xlib.textWidth fs s
 #ifdef XFT
 textWidth dpy (Xft xftdraw) s = do
-    gi <- xftTextExtents dpy xftdraw s
+    gi <- xftTxtExtents dpy xftdraw s
     return $ xglyphinfo_xOff gi
 #endif
 
@@ -146,8 +146,8 @@ textExtents (Utf8 fs) s = do
   return (ascent, descent)
 #ifdef XFT
 textExtents (Xft xftfont) _ = do
-  ascent  <- fi `fmap` xftfont_ascent  xftfont
-  descent <- fi `fmap` xftfont_descent xftfont
+  ascent  <- fi `fmap` xft_ascent  xftfont
+  descent <- fi `fmap` xft_descent xftfont
   return (ascent, descent)
 #endif
 
@@ -168,20 +168,14 @@ printString d p (Utf8 fs) gc fc bc x y s =
 
 #ifdef XFT
 printString dpy drw fs@(Xft font) _ fc bc x y s = do
-  let screen   = defaultScreenOfDisplay dpy
-      colormap = defaultColormapOfScreen screen
-      visual   = defaultVisualOfScreen screen
   (a,d)  <- textExtents fs s
-  gi <- xftTextExtents dpy font s
-  withXftDraw dpy drw visual colormap $ \draw ->
-    (withXftColorName dpy visual colormap bc $ \color ->
-      xftDrawRect draw color (x + 1 - fi (xglyphinfo_x gi))
-                             (y - (a + d) + 1)
-                             (xglyphinfo_xOff gi)
-                             (a + d)
-                             ) >>
-    (withXftColorName dpy visual colormap fc $ \color ->
-        xftDrawString draw color font x (y - 2) s)
+  gi <- xftTxtExtents dpy font s
+  withDrawingColors dpy drw fc bc $ \draw -> \fc' -> \bc' ->
+    (drawXftRect draw bc' (x + 1 - fi (xglyphinfo_x gi))
+                          (y - (a + d) + 1)
+                          (xglyphinfo_xOff gi)
+                          (a + d)) >>
+    (drawXftString draw fc' font x (y - 2) s)
 #endif
 
 

@@ -7,7 +7,7 @@
 --
 -- Maintainer: jao@gnu.org
 -- Stability: unstable
--- Portability: portable
+-- Portability: unportable
 -- Created: Mon Sep 10, 2012 00:27
 --
 --
@@ -15,23 +15,25 @@
 --
 ------------------------------------------------------------------------------
 
+#if defined XFT
+
+module ColorCache(withColors, withDrawingColors) where
+
+import MinXft
+import Graphics.X11.Xlib
+
+#else
 module ColorCache(withColors) where
 
-#if defined XFT
--- import Graphics.X11.Xft
 #endif
+
 import Data.IORef
-import Graphics.X11.Xlib
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Monad.Trans (MonadIO, liftIO)
 import Control.Exception (SomeException, handle)
 
-data DynPixel = DynPixel { allocated :: Bool
-                         , pixel     :: Pixel
-                         }
+data DynPixel = DynPixel Bool Pixel
 
--- | Get the Pixel value for a named color: if an invalid name is
--- given the black pixel will be returned.
 initColor :: Display -> String -> IO DynPixel
 initColor dpy c = handle black $ (initColor' dpy c)
   where
@@ -63,4 +65,46 @@ initColor' dpy c = do
 withColors :: MonadIO m => Display -> [String] -> ([Pixel] -> m a) -> m a
 withColors d cs f = do
   ps <- mapM (liftIO . initColor d) cs
-  f $ map pixel ps
+  f $ map (\(DynPixel _ pixel) -> pixel) ps
+
+#ifdef XFT
+
+type AXftColorCache = [(String, AXftColor)]
+{-# NOINLINE xftColorCache #-}
+xftColorCache :: IORef AXftColorCache
+xftColorCache = unsafePerformIO $ newIORef []
+
+getXftCachedColor :: String -> IO (Maybe AXftColor)
+getXftCachedColor name = lookup name `fmap` readIORef xftColorCache
+
+putXftCachedColor :: String -> AXftColor -> IO ()
+putXftCachedColor name cptr =
+  modifyIORef xftColorCache $ \c -> (name, cptr) : c
+
+initAXftColor' :: Display -> Visual -> Colormap -> String -> IO AXftColor
+initAXftColor' d v cm c = do
+  cc <- getXftCachedColor c
+  c' <- case cc of
+          Just col -> return col
+          _        -> do c'' <- mallocAXftColor d v cm c
+                         putXftCachedColor c c''
+                         return c''
+  return c'
+
+initAXftColor :: Display -> Visual -> Colormap -> String -> IO AXftColor
+initAXftColor d v cm c = handle black $ (initAXftColor' d v cm c)
+  where
+    black :: SomeException -> IO AXftColor
+    black = (const $ initAXftColor' d v cm "black")
+
+withDrawingColors :: -- MonadIO m =>
+                     Display -> Drawable -> String -> String
+                    -> (AXftDraw -> AXftColor -> AXftColor -> IO ()) -> IO ()
+withDrawingColors dpy drw fc bc f = do
+  let screen = defaultScreenOfDisplay dpy
+      colormap = defaultColormapOfScreen screen
+      visual = defaultVisualOfScreen screen
+  fc' <- initAXftColor dpy visual colormap fc
+  bc' <- initAXftColor dpy visual colormap bc
+  withAXftDraw dpy drw visual colormap $ \draw -> f draw fc' bc'
+#endif

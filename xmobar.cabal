@@ -78,7 +78,7 @@ executable xmobar
     main-is:            Main.hs
     other-modules:
       Xmobar, Config, Parsers, Commands, Localize,
-      XUtil, StatFS, Runnable, ColorCache, Window,
+      XUtil, StatFS, Runnable, ColorCache, Window
       Plugins, Plugins.CommandReader, Plugins.Date, Plugins.EWMH,
       Plugins.PipeReader, Plugins.StdinReader, Plugins.XMonadLog,
       Plugins.Utils, Plugins.Kbd, Plugins.Monitors,
@@ -134,6 +134,7 @@ executable xmobar
 
     if flag(with_xft) || flag(all_extensions)
        build-depends: utf8-string == 0.3.*, X11-xft >= 0.2 && < 0.4
+       other-modules: MinXft
        cpp-options: -DXFT
 
     if flag(with_utf8) || flag(all_extensions)

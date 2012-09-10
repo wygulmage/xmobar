@@ -51,6 +51,10 @@ import Window
 import XUtil
 import ColorCache
 
+#ifdef XFT
+import Graphics.X11.Xft
+#endif
+
 #ifdef DBUS
 import IPC.DBus
 #endif
@@ -78,6 +82,9 @@ runX xc f = runReaderT f xc
 -- | Starts the main event loop and threads
 startLoop :: XConf -> TMVar SignalType -> [[(Maybe ThreadId, TVar String)]] -> IO ()
 startLoop xcfg@(XConf _ _ w _ _) sig vs = do
+#ifdef XFT
+    xftInitFtLibrary
+#endif
     tv <- atomically $ newTVar []
     _ <- forkIO (checker tv [] vs sig `catch`
                    \(SomeException _) -> void (putStrLn "Thread checker failed"))
