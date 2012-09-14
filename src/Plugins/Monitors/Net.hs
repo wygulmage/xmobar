@@ -135,7 +135,7 @@ runNet :: NetDevRef -> String -> [String] -> Monitor String
 runNet nref i _ = io (parseNet nref i) >>= printNet
 
 parseNets :: [(NetDevRef, String)] -> IO [NetDev]
-parseNets = mapM (\(ref, i) -> parseNet ref i)
+parseNets = mapM $ \(ref, i) -> parseNet ref i
 
 runNets :: [(NetDevRef, String)] -> [String] -> Monitor String
 runNets refs _ = io (parseActive refs) >>= printNet
