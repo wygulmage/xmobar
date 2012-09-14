@@ -158,6 +158,3 @@ startDynNet a r cb = do
             _ <- parseNet nref d
             return (nref, d)
   runM a netConfig (runNets refs) r cb
-
--- TODO: Prelude.head: empty list
--- TODO: remember last active interface. 
