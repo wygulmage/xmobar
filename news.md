@@ -8,6 +8,8 @@ _New features_
     MPD status (thanks to Ben Boeckel).
   - New monitor `BufferedPipeReader` displaying data from multiple
     pipes (thanks to Jochen Keil).
+  - `PipeReader`'s default text is now configurable, by Reto
+    Hablützel.
   - DBUS support: Jochen implemented an extension for DBUS signal
     handling.
   - Hide/Reveal: one can send signals to xmobar and make it (un)hide
