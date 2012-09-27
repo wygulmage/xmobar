@@ -21,13 +21,17 @@ _New features_
   - Dependencies updated to latest mtl and libmpd (thanks to Sergei
     Trofimovich).
   - Dependencies on the deprecated dbus-core removed in favour of
-    dbus 0.10 (thanks to Jochen Keil)..
+    dbus 0.10 (thanks to Jochen Keil).
 
 _Bug fixes_
 
   - `DiskU`, the disk usage monitor, works again correctly on Linux,
     instead of randomly crashing every now and then, and reporting
     wrong used size.
+  - When using antialiased fonts, we were causing a memory leak in the
+    X server by repeatedly allocating colors that, apparently, the
+    server doesn't know how to get rid of (even when told so!).  We're
+    caching them now and X server memory doesn't grow.
 
 ## Version 0.15 (June 4, 2012)
 
