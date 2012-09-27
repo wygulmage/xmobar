@@ -10,6 +10,8 @@ _New features_
     pipes (thanks to Jochen Keil).
   - New monitor `DynNetwork`, which detects the active interface
     automatically, by Reto Hablützel
+  - New monitor, `Locks`, displaying the status of lock keys, by
+    Patrick Chilton.
   - `PipeReader`'s default text is now configurable, by Reto
     Hablützel.
   - DBUS support: Jochen implemented an extension for DBUS signal
