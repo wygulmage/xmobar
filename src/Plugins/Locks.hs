@@ -26,8 +26,8 @@ data Locks = Locks
 
 locks :: [ ( KeySym, String )]
 locks = [ ( xK_Caps_Lock,   "CAPS"   )
-        , ( xK_Num_Lock,    "NUM"    ) 
-        , ( xK_Scroll_Lock, "SCROLL" ) 
+        , ( xK_Num_Lock,    "NUM"    )
+        , ( xK_Scroll_Lock, "SCROLL" )
         ]
 
 instance Exec Locks where
@@ -48,4 +48,4 @@ instance Exec Locks where
             ) locks
         closeDisplay d
 
-        return $ unwords $ map snd ls 
+        return $ unwords $ map snd ls
