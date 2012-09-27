@@ -81,7 +81,7 @@ executable xmobar
       XUtil, StatFS, Runnable, ColorCache, Window
       Plugins, Plugins.CommandReader, Plugins.Date, Plugins.EWMH,
       Plugins.PipeReader, Plugins.StdinReader, Plugins.XMonadLog,
-      Plugins.Utils, Plugins.Kbd, Plugins.Monitors,
+      Plugins.Utils, Plugins.Kbd, Plugins.Locks, Plugins.Monitors,
       Plugins.Monitors.Batt, Plugins.Monitors.Common,
       Plugins.Monitors.CoreCommon, Plugins.Monitors.CoreTemp,
       Plugins.Monitors.CpuFreq, Plugins.Monitors.Cpu,
