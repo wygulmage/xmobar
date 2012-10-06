@@ -14,6 +14,7 @@
 
 module Plugins.Monitors.Bright (brightConfig, runBright) where
 
+import Control.Exception (SomeException, handle)
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.Char
 import System.FilePath ((</>))
@@ -88,7 +89,8 @@ readBright files = do
   currVal<- grab $ (fCurr files)
   maxVal <- grab $ (fMax files)
   return $ (currVal / maxVal)
-  where grab f = catch (fmap (read . B.unpack) $ B.readFile f)(\_ -> return 0)
+  where grab f = handle handler (fmap (read . B.unpack) $ B.readFile f)
+        handler = const (return 0) :: SomeException -> IO Float
 
 showHorizontalBar :: Float -> Monitor String
 showHorizontalBar x = do
