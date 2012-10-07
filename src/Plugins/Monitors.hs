@@ -3,7 +3,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Xmobar.Plugins.Monitors
--- Copyright   :  (c) 2010, 2011 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2010, 2011, 2012 Jose Antonio Ortega Ruiz
 --                (c) 2007-10 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -19,7 +19,7 @@ module Plugins.Monitors where
 
 import Plugins
 
-import Plugins.Monitors.Common ( runM, runMB )
+import Plugins.Monitors.Common (runM)
 import Plugins.Monitors.Weather
 import Plugins.Monitors.Net
 import Plugins.Monitors.Mem
@@ -40,6 +40,7 @@ import Plugins.Monitors.Wireless
 #endif
 #ifdef LIBMPD
 import Plugins.Monitors.MPD
+import Plugins.Monitors.Common (runMB)
 #endif
 #ifdef ALSA
 import Plugins.Monitors.Volume

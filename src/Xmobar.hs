@@ -29,7 +29,7 @@ module Xmobar
     , drawInWin, printStrings
     ) where
 
-import Prelude hiding (catch)
+import Prelude
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
 import Graphics.X11.Xinerama
@@ -39,7 +39,7 @@ import Control.Arrow ((&&&))
 import Control.Monad.Reader
 import Control.Concurrent
 import Control.Concurrent.STM
-import Control.Exception (catch, SomeException(..))
+import Control.Exception (handle, SomeException(..))
 import Data.Bits
 
 import Config
@@ -86,23 +86,22 @@ startLoop xcfg@(XConf _ _ w _ _) sig vs = do
     xftInitFtLibrary
 #endif
     tv <- atomically $ newTVar []
-    _ <- forkIO (checker tv [] vs sig `catch`
-                   \(SomeException _) -> void (putStrLn "Thread checker failed"))
+    _ <- forkIO (handle (handler "checker") (checker tv [] vs sig))
 #ifdef THREADED_RUNTIME
-    _ <- forkOS (eventer sig `catch`
+    _ <- forkOS (handle (handler "eventer") (eventer sig))
 #else
-    _ <- forkIO (eventer sig `catch`
+    _ <- forkIO (handle (handler "eventer") (eventer sig))
 #endif
-                   \(SomeException _) -> void (putStrLn "Thread eventer failed"))
 #ifdef DBUS
     runIPC sig
 #endif
     eventLoop tv xcfg sig
   where
+    handler thing (SomeException _) =
+      putStrLn ("Thread " ++ thing ++ " failed") >> return ()
     -- Reacts on events from X
     eventer signal =
       allocaXEvent $ \e -> do
-
         dpy <- openDisplay ""
         xrrSelectInput    dpy (defaultRootWindow dpy) rrScreenChangeNotifyMask
         selectInput       dpy w (exposureMask .|. structureNotifyMask)

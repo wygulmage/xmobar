@@ -15,7 +15,7 @@
 
 module Window where
 
-import Prelude hiding (catch)
+import Prelude
 import Control.Monad (when)
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras

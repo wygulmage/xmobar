@@ -14,13 +14,13 @@
 
 module Plugins.MBox (MBox(..)) where
 
-import Prelude hiding (catch)
+import Prelude
 import Plugins
 import Plugins.Utils (changeLoop, expandHome)
 
 import Control.Monad (when)
 import Control.Concurrent.STM
-import Control.Exception (SomeException, handle, evaluate)
+import Control.Exception (SomeException (..), handle, evaluate)
 
 import System.Console.GetOpt
 import System.Directory (doesFileExist)
@@ -99,7 +99,7 @@ showC u m n c =
 
 countMails :: FilePath -> IO Int
 countMails f =
-  handle ((\_ -> evaluate 0) :: SomeException -> IO Int)
+  handle (\(SomeException _) -> evaluate 0)
          (do txt <- B.readFile f
              evaluate $! length . filter (B.isPrefixOf from) . B.lines $ txt)
   where from = B.pack "From "

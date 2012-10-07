@@ -23,9 +23,9 @@ module Commands
     , tenthSeconds
     ) where
 
-import Prelude hiding (catch)
+import Prelude
 import Control.Concurrent
-import Control.Exception
+import Control.Exception (handle, SomeException(..))
 import Data.Char
 import System.Process
 import System.Exit
@@ -65,12 +65,12 @@ instance Exec Command where
                 (i,o,e,p) <- runInteractiveCommand (unwords (prog:args))
                 exit <- waitForProcess p
                 let closeHandles = hClose o >> hClose i >> hClose e
+                    getL = handle (\(SomeException _) -> return "")
+                                  (hGetLineSafe o)
                 case exit of
-                  ExitSuccess -> do
-                            str <- catch (hGetLineSafe o)
-                                         (\(SomeException _) -> return "")
-                            closeHandles
-                            cb str
+                  ExitSuccess -> do str <- getL
+                                    closeHandles
+                                    cb str
                   _ -> do closeHandles
                           cb $ "Could not execute command " ++ prog
 

@@ -14,11 +14,11 @@
 
 module Plugins.StdinReader where
 
-import Prelude hiding (catch)
+import Prelude
 import System.Posix.Process
 import System.Exit
 import System.IO
-import Control.Exception (SomeException(..),catch)
+import Control.Exception (SomeException(..), handle)
 import Plugins
 
 data StdinReader = StdinReader
@@ -26,8 +26,8 @@ data StdinReader = StdinReader
 
 instance Exec StdinReader where
     start StdinReader cb = do
-        cb =<< catch (hGetLineSafe stdin)
-                     (\(SomeException e) -> do hPrint stderr e; return "")
+        cb =<< handle (\(SomeException e) -> do hPrint stderr e; return "")
+                      (hGetLineSafe stdin)
         eof <- hIsEOF stdin
         if eof
             then exitImmediately ExitSuccess

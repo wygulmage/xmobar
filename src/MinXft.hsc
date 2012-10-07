@@ -20,7 +20,7 @@
 ------------------------------------------------------------------------------
 
 module MinXft ( AXftColor
-              , AXftDraw
+              , AXftDraw (..)
               , AXftFont
               , mallocAXftColor
               , freeAXftColor
