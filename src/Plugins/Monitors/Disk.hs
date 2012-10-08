@@ -51,6 +51,20 @@ mountedDevices req = do
     isReq (d, p) = p `elem` req || drop 5 d `elem` req
     undev (d, f) = (drop 5 d, f)
 
+availDevices :: [String] -> IO [(DevName, Path)]
+availDevices req = do
+  s <- B.readFile "/proc/diskstats"
+  parse `fmap` mapM canon (devs s)
+  where
+    canon (d, p) = do {d' <- canonicalizePath ("/dev/"++d); return (d', p)}
+    devs =  map (third . B.words) . B.lines
+    parse = map undev . filter isReq
+    third (_:_:c:_) = (B.unpack c, B.unpack c)
+    third _ = ("", "")
+    isReq (d, p) = p `elem` req || drop 5 d `elem` req
+    undev (d, f) = (drop 5 d, f)
+
+
 diskData :: IO [(DevName, [Float])]
 diskData = do
   s <- B.readFile "/proc/diskstats"
@@ -109,7 +123,7 @@ runDiskIO' (tmp, xs) = do
 
 runDiskIO :: DevDataRef -> [(String, String)] -> [String] -> Monitor String
 runDiskIO dref disks _ = do
-  mounted <- io $ mountedDevices (map fst disks)
+  mounted <- io $ availDevices (map fst disks)
   dat <- io $ mountedData dref (map fst mounted)
   strs <- mapM runDiskIO' $ devTemplates disks mounted dat
   return $ unwords strs
@@ -117,7 +131,7 @@ runDiskIO dref disks _ = do
 startDiskIO :: [(String, String)] ->
                [String] -> Int -> (String -> IO ()) -> IO ()
 startDiskIO disks args rate cb = do
-  mounted <- mountedDevices (map fst disks)
+  mounted <- availDevices (map fst disks)
   dref <- newIORef (map (\d -> (fst d, repeat 0)) mounted)
   _ <- mountedData dref (map fst mounted)
   runM args diskIOConfig (runDiskIO dref disks) rate cb
