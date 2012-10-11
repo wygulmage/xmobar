@@ -12,12 +12,10 @@ _New features_
     automatically, by Reto Hablützel
   - New monitor, `Locks`, displaying the status of lock keys, by
     Patrick Chilton.
-  - `PipeReader`'s default text is now configurable, by Reto
-    Hablützel.
-  - DBUS support: Jochen implemented an extension for DBUS signal
-    handling.
+  - Extension for DBUS signal handling (Jochen Keil)
   - Hide/Reveal: one can send signals to xmobar and make it (un)hide
     itself (Jochen again).
+  - `PipeReader`'s default text is now configurable, by Reto Hablützel.
   - Dependencies updated to latest mtl and libmpd (thanks to Sergei
     Trofimovich).
   - Dependencies on the deprecated dbus-core removed in favour of
@@ -32,6 +30,10 @@ _Bug fixes_
     X server by repeatedly allocating colors that, apparently, the
     server doesn't know how to get rid of (even when told so!).  We're
     caching them now and X server memory doesn't grow.
+  - Compilation errors and warnings with GHC 7.6 removed (thanks to
+    Raghavendra D Prabhu for his reports in [github #71]).
+
+[github #71]: https://github.com/jaor/xmobar/issues/71
 
 ## Version 0.15 (June 4, 2012)
 
