@@ -20,7 +20,6 @@
 module ColorCache(withColors, withDrawingColors) where
 
 import MinXft
-import Graphics.X11.Xlib
 
 #else
 module ColorCache(withColors) where
@@ -31,6 +30,7 @@ import Data.IORef
 import System.IO.Unsafe (unsafePerformIO)
 import Control.Monad.Trans (MonadIO, liftIO)
 import Control.Exception (SomeException, handle)
+import Graphics.X11.Xlib
 
 data DynPixel = DynPixel Bool Pixel
 
