@@ -39,27 +39,37 @@ type DevDataRef = IORef [(DevName, [Float])]
 
 mountedDevices :: [String] -> IO [(DevName, Path)]
 mountedDevices req = do
-  sm <- B.readFile "/etc/mtab"
-  sd <- B.readFile "/proc/diskstats"
-  parse `fmap` mapM canon (devs [sm, sd])
+  s <- B.readFile "/etc/mtab"
+  parse `fmap` mapM canon (devs s)
   where
     canon (d, p) = do {d' <- canonicalizePath d; return (d', p)}
-    devs fs = concatMap devs' fs
-              where
-                devs' f = case (devsm f) of
-                               [] -> devsd f
-                               d  -> d
-                firstTwo (a:b:_) = (B.unpack a, B.unpack b)
-                firstTwo _ = ("", "")
-                third (_:_:c:_) = ("/dev/"++(B.unpack c), B.unpack c)
-                third _ = ("", "")
-                devsm = filter isDev . map (firstTwo . B.words) . B.lines
-                devsd = filter isDev . map (third . B.words) . B.lines
+    devs = filter isDev . map (firstTwo . B.words) . B.lines
     parse = map undev . filter isReq
+    firstTwo (a:b:_) = (B.unpack a, B.unpack b)
+    firstTwo _ = ("", "")
     isDev (d, _) = "/dev/" `isPrefixOf` d
     isReq (d, p) = p `elem` req || drop 5 d `elem` req
     undev (d, f) = (drop 5 d, f)
 
+diskDevices :: [String] -> IO [(DevName, Path)]
+diskDevices req = do
+  s <- B.readFile "/proc/diskstats"
+  parse `fmap` mapM canon (devs s)
+  where
+    canon (d, p) = do {d' <- canonicalizePath (d); return (d', p)}
+    devs = map (third . B.words) . B.lines
+    parse = map undev . filter isReq
+    third (_:_:c:_) = ("/dev/" ++ (B.unpack c), B.unpack c)
+    third _ = ("", "")
+    isReq (d, p) = p `elem` req || drop 5 d `elem` req
+    undev (d, f) = (drop 5 d, f)
+
+mountedOrDiskDevices :: [String] -> IO [(DevName, Path)]
+mountedOrDiskDevices req = do
+  mnt <- mountedDevices req
+  case mnt of
+       []    -> diskDevices req
+       other -> return other
 
 diskData :: IO [(DevName, [Float])]
 diskData = do
@@ -119,17 +129,17 @@ runDiskIO' (tmp, xs) = do
 
 runDiskIO :: DevDataRef -> [(String, String)] -> [String] -> Monitor String
 runDiskIO dref disks _ = do
-  mounted <- io $ mountedDevices (map fst disks)
-  dat <- io $ mountedData dref (map fst mounted)
-  strs <- mapM runDiskIO' $ devTemplates disks mounted dat
+  dev <- io $ mountedOrDiskDevices (map fst disks)
+  dat <- io $ mountedData dref (map fst dev)
+  strs <- mapM runDiskIO' $ devTemplates disks dev dat
   return $ unwords strs
 
 startDiskIO :: [(String, String)] ->
                [String] -> Int -> (String -> IO ()) -> IO ()
 startDiskIO disks args rate cb = do
-  mounted <- mountedDevices (map fst disks)
-  dref <- newIORef (map (\d -> (fst d, repeat 0)) mounted)
-  _ <- mountedData dref (map fst mounted)
+  dev <- mountedOrDiskDevices (map fst disks)
+  dref <- newIORef (map (\d -> (fst d, repeat 0)) dev)
+  _ <- mountedData dref (map fst dev)
   runM args diskIOConfig (runDiskIO dref disks) rate cb
 
 fsStats :: String -> IO [Integer]
