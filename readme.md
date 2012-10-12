@@ -906,13 +906,22 @@ something like:
 - Default template: `<artist> - <title>`
 - Example:
 
-         Run Mpris1 "clementine" ["-t",
-                                  "<artist> - [<tracknumber>] <title>"] 10
+         Run Mpris1 "clementine" ["-t", "<artist> - [<tracknumber>] <title>"] 10
 
 ### `Mpris2 PlayerName Args RefreshRate`
 
-- Just like Mpris1.
-  Supposed to be used with mediaplayers which support MPRIS v2.
+- Aliases to `mpris1`
+- Requires [dbus] and [text] packages.
+  To activate, pass `--flags="with_mpris"` during compilation.
+- PlayerName: player supporting MPRIS v2 protocol, in lowercase.
+- Args: default monitor arguments.
+- Variables that can be used with the `-t`/`--template` argument:
+            `album`, `artist`, `arturl`, `length`, `title`,
+            `tracknumber`, `composer`, `genre`
+- Default template: `<artist> - <title>`
+- Example:
+
+         Run Mpris2 "clementine" ["-t", "<artist> - [<composer>] <title>"] 10
 
 ### `Mail Args Alias`
 
