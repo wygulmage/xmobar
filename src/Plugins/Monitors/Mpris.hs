@@ -66,12 +66,15 @@ instance MprisVersion MprisVersion2 where
                             ["org.mpris.MediaPlayer2.Player", "Metadata"]
 
     fieldsList MprisVersion2 = [ "xesam:album", "xesam:artist", "mpris:artUrl"
-                               , "mpris:length", "xesam:title", "xesam:trackNumber"
+                               , "mpris:length", "xesam:title",
+                                 "xesam:trackNumber", "xesam:composer",
+                                 "xesam:genre"
                                ]
 
 mprisConfig :: IO MConfig
 mprisConfig = mkMConfig "<artist> - <title>"
-                [ "album", "artist", "arturl", "length" , "title", "tracknumber"
+                [ "album", "artist", "arturl", "length"
+                , "title", "tracknumber" , "composer", "genre"
                 ]
 
 dbusClient :: DC.Client

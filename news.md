@@ -20,6 +20,7 @@ _New features_
     Trofimovich).
   - Dependencies on the deprecated dbus-core removed in favour of
     dbus 0.10 (thanks to Jochen Keil).
+  - MPris2 now includes genre and composer among its fields.
 
 _Bug fixes_
 
