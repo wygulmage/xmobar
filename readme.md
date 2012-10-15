@@ -1254,8 +1254,8 @@ Cheplyaka, Patrick Chilton, John Goerzen, Reto Hablützel, Juraj
 Hercek, Tomas Janousek, Spencer Janssen, Jochen Keil, Lennart
 Kolmodin, Krzysztof Kosciuszkiewicz, Dmitry Kurochkin, Svein Ove,
 Martin Perner, Jens Petersen, Petr Rockai, Andrew Sackville-West,
-Alexander Solovyov, Artem Tarasov, Sergei Trofimovich, Thomas Tuegel,
-Jan Vornberger, Daniel Wagner and Norbert Zeh.
+Alexander Solovyov, John Soros, Artem Tarasov, Sergei Trofimovich,
+Thomas Tuegel, Jan Vornberger, Daniel Wagner and Norbert Zeh.
 
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
 

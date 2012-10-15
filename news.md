@@ -24,6 +24,9 @@ _New features_
 
 _Bug fixes_
 
+  - `DiskIO` now can report overall activity in all partitions of a device
+    which is not mounted itself (e.g., sda when sda1, sda3, etc. are
+    the mounted partitions).  Thanks to John Soros. See [github #73].
   - `DiskU`, the disk usage monitor, works again correctly on Linux,
     instead of randomly crashing every now and then, and reporting
     wrong used size.
@@ -35,6 +38,7 @@ _Bug fixes_
     Raghavendra D Prabhu for his reports in [github #71]).
 
 [github #71]: https://github.com/jaor/xmobar/issues/71
+[github #71]: https://github.com/jaor/xmobar/issues/73
 
 ## Version 0.15 (June 4, 2012)
 
