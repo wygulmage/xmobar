@@ -75,8 +75,9 @@ executable xmobar
     main-is:            Main.hs
     other-modules:
       Xmobar, Config, Parsers, Commands, Localize,
-      XUtil, StatFS, Runnable, ColorCache, Window
-      Plugins, Plugins.CommandReader, Plugins.Date, Plugins.EWMH,
+      XUtil, StatFS, Runnable, ColorCache, Window, Signal,
+      Plugins, Plugins.BufferedPipeReader,
+      Plugins.CommandReader, Plugins.Date, Plugins.EWMH,
       Plugins.PipeReader, Plugins.StdinReader, Plugins.XMonadLog,
       Plugins.Utils, Plugins.Kbd, Plugins.Locks, Plugins.Monitors,
       Plugins.Monitors.Batt, Plugins.Monitors.Common,

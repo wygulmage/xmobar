@@ -1,6 +1,6 @@
 % xmobar - Release notes
 
-## Version 0.16
+## Version 0.16 (Dec 3, 2012)
 
 _New features_
 
@@ -37,8 +37,16 @@ _Bug fixes_
   - Compilation errors and warnings with GHC 7.6 removed (thanks to
     Raghavendra D Prabhu for his reports in [github #71]).
 
+_Known problems_
+
+Some users have reported problems with xmobar compiled with GHC 7.6 in
+ArchLinux: see [github #78] and pointers therein.  Please, send
+reports of any problems or successes in that regard so that we can fix
+any remaining issues.  Thanks!
+
 [github #71]: https://github.com/jaor/xmobar/issues/71
-[github #71]: https://github.com/jaor/xmobar/issues/73
+[github #73]: https://github.com/jaor/xmobar/issues/73
+[github #78]: https://github.com/jaor/xmobar/issues/78
 
 ## Version 0.15 (June 4, 2012)
 
