@@ -1,5 +1,13 @@
 % xmobar - Release notes
 
+## Version 0.17
+
+_New features_
+
+  - New `TopP` and `BottomP` alignments, taking left and right
+    paddings (thanks to Dmitry Malikov).
+
+
 ## Version 0.16 (Dec 3, 2012)
 
 _New features_
