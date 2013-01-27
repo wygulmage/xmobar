@@ -163,21 +163,21 @@ textExtents (Xft xftfont) _ = do
 
 loadBitmap :: Display -> Drawable -> FilePath -> IO (Maybe Bitmap)
 loadBitmap d w p = do
-     exist <- doesFileExist p
-     if exist
-	then do
-	   (bw, bh, bp, _, _) <- readBitmapFile d w p
-	   return $ Just $ Bitmap bw bh bp
-	else
-	   return Nothing
+    exist <- doesFileExist p
+    if exist
+    then do
+        (bw, bh, bp, _, _) <- readBitmapFile d w p
+        return $ Just $ Bitmap bw bh bp
+    else
+        return Nothing
 
 drawBitmap :: Display -> Drawable -> XFont -> GC -> String -> String
             -> Position -> Position -> Bitmap -> IO ()
 drawBitmap d p _ gc fc bc x y i = do
     withColors d [fc, bc] $ \[fc', bc'] -> do
-        setForeground d gc fc'
-        setBackground d gc bc'
-        io $ copyPlane d (pixmap i) p gc 0 0 (width i) (height i) x (y - (fi $ height i)) 1
+    setForeground d gc fc'
+    setBackground d gc bc'
+    io $ copyPlane d (pixmap i) p gc 0 0 (width i) (height i) x (y - (fi $ height i)) 1
 
 printString :: Display -> Drawable -> XFont -> GC -> String -> String
             -> Position -> Position -> Widget -> IO ()
