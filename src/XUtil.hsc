@@ -165,12 +165,12 @@ loadBitmap :: Display -> Drawable -> FilePath -> IO (Maybe Bitmap)
 loadBitmap d w p = do
     exist <- doesFileExist p
     if exist
-    then do
-        (bw, bh, bp, _, _) <- readBitmapFile d w p
-        addFinalizer bp (freePixmap d bp)
-        return $ Just $ Bitmap bw bh bp
-    else
-        return Nothing
+       then do
+            (bw, bh, bp, _, _) <- readBitmapFile d w p
+            addFinalizer bp (freePixmap d bp)
+            return $ Just $ Bitmap bw bh bp
+       else
+           return Nothing
 
 drawBitmap :: Display -> Drawable -> XFont -> GC -> String -> String
             -> Position -> Position -> Bitmap -> IO ()
