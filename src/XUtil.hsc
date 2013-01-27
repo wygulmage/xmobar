@@ -167,6 +167,7 @@ loadBitmap d w p = do
     if exist
     then do
         (bw, bh, bp, _, _) <- readBitmapFile d w p
+        addFinalizer bp (freePixmap d bp)
         return $ Just $ Bitmap bw bh bp
     else
         return Nothing
