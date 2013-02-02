@@ -23,13 +23,13 @@ module Xmobar
     , startCommand
     -- * Window Management
     -- $window
-    , createWin, updateWin
+    , createWin
     -- * Printing
     -- $print
     , drawInWin, printStrings
     ) where
 
-import Prelude
+import Prelude hiding (lookup)
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
 import Graphics.X11.Xinerama
@@ -41,12 +41,14 @@ import Control.Concurrent
 import Control.Concurrent.STM
 import Control.Exception (handle, SomeException(..))
 import Data.Bits
+import Data.Map hiding (foldr, map, filter)
 
 import Config
 import Parsers
 import Commands
 import Runnable
 import Signal
+import Types
 import Window
 import XUtil
 import ColorCache
@@ -72,6 +74,7 @@ data XConf =
           , rect    :: Rectangle
           , window  :: Window
           , fontS   :: XFont
+          , iconS   :: Map FilePath Bitmap
           , config  :: Config
           }
 
@@ -81,7 +84,7 @@ runX xc f = runReaderT f xc
 
 -- | Starts the main event loop and threads
 startLoop :: XConf -> TMVar SignalType -> [[(Maybe ThreadId, TVar String)]] -> IO ()
-startLoop xcfg@(XConf _ _ w _ _) sig vs = do
+startLoop xcfg@(XConf _ _ w _ _ _) sig vs = do
 #ifdef XFT
     xftInitFtLibrary
 #endif
@@ -98,7 +101,7 @@ startLoop xcfg@(XConf _ _ w _ _) sig vs = do
     eventLoop tv xcfg sig
   where
     handler thing (SomeException _) =
-      putStrLn ("Thread " ++ thing ++ " failed") >> return ()
+      void $ putStrLn ("Thread " ++ thing ++ " failed")
     -- Reacts on events from X
     eventer signal =
       allocaXEvent $ \e -> do
@@ -139,12 +142,14 @@ checker tvar ov vs signal = do
 
 -- | Continuously wait for a signal from a thread or a interrupt handler
 eventLoop :: TVar [String] -> XConf -> TMVar SignalType -> IO ()
-eventLoop tv xc@(XConf d r w fs cfg) signal = do
+eventLoop tv xc@(XConf d r w fs is cfg) signal = do
       typ <- atomically $ takeTMVar signal
       case typ of
          Wakeup -> do
-            runX xc (updateWin tv)
-            eventLoop tv xc signal
+            str <- updateString cfg tv
+            xc' <- updateCache d w is str >>= \c -> return xc { iconS = c }
+            runX xc' $ drawInWin r str
+            eventLoop tv xc' signal
 
          Reposition ->
             reposWindow cfg
@@ -187,7 +192,7 @@ eventLoop tv xc@(XConf d r w fs cfg) signal = do
 
         reposWindow rcfg = do
           r' <- repositionWin d w fs rcfg
-          eventLoop tv (XConf d r' w fs rcfg) signal
+          eventLoop tv (XConf d r' w fs is rcfg) signal
 
         updateConfigPosition ocfg =
           case position ocfg of
@@ -219,14 +224,23 @@ startCommand sig (com,s,ss)
                            return (Just h,var)
     where is = s ++ "Updating..." ++ ss
 
-updateWin :: TVar [String] -> X ()
-updateWin v = do
-  xc <- ask
-  s <- io $ atomically $ readTVar v
-  let (conf,rec) = (config &&& rect) xc
-      l:c:r:_ = s ++ repeat ""
-  ps <- io $ mapM (parseString conf) [l, c, r]
-  drawInWin rec ps
+updateString :: Config -> TVar [String] -> IO [[(Widget, String)]]
+updateString conf v = do
+  s <- atomically $ readTVar v
+  let l:c:r:_ = s ++ repeat ""
+  io $ mapM (parseString conf) [l, c, r]
+
+updateCache :: Display -> Window -> Map FilePath Bitmap -> [[(Widget, String)]] -> IO (Map FilePath Bitmap)
+updateCache dpy win cache ps = do
+  let paths = map (\(Icon p, _) -> p) . concatMap (filter icons) $ ps
+      icons (Icon _, _) = True
+      icons _ = False
+  foldM (\m path -> if member path m
+                       then return m
+                       else do bitmap <- io $ loadBitmap dpy win path
+                               case bitmap of
+                                    Nothing -> return m
+                                    Just bmap -> return $ insert path bmap m) cache paths
 
 -- $print
 
@@ -283,5 +297,7 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
       (fc,bc)              = case break (==',') c of
                                (f,',':b) -> (f, b           )
                                (f,    _) -> (f, bgColor conf)
-  io $ printString d dr fontst gc fc bc offset valign s
+  case s of
+    (Text t) -> io $ printString d dr fontst gc fc bc offset valign t
+    (Icon p) -> io $ maybe (return ()) (drawBitmap d dr fontst gc fc bc offset valign) (lookup p (iconS r))
   printStrings dr gc fontst (offs + l) a xs

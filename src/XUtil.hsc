@@ -17,6 +17,8 @@ module XUtil
     , initFont
     , initCoreFont
     , initUtf8Font
+    , loadBitmap
+    , drawBitmap
     , textExtents
     , textWidth
     , printString
@@ -72,11 +74,6 @@ hGetLineSafe = UTF8.hGetLine
 #else
 hGetLineSafe = hGetLine
 #endif
-
-data Bitmap = Bitmap { width  :: Dimension
-                     , height :: Dimension
-                     , pixmap :: Pixmap
-                     }
 
 -- Hide the Core Font/Xft switching here
 data XFont = Core FontStruct
@@ -181,30 +178,22 @@ drawBitmap d p _ gc fc bc x y i = do
     io $ copyPlane d (pixmap i) p gc 0 0 (width i) (height i) x (y - (fi $ height i)) 1
 
 printString :: Display -> Drawable -> XFont -> GC -> String -> String
-            -> Position -> Position -> Widget -> IO ()
-printString d p fs gc fc bc x y w = do
-    case w of 
-        (Text s) -> printString' d p fs gc fc bc x y s
-        (Icon i) -> do bitmap <- loadBitmap d p i
-                       forM_ bitmap $ drawBitmap d p fs gc fc bc x y
-
-printString' :: Display -> Drawable -> XFont -> GC -> String -> String
             -> Position -> Position -> String  -> IO ()
-printString' d p (Core fs) gc fc bc x y s = do
+printString d p (Core fs) gc fc bc x y s = do
     setFont d gc $ fontFromFontStruct fs
     withColors d [fc, bc] $ \[fc', bc'] -> do
       setForeground d gc fc'
       setBackground d gc bc'
       drawImageString d p gc x y s
 
-printString' d p (Utf8 fs) gc fc bc x y s =
+printString d p (Utf8 fs) gc fc bc x y s =
     withColors d [fc, bc] $ \[fc', bc'] -> do
       setForeground d gc fc'
       setBackground d gc bc'
       io $ wcDrawImageString d p fs gc x y s
 
 #ifdef XFT
-printString' dpy drw fs@(Xft font) _ fc bc x y s = do
+printString dpy drw fs@(Xft font) _ fc bc x y s = do
   (a,d)  <- textExtents fs s
   gi <- xftTxtExtents dpy font s
   withDrawingColors dpy drw fc bc $ \draw -> \fc' -> \bc' ->
