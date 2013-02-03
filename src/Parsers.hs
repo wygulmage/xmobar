@@ -61,12 +61,10 @@ notFollowedBy' p e = do x <- p
                         notFollowedBy $ try (e >> return '*')
                         return x
 
-icon :: Parser String
-icon = many1 $ noneOf ">"
-
 iconParser :: String -> Parser [(Widget, ColorString)]
 iconParser c = do
-  i <- between (string "<icon=") (string ">") icon
+  string "<icon="
+  i <- manyTill (noneOf ">") (try (string "/>"))
   return [(Icon i, c)]
   
 -- | Parsers a string wrapped in a color specification.
