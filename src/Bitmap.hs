@@ -1,3 +1,15 @@
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  Bitmap
+-- Copyright   :  (C) 2013 Alexander Polakov
+-- License     :  BSD3
+--
+-- Maintainer  :  jao@gnu.org
+-- Stability   :  unstable
+-- Portability :  unportable
+--
+-----------------------------------------------------------------------------
+
 module Bitmap
  ( updateCache
  , drawBitmap
