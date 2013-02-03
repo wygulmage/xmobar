@@ -60,4 +60,4 @@ drawBitmap d p gc fc bc x y i =
         h = height i
     setForeground d gc fc'
     setBackground d gc bc'
-    copyPlane d (pixmap i) p gc 0 0 w h x (y - (fromIntegral h)) 1
+    copyPlane d (pixmap i) p gc 0 0 w h x (y - fromIntegral h) 1

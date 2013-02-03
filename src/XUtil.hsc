@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  XUtil
--- Copyright   :  (C) 2011, 2012 Jose Antonio Ortega Ruiz
+-- Copyright   :  (C) 2011, 2012, 2013 Jose Antonio Ortega Ruiz
 --                (C) 2007 Andrea Rossato
 -- License     :  BSD3
 --
@@ -32,8 +32,6 @@ import Control.Concurrent
 import Control.Monad.Trans
 import Control.Exception (SomeException, handle)
 import Foreign
--- import Foreign.C.Types
-import Data.Foldable (forM_)
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import qualified Graphics.X11.Xlib as Xlib (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
