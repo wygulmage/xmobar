@@ -3,12 +3,12 @@
 About
 =====
 
-xmobar is a minimalistic, text based, status bar. It was originally
-designed and implemented by Andrea Rossato to work with [xmonad],
-but it's actually usable with any window-manager.
+xmobar is a minimalistic, mostly text based, status bar. It was
+originally designed and implemented by Andrea Rossato to work with
+[xmonad], but it's actually usable with any window-manager.
 
 xmobar was inspired by the [Ion3] status bar, and supports similar
-features, like dynamic color management, output templates, and
+features, like dynamic color management, icons, output templates, and
 extensibility through plugins.
 
 This page documents xmobar 0.16 (see [release notes]).
@@ -187,6 +187,8 @@ For the output template:
 
 - `<fc=#FF0000>string</fc>` will print `string` with `#FF0000` color
   (red).
+
+- `<icon=/path/to/icon.xbm/>` will insert the given bitmap.
 
 Other configuration options:
 
@@ -430,6 +432,13 @@ operating system to execute a program with the name found in the
 template. If the execution is not successful an error will be
 reported.
 
+It's possible to insert in the global templates icon directives of the
+form:
+
+     <icon=/path/to/bitmap.xbm/>
+
+which will produce the expected result.
+
 ## The `commands` Configuration Option
 
 The `commands` configuration option is a list of commands information
@@ -446,7 +455,10 @@ Example:
     [Run Memory ["-t","Mem: <usedratio>%"] 10, Run Swap [] 10]
 
 to run the Memory monitor plugin with the specified template, and the
-swap monitor plugin, with default options, every second.
+swap monitor plugin, with default options, every second.  And here's
+an example of a template for the commands above using an icon:
+
+    template="<icon=/home/jao/.xmobar/mem.xbm/><memory> <swap>"
 
 The only internal available command is `Com` (see below Executing
 External Commands). All other commands are provided by plugins. xmobar
@@ -454,10 +466,8 @@ comes with some plugins, providing a set of system monitors, a
 standard input reader, an Unix named pipe reader, a configurable date
 plugin, and much more: we list all available plugins below.
 
-To remove them see below Installing/Removing a Plugin
-
 Other commands can be created as plugins with the Plugin
-infrastructure. See below Writing a Plugin
+infrastructure. See below.
 
 ## System Monitor Plugins
 
@@ -1262,10 +1272,10 @@ In particular, xmobar [incorporates patches] by Ben Boeckel, Roman
 Cheplyaka, Patrick Chilton, John Goerzen, Reto Hablützel, Juraj
 Hercek, Tomas Janousek, Spencer Janssen, Jochen Keil, Lennart
 Kolmodin, Krzysztof Kosciuszkiewicz, Dmitry Kurochkin, Dmitry Malikov,
-Svein Ove, Martin Perner, Jens Petersen, Petr Rockai, Andrew
-Sackville-West, Alexander Solovyov, John Soros, Artem Tarasov, Sergei
-Trofimovich, Thomas Tuegel, Jan Vornberger, Daniel Wagner and Norbert
-Zeh.
+Edward O'Callaghan, Svein Ove, Martin Perner, Jens Petersen, Alexander
+Polakov, Petr Rockai, Andrew Sackville-West, Alexander Solovyov, John
+Soros, Artem Tarasov, Sergei Trofimovich, Thomas Tuegel, Jan
+Vornberger, Daniel Wagner and Norbert Zeh.
 
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
 

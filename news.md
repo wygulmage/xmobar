@@ -4,6 +4,8 @@
 
 _New features_
 
+  - Icons support: it's now possible to insert bitmaps in the global
+    template (Edward O'Callaghan and Alexander Polakov).
   - New `TopP` and `BottomP` alignments, taking left and right
     paddings (thanks to Dmitry Malikov).
 
