@@ -17,8 +17,6 @@ module XUtil
     , initFont
     , initCoreFont
     , initUtf8Font
-    , loadBitmap
-    , drawBitmap
     , textExtents
     , textWidth
     , printString
@@ -41,10 +39,7 @@ import qualified Graphics.X11.Xlib as Xlib (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
 import System.Mem.Weak ( addFinalizer )
 import System.Posix.Types (Fd(..))
-import System.Directory (doesFileExist)
 import System.IO
-import XGraphic
-import Types
 
 #if defined XFT || defined UTF8
 # if __GLASGOW_HASKELL__ < 612
@@ -157,25 +152,6 @@ textExtents (Xft xftfont) _ = do
   descent <- fi `fmap` xft_descent xftfont
   return (ascent, descent)
 #endif
-
-loadBitmap :: Display -> Drawable -> FilePath -> IO (Maybe Bitmap)
-loadBitmap d w p = do
-    exist <- doesFileExist p
-    if exist
-       then do
-            (bw, bh, bp, _, _) <- readBitmapFile d w p
-            addFinalizer bp (freePixmap d bp)
-            return $ Just $ Bitmap bw bh bp
-       else
-           return Nothing
-
-drawBitmap :: Display -> Drawable -> XFont -> GC -> String -> String
-            -> Position -> Position -> Bitmap -> IO ()
-drawBitmap d p _ gc fc bc x y i = do
-    withColors d [fc, bc] $ \[fc', bc'] -> do
-    setForeground d gc fc'
-    setBackground d gc bc'
-    io $ copyPlane d (pixmap i) p gc 0 0 (width i) (height i) x (y - (fi $ height i)) 1
 
 printString :: Display -> Drawable -> XFont -> GC -> String -> String
             -> Position -> Position -> String  -> IO ()

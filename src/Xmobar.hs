@@ -43,12 +43,12 @@ import Control.Exception (handle, SomeException(..))
 import Data.Bits
 import Data.Map hiding (foldr, map, filter)
 
+import Bitmap
 import Config
 import Parsers
 import Commands
 import Runnable
 import Signal
-import Types
 import Window
 import XUtil
 import ColorCache
@@ -230,18 +230,6 @@ updateString conf v = do
   let l:c:r:_ = s ++ repeat ""
   io $ mapM (parseString conf) [l, c, r]
 
-updateCache :: Display -> Window -> Map FilePath Bitmap -> [[(Widget, String)]] -> IO (Map FilePath Bitmap)
-updateCache dpy win cache ps = do
-  let paths = map (\(Icon p, _) -> p) . concatMap (filter icons) $ ps
-      icons (Icon _, _) = True
-      icons _ = False
-  foldM (\m path -> if member path m
-                       then return m
-                       else do bitmap <- io $ loadBitmap dpy win path
-                               case bitmap of
-                                    Nothing -> return m
-                                    Just bmap -> return $ insert path bmap m) cache paths
-
 -- $print
 
 -- | Draws in and updates the window
@@ -299,5 +287,5 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
                                (f,    _) -> (f, bgColor conf)
   case s of
     (Text t) -> io $ printString d dr fontst gc fc bc offset valign t
-    (Icon p) -> io $ maybe (return ()) (drawBitmap d dr fontst gc fc bc offset valign) (lookup p (iconS r))
+    (Icon p) -> io $ maybe (return ()) (drawBitmap d dr gc fc bc offset valign) (lookup p (iconS r))
   printStrings dr gc fontst (offs + l) a xs

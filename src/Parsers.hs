@@ -21,13 +21,14 @@ module Parsers
     ) where
 
 import Config
-import Types
 import Runnable
 import Commands
 
 import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Perm
+
+data Widget = Icon String | Text String
 
 type ColorString = String
 

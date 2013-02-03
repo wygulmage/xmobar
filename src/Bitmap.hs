@@ -6,7 +6,6 @@ module Bitmap
 import Control.Monad
 import Data.Map hiding (foldr, map, filter)
 import Graphics.X11.Xlib
-import Graphics.X11.Xlib.Extras
 import System.Directory (doesFileExist)
 import System.Mem.Weak ( addFinalizer )
 import XGraphic
