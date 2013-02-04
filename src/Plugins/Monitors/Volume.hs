@@ -19,7 +19,7 @@ import Control.Monad ( join, liftM2, liftM3, mplus )
 import Data.Traversable (sequenceA)
 import Plugins.Monitors.Common
 import Sound.ALSA.Mixer
-import Sound.ALSA.Exception ( catch )
+import qualified Sound.ALSA.Exception as AE
 import System.Console.GetOpt
 
 volumeConfig :: IO MConfig
@@ -124,10 +124,12 @@ runVolume mixerName controlName argv = do
   where
 
     volumeControl :: Maybe Control -> Maybe Volume
-    volumeControl c = join $ (playback . volume <$> c) `mplus` (common . volume <$> c)
+    volumeControl c = join $
+           (playback . volume <$> c) `mplus` (common . volume <$> c)
 
     switchControl :: Maybe Control -> Maybe Switch
-    switchControl c = join $ (playback . switch <$> c) `mplus` (common . switch <$> c)
+    switchControl c = join $
+           (playback . switch <$> c) `mplus` (common . switch <$> c)
 
     liftMaybe :: Maybe (IO (a,b)) -> IO (Maybe a, Maybe b)
     liftMaybe = fmap (liftM2 (,) (fmap fst) (fmap snd)) . sequenceA
@@ -138,7 +140,8 @@ runVolume mixerName controlName argv = do
 
     getDB :: Maybe Volume -> Monitor (Maybe Integer)
     getDB Nothing = return Nothing
-    getDB (Just v) = io $ catch (getChannel FrontLeft $ dB v) (const $ return $ Just 0)
+    getDB (Just v) = io $ AE.catch (getChannel FrontLeft $ dB v)
+                                   (const $ return $ Just 0)
 
     getVal :: Maybe Volume -> Monitor (Maybe Integer)
     getVal Nothing = return Nothing
