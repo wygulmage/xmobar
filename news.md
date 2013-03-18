@@ -4,10 +4,12 @@
 
 _New features_
 
-  - Icons support: it's now possible to insert bitmaps in the global
-    template (Edward O'Callaghan and Alexander Polakov).
+  - Icons support: it's now possible to insert bitmaps in the template
+    (Edward O'Callaghan, Alexander Polakov and Tomáš Janoušek).
+  - Initial support for reacting to mouse clicks (Alexander Polakov).
   - New `TopP` and `BottomP` alignments, taking left and right
     paddings (thanks to Dmitry Malikov).
+  - New `<freeratio>` field for memory monitor (Peter Simons).
 
 
 ## Version 0.16 (Dec 3, 2012)

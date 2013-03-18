@@ -11,7 +11,7 @@ xmobar was inspired by the [Ion3] status bar, and supports similar
 features, like dynamic color management, icons, output templates, and
 extensibility through plugins.
 
-This page documents xmobar 0.16 (see [release notes]).
+This page documents xmobar 0.17 (see [release notes]).
 
 [This screenshot] shows xmobar running under [sawfish], with
 antialiased fonts. And [this one] is my desktop with [xmonad] and two
@@ -1285,9 +1285,9 @@ Cheplyaka, Patrick Chilton, John Goerzen, Reto Hablützel, Juraj
 Hercek, Tomas Janousek, Spencer Janssen, Jochen Keil, Lennart
 Kolmodin, Krzysztof Kosciuszkiewicz, Dmitry Kurochkin, Dmitry Malikov,
 Edward O'Callaghan, Svein Ove, Martin Perner, Jens Petersen, Alexander
-Polakov, Petr Rockai, Andrew Sackville-West, Alexander Solovyov, John
-Soros, Artem Tarasov, Sergei Trofimovich, Thomas Tuegel, Jan
-Vornberger, Daniel Wagner and Norbert Zeh.
+Polakov, Petr Rockai, Peter Simons, Andrew Sackville-West, Alexander
+Solovyov, John Soros, Artem Tarasov, Sergei Trofimovich, Thomas
+Tuegel, Jan Vornberger, Daniel Wagner and Norbert Zeh.
 
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
 
