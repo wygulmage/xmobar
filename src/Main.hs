@@ -34,6 +34,7 @@ import Graphics.X11.Xlib
 import System.Console.GetOpt
 import System.Exit
 import System.Environment
+import System.Environment.XDG.BaseDir
 import System.Posix.Files
 import Control.Monad (unless)
 
@@ -91,10 +92,14 @@ readConfig f = do
 -- | Read default configuration file or load the default config
 readDefaultConfig :: IO (Config,[String])
 readDefaultConfig = do
+  xdgconf <- getUserDataFile "xmobar" "xmobarrc"
+  x <- io $ fileExist xdgconf
   home <- io $ getEnv "HOME"
   let path = home ++ "/.xmobarrc"
   f <- io $ fileExist path
-  if f then readConfig path else return (defaultConfig,[])
+  if x then readConfig path
+       else if f then readConfig path
+                 else return (defaultConfig,[])
 
 data Opts = Help
           | Version
