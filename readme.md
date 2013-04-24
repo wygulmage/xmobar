@@ -247,6 +247,11 @@ Other configuration options:
       can be toggled manually (for example using the dbus interface) or
       automatically (by a plugin) to make it reappear.
 
+`allDesktops`
+:     When set to True (the default is False), xmobar will tell the
+      window manager explicitily to be shown in all desktops, by
+      setting `_NET_WM_DESKTOP` to 0xffffffff.
+
 `persistent`
 :     When True the window status is fixed i.e. hiding or revealing is not
       possible. This option can be toggled at runtime.

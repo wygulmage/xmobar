@@ -10,6 +10,7 @@ _New features_
   - New `TopP` and `BottomP` alignments, taking left and right
     paddings (thanks to Dmitry Malikov).
   - New `<freeratio>` field for memory monitor (Peter Simons).
+  - New `allDesktops` configuration option.
 
 
 ## Version 0.16 (Dec 3, 2012)

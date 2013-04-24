@@ -51,24 +51,29 @@ import Plugins.DateZone
 
 -- | The configuration data type
 data Config =
-    Config { font           :: String     -- ^ Font
-           , bgColor        :: String     -- ^ Backgroud color
-           , fgColor        :: String     -- ^ Default font color
-           , position       :: XPosition  -- ^ Top Bottom or Static
-           , border         :: Border     -- ^ NoBorder TopB BottomB or FullB
-           , borderColor    :: String     -- ^ Border color
-           , hideOnStart    :: Bool       -- ^ Hide (Unmap) the window on
-                                          --   initialization
-           , lowerOnStart   :: Bool       -- ^ Lower to the bottom of the
-                                          --   window stack on initialization
-           , persistent     :: Bool       -- ^ Whether automatic hiding should
-                                          --   be enabled or disabled
-           , commands       :: [Runnable] -- ^ For setting the command, the command arguments
-                                          --   and refresh rate for the programs to run (optional)
-           , sepChar        :: String     -- ^ The character to be used for indicating
-                                          --   commands in the output template (default '%')
-           , alignSep       :: String     -- ^ Separators for left, center and right text alignment
-           , template       :: String     -- ^ The output template
+    Config { font :: String         -- ^ Font
+           , bgColor :: String      -- ^ Backgroud color
+           , fgColor :: String      -- ^ Default font color
+           , position :: XPosition  -- ^ Top Bottom or Static
+           , border :: Border       -- ^ NoBorder TopB BottomB or FullB
+           , borderColor :: String  -- ^ Border color
+           , hideOnStart :: Bool    -- ^ Hide (Unmap) the window on
+                                    --   initialization
+           , allDesktops :: Bool    -- ^ Tell the WM to map to all desktops
+           , lowerOnStart :: Bool   -- ^ lower to the bottom of the
+                                    --   window stack on initialization
+           , persistent :: Bool     -- ^ Whether automatic hiding should
+                                    --   be enabled or disabled
+           , commands :: [Runnable] -- ^ For setting the command,
+                                    --   the command arguments
+                                    --   and refresh rate for the programs
+                                    --   to run (optional)
+           , sepChar :: String      -- ^ The character to be used for indicating
+                                    --   commands in the output template
+                                    --   (default '%')
+           , alignSep :: String     -- ^ Separators for left, center and
+                                    -- right text alignment
+           , template :: String     -- ^ The output template
            } deriving (Read)
 
 data XPosition = Top
@@ -97,18 +102,19 @@ data Border = NoBorder
 -- | The default configuration values
 defaultConfig :: Config
 defaultConfig =
-    Config { font     = "-misc-fixed-*-*-*-*-10-*-*-*-*-*-*-*"
-           , bgColor  = "#000000"
-           , fgColor  = "#BFBFBF"
+    Config { font = "-misc-fixed-*-*-*-*-10-*-*-*-*-*-*-*"
+           , bgColor = "#000000"
+           , fgColor = "#BFBFBF"
            , position = Top
            , border = NoBorder
-           , borderColor  = "#BFBFBF"
-           , hideOnStart  = False
+           , borderColor = "#BFBFBF"
+           , hideOnStart = False
            , lowerOnStart = True
-           , persistent   = False
+           , persistent = False
+           , allDesktops = False
            , commands = [ Run $ Date "%a %b %_d %Y * %H:%M:%S" "theDate" 10
                         , Run StdinReader]
-           , sepChar  = "%"
+           , sepChar = "%"
            , alignSep = "}{"
            , template = "%StdinReader% }{ <fc=#00FF00>%uname%</fc> * <fc=#FF0000>%theDate%</fc>"
            }

@@ -48,12 +48,13 @@ stringParser c a = manyTill (textParser c a <|> try (iconParser c a) <|>
 -- | Parses a maximal string without color markup.
 textParser :: String -> Maybe Action -> Parser [(Widget, ColorString, Maybe Action)]
 textParser c a = do s <- many1 $
-                        noneOf "<" <|>
-                        (try $ notFollowedBy' (char '<')
-                                               (try (string "fc=")  <|>
-                                               try (string "action=") <|>
-                                               try (string "/action>") <|>
-                                               try (string "icon=") <|> string "/fc>"))
+                          noneOf "<" <|>
+                            try (notFollowedBy' (char '<')
+                                  (try (string "fc=")  <|>
+                                   try (string "action=") <|>
+                                   try (string "/action>") <|>
+                                   try (string "icon=") <|>
+                                   string "/fc>"))
                     return [(Text s, c, a)]
 
 
@@ -78,7 +79,7 @@ actionParser c = do
   s <- manyTill (try (textParser c a') <|> try (iconParser c a') <|>
                  try (colorParser a') <|> actionParser c) (try $ string "</action>")
   return (concat s)
- 
+
 -- | Parsers a string wrapped in a color specification.
 colorParser :: Maybe Action -> Parser [(Widget, ColorString, Maybe Action)]
 colorParser a = do
@@ -154,33 +155,33 @@ parseConfig = runParser parseConf fields "Config" . stripComments
         return (x,s)
 
       perms = permute $ Config
-              <$?> pFont         <|?> pBgColor
-              <|?> pFgColor      <|?> pPosition
-              <|?> pBorder       <|?> pBdColor
-              <|?> pHideOnStart  <|?> pLowerOnStart
-              <|?> pPersistent   <|?> pCommands
-              <|?> pSepChar      <|?> pAlignSep
-              <|?> pTemplate
+              <$?> pFont <|?> pBgColor <|?> pFgColor <|?> pPosition
+              <|?> pBorder <|?> pBdColor <|?> pHideOnStart <|?> pAllDesktops
+              <|?> pLowerOnStart <|?> pPersistent <|?> pCommands
+              <|?> pSepChar <|?> pAlignSep <|?> pTemplate
 
       fields    = [ "font", "bgColor", "fgColor", "sepChar", "alignSep"
                   , "border", "borderColor" ,"template", "position"
-                  , "hideOnStart", "lowerOnStart", "persistent", "commands"
+                  , "allDesktops", "hideOnStart", "lowerOnStart"
+                  , "persistent", "commands"
                   ]
 
-      pFont     = strField font     "font"
-      pBgColor  = strField bgColor  "bgColor"
-      pFgColor  = strField fgColor  "fgColor"
-      pBdColor  = strField borderColor "borderColor"
-      pSepChar  = strField sepChar  "sepChar"
+      pFont = strField font "font"
+      pBgColor = strField bgColor "bgColor"
+      pFgColor = strField fgColor "fgColor"
+      pBdColor = strField borderColor "borderColor"
+      pSepChar = strField sepChar "sepChar"
       pAlignSep = strField alignSep "alignSep"
       pTemplate = strField template "template"
 
-      pPosition     = field position     "position"     $ tillFieldEnd >>= read' "position"
-      pHideOnStart  = field hideOnStart  "hideOnStart"  $ tillFieldEnd >>= read' "hideOnStart"
-      pLowerOnStart = field lowerOnStart "lowerOnStart" $ tillFieldEnd >>= read' "lowerOnStart"
-      pPersistent   = field persistent   "persistent"   $ tillFieldEnd >>= read' "persistent"
-      pBorder       = field border       "border"       $ tillFieldEnd >>= read' "border"
-      pCommands     = field commands     "commands"     $ readCommands
+      pPosition = readField position "position"
+      pHideOnStart = readField hideOnStart "hideOnStart"
+      pLowerOnStart = readField lowerOnStart "lowerOnStart"
+      pPersistent = readField persistent "persistent"
+      pBorder = readField border "border"
+      pAllDesktops = readField allDesktops "allDesktops"
+
+      pCommands = field commands "commands" readCommands
 
       staticPos = do string "Static"
                      wrapSkip (string "{")
@@ -191,12 +192,17 @@ parseConfig = runParser parseConf fields "Config" . stripComments
       tillFieldEnd = staticPos <|> many (noneOf ",}\n\r")
 
       commandsEnd  = wrapSkip (string "]") >> (string "}" <|> notNextRun)
-      notNextRun = do { string ","; notFollowedBy $ wrapSkip $ string "Run"; return ","} 
+      notNextRun = do {string ","
+                      ; notFollowedBy $ wrapSkip $ string "Run"
+                      ; return ","
+                      }
       readCommands = manyTill anyChar (try commandsEnd) >>= read' commandsErr . flip (++) "]"
 
-      strField e n = field e n . between (strDel "start" n) (strDel "end" n) . many $ noneOf "\"\n\r"
-      strDel   t n = char '"' <?> strErr t n
-      strErr   t n = "the " ++ t ++ " of the string field " ++ n ++ " - a double quote (\")."
+      strField e n = field e n . between (strDel "start" n) (strDel "end" n) .
+                     many $ noneOf "\"\n\r"
+      strDel t n = char '"' <?> strErr t n
+      strErr t n = "the " ++ t ++ " of the string field " ++ n ++
+                       " - a double quote (\")."
 
       wrapSkip   x = many space >> x >>= \r -> many space >> return r
       sepEndSpc    = mapM_ (wrapSkip . try . string)
@@ -204,12 +210,11 @@ parseConfig = runParser parseConf fields "Config" . stripComments
       field  e n c = (,) (e defaultConfig) $
                      updateState (filter (/= n)) >> sepEndSpc [n,"="] >>
                      wrapSkip c >>= \r -> fieldEnd >> return r
-
+      readField a n = field a n $ tillFieldEnd >>= read' n
       read' d s = case reads s of
                     [(x, _)] -> return x
-                    _        -> fail $ "error reading the " ++ d ++ " field: " ++ s
+                    _ -> fail $ "error reading the " ++ d ++ " field: " ++ s
 
 commandsErr :: String
 commandsErr = "commands: this usually means that a command could not be parsed.\n" ++
               "The error could be located at the begining of the command which follows the offending one."
-

@@ -16,7 +16,7 @@
 module Window where
 
 import Prelude
-import Control.Monad (when)
+import Control.Monad (when, unless)
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
 import Graphics.X11.Xinerama
@@ -40,7 +40,7 @@ createWin d fs c = do
       (r,o) = setPosition (position c) srs (fi ht)
   win <- newWindow  d (defaultScreenOfDisplay d) rootw r o
   when (lowerOnStart c) (lowerWindow d win)
-  when (not $ hideOnStart c) $ showWindow r c d win
+  unless (hideOnStart c) $ showWindow r c d win
   setProperties r c d win srs
   return (r,win)
 
@@ -88,25 +88,32 @@ setPosition p rs ht =
 
 setProperties :: Rectangle -> Config -> Display -> Window -> [Rectangle]
                  -> IO ()
-setProperties r c d w srs = do
-  a1 <- internAtom d "_NET_WM_STRUT_PARTIAL"    False
-  c1 <- internAtom d "CARDINAL"                 False
-  a2 <- internAtom d "_NET_WM_WINDOW_TYPE"      False
-  c2 <- internAtom d "ATOM"                     False
-  v  <- internAtom d "_NET_WM_WINDOW_TYPE_DOCK" False
-  p  <- internAtom d "_NET_WM_PID"              False
+setProperties r c d w rs = do
+  pstrut <- internAtom d "_NET_WM_STRUT_PARTIAL" False
+  strut <- internAtom d "_NET_WM_STRUT" False
+  card <- internAtom d "CARDINAL" False
+  wtype <- internAtom d "_NET_WM_WINDOW_TYPE" False
+  atom <- internAtom d "ATOM" False
+  dock <- internAtom d "_NET_WM_WINDOW_TYPE_DOCK" False
+  pid  <- internAtom d "_NET_WM_PID" False
 
   setTextProperty d w "xmobar" wM_CLASS
   setTextProperty d w "xmobar" wM_NAME
 
   ismapped <- isMapped d w
-  changeProperty32 d w a1 c1 propModeReplace $
-    if ismapped
-        then map fi $ getStrutValues r (position c) (getRootWindowHeight srs)
-        else replicate 12 0
-  changeProperty32 d w a2 c2 propModeReplace [fromIntegral v]
+  let svs = if ismapped
+              then map fi $ getStrutValues r
+                                           (position c)
+                                           (getRootWindowHeight rs)
+              else replicate 12 0
+  changeProperty32 d w pstrut card propModeReplace svs
+  changeProperty32 d w strut card propModeReplace (take 4 svs)
+  changeProperty32 d w wtype atom propModeReplace [fi dock]
+  when (allDesktops c) $ do
+    desktop <- internAtom d "_NET_WM_DESKTOP" False
+    changeProperty32 d w desktop card propModeReplace [0xffffffff]
 
-  getProcessID >>= changeProperty32 d w p c1 propModeReplace . return . fromIntegral
+  getProcessID >>= changeProperty32 d w pid card propModeReplace . return . fi
 
 getRootWindowHeight :: [Rectangle] -> Int
 getRootWindowHeight srs = maximum (map getMaxScreenYCoord srs)
@@ -115,7 +122,7 @@ getRootWindowHeight srs = maximum (map getMaxScreenYCoord srs)
 
 getStrutValues :: Rectangle -> XPosition -> Int -> [Int]
 getStrutValues r@(Rectangle x y w h) p rwh =
-    case p of
+  case p of
     OnScreen _ p'   -> getStrutValues r p' rwh
     Top             -> [0, 0, st,  0, 0, 0, 0, 0, nx, nw,  0,  0]
     TopP    _ _     -> [0, 0, st,  0, 0, 0, 0, 0, nx, nw,  0,  0]
@@ -126,10 +133,10 @@ getStrutValues r@(Rectangle x y w h) p rwh =
     BottomW _ _     -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
     BottomSize   {} -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
     Static       {} -> getStaticStrutValues p rwh
-    where st = fi y + fi h
-          sb = rwh - fi y
-          nx = fi x
-          nw = fi (x + fi w - 1)
+  where st = fi y + fi h
+        sb = rwh - fi y
+        nx = fi x
+        nw = fi (x + fi w - 1)
 
 -- get some reaonable strut values for static placement.
 getStaticStrutValues :: XPosition -> Int -> [Int]
