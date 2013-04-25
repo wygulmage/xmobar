@@ -183,8 +183,8 @@ printString dpy drw fs@(Xft font) _ fc bc x y s = do
 -- Windows Managers should not touch this kind of windows.
 newWindow :: Display -> Screen -> Window -> Rectangle -> Bool -> IO Window
 newWindow dpy scr rw (Rectangle x y w h) o = do
-  let visual   = defaultVisualOfScreen scr
-      attrmask = cWOverrideRedirect
+  let visual = defaultVisualOfScreen scr
+      attrmask = if o then cWOverrideRedirect else 0
   allocaSetWindowAttributes $
          \attributes -> do
            set_override_redirect attributes o

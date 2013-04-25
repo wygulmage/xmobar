@@ -60,6 +60,8 @@ data Config =
            , hideOnStart :: Bool    -- ^ Hide (Unmap) the window on
                                     --   initialization
            , allDesktops :: Bool    -- ^ Tell the WM to map to all desktops
+           , overrideRedirect :: Bool -- ^ Needed for dock behaviour in some
+                                      --   non-tiling WMs
            , lowerOnStart :: Bool   -- ^ lower to the bottom of the
                                     --   window stack on initialization
            , persistent :: Bool     -- ^ Whether automatic hiding should
@@ -111,7 +113,8 @@ defaultConfig =
            , hideOnStart = False
            , lowerOnStart = True
            , persistent = False
-           , allDesktops = False
+           , allDesktops = True
+           , overrideRedirect = True
            , commands = [ Run $ Date "%a %b %_d %Y * %H:%M:%S" "theDate" 10
                         , Run StdinReader]
            , sepChar = "%"

@@ -37,8 +37,8 @@ createWin d fs c = do
   rootw   <- rootWindow d dflt
   (as,ds) <- textExtents fs "0"
   let ht    = as + ds + 4
-      (r,o) = setPosition (position c) srs (fi ht)
-  win <- newWindow  d (defaultScreenOfDisplay d) rootw r o
+      r = setPosition (position c) srs (fi ht)
+  win <- newWindow  d (defaultScreenOfDisplay d) rootw r (overrideRedirect c)
   when (lowerOnStart c) (lowerWindow d win)
   unless (hideOnStart c) $ showWindow r c d win
   setProperties r c d win srs
@@ -50,23 +50,23 @@ repositionWin d win fs c = do
   srs     <- getScreenInfo d
   (as,ds) <- textExtents fs "0"
   let ht    = as + ds + 4
-      (r,_) = setPosition (position c) srs (fi ht)
+      r = setPosition (position c) srs (fi ht)
   moveResizeWindow d win (rect_x r) (rect_y r) (rect_width r) (rect_height r)
   setProperties r c d win srs
   return r
 
-setPosition :: XPosition -> [Rectangle] -> Dimension -> (Rectangle,Bool)
+setPosition :: XPosition -> [Rectangle] -> Dimension -> Rectangle
 setPosition p rs ht =
   case p' of
-    Top -> (Rectangle rx ry rw h, True)
-    TopP l r -> (Rectangle (rx + fi l) ry (rw - fi l - fi r) h, True)
-    TopW a i -> (Rectangle (ax a i) ry (nw i) h, True)
-    TopSize a i ch -> (Rectangle (ax a i) ry (nw i) (mh ch), True)
-    Bottom -> (Rectangle rx ny rw h, True)
-    BottomW a i -> (Rectangle (ax a i) ny (nw i) h, True)
-    BottomP l r -> (Rectangle (rx + fi l) ny (rw - fi l - fi r) h, True)
-    BottomSize a i ch  -> (Rectangle (ax a i) (ny' ch) (nw i) (mh ch), True)
-    Static cx cy cw ch -> (Rectangle (fi cx) (fi cy) (fi cw) (fi ch), True)
+    Top -> Rectangle rx ry rw h
+    TopP l r -> Rectangle (rx + fi l) ry (rw - fi l - fi r) h
+    TopW a i -> Rectangle (ax a i) ry (nw i) h
+    TopSize a i ch -> Rectangle (ax a i) ry (nw i) (mh ch)
+    Bottom -> Rectangle rx ny rw h
+    BottomW a i -> Rectangle (ax a i) ny (nw i) h
+    BottomP l r -> Rectangle (rx + fi l) ny (rw - fi l - fi r) h
+    BottomSize a i ch  -> Rectangle (ax a i) (ny' ch) (nw i) (mh ch)
+    Static cx cy cw ch -> Rectangle (fi cx) (fi cy) (fi cw) (fi ch)
     OnScreen _ p'' -> setPosition p'' [scr] ht
   where
     (scr@(Rectangle rx ry rw rh), p') =
@@ -89,13 +89,9 @@ setPosition p rs ht =
 setProperties :: Rectangle -> Config -> Display -> Window -> [Rectangle]
                  -> IO ()
 setProperties r c d w rs = do
-  pstrut <- internAtom d "_NET_WM_STRUT_PARTIAL" False
-  strut <- internAtom d "_NET_WM_STRUT" False
-  card <- internAtom d "CARDINAL" False
-  wtype <- internAtom d "_NET_WM_WINDOW_TYPE" False
-  atom <- internAtom d "ATOM" False
-  dock <- internAtom d "_NET_WM_WINDOW_TYPE_DOCK" False
-  pid  <- internAtom d "_NET_WM_PID" False
+  let mkatom n = internAtom d n False
+  card <- mkatom "CARDINAL"
+  atom <- mkatom "ATOM"
 
   setTextProperty d w "xmobar" wM_CLASS
   setTextProperty d w "xmobar" wM_NAME
@@ -106,13 +102,21 @@ setProperties r c d w rs = do
                                            (position c)
                                            (getRootWindowHeight rs)
               else replicate 12 0
+
+  pstrut <- mkatom "_NET_WM_STRUT_PARTIAL"
   changeProperty32 d w pstrut card propModeReplace svs
+  strut <- mkatom "_NET_WM_STRUT"
   changeProperty32 d w strut card propModeReplace (take 4 svs)
+
+  wtype <- mkatom "_NET_WM_WINDOW_TYPE"
+  dock <- mkatom "_NET_WM_WINDOW_TYPE_DOCK"
   changeProperty32 d w wtype atom propModeReplace [fi dock]
+
   when (allDesktops c) $ do
-    desktop <- internAtom d "_NET_WM_DESKTOP" False
+    desktop <- mkatom "_NET_WM_DESKTOP"
     changeProperty32 d w desktop card propModeReplace [0xffffffff]
 
+  pid  <- mkatom "_NET_WM_PID"
   getProcessID >>= changeProperty32 d w pid card propModeReplace . return . fi
 
 getRootWindowHeight :: [Rectangle] -> Int
