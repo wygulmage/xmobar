@@ -119,7 +119,8 @@ defaultConfig =
                         , Run StdinReader]
            , sepChar = "%"
            , alignSep = "}{"
-           , template = "%StdinReader% }{ <fc=#00FF00>%uname%</fc> * <fc=#FF0000>%theDate%</fc>"
+           , template = "%StdinReader% }{ " ++
+                        "<fc=#00FF00>%uname%</fc> * <fc=#FF0000>%theDate%</fc>"
            }
 
 

@@ -248,13 +248,18 @@ Other configuration options:
       automatically (by a plugin) to make it reappear.
 
 `allDesktops`
-:     When set to True (the default is False), xmobar will tell the
-      window manager explicitily to be shown in all desktops, by
-      setting `_NET_WM_DESKTOP` to 0xffffffff.
+:     When set to True (the default), xmobar will tell the window manager
+      explicitily to be shown in all desktops, by setting
+      `_NET_WM_DESKTOP` to 0xffffffff.
+
+`overrideRedirect`
+:     If you're running xmobar in a tiling window manager, you might need
+      to set this option to `False` so that it behaves as a docked
+      application.  Defaults to `True`.
 
 `persistent`
 :     When True the window status is fixed i.e. hiding or revealing is not
-      possible. This option can be toggled at runtime.
+      possible. This option can be toggled at runtime. Defaults to False.
 
 `border`
 :     TopB, TopBM, BottomB, BottomBM, FullB, FullBM or NoBorder (default).

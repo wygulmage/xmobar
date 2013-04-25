@@ -10,7 +10,18 @@ _New features_
   - New `TopP` and `BottomP` alignments, taking left and right
     paddings (thanks to Dmitry Malikov).
   - New `<freeratio>` field for memory monitor (Peter Simons).
-  - New `allDesktops` configuration option.
+  - New `allDesktops` and `overrideRedirect` configuration options,
+    providing dock behaviour in tiling WMs (when set to True and False
+    respectively). Cf. discussion at [github #105].
+
+_Bug fixes_
+
+  - Partial (as reports go) fix for [github #77].
+  - Safer volume plugin (Dmitry Malikov).
+  - Battery percentage capped at 100% (RJ Regenold).
+
+[github #77]: https://github.com/jaor/xmobar/issues/77
+[github #77]: https://github.com/jaor/xmobar/issues/105
 
 
 ## Version 0.16 (Dec 3, 2012)
