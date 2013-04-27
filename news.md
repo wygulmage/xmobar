@@ -1,6 +1,6 @@
 % xmobar - Release notes
 
-## Version 0.17
+## Version 0.17 (April 28, 2013)
 
 _New features_
 
@@ -13,6 +13,8 @@ _New features_
   - New `allDesktops` and `overrideRedirect` configuration options,
     providing dock behaviour in tiling WMs (when set to True and False
     respectively). Cf. discussion at [github #105].
+  - Experimental `-d` (start as a dock) option, may address [github #67]
+    in some window managers.
 
 _Bug fixes_
 
@@ -20,8 +22,9 @@ _Bug fixes_
   - Safer volume plugin (Dmitry Malikov).
   - Battery percentage capped at 100% (RJ Regenold).
 
+[github #67]: https://github.com/jaor/xmobar/issues/77
 [github #77]: https://github.com/jaor/xmobar/issues/77
-[github #77]: https://github.com/jaor/xmobar/issues/105
+[github #105]: https://github.com/jaor/xmobar/issues/105
 
 
 ## Version 0.16 (Dec 3, 2012)

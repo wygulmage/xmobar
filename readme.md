@@ -322,6 +322,7 @@ xmobar --help):
       -F fg color   --fgcolor=fg color     The foreground color. Default grey
       -o            --top                  Place xmobar at the top of the screen
       -b            --bottom               Place xmobar at the bottom of the screen
+      -d            --dock                 Try to start xmobar as a dock
       -a alignsep   --alignsep=alignsep    Separators for left, center and right text
                                            alignment. Default: '}{'
       -s char       --sepchar=char         The character used to separate commands in

@@ -45,12 +45,12 @@ import Signal (setupSignalHandler)
 main :: IO ()
 main = do
   initThreads
-  d   <- openDisplay ""
-  args     <- getArgs
+  d <- openDisplay ""
+  args <- getArgs
   (o,file) <- getOpts args
   (c,defaultings) <- case file of
                        [cfgfile] -> readConfig cfgfile
-                       _         -> readDefaultConfig
+                       _ -> readDefaultConfig
 
   unless (null defaultings) $ putStrLn $
     "Fields missing from config defaulted: " ++ intercalate "," defaultings
@@ -82,8 +82,8 @@ splitTemplate conf =
 readConfig :: FilePath -> IO (Config,[String])
 readConfig f = do
   file <- io $ fileExist f
-  s    <- io $ if file then readFileSafe f else error $
-                   f ++ ": file not found!\n" ++ usage
+  s <- io $ if file then readFileSafe f else error $
+               f ++ ": file not found!\n" ++ usage
   either (\err -> error $ f ++
                     ": configuration file contains errors at:\n" ++ show err)
          return $ parseConfig s
@@ -103,6 +103,7 @@ data Opts = Help
           | FgColor    String
           | T
           | B
+          | D
           | AlignSep   String
           | Commands   String
           | AddCommand String
@@ -123,6 +124,8 @@ options =
     , Option "o" ["top"] (NoArg T) "Place xmobar at the top of the screen"
     , Option "b" ["bottom"] (NoArg B)
       "Place xmobar at the bottom of the screen"
+    , Option "d" ["dock"] (NoArg D)
+      "Don't override redirect from WM and function as a dock"
     , Option "a" ["alignsep"] (ReqArg AlignSep "alignsep")
       "Separators for left, center and right text\nalignment. Default: '}{'"
     , Option "s" ["sepchar"] (ReqArg SepChar "char")
@@ -165,7 +168,8 @@ license = "\nThis program is distributed in the hope that it will be useful," ++
           "\nSee the License for more details."
 
 doOpts :: Config -> [Opts] -> IO Config
-doOpts conf []     = return conf
+doOpts conf [] = 
+  return (conf {lowerOnStart = lowerOnStart conf && overrideRedirect conf})
 doOpts conf (o:oo) =
   case o of
     Help -> putStr   usage >> exitSuccess
@@ -175,6 +179,7 @@ doOpts conf (o:oo) =
     FgColor s -> doOpts' (conf {fgColor = s})
     T -> doOpts' (conf {position = Top})
     B -> doOpts' (conf {position = Bottom})
+    D -> doOpts' (conf {overrideRedirect = False})
     AlignSep s -> doOpts' (conf {alignSep = s})
     SepChar s -> doOpts' (conf {sepChar = s})
     Template s -> doOpts' (conf {template = s})
@@ -192,3 +197,4 @@ doOpts conf (o:oo) =
                         "specified with the -" ++ c:" option\n")
         readStr str = [x | (x,t) <- reads str, ("","") <- lex t]
         doOpts' opts = doOpts opts oo
+

@@ -40,7 +40,7 @@ createWin d fs c = do
       r = setPosition (position c) srs (fi ht)
   win <- newWindow  d (defaultScreenOfDisplay d) rootw r (overrideRedirect c)
   when (lowerOnStart c) (lowerWindow d win)
-  unless (hideOnStart c) $ showWindow r c d win
+  unless (hideOnStart c) $ showWindow r c d win 
   setProperties r c d win srs
   return (r,win)
 
