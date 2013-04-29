@@ -33,26 +33,28 @@ import XUtil
 createWin :: Display -> XFont -> Config -> IO (Rectangle,Window)
 createWin d fs c = do
   let dflt = defaultScreen d
-  srs     <- getScreenInfo d
-  rootw   <- rootWindow d dflt
+  srs <- getScreenInfo d
+  rootw <- rootWindow d dflt
   (as,ds) <- textExtents fs "0"
-  let ht    = as + ds + 4
+  let ht = as + ds + 4
       r = setPosition (position c) srs (fi ht)
   win <- newWindow  d (defaultScreenOfDisplay d) rootw r (overrideRedirect c)
+  setProperties c d win
   when (lowerOnStart c) (lowerWindow d win)
-  unless (hideOnStart c) $ showWindow r c d win 
-  setProperties r c d win srs
+  unless (hideOnStart c) $ showWindow r c d win
+  setStruts r c d win srs
   return (r,win)
 
 -- | Updates the size and position of the window
 repositionWin :: Display -> Window -> XFont -> Config -> IO Rectangle
 repositionWin d win fs c = do
-  srs     <- getScreenInfo d
+  srs <- getScreenInfo d
   (as,ds) <- textExtents fs "0"
-  let ht    = as + ds + 4
+  let ht = as + ds + 4
       r = setPosition (position c) srs (fi ht)
   moveResizeWindow d win (rect_x r) (rect_y r) (rect_width r) (rect_height r)
-  setProperties r c d win srs
+  setProperties c d win
+  setStruts r c d win srs
   return r
 
 setPosition :: XPosition -> [Rectangle] -> Dimension -> Rectangle
@@ -72,29 +74,44 @@ setPosition p rs ht =
     (scr@(Rectangle rx ry rw rh), p') =
       case p of OnScreen i x -> (fromMaybe (head rs) $ safeIndex i rs, x)
                 _ -> (head rs, p)
-    ny       = ry + fi (rh - ht)
+    ny = ry + fi (rh - ht)
     center i = rx + fi (div (remwid i) 2)
     right  i = rx + fi (remwid i)
     remwid i = rw - pw (fi i)
-    ax L     = const rx
-    ax R     = right
-    ax C     = center
-    pw i     = rw * min 100 i `div` 100
-    nw       = fi . pw . fi
-    h        = fi ht
-    mh h'    = max (fi h') h
-    ny' h'   = ry + fi (rh - mh h')
+    ax L = const rx
+    ax R = right
+    ax C = center
+    pw i = rw * min 100 i `div` 100
+    nw = fi . pw . fi
+    h = fi ht
+    mh h' = max (fi h') h
+    ny' h' = ry + fi (rh - mh h')
     safeIndex i = lookup i . zip [0..]
 
-setProperties :: Rectangle -> Config -> Display -> Window -> [Rectangle]
-                 -> IO ()
-setProperties r c d w rs = do
+setProperties :: Config -> Display -> Window -> IO ()
+setProperties c d w = do
   let mkatom n = internAtom d n False
   card <- mkatom "CARDINAL"
   atom <- mkatom "ATOM"
 
   setTextProperty d w "xmobar" wM_CLASS
   setTextProperty d w "xmobar" wM_NAME
+
+  wtype <- mkatom "_NET_WM_WINDOW_TYPE"
+  dock <- mkatom "_NET_WM_WINDOW_TYPE_DOCK"
+  changeProperty32 d w wtype atom propModeReplace [fi dock]
+
+  when (allDesktops c) $ do
+    desktop <- mkatom "_NET_WM_DESKTOP"
+    changeProperty32 d w desktop card propModeReplace [0xffffffff]
+
+  pid  <- mkatom "_NET_WM_PID"
+  getProcessID >>= changeProperty32 d w pid card propModeReplace . return . fi
+
+setStruts :: Rectangle -> Config -> Display -> Window -> [Rectangle] -> IO ()
+setStruts r c d w rs = do
+  let mkatom n = internAtom d n False
+  card <- mkatom "CARDINAL"
 
   ismapped <- isMapped d w
   let svs = if ismapped
@@ -107,17 +124,6 @@ setProperties r c d w rs = do
   changeProperty32 d w pstrut card propModeReplace svs
   strut <- mkatom "_NET_WM_STRUT"
   changeProperty32 d w strut card propModeReplace (take 4 svs)
-
-  wtype <- mkatom "_NET_WM_WINDOW_TYPE"
-  dock <- mkatom "_NET_WM_WINDOW_TYPE_DOCK"
-  changeProperty32 d w wtype atom propModeReplace [fi dock]
-
-  when (allDesktops c) $ do
-    desktop <- mkatom "_NET_WM_DESKTOP"
-    changeProperty32 d w desktop card propModeReplace [0xffffffff]
-
-  pid  <- mkatom "_NET_WM_PID"
-  getProcessID >>= changeProperty32 d w pid card propModeReplace . return . fi
 
 getRootWindowHeight :: [Rectangle] -> Int
 getRootWindowHeight srs = maximum (map getMaxScreenYCoord srs)
@@ -148,7 +154,7 @@ getStaticStrutValues (Static cx cy cw ch) rwh
     -- if the yPos is in the top half of the screen, then assume a Top
     -- placement, otherwise, it's a Bottom placement
     | cy < (rwh `div` 2) = [0, 0, st,  0, 0, 0, 0, 0, xs, xe,  0,  0]
-    | otherwise          = [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, xs, xe]
+    | otherwise = [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, xs, xe]
     where st = cy + ch
           sb = rwh - cy
           xs = cx -- a simple calculation for horizontal (x) placement
