@@ -20,6 +20,7 @@ import Control.Monad (when, unless)
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
 import Graphics.X11.Xinerama
+import Foreign.C.Types (CLong)
 
 import Data.Maybe(fromMaybe)
 import System.Posix.Process (getProcessID)
@@ -40,9 +41,9 @@ createWin d fs c = do
       r = setPosition (position c) srs (fi ht)
   win <- newWindow  d (defaultScreenOfDisplay d) rootw r (overrideRedirect c)
   setProperties c d win
-  when (lowerOnStart c) (lowerWindow d win)
-  unless (hideOnStart c) $ showWindow r c d win
   setStruts r c d win srs
+  when (lowerOnStart c) $ lowerWindow d win
+  unless (hideOnStart c) $ showWindow r c d win
   return (r,win)
 
 -- | Updates the size and position of the window
@@ -53,7 +54,6 @@ repositionWin d win fs c = do
   let ht = as + ds + 4
       r = setPosition (position c) srs (fi ht)
   moveResizeWindow d win (rect_x r) (rect_y r) (rect_width r) (rect_height r)
-  setProperties c d win
   setStruts r c d win srs
   return r
 
@@ -108,22 +108,19 @@ setProperties c d w = do
   pid  <- mkatom "_NET_WM_PID"
   getProcessID >>= changeProperty32 d w pid card propModeReplace . return . fi
 
-setStruts :: Rectangle -> Config -> Display -> Window -> [Rectangle] -> IO ()
-setStruts r c d w rs = do
+setStruts' :: Display -> Window -> [Foreign.C.Types.CLong] -> IO ()
+setStruts' d w svs = do
   let mkatom n = internAtom d n False
   card <- mkatom "CARDINAL"
-
-  ismapped <- isMapped d w
-  let svs = if ismapped
-              then map fi $ getStrutValues r
-                                           (position c)
-                                           (getRootWindowHeight rs)
-              else replicate 12 0
-
   pstrut <- mkatom "_NET_WM_STRUT_PARTIAL"
-  changeProperty32 d w pstrut card propModeReplace svs
   strut <- mkatom "_NET_WM_STRUT"
+  changeProperty32 d w pstrut card propModeReplace svs
   changeProperty32 d w strut card propModeReplace (take 4 svs)
+
+setStruts :: Rectangle -> Config -> Display -> Window -> [Rectangle] -> IO ()
+setStruts r c d w rs = do
+  let svs = map fi $ getStrutValues r (position c) (getRootWindowHeight rs)
+  setStruts' d w svs
 
 getRootWindowHeight :: [Rectangle] -> Int
 getRootWindowHeight srs = maximum (map getMaxScreenYCoord srs)
@@ -178,19 +175,14 @@ drawBorder b d p gc c wi ht =  case b of
 
 hideWindow :: Display -> Window -> IO ()
 hideWindow d w = do
-    a <- internAtom d "_NET_WM_STRUT_PARTIAL"    False
-    c <- internAtom d "CARDINAL"                 False
-    changeProperty32 d w a c propModeReplace $ replicate 12 0
+    setStruts' d w (replicate 12 0)
     unmapWindow d w >> sync d False
 
 showWindow :: Rectangle -> Config -> Display -> Window -> IO ()
-showWindow r cfg d w = do
-    srs <- getScreenInfo d
-    a   <- internAtom d "_NET_WM_STRUT_PARTIAL"    False
-    c   <- internAtom d "CARDINAL"                 False
-    changeProperty32 d w a c propModeReplace $ map fi $
-        getStrutValues r (position cfg) (getRootWindowHeight srs)
-    mapWindow d w >> sync d False
+showWindow r c d w = do
+    mapWindow d w
+    getScreenInfo d >>= setStruts r c d w
+    sync d False
 
 isMapped :: Display -> Window -> IO Bool
 isMapped d w = fmap ism $ getWindowAttributes d w
