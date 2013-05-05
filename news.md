@@ -22,7 +22,7 @@ _Bug fixes_
   - Safer volume plugin (Dmitry Malikov).
   - Battery percentage capped at 100% (RJ Regenold).
 
-[github #67]: https://github.com/jaor/xmobar/issues/77
+[github #67]: https://github.com/jaor/xmobar/issues/67
 [github #77]: https://github.com/jaor/xmobar/issues/77
 [github #105]: https://github.com/jaor/xmobar/issues/105
 
@@ -97,10 +97,10 @@ _New features_
 _Bug fixes_
 
   - Stricter build dependencies versioning in cabal file.
-  - [issue 56]: vertical alignment of text improved.
-  - [issue 64]: display of `watts` in `Batt` monitor fixed.
-  - [issue 69]: miscellaneous battery reporting issues.
-  - [issue 67]: compilation in DragonFly.
+  - [issue 56] vertical alignment of text improved.
+  - [issue 64] display of `watts` in `Batt` monitor fixed.
+  - [issue 69] miscellaneous battery reporting issues.
+  - [issue 67] compilation in DragonFly.
   - DiskIO works also when device path in mtab are symbolic links
     to the real device file.
   - Wireless monitor honours padding settings for ESSID names.
@@ -111,7 +111,7 @@ _Bug fixes_
 [issue 64]: http://code.google.com/p/xmobar/issues/detail?id=64
 [issue 67]: http://code.google.com/p/xmobar/issues/detail?id=67
 [issue 69]: http://code.google.com/p/xmobar/issues/detail?id=69
-[github #36]: https://github.com/jaor/xmobar/issues/38
+[github #36]: https://github.com/jaor/xmobar/issues/36
 [github #38]: https://github.com/jaor/xmobar/issues/38
 
 ## Version 0.14 (Dec 10, 2011)
@@ -131,10 +131,10 @@ _New features_
 
 _Bug fixes_
 
-  - [issue 45]: Fix for crashes with AC status changes in battery monitor.
-  - [issue 48]: The <quality> field of Wireless behaves like a percentage.
+  - [issue 45] Fix for crashes with AC status changes in battery monitor.
+  - [issue 48] The <quality> field of Wireless behaves like a percentage.
   - [issue 50]/[issue 61]: `MPD` monitor now works with libmpd 0.6.
-  - [issue 60]: Fixes for crashes on power resume for battery monitor.
+  - [issue 60] Fixes for crashes on power resume for battery monitor.
   - Template sections without fields are now correctly displayed.
   - Catch errors when reading battery status (Ben Boeckel).
   - Compilation issues with ghc 7.x (Sergei Trofimovich).
@@ -178,17 +178,17 @@ _Incompatible changes_
 
 _Bug fixes_
 
-  - [issue 14]: `StdinReader` and other plugins accepting external
+  - [issue 14] `StdinReader` and other plugins accepting external
     input don't get confused anymore when characters from `alignSep`
     appear in their input.
-  - [issue 27]: `BottomSize` placement now respects its width argument.
-  - [issue 28]: Compilation in Mac OS X fixed.
-  - [issue 30]: `Mail` plugin can be specified anywhere in commands list.
-  - [issue 36]: Battery monitor now supports non-standard locations of
+  - [issue 27] `BottomSize` placement now respects its width argument.
+  - [issue 28] Compilation in Mac OS X fixed.
+  - [issue 30] `Mail` plugin can be specified anywhere in commands list.
+  - [issue 36] Battery monitor now supports non-standard locations of
     the `/sys/class/power_supply/AC/online` file.
-  - [issue 40]: Battery monitor now supports the new power_now, that
+  - [issue 40] Battery monitor now supports the new power_now, that
     replaces current_now in linux kernels for v. 2.36 and above.
-  - [issue 42]: More accurate net monitor rates.
+  - [issue 42] More accurate net monitor rates.
   - DiskIO, Cpu and MultiCpu monitors are also more accurate now.
   - Text is now correctly centered vertically.
   - `FullBM` border spec fixed.
@@ -247,10 +247,10 @@ _New features_
 
 _Bug fixes_
 
-  - [issue 23]: Wireless monitor is now compatible with iwlib 29.
-  - [issue 24]: Swap monitor's used ratio display fixed.
-  - [issue 25]: Percentages only include `%` if requested using `-P`.
-  - [issue 31]: MPD monitor now respects `-W` argument.
+  - [issue 23] Wireless monitor is now compatible with iwlib 29.
+  - [issue 24] Swap monitor's used ratio display fixed.
+  - [issue 25] Percentages only include `%` if requested using `-P`.
+  - [issue 31] MPD monitor now respects `-W` argument.
   - Fixes in CPU frequency formatting, string alignment and colour
     boxes in monitors (Norbert Zeh).
   - TopMem and TopProc now use the `-L` and `-H` options correctly for
