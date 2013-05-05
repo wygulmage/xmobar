@@ -1,6 +1,6 @@
 % xmobar - Release notes
 
-## Version 0.17 (April 28, 2013)
+## Version 0.17 (May 5, 2013)
 
 _New features_
 
