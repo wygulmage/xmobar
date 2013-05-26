@@ -306,14 +306,15 @@ parseTemplate l =
        let m = Map.fromList . zip e $ l
        parseTemplate' t m
 
--- | Works like parseTemplate, but using the given template string.
+-- | Parses the template given to it with a map of export values and combines
+-- them
 parseTemplate' :: String -> Map.Map String String -> Monitor String
 parseTemplate' t m =
     do s <- io $ runP templateParser t
        combine m s
 
--- | Given a finite "Map" and a parsed templatet produces the
--- | resulting output string.
+-- | Given a finite "Map" and a parsed template t produces the
+-- | resulting output string as the output of the monitor.
 combine :: Map.Map String String -> [(String, String, String)] -> Monitor String
 combine _ [] = return []
 combine m ((s,ts,ss):xs) =
@@ -321,7 +322,7 @@ combine m ((s,ts,ss):xs) =
        let str = Map.findWithDefault err ts m
            err = "<" ++ ts ++ " not found!>"
        nstr <- parseTemplate' str m
-       return $ s ++ (if nstr == [] then str else nstr) ++ ss ++ next
+       return $ s ++ (if null nstr then str else nstr) ++ ss ++ next
 
 -- $strings
 
