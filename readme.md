@@ -734,6 +734,7 @@ something like:
   (these options, being specific to the monitor, are to be specified
   after a `--` in the argument list):
   - `-O`: string for AC "on" status (default: "On")
+  - `-i`: string for AC "idle" status (default: "On")
   - `-o`: string for AC "off" status (default: "Off")
   - `-L`: low power (`watts`) threshold (default: -12)
   - `-H`: high power threshold (default: -10)
@@ -753,7 +754,7 @@ something like:
          Run BatteryP ["BAT0"]
                       ["-t", "<acstatus><watts> (<left>%)",
                        "-L", "10", "-H", "80", "-p", "3",
-                       "--", "-O", "<fc=green>On</fc> - ", "-o", "",
+                       "--", "-O", "<fc=green>On</fc> - ", "-i", "",
                        "-L", "-15", "-H", "-5",
                        "-l", "red", "-m", "blue", "-h", "green"]
                       600
@@ -773,6 +774,10 @@ something like:
                       , "-l", "red", "-h", "green"
                       , "--", "-O", "Charging", "-o", "Battery: <left>%"
                       ] 10
+
+- The "idle" AC state is selected whenever the AC power entering the
+  battery is zero.
+
 
 ### `TopProc Args RefreshRate`
 

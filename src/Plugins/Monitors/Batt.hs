@@ -25,6 +25,7 @@ import System.Console.GetOpt
 data BattOpts = BattOpts
   { onString :: String
   , offString :: String
+  , idleString :: String
   , posColor :: Maybe String
   , lowWColor :: Maybe String
   , mediumWColor :: Maybe String
@@ -39,6 +40,7 @@ defaultOpts :: BattOpts
 defaultOpts = BattOpts
   { onString = "On"
   , offString = "Off"
+  , idleString = "On"
   , posColor = Nothing
   , lowWColor = Nothing
   , mediumWColor = Nothing
@@ -53,6 +55,7 @@ options :: [OptDescr (BattOpts -> BattOpts)]
 options =
   [ Option "O" ["on"] (ReqArg (\x o -> o { onString = x }) "") ""
   , Option "o" ["off"] (ReqArg (\x o -> o { offString = x }) "") ""
+  , Option "i" ["idle"] (ReqArg (\x o -> o { idleString = x }) "") ""
   , Option "p" ["positive"] (ReqArg (\x o -> o { posColor = Just x }) "") ""
   , Option "l" ["low"] (ReqArg (\x o -> o { lowWColor = Just x }) "") ""
   , Option "m" ["medium"] (ReqArg (\x o -> o { mediumWColor = Just x }) "") ""
@@ -140,10 +143,12 @@ readBatteries opts bfs =
            ft = sum (map full bats)
            left = if ft > 0 then sum (map now bats) / ft else 0
            watts = sign * sum (map power bats)
-           time = if watts == 0 then 0 else sum $ map time' bats
-           mwatts = if watts == 0 then 1 else sign * watts
+           idle = watts == 0
+           time = if idle then 0 else sum $ map time' bats
+           mwatts = if idle then 1 else sign * watts
            time' b = (if ac then full b - now b else now b) / mwatts
-           acstr = if ac then onString opts else offString opts
+           acstr = if idle then idleString opts else
+                     if ac then onString opts else offString opts
        return $ if isNaN left then NA else Result left watts time acstr
 
 runBatt :: [String] -> Monitor String

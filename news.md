@@ -5,7 +5,8 @@
 _New features_
 
   - The battery monitor accepts template variables in its `-O` and
-    `-o` (on/off AC-status) arguments (see [github #109]).
+    `-o` and the new `-i` (on/off/idle AC-status) arguments (see
+    [github #109]).
 
 [github #109]: https://github.com/jaor/xmobar/issues/109
 
