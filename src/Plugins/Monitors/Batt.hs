@@ -149,14 +149,6 @@ readBatteries opts bfs =
 runBatt :: [String] -> Monitor String
 runBatt = runBatt' ["BAT0","BAT1","BAT2"]
 
-statusTemplate:: String -> [String] -> Monitor String
-statusTemplate s vs = do
-  t <- getConfigValue template
-  setConfigValue (s ++ "<acstatus>") template
-  r <- parseTemplate vs
-  setConfigValue t template
-  return r
-
 runBatt' :: [String] -> [String] -> Monitor String
 runBatt' bfs args = do
   opts <- io $ parseOpts args
@@ -167,7 +159,7 @@ runBatt' bfs args = do
     Result x w t s ->
       do l <- fmtPercent x
          let ts =  [fmtTime $ floor t, fmtWatts w opts suffix d]
-         s' <- statusTemplate s (l ++ "":ts)
+         s' <- parseTemplate' (s ++ "<acstatus>") (l ++ "":ts)
          parseTemplate (l ++ s':ts)
     NA -> return "N/A"
   where fmtPercent :: Float -> Monitor [String]

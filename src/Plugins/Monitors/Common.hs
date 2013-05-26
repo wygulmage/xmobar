@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Common
--- Copyright   :  (c) 2010, 2011 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2010, 2011, 2013 Jose Antonio Ortega Ruiz
 --                (c) 2007-2010 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -35,6 +35,7 @@ module Plugins.Monitors.Common (
                        , getAfterString
                        , skipTillString
                        , parseTemplate
+                       , parseTemplate'
                        -- ** String Manipulation
                        -- $strings
                        , padString
@@ -305,6 +306,15 @@ parseTemplate l =
        e <- getConfigValue export
        let m = Map.fromList . zip e $ l
        return $ combine m s
+
+-- | Works like parseTemplate, but using the given template string.
+parseTemplate' :: String -> [String] -> Monitor String
+parseTemplate' t l = do
+  t' <- getConfigValue template
+  setConfigValue t template
+  r <- parseTemplate l
+  setConfigValue t' template
+  return r
 
 -- | Given a finite "Map" and a parsed templatet produces the
 -- | resulting output string.
