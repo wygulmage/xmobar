@@ -1,5 +1,14 @@
 % xmobar - Release notes
 
+## Version 0.18
+
+_New features_
+
+  - The battery monitor accepts template variables in its `-O` and
+    `-o` (on/off AC-status) arguments (see [github #109]).
+
+[github #109]: https://github.com/jaor/xmobar/issues/109
+
 ## Version 0.17 (May 5, 2013)
 
 _New features_

@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Batt
--- Copyright   :  (c) 2010, 2011, 2012 Jose A Ortega
+-- Copyright   :  (c) 2010, 2011, 2012, 2013 Jose A Ortega
 --                (c) 2010 Andrea Rossato, Petr Rockai
 -- License     :  BSD-style (see LICENSE)
 --
@@ -149,6 +149,14 @@ readBatteries opts bfs =
 runBatt :: [String] -> Monitor String
 runBatt = runBatt' ["BAT0","BAT1","BAT2"]
 
+statusTemplate:: String -> [String] -> Monitor String
+statusTemplate s vs = do
+  t <- getConfigValue template
+  setConfigValue (s ++ "<acstatus>") template
+  r <- parseTemplate vs
+  setConfigValue t template
+  return r
+
 runBatt' :: [String] -> [String] -> Monitor String
 runBatt' bfs args = do
   opts <- io $ parseOpts args
@@ -158,7 +166,9 @@ runBatt' bfs args = do
   case c of
     Result x w t s ->
       do l <- fmtPercent x
-         parseTemplate (l ++ s:[fmtTime $ floor t, fmtWatts w opts suffix d])
+         let ts =  [fmtTime $ floor t, fmtWatts w opts suffix d]
+         s' <- statusTemplate s (l ++ "":ts)
+         parseTemplate (l ++ s':ts)
     NA -> return "N/A"
   where fmtPercent :: Float -> Monitor [String]
         fmtPercent x = do

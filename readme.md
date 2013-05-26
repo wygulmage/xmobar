@@ -764,6 +764,16 @@ something like:
   neither the generic nor the specific options have any effect on
   `<timeleft>`.
 
+  It is also possible to specify template variables in the `-O` and
+  `-o` switches, as in the following example:
+
+         Run BatteryP ["BAT0"]
+                      ["-t", "<acstatus>"
+                      , "-L", "10", "-H", "80"
+                      , "-l", "red", "-h", "green"
+                      , "--", "-O", "Charging", "-o", "Battery: <left>%"
+                      ] 10
+
 ### `TopProc Args RefreshRate`
 
 - Aliases to `top`
