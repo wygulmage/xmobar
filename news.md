@@ -4,11 +4,15 @@
 
 _New features_
 
-  - The battery monitor accepts template variables in its `-O` and
-    `-o` and the new `-i` (on/off/idle AC-status) arguments (see
-    [github #109]).
+  - All extra argument monitors taking a string (e.g. `-O` for
+    `BatteryP`) accept now template variables (see [github #109] and
+    [#110]).  Thanks to Todd Lunter.
+
+  - New battery monitor extra argument, `-i`, for the idle status.
+
 
 [github #109]: https://github.com/jaor/xmobar/issues/109
+[#110]: https://github.com/jaor/xmobar/issues/110
 
 ## Version 0.17 (May 5, 2013)
 
