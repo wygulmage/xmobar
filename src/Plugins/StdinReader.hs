@@ -20,15 +20,16 @@ import System.Exit
 import System.IO
 import Control.Exception (SomeException(..), handle)
 import Plugins
+import Actions (stripActions)
 
-data StdinReader = StdinReader
-    deriving (Read, Show)
+data StdinReader = StdinReader deriving (Read, Show)
 
 instance Exec StdinReader where
-    start StdinReader cb = do
-        cb =<< handle (\(SomeException e) -> do hPrint stderr e; return "")
-                      (hGetLineSafe stdin)
-        eof <- hIsEOF stdin
-        if eof
-            then exitImmediately ExitSuccess
-            else start StdinReader cb
+  start StdinReader cb = do
+    s <- handle (\(SomeException e) -> do hPrint stderr e; return "")
+                (hGetLineSafe stdin)
+    cb (stripActions s)
+    eof <- hIsEOF stdin
+    if eof
+      then exitImmediately ExitSuccess
+      else start StdinReader cb

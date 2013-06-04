@@ -28,9 +28,11 @@ import Codec.Binary.UTF8.String as UTF8
 #endif
 import Foreign.C (CChar)
 import XUtil (nextEvent')
+import Actions (stripActions)
 
-
-data XMonadLog = XMonadLog | XPropertyLog String | NamedXPropertyLog String String
+data XMonadLog = XMonadLog
+               | XPropertyLog String
+               | NamedXPropertyLog String String
     deriving (Read, Show)
 
 instance Exec XMonadLog where
@@ -51,7 +53,7 @@ instance Exec XMonadLog where
 
         let update = do
                         mwp <- getWindowProperty8 d xlog root
-                        maybe (return ()) (cb . decodeCChar) mwp
+                        maybe (return ()) (cb . stripActions. decodeCChar) mwp
 
         update
 

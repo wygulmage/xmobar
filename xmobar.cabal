@@ -97,6 +97,7 @@ executable xmobar
     build-depends:
       base == 4.*,
       containers,
+      regex-compat,
       process,
       old-locale,
       bytestring,
