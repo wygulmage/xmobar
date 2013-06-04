@@ -37,16 +37,20 @@ type ColorString = String
 parseString :: Config -> String -> IO [(Widget, ColorString, Maybe Action)]
 parseString c s =
     case parse (stringParser (fgColor c) Nothing) "" s of
-      Left  _ -> return [(Text $ "Could not parse string: " ++ s, fgColor c, Nothing)]
+      Left  _ -> return [(Text $ "Could not parse string: " ++ s
+                          , fgColor c
+                          , Nothing)]
       Right x -> return (concat x)
 
 -- | Gets the string and combines the needed parsers
-stringParser :: String -> Maybe Action -> Parser [[(Widget, ColorString, Maybe Action)]]
+stringParser :: String -> Maybe Action
+                -> Parser [[(Widget, ColorString, Maybe Action)]]
 stringParser c a = manyTill (textParser c a <|> try (iconParser c a) <|>
                              try (actionParser c) <|> colorParser a) eof
 
 -- | Parses a maximal string without color markup.
-textParser :: String -> Maybe Action -> Parser [(Widget, ColorString, Maybe Action)]
+textParser :: String -> Maybe Action
+              -> Parser [(Widget, ColorString, Maybe Action)]
 textParser c a = do s <- many1 $
                           noneOf "<" <|>
                             try (notFollowedBy' (char '<')
@@ -66,7 +70,8 @@ notFollowedBy' p e = do x <- p
                         notFollowedBy $ try (e >> return '*')
                         return x
 
-iconParser :: String -> Maybe Action -> Parser [(Widget, ColorString, Maybe Action)]
+iconParser :: String -> Maybe Action
+              -> Parser [(Widget, ColorString, Maybe Action)]
 iconParser c a = do
   string "<icon="
   i <- manyTill (noneOf ">") (try (string "/>"))
@@ -77,7 +82,8 @@ actionParser c = do
   a <- between (string "<action=") (string ">") (many1 (noneOf ">"))
   let a' = Just (Spawn a)
   s <- manyTill (try (textParser c a') <|> try (iconParser c a') <|>
-                 try (colorParser a') <|> actionParser c) (try $ string "</action>")
+                 try (colorParser a') <|> actionParser c)
+                (try $ string "</action>")
   return (concat s)
 
 -- | Parsers a string wrapped in a color specification.
@@ -122,7 +128,8 @@ parseTemplate c s =
 
 -- | Given a finite "Map" and a parsed template produce the resulting
 -- output string.
-combine :: Config -> Map.Map String Runnable -> [(String, String, String)] -> [(Runnable,String,String)]
+combine :: Config -> Map.Map String Runnable
+           -> [(String, String, String)] -> [(Runnable,String,String)]
 combine _ _ [] = []
 combine c m ((ts,s,ss):xs) = (com, s, ss) : combine c m xs
     where com  = Map.findWithDefault dflt ts m
@@ -132,7 +139,8 @@ allTillSep :: Config -> Parser String
 allTillSep = many . noneOf . sepChar
 
 stripComments :: String -> String
-stripComments = unlines . map (drop 5 . strip False . (replicate 5 ' '++)) . lines
+stripComments =
+  unlines . map (drop 5 . strip False . (replicate 5 ' '++)) . lines
     where strip m ('-':'-':xs) = if m then "--" ++ strip m xs else ""
           strip m ('\\':xss) = case xss of
                                 '\\':xs -> '\\' : strip m xs
@@ -197,7 +205,8 @@ parseConfig = runParser parseConf fields "Config" . stripComments
                       ; notFollowedBy $ wrapSkip $ string "Run"
                       ; return ","
                       }
-      readCommands = manyTill anyChar (try commandsEnd) >>= read' commandsErr . flip (++) "]"
+      readCommands = manyTill anyChar (try commandsEnd) >>=
+                        read' commandsErr . flip (++) "]"
 
       strField e n = field e n . between (strDel "start" n) (strDel "end" n) .
                      many $ noneOf "\"\n\r"
@@ -217,5 +226,7 @@ parseConfig = runParser parseConf fields "Config" . stripComments
                     _ -> fail $ "error reading the " ++ d ++ " field: " ++ s
 
 commandsErr :: String
-commandsErr = "commands: this usually means that a command could not be parsed.\n" ++
-              "The error could be located at the begining of the command which follows the offending one."
+commandsErr = "commands: this usually means that a command could not" ++
+              "\nbe parsed." ++
+              "\nThe error could be located at the begining of the command" ++
+              "\nwhich follows the offending one."
