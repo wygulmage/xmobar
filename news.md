@@ -1,6 +1,6 @@
 % xmobar - Release notes
 
-## Version 0.18
+## Version 0.18 (June 5, 2013)
 
 _New features_
 
@@ -9,6 +9,10 @@ _New features_
     [#110]).  Thanks to Todd Lunter.
 
   - New battery monitor extra argument, `-i`, for the idle status.
+
+_Bug fixes_
+
+  - Safer standard input parsing, avoiding <action> injections.
 
 
 [github #109]: https://github.com/jaor/xmobar/issues/109
