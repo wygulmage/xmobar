@@ -778,6 +778,11 @@ something like:
 - The "idle" AC state is selected whenever the AC power entering the
   battery is zero.
 
+### `BatteryN Dirs Args RefreshRate Alias`
+
+Works like `BatteryP`, but lets you specify an alias for the monitor
+other than "battery".  Useful in case you one separate monitors for
+more than one battery.
 
 ### `TopProc Args RefreshRate`
 

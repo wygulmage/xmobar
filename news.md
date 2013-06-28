@@ -1,5 +1,12 @@
 % xmobar - Release notes
 
+## Vesion 0.19
+
+_New features_
+
+  - New monitor `BatteryN`, a variant of `BatteryP` that lets you
+    specify the name of the monitor in the template.
+
 ## Version 0.18 (June 5, 2013)
 
 _New features_
