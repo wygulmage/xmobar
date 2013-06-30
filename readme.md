@@ -141,7 +141,9 @@ Otherwise, you'll need to install them yourself.
 
 `with_alsa`
 :    Support for ALSA sound cards. Enables the Volume plugin. Requires the
-     [alsa-mixer] package.
+     [alsa-mixer] package.  To install the latter, you'll need the
+     [libasound] C library and headers in your system (e.g., install
+     `libasound2-dev` in Debian-based systems).
 
 `with_datezone`
 :    Support for other timezones. Enables the DateZone plugin.
@@ -1376,6 +1378,7 @@ Copyright &copy; 2010-2012 Jose Antonio Ortega Ruiz
 [i3status]: http://i3wm.org/i3status/
 [i3status manual]: http://i3wm.org/i3status/manpage.html#_using_i3status_with_xmobar
 [iwlib]: http://www.hpl.hp.com/personal/Jean_Tourrilhes/Linux/Tools.html
+[libasound]: http://packages.debian.org/stable/libasound2-dev
 [hinotify]: http://hackage.haskell.org/package/hinotify/
 [libmpd]: http://hackage.haskell.org/package/libmpd/
 [dbus]: http://hackage.haskell.org/package/dbus
