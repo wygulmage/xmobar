@@ -98,6 +98,7 @@ executable xmobar
       base == 4.*,
       containers,
       regex-compat,
+      regex-posix,
       process,
       old-locale,
       bytestring,
