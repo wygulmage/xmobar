@@ -97,6 +97,7 @@ executable xmobar
     build-depends:
       base == 4.*,
       containers,
+      array,
       regex-compat,
       regex-pcre,
       process,
