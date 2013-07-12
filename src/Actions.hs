@@ -24,4 +24,4 @@ runAction (Spawn s) = void $ system (s ++ "&")
 
 stripActions :: String -> String
 stripActions s = subRegex actionRegex s "[action=\1]\2[action]"
-  where actionRegex = mkRegex "<action=([^>])*>(.+?)</action>"
+  where actionRegex = mkRegex "<action=([^>])*>(.+)</action>"
