@@ -6,6 +6,20 @@ _New features_
 
   - New monitor `BatteryN`, a variant of `BatteryP` that lets you
     specify the name of the monitor in the template.
+  - Support for configuration file living in XDG_CONFIG_HOME (see
+    [github #99]).
+
+_Bug fixes_
+
+  - Honour the "-d" option in `CoreTemp` ([github #115])
+  - Fix for systems not supporting PCRE regular expressions: we use
+    now BCEs, so regex-compat should be enough everywhere (see
+    [github #117]).
+
+
+[github #99]: https://github.com/jaor/xmobar/issues/115
+[github #115]: https://github.com/jaor/xmobar/issues/115
+[github #117]: https://github.com/jaor/xmobar/issues/117
 
 ## Version 0.18 (June 5, 2013)
 

@@ -34,10 +34,11 @@ coreTempConfig = mkMConfig
 -- Function retrieves monitor string holding the core temperature
 -- (or temperatures)
 runCoreTemp :: [String] -> Monitor String
-runCoreTemp _ = let path = ["/sys/bus/platform/devices/coretemp.",
-                            "/temp",
-                            "_input"]
-                    lbl  = Just ("_label", read . (dropWhile (not . isDigit)))
-                    divisor = 1e3 :: Double
-                    failureMessage = "CoreTemp: N/A"
-                in  checkedDataRetrieval failureMessage path lbl (/divisor) show
+runCoreTemp _ = do
+   dn <- getConfigValue decDigits
+   let path = ["/sys/bus/platform/devices/coretemp.", "/temp", "_input"]
+       lbl  = Just ("_label", read . (dropWhile (not . isDigit)))
+       divisor = 1e3 :: Double
+       failureMessage = "CoreTemp: N/A"
+       show' = showDigits (max 0 dn)
+   checkedDataRetrieval failureMessage path lbl (/divisor) show'
