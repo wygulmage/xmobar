@@ -8,6 +8,8 @@ _New features_
     specify the name of the monitor in the template.
   - Support for configuration file living in XDG_CONFIG_HOME (see
     [github #99]).
+  - `Com` uses safer `runInteractiveProcess` instead of spawning a
+    shell (David McLean).
 
 _Bug fixes_
 
@@ -15,11 +17,13 @@ _Bug fixes_
   - Fix for systems not supporting PCRE regular expressions: we use
     now BCEs, so regex-compat should be enough everywhere (see
     [github #117]).
-
+  - Weather monitor: support for stations without name (Sergei
+    Trofimovich, [issue #65]).
 
 [github #99]: https://github.com/jaor/xmobar/issues/115
 [github #115]: https://github.com/jaor/xmobar/issues/115
 [github #117]: https://github.com/jaor/xmobar/issues/117
+[issue #65]: http://code.google.com/p/xmobar/issues/detail?id=65
 
 ## Version 0.18 (June 5, 2013)
 
