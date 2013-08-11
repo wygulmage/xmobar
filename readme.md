@@ -26,10 +26,13 @@ instances of xmobar.
 Bug Reports
 ===========
 
-To submit bug reports you can use the [bug tracker over at Google
-code] or send mail to our [Mailing list].
+To submit bug reports you can use the [bug tracker over at Github] or
+send mail to our [Mailing list].
 
-[bug tracker over at Google code]: http://code.google.com/p/xmobar/issues
+Note: the old bug tracker at Google code is deprecated.  Please use
+Github's for new bugs.
+
+[bug tracker over at Github]: https://github.com/jaor/xmobar/issues
 
 Installation
 ============
