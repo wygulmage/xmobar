@@ -46,7 +46,7 @@ getLangInfo item = do
   itemStr <- nl_langinfo item
 #ifdef UTF8
   str <- peekCString itemStr
-  return $ decodeString str
+  return $ if (isUTF8Encoded str) then decodeString str else str
 #else
   peekCString itemStr
 #endif
