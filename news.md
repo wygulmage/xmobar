@@ -12,7 +12,7 @@ _New features_
     shell (David McLean).
   - New plugin `UnsafeStdinReader` that allows actions from stdin.
     Now it's possible to have clickable workspaces!
-    (see [github #125]).
+    (Thiago Negri, see [github #125]).
 
 _Bug fixes_
 

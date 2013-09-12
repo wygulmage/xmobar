@@ -1338,11 +1338,11 @@ In particular, xmobar [incorporates patches] by Ben Boeckel, Roman
 Cheplyaka, Patrick Chilton, John Goerzen, Reto Hablützel, Juraj
 Hercek, Tomas Janousek, Spencer Janssen, Jochen Keil, Lennart
 Kolmodin, Krzysztof Kosciuszkiewicz, Dmitry Kurochkin, Todd Lunter,
-Dmitry Malikov, David McLean, Edward O'Callaghan, Svein Ove, Martin
-Perner, Jens Petersen, Alexander Polakov, Petr Rockai, Peter Simons,
-Andrew Sackville-West, Alexander Solovyov, John Soros, Artem Tarasov,
-Sergei Trofimovich, Thomas Tuegel, Jan Vornberger, Daniel Wagner and
-Norbert Zeh.
+Dmitry Malikov, David McLean, Thiago Negri, Edward O'Callaghan, Svein
+Ove, Martin Perner, Jens Petersen, Alexander Polakov, Petr Rockai,
+Peter Simons, Andrew Sackville-West, Alexander Solovyov, John Soros,
+Artem Tarasov, Sergei Trofimovich, Thomas Tuegel, Jan Vornberger,
+Daniel Wagner and Norbert Zeh.
 
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
 
