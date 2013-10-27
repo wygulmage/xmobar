@@ -16,7 +16,9 @@ _New features_
 
 _Bug fixes_
 
-  - Honour the "-d" option in `CoreTemp` ([github #115])
+  - Honour the width options `-w`, `-m` and `-M` in battery monitors
+    watts display ([github #118]).
+  - Honour the `-d` option in `CoreTemp` ([github #115])
   - Fix for systems not supporting PCRE regular expressions: we use
     now BCEs, so regex-compat should be enough everywhere (see
     [github #117]).
@@ -28,6 +30,7 @@ _Bug fixes_
 [github #117]: https://github.com/jaor/xmobar/issues/117
 [github #125]: https://github.com/jaor/xmobar/issues/125
 [issue #65]: http://code.google.com/p/xmobar/issues/detail?id=65
+[github #118]: https://github.com/jaor/xmobar/issues/118
 
 ## Version 0.18 (June 5, 2013)
 
