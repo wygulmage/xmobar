@@ -1390,9 +1390,9 @@ License
 This software is released under a BSD-style license. See [LICENSE] for
 more details.
 
-Copyright &copy; 2007-2010 Andrea Rossato
+Copyright &copy; 2010-2013 Jose Antonio Ortega Ruiz
 
-Copyright &copy; 2010-2012 Jose Antonio Ortega Ruiz
+Copyright &copy; 2007-2010 Andrea Rossato
 
 [Github]: http://github.com/jaor/xmobar/
 [Github page]: http://github.com/jaor/xmobar

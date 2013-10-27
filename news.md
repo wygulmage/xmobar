@@ -2,6 +2,9 @@
 
 ## Version 0.19 (October 27, 2013)
 
+As of this release, the old bug tracker at Google code is deprecated.
+Please use [Github's tracker] for new bugs.
+
 _New features_
 
   - New monitor `BatteryN`, a variant of `BatteryP` that lets you
@@ -19,7 +22,6 @@ _New features_
     specifying what string to display when a monitor is not available
     (defaulting to "N/A"). Cf. [github #119].
 
-
 _Bug fixes_
 
   - Using the width options `-w`, `-m` and `-M` in battery monitors
@@ -31,6 +33,7 @@ _Bug fixes_
   - Weather monitor: support for stations without name (Sergei
     Trofimovich, [issue #65]).
 
+[Github's tracker]: https://github.com/jaor/xmobar/issues
 [github #99]: https://github.com/jaor/xmobar/issues/115
 [github #115]: https://github.com/jaor/xmobar/issues/115
 [github #117]: https://github.com/jaor/xmobar/issues/117
