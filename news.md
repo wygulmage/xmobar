@@ -1,12 +1,12 @@
 % xmobar - Release notes
 
-## Vesion 0.19
+## Version 0.19 (October 27, 2013)
 
 _New features_
 
   - New monitor `BatteryN`, a variant of `BatteryP` that lets you
     specify the name of the monitor in the template.
-  - Support for configuration file living in XDG_CONFIG_HOME (see
+  - Support for configuration file living in `XDG_CONFIG_HOME` (see
     [github #99]).
   - `Com` uses safer `runInteractiveProcess` instead of spawning a
     shell (David McLean).  If you're using shell expansion in your
@@ -15,12 +15,16 @@ _New features_
   - New plugin `UnsafeStdinReader` that allows actions from stdin.
     Now it's possible to have clickable workspaces!
     (Thiago Negri, see [github #125]).
+  - New monitor configuration option (`-x` or `--nastring`) that allows
+    specifying what string to display when a monitor is not available
+    (defaulting to "N/A"). Cf. [github #119].
+
 
 _Bug fixes_
 
-  - Honour the width options `-w`, `-m` and `-M` in battery monitors
+  - Using the width options `-w`, `-m` and `-M` in battery monitors
     watts display ([github #118]).
-  - Honour the `-d` option in `CoreTemp` ([github #115])
+  - Using the `-d` option in `CoreTemp` ([github #115])
   - Fix for systems not supporting PCRE regular expressions: we use
     now BCEs, so regex-compat should be enough everywhere (see
     [github #117]).
@@ -33,6 +37,7 @@ _Bug fixes_
 [github #125]: https://github.com/jaor/xmobar/issues/125
 [issue #65]: http://code.google.com/p/xmobar/issues/detail?id=65
 [github #118]: https://github.com/jaor/xmobar/issues/118
+[github #119]: https://github.com/jaor/xmobar/issues/119
 [github #127]: https://github.com/jaor/xmobar/issues/127
 
 ## Version 0.18 (June 5, 2013)

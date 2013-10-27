@@ -616,6 +616,10 @@ These are the options available for all monitors below:
     - Total number of characters used to draw bars.
     - Long option: `--bwidth`
     - Default value: 10
+- `-x` _string_ N/A string
+    - String to be used when the monitor is not available
+    - Long option: `--nastring`
+    - Default value: "N/A"
 
 Commands' arguments must be set as a list. E.g.:
 

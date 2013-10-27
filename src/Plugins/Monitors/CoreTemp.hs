@@ -36,9 +36,9 @@ coreTempConfig = mkMConfig
 runCoreTemp :: [String] -> Monitor String
 runCoreTemp _ = do
    dn <- getConfigValue decDigits
+   failureMessage <- getConfigValue naString
    let path = ["/sys/bus/platform/devices/coretemp.", "/temp", "_input"]
        lbl  = Just ("_label", read . (dropWhile (not . isDigit)))
        divisor = 1e3 :: Double
-       failureMessage = "CoreTemp: N/A"
        show' = showDigits (max 0 dn)
    checkedDataRetrieval failureMessage path lbl (/divisor) show'

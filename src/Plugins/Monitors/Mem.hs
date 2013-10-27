@@ -52,7 +52,7 @@ formatMem (r:fr:xs) =
        fs <- showPercentWithColors fr
        s <- mapM (showWithColors f) xs
        return (ub:fb:rs:fs:s)
-formatMem _ = return $ replicate 10 "N/A"
+formatMem _ = replicate 10 `fmap` getConfigValue naString
 
 runMem :: [String] -> Monitor String
 runMem _ =

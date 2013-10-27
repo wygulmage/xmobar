@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Volume
--- Copyright   :  (c) 2011 Thomas Tuegel
+-- Copyright   :  (c) 2011, 2013 Thomas Tuegel
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
@@ -135,7 +135,7 @@ runVolume mixerName controlName argv = do
     liftMaybe = fmap (liftM2 (,) (fmap fst) (fmap snd)) . sequenceA
 
     liftMonitor :: Maybe (Monitor String) -> Monitor String
-    liftMonitor Nothing = return unavailable
+    liftMonitor Nothing = unavailable
     liftMonitor (Just m) = m
 
     getDB :: Maybe Volume -> Monitor (Maybe Integer)
@@ -152,11 +152,11 @@ runVolume mixerName controlName argv = do
     getSw (Just s) = io $ getChannel FrontLeft s
 
     getFormatDB :: VolumeOpts -> Maybe Integer -> Monitor String
-    getFormatDB _ Nothing = return unavailable
+    getFormatDB _ Nothing = unavailable
     getFormatDB opts (Just d) = formatDb opts d
 
     getFormatSwitch :: VolumeOpts -> Maybe Bool -> Monitor String
-    getFormatSwitch _ Nothing = return unavailable
+    getFormatSwitch _ Nothing = unavailable
     getFormatSwitch opts (Just sw) = formatSwitch opts sw
 
-    unavailable = "N/A"
+    unavailable = getConfigValue naString

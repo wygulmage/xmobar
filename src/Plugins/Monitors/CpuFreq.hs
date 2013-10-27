@@ -30,10 +30,10 @@ cpuFreqConfig = mkMConfig
 -- |
 -- Function retrieves monitor string holding the cpu frequency (or frequencies)
 runCpuFreq :: [String] -> Monitor String
-runCpuFreq _ =
+runCpuFreq _ = do
   let path = ["/sys/devices/system/cpu/cpu", "/cpufreq/scaling_cur_freq"]
       divisor = 1e6 :: Double
-      failureMessage = "CpuFreq: N/A"
       fmt x | x < 1 = (show (round (x * 1000) :: Integer)) ++ "MHz"
             | otherwise = (show x) ++ "GHz"
-  in  checkedDataRetrieval failureMessage path Nothing (/divisor) fmt
+  failureMessage <- getConfigValue naString
+  checkedDataRetrieval failureMessage path Nothing (/divisor) fmt

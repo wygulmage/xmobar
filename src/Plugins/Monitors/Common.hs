@@ -89,6 +89,7 @@ data MConfig =
        , barFore     :: IORef String
        , barWidth    :: IORef Int
        , useSuffix   :: IORef Bool
+       , naString    :: IORef String
        }
 
 -- | from 'http:\/\/www.haskell.org\/hawiki\/MonadState'
@@ -132,7 +133,8 @@ mkMConfig tmpl exprts =
        bf <- newIORef "#"
        bw <- newIORef 10
        up <- newIORef False
-       return $ MC nc l lc h hc t e p d mn mx pc pr bb bf bw up
+       na <- newIORef "N/A"
+       return $ MC nc l lc h hc t e p d mn mx pc pr bb bf bw up na
 
 data Opts = HighColor String
           | NormalColor String
@@ -151,27 +153,29 @@ data Opts = HighColor String
           | BarFore String
           | BarWidth String
           | UseSuffix String
+          | NAString String
 
 options :: [OptDescr Opts]
 options =
     [
-      Option "H"  ["High"] (ReqArg High "number") "The high threshold"
-    , Option "L"  ["Low"] (ReqArg Low "number") "The low threshold"
-    , Option "h"  ["high"] (ReqArg HighColor "color number") "Color for the high threshold: ex \"#FF0000\""
-    , Option "n"  ["normal"] (ReqArg NormalColor "color number") "Color for the normal threshold: ex \"#00FF00\""
-    , Option "l"  ["low"] (ReqArg LowColor "color number") "Color for the low threshold: ex \"#0000FF\""
-    , Option "t"  ["template"] (ReqArg Template "output template") "Output template."
-    , Option "S"  ["suffix"] (ReqArg UseSuffix "True/False") "Use % to display percents or other suffixes."
-    , Option "d"  ["ddigits"] (ReqArg DecDigits "decimal digits") "Number of decimal digits to display."
-    , Option "p"  ["ppad"] (ReqArg PercentPad "percent padding") "Minimum percentage width."
-    , Option "m"  ["minwidth"] (ReqArg MinWidth "minimum width") "Minimum field width"
-    , Option "M"  ["maxwidth"] (ReqArg MaxWidth "maximum width") "Maximum field width"
-    , Option "w"  ["width"] (ReqArg Width "fixed width") "Fixed field width"
-    , Option "c"  ["padchars"] (ReqArg PadChars "padding chars") "Characters to use for padding"
-    , Option "a"  ["align"] (ReqArg PadAlign "padding alignment") "'l' for left padding, 'r' for right"
-    , Option "b"  ["bback"] (ReqArg BarBack "bar background") "Characters used to draw bar backgrounds"
-    , Option "f"  ["bfore"] (ReqArg BarFore "bar foreground") "Characters used to draw bar foregrounds"
-    , Option "W"  ["bwidth"] (ReqArg BarWidth "bar width") "Bar width"
+      Option "H" ["High"] (ReqArg High "number") "The high threshold"
+    , Option "L" ["Low"] (ReqArg Low "number") "The low threshold"
+    , Option "h" ["high"] (ReqArg HighColor "color number") "Color for the high threshold: ex \"#FF0000\""
+    , Option "n" ["normal"] (ReqArg NormalColor "color number") "Color for the normal threshold: ex \"#00FF00\""
+    , Option "l" ["low"] (ReqArg LowColor "color number") "Color for the low threshold: ex \"#0000FF\""
+    , Option "t" ["template"] (ReqArg Template "output template") "Output template."
+    , Option "S" ["suffix"] (ReqArg UseSuffix "True/False") "Use % to display percents or other suffixes."
+    , Option "d" ["ddigits"] (ReqArg DecDigits "decimal digits") "Number of decimal digits to display."
+    , Option "p" ["ppad"] (ReqArg PercentPad "percent padding") "Minimum percentage width."
+    , Option "m" ["minwidth"] (ReqArg MinWidth "minimum width") "Minimum field width"
+    , Option "M" ["maxwidth"] (ReqArg MaxWidth "maximum width") "Maximum field width"
+    , Option "w" ["width"] (ReqArg Width "fixed width") "Fixed field width"
+    , Option "c" ["padchars"] (ReqArg PadChars "padding chars") "Characters to use for padding"
+    , Option "a" ["align"] (ReqArg PadAlign "padding alignment") "'l' for left padding, 'r' for right"
+    , Option "b" ["bback"] (ReqArg BarBack "bar background") "Characters used to draw bar backgrounds"
+    , Option "f" ["bfore"] (ReqArg BarFore "bar foreground") "Characters used to draw bar foregrounds"
+    , Option "W" ["bwidth"] (ReqArg BarWidth "bar width") "Bar width"
+    , Option "x" ["nastring"] (ReqArg NAString "N/A string") "String used when the monitor is not available"
     ]
 
 doArgs :: [String] -> ([String] -> Monitor String) -> Monitor String
@@ -205,7 +209,8 @@ doConfigOptions (o:oo) =
           BarBack     s -> setConfigValue s barBack
           BarFore     s -> setConfigValue s barFore
           BarWidth    w -> setConfigValue (nz w) barWidth
-          UseSuffix   u -> setConfigValue (bool u) useSuffix) >> next
+          UseSuffix   u -> setConfigValue (bool u) useSuffix
+          NAString    s -> setConfigValue s naString) >> next
 
 runM :: [String] -> IO MConfig -> ([String] -> Monitor String) -> Int
         -> (String -> IO ()) -> IO ()

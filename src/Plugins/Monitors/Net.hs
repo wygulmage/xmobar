@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Net
--- Copyright   :  (c) 2011, 2012 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2011, 2012, 2013 Jose Antonio Ortega Ruiz
 --                (c) 2007-2010 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -114,7 +114,7 @@ printNet nd =
         (tx, tb) <- formatNet t
         parseTemplate [d,rx,tx,rb,tb]
     NI _ -> return ""
-    NA -> return "N/A"
+    NA -> getConfigValue naString
 
 parseNet :: NetDevRef -> String -> IO NetDev
 parseNet nref nd = do

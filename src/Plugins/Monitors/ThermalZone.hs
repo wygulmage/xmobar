@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module       :  Plugins.Monitors.ThermalZone
--- Copyright    :  (c) 2011 Jose Antonio Ortega Ruiz
+-- Copyright    :  (c) 2011, 2013 Jose Antonio Ortega Ruiz
 -- License      :  BSD3-style (see LICENSE)
 --
 -- Maintainer   :  jao@gnu.org
@@ -39,5 +39,4 @@ runThermalZone args = do
       then do mdegrees <- io $ B.readFile file >>= parse
               temp <- showWithColors show (mdegrees `quot` 1000)
               parseTemplate [ temp ]
-      else return "N/A"
-
+      else getConfigValue naString

@@ -149,7 +149,7 @@ formatWeather [(WI st ss y m d h w v sk tC tF dp r p)] =
     do cel <- showWithColors show tC
        far <- showWithColors show tF
        parseTemplate [st, ss, y, m, d, h, w, v, sk, cel, far, dp, show r , show p ]
-formatWeather _ = return "N/A"
+formatWeather _ = getConfigValue naString
 
 runWeather :: [String] -> Monitor String
 runWeather str =

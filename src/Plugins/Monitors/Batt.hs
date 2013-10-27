@@ -165,7 +165,7 @@ runBatt' bfs args = do
       do l <- fmtPercent x
          ws <- fmtWatts w opts suffix d
          parseTemplate (l ++ [s, fmtTime $ floor t, ws])
-    NA -> return "N/A"
+    NA -> getConfigValue naString
   where fmtPercent :: Float -> Monitor [String]
         fmtPercent x = do
           let x' = minimum [1, x]

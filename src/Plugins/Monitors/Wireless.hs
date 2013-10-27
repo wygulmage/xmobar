@@ -24,11 +24,14 @@ wirelessConfig =
 runWireless :: [String] -> Monitor String
 runWireless (iface:_) = do
   wi <- io $ getWirelessInfo iface
+  na <- getConfigValue naString
   let essid = wiEssid wi
       qlty = fromIntegral $ wiQuality wi
-      e = if essid == "" then "N/A" else essid
+      e = if essid == "" then na else essid
   ep <- showWithPadding e
-  q <- if qlty >= 0 then showPercentWithColors (qlty/100) else showWithPadding ""
+  q <- if qlty >= 0
+       then showPercentWithColors (qlty / 100)
+       else showWithPadding ""
   qb <- showPercentBar qlty (qlty / 100)
   parseTemplate [ep, q, qb]
-runWireless _ = return ""
+runWireless _ = getConfigValue naString
