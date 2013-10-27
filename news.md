@@ -9,7 +9,9 @@ _New features_
   - Support for configuration file living in XDG_CONFIG_HOME (see
     [github #99]).
   - `Com` uses safer `runInteractiveProcess` instead of spawning a
-    shell (David McLean).
+    shell (David McLean).  If you're using shell expansion in your
+    `Com` (e.g. "~/bin/script") here's a workaround: `Run Com
+    "/bin/bash" ["-c", "~/bin/script"]` (cf. [github #127]).
   - New plugin `UnsafeStdinReader` that allows actions from stdin.
     Now it's possible to have clickable workspaces!
     (Thiago Negri, see [github #125]).
@@ -31,6 +33,7 @@ _Bug fixes_
 [github #125]: https://github.com/jaor/xmobar/issues/125
 [issue #65]: http://code.google.com/p/xmobar/issues/detail?id=65
 [github #118]: https://github.com/jaor/xmobar/issues/118
+[github #127]: https://github.com/jaor/xmobar/issues/127
 
 ## Version 0.18 (June 5, 2013)
 
