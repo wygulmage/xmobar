@@ -1,4 +1,4 @@
-% xmobar - A Minimalistic Text Based Status Bar
+% xmobar - a minimalistic status bar
 
 About
 =====
@@ -170,7 +170,7 @@ if you have the default configuration file saved as
 `$XDG\_CONFIG\_HOME/xmobar/xmobarrc` (defaulting to
 `~/.config/xmobar/xmobarrc`), or `~/.xmobarrc`.
 
-### Signal Handling
+## Signal Handling
 
 Since 0.14 xmobar reacts to SIGUSR1 and SIGUSR2:
 
@@ -1117,7 +1117,7 @@ can be used in the output template as `%mydate%`
 
 ## Other Plugins
 
-`StdinReader`
+<font size="+1">**`StdinReader`**</font>
 
 - Aliases to StdinReader
 - Displays any text received by xmobar on its standard input.
@@ -1125,7 +1125,7 @@ can be used in the output template as `%mydate%`
   actions via stdin.  This is safer than `UnsafeStdinReader` because there is
   no need to escape the content before passing it to xmobar's standard input.
 
-`UnsafeStdinReader`
+<font size="+1">**`UnsafeStdinReader`**</font>
 
 - Aliases to UnsafeStdinReader
 - Displays any text received by xmobar on its standard input.
@@ -1139,13 +1139,13 @@ can be used in the output template as `%mydate%`
   clicking on xmobar:
   `<action=xdotool key alt+1>ws1</action> <action=xdotool key alt+1>ws2</action>`
 
-`Date Format Alias RefreshRate`
+<font size="+1">**`Date Format Alias RefreshRate`**</font>
 
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
 - Sample usage: `Run Date "%a %b %_d %Y <fc=#ee9a00>%H:%M:%S</fc>" "date" 10`
 
-`DateZone Format Locale Zone Alias RefreshRate`
+<font size="+1">**`DateZone Format Locale Zone Alias RefreshRate`**</font>
 
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
@@ -1158,45 +1158,49 @@ can be used in the output template as `%mydate%`
 - Sample usage:
   `Run DateZone "%a %H:%M:%S" "de_DE.UTF-8" "Europe/Vienna" "viennaTime" 10`
 
-`CommandReader "/path/to/program" Alias`
+<font size="+1">**`CommandReader "/path/to/program" Alias`**</font>
 
 - Runs the given program, and displays its standard output.
 
-`PipeReader "default text:/path/to/pipe" Alias`
+<font size="+1">**`PipeReader "default text:/path/to/pipe" Alias`**</font>
 
 - Reads its displayed output from the given pipe.
 - Prefix an optional default text separated by a colon
 
-`BufferedPipeReader  Alias [ (Timeout, Bool, "/path/to/pipe1")
-                           , (Timeout, Bool, "/path/to/pipe2")
-                           , ..
-                           ]`
+<font size="+1">
+**`BufferedPipeReader Alias [(Timeout, Bool, "/path/to/pipe1"), ..]`**
+</font>
 
 - Display data from multiple pipes.
-- Timeout (in tenth of seconds) is the value after which the previous content is
-  restored i.e. if there was already something from a previous pipe it will be
-  put on display again, overwriting the current status.
-- A pipe with Timout of 0 will be displayed permanently, just like `PipeReader`
-- The boolean option indicates whether new data for this pipe should make xmobar
-  appear (unhide, reveal). In this case, the Timeout additionally specifies when
-  the window should be hidden again. The output is restored in any case.
-- Use it for OSD like status bars e.g. for setting the volume or brightness:
+- Timeout (in tenth of seconds) is the value after which the previous
+  content is restored i.e. if there was already something from a
+  previous pipe it will be put on display again, overwriting the
+  current status.
+- A pipe with Timout of 0 will be displayed permanently, just like
+  `PipeReader`
+- The boolean option indicates whether new data for this pipe should
+  make xmobar appear (unhide, reveal). In this case, the Timeout
+  additionally specifies when the window should be hidden again. The
+  output is restored in any case.
+- Use it for OSD like status bars e.g. for setting the volume or
+  brightness:
 
         Run BufferedPipeReader "bpr"
             [ (  0, False, "/tmp/xmobar_window"  )
             , ( 15,  True, "/tmp/xmobar_status"  )
             ]
 
-  Have your window manager send window titles to `"/tmp/xmobar_window"`. They will
-  always be shown and not reveal your xmobar.
-  Sending some status information to `"/tmp/xmobar_status"` will reveal xmonad
-  for 1.5 seconds and temporarily overwrite the window titles.
+  Have your window manager send window titles to
+  `"/tmp/xmobar_window"`. They will always be shown and not reveal
+  your xmobar.  Sending some status information to
+  `"/tmp/xmobar_status"` will reveal xmonad for 1.5 seconds and
+  temporarily overwrite the window titles.
 - Take a look at [samples/status.sh]
 
 [samples/status.sh]: http://github.com/jaor/xmobar/raw/master/samples/status.sh
 
 
-`XMonadLog`
+<font size="+1">**`XMonadLog`**</font>
 
 - Aliases to XMonadLog
 - Displays information from xmonad's `_XMONAD_LOG`. You can set this
@@ -1335,9 +1339,8 @@ Authors and credits
 ===================
 
 Andrea Rossato originally designed and implemented xmobar up to
-version 0.11.1. Since then, it is maintained and developed by [Jose
-Antonio Ortega Ruiz](http://hacks-galore.org/jao/), with the help of
-the greater Haskell community.
+version 0.11.1. Since then, it is maintained and developed by [jao],
+with the help of the greater xmobar and Haskell communities.
 
 In particular, xmobar [incorporates patches] by Ben Boeckel, Roman
 Cheplyaka, Patrick Chilton, John Goerzen, Reto Hablützel, Juraj
@@ -1349,6 +1352,7 @@ Peter Simons, Andrew Sackville-West, Alexander Solovyov, John Soros,
 Artem Tarasov, Sergei Trofimovich, Thomas Tuegel, Jan Vornberger,
 Daniel Wagner and Norbert Zeh.
 
+[jao]: http://jao.io
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
 
 ## Thanks
