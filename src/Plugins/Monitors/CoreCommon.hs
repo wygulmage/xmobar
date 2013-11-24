@@ -35,7 +35,8 @@ retrieveData :: (Ord a, Num a)
              => [String] -> Maybe (String, String -> Int)
              -> (Double -> a) -> (a -> String) -> Monitor (Maybe String)
 retrieveData path lbl trans fmt = do
-  pairs <- map snd . sortBy (compare `on` fst) <$> (mapM readFiles =<< findFiles path lbl)
+  pairs <- map snd . sortBy (compare `on` fst) <$>
+             (mapM readFiles =<< findFilesAndLabel path lbl)
   if null pairs
     then return Nothing
     else Just <$> (     parseTemplate
@@ -84,9 +85,9 @@ pathComponents = joinComps . drop 2 . intercalate [Space] . map splitParts
 
 -- | Function to find all files matching the given path and possible label file.
 -- The path must be absolute (start with a leading slash).
-findFiles :: [String] -> Maybe (String, String -> Int)
+findFilesAndLabel :: [String] -> Maybe (String, String -> Int)
           -> Monitor [(String, Either Int (String, String -> Int))]
-findFiles path lbl  =  catMaybes
+findFilesAndLabel path lbl  =  catMaybes
                    <$> (     mapM addLabel . zip [0..] . sort
                          =<< recFindFiles (pathComponents path) "/"
                        )
