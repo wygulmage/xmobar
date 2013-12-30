@@ -87,6 +87,7 @@ data Files = Files
   , fNow :: String
   , fVoltage :: String
   , fCurrent :: String
+  , isCurrent :: Bool
   } | NoFiles
 
 data Battery = Battery
@@ -103,20 +104,21 @@ batteryFiles :: String -> IO Files
 batteryFiles bat =
   do is_charge <- exists "charge_now"
      is_energy <- if is_charge then return False else exists "energy_now"
-     is_current <- exists "current_now"
+     is_power <- exists "power_now"
      plain <- if is_charge then exists "charge_full" else exists "energy_full"
-     let cf = if is_current then "current_now" else "power_now"
+     let cf = if is_power then "power_now" else "current_now"
          sf = if plain then "" else "_design"
      return $ case (is_charge, is_energy) of
-       (True, _) -> files "charge" cf sf
-       (_, True) -> files "energy" cf sf
+       (True, _) -> files "charge" cf sf is_power
+       (_, True) -> files "energy" cf sf is_power
        _ -> NoFiles
   where prefix = sysDir </> bat
         exists = safeFileExist prefix
-        files ch cf sf = Files { fFull = prefix </> ch ++ "_full" ++ sf
-                               , fNow = prefix </> ch ++ "_now"
-                               , fCurrent = prefix </> cf
-                               , fVoltage = prefix </> "voltage_now" }
+        files ch cf sf ip = Files { fFull = prefix </> ch ++ "_full" ++ sf
+                                  , fNow = prefix </> ch ++ "_now"
+                                  , fCurrent = prefix </> cf
+                                  , fVoltage = prefix </> "voltage_now"
+                                  , isCurrent = not ip}
 
 haveAc :: FilePath -> IO Bool
 haveAc f =
@@ -129,9 +131,10 @@ readBattery sc files =
     do a <- grab $ fFull files
        b <- grab $ fNow files
        d <- grab $ fCurrent files
+       let d' = if isCurrent files then d * 10 else d
        return $ Battery (3600 * a / sc) -- wattseconds
                         (3600 * b / sc) -- wattseconds
-                        (d / sc) -- watts
+                        (d' / sc) -- watts
     where grab f = handle onError $ withFile f ReadMode (fmap read . hGetLine)
           onError = const (return (-1)) :: SomeException -> IO Float
 
