@@ -131,10 +131,10 @@ readBattery sc files =
     do a <- grab $ fFull files
        b <- grab $ fNow files
        d <- grab $ fCurrent files
-       let d' = if isCurrent files then d * 10 else d
-       return $ Battery (3600 * a / sc) -- wattseconds
-                        (3600 * b / sc) -- wattseconds
-                        (d' / sc) -- watts
+       let sc' = if isCurrent files then sc / 10 else sc
+       return $ Battery (3600 * a / sc') -- wattseconds
+                        (3600 * b / sc') -- wattseconds
+                        (d / sc') -- watts
     where grab f = handle onError $ withFile f ReadMode (fmap read . hGetLine)
           onError = const (return (-1)) :: SomeException -> IO Float
 
