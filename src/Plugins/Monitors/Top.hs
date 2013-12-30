@@ -57,10 +57,15 @@ processes :: IO [FilePath]
 processes = fmap (filter isPid) (getDirectoryContents "/proc")
   where isPid = (`elem` ['0'..'9']) . head
 
+statWords :: [String] -> [String]
+statWords line@(x:pn:ppn:xs) =
+  if last pn == ')' then line else statWords (x:(pn ++ " " ++ ppn):xs)
+statWords _ = replicate 52 "0"
+
 getProcessData :: FilePath -> IO [String]
 getProcessData pidf =
   handle ign $ withFile ("/proc" </> pidf </> "stat") ReadMode readWords
-  where readWords = fmap words . hGetLine
+  where readWords = fmap (statWords . words) . hGetLine
         ign = const (return []) :: SomeException -> IO [String]
 
 handleProcesses :: ([String] -> a) -> IO [a]

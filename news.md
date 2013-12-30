@@ -1,5 +1,15 @@
 % xmobar - Release notes
 
+## Version 0.20 ()
+
+_Bug fixes_
+
+  - Fix for `Top` monitor's readings for processes whose name contains
+    blanks.
+  - Fixes for geometry computation on multihead (Dmitry Malikov).
+  - Fixes for missing XDG configuration (Thiago Negri and James McCoy).
+  - Compatibility with latest `directory` (1.2.0.2).
+
 ## Version 0.19 (October 27, 2013)
 
 As of this release, the old bug tracker at Google code is deprecated.
