@@ -4,6 +4,8 @@
 
 _Bug fixes_
 
+  - Fix for `Memory` monitor in 3.14 kernels (Ben Boeckel).
+  - More robust AC readings in `BatteryP`.
   - Fix for `Top` monitor's readings for processes whose name contains
     blanks.
   - Fixes for geometry computation on multihead (Dmitry Malikov).
