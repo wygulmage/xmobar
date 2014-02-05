@@ -133,8 +133,7 @@ stationUrl station = defUrl ++ station ++ ".TXT"
 getData :: String -> IO String
 getData station = do
     let request = getRequest (stationUrl station)
-    result <- simpleHTTP request
-    catch (getResponseBody result) errHandler
+    catch (simpleHTTP request >>= getResponseBody) errHandler
     where errHandler :: IOException -> IO String
           errHandler _ = return "<Could not retrieve data>"
 
@@ -155,13 +154,16 @@ weatherReady :: [String] -> Monitor Bool
 weatherReady str = do
     let station = head str
         request = headRequest (stationUrl station)
-    result <- io $ simpleHTTP request
-    case result of
-        Left _ -> return False
-        Right response -> do
-            case rspCode response of
-                -- Permission or network errors are failures; anything else is
-                -- recoverable.
-                (4, _, _) -> return False
-                (5, _, _) -> return False
-                (_, _, _) -> return True
+    io $ catch (simpleHTTP request >>= checkResult) errHandler
+    where errHandler :: IOException -> IO Bool
+          errHandler _ = return False
+          checkResult result = do
+            case result of
+                Left _ -> return False
+                Right response -> do
+                    case rspCode response of
+                        -- Permission or network errors are failures; anything
+                        -- else is recoverable.
+                        (4, _, _) -> return False
+                        (5, _, _) -> return False
+                        (_, _, _) -> return True
