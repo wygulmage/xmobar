@@ -5,12 +5,16 @@
 _Bug fixes_
 
   - Fix for `Memory` monitor in 3.14 kernels (Ben Boeckel).
+  - Fix for infinite loops in `AutoMPD` ([issue #76], [issue #111]).
   - More robust AC readings in `BatteryP`.
   - Fix for `Top` monitor's readings for processes whose name contains
     blanks.
   - Fixes for geometry computation on multihead (Dmitry Malikov).
   - Fixes for missing XDG configuration (Thiago Negri and James McCoy).
   - Compatibility with latest `directory` (1.2.0.2).
+
+[issue #76]: https://github.com/jaor/xmobar/issues/76
+[issue #111]: https://github.com/jaor/xmobar/issues/111
 
 ## Version 0.19 (October 27, 2013)
 

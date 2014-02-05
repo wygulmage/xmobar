@@ -18,6 +18,7 @@ import Data.List
 import Plugins.Monitors.Common
 import System.Console.GetOpt
 import qualified Network.MPD as M
+import Control.Concurrent (threadDelay)
 
 mpdConfig :: IO MConfig
 mpdConfig = mkMConfig "MPD: <state>"
@@ -57,7 +58,11 @@ runMPD args = do
   parseTemplate s
 
 mpdWait :: IO ()
-mpdWait = M.withMPD idle >> return ()
+mpdWait = do
+  status <- M.withMPD M.status
+  case status of
+    Left _ -> threadDelay 10000000
+    _ -> M.withMPD idle >> return ()
   where idle = M.idle [M.PlayerS, M.MixerS]
 
 mopts :: [String] -> IO MOpts
@@ -68,7 +73,7 @@ mopts argv =
 
 parseMPD :: M.Response M.Status -> M.Response (Maybe M.Song) -> MOpts
             -> Monitor [String]
-parseMPD (Left e) _ _ = return $ show e:repeat ""
+parseMPD (Left e) _ _ = return $ show e:replicate 18 ""
 parseMPD (Right st) song opts = do
   songData <- parseSong song
   bar <- showPercentBar (100 * b) b
