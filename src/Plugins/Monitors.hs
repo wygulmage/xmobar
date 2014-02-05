@@ -40,7 +40,7 @@ import Plugins.Monitors.Wireless
 #endif
 #ifdef LIBMPD
 import Plugins.Monitors.MPD
-import Plugins.Monitors.Common (runMB)
+import Plugins.Monitors.Common (runMD, runMBD)
 #endif
 #ifdef ALSA
 import Plugins.Monitors.Volume
@@ -155,8 +155,8 @@ instance Exec Monitors where
     start (Wireless i a r) = runM (a ++ [i]) wirelessConfig runWireless r
 #endif
 #ifdef LIBMPD
-    start (MPD a r) = runM a mpdConfig runMPD r
-    start (AutoMPD a) = runMB a mpdConfig runMPD mpdWait
+    start (MPD a r) = runMD a mpdConfig runMPD r mpdReady
+    start (AutoMPD a) = runMBD a mpdConfig runMPD mpdWait mpdReady
 #endif
 #ifdef ALSA
     start (Volume m c a r) = runM a volumeConfig (runVolume m c) r
