@@ -20,6 +20,7 @@ import Control.Monad (when)
 import System.Process
 import System.Exit
 import System.IO
+import Network.HTTP
 
 import Text.ParserCombinators.Parsec
 
@@ -129,6 +130,9 @@ parseData =
 defUrl :: String
 defUrl = "http://weather.noaa.gov/pub/data/observations/metar/decoded/"
 
+stationUrl :: String -> String
+stationUrl station = defUrl ++ station ++ ".TXT"
+
 getData :: String -> IO String
 getData url=
         do (i,o,e,p) <- runInteractiveCommand ("curl " ++ defUrl ++ url ++ ".TXT")
@@ -156,3 +160,18 @@ runWeather str =
     do d <- io $ getData $ head str
        i <- io $ runP parseData d
        formatWeather i
+
+weatherReady :: [String] -> Monitor Bool
+weatherReady str = do
+    let station = head str
+        request = headRequest (stationUrl station)
+    result <- io $ simpleHTTP request
+    case result of
+        Left _ -> return False
+        Right response -> do
+            case rspCode response of
+                -- Permission or network errors are failures; anything else is
+                -- recoverable.
+                (4, _, _) -> return False
+                (5, _, _) -> return False
+                (_, _, _) -> return True
