@@ -51,19 +51,17 @@ options =
 runMPD :: [String] -> Monitor String
 runMPD args = do
   opts <- io $ mopts args
-  let mpd = M.withMPD
-  status <- io $ mpd M.status
-  song <- io $ mpd M.currentSong
+  status <- io $ M.withMPD M.status
+  song <- io $ M.withMPD M.currentSong
   s <- parseMPD status song opts
   parseTemplate s
 
 mpdWait :: IO ()
 mpdWait = do
-  status <- M.withMPD M.status
+  status <- M.withMPD $ M.idle [M.PlayerS, M.MixerS]
   case status of
     Left _ -> threadDelay 10000000
-    _ -> M.withMPD idle >> return ()
-  where idle = M.idle [M.PlayerS, M.MixerS]
+    _ -> return ()
 
 mopts :: [String] -> IO MOpts
 mopts argv =

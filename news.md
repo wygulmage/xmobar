@@ -10,11 +10,13 @@ _Bug fixes_
   - Fix for `Top` monitor's readings for processes whose name contains
     blanks.
   - Fixes for geometry computation on multihead (Dmitry Malikov).
-  - Fixes for missing XDG configuration (Thiago Negri and James McCoy).
+  - Fixes for missing XDG configuration (Thiago Negri and James McCoy,
+    see [issue #133]).
   - Compatibility with latest `directory` (1.2.0.2).
 
 [issue #76]: https://github.com/jaor/xmobar/issues/76
 [issue #111]: https://github.com/jaor/xmobar/issues/111
+[issue #133]: https://github.com/jaor/xmobar/issues/133
 
 ## Version 0.19 (October 27, 2013)
 
