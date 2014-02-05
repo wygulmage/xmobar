@@ -16,10 +16,7 @@ module Plugins.Monitors.Weather where
 
 import Plugins.Monitors.Common
 
-import Control.Monad (when)
-import System.Process
-import System.Exit
-import System.IO
+import Control.Exception (catch, IOException)
 import Network.HTTP
 
 import Text.ParserCombinators.Parsec
@@ -134,19 +131,12 @@ stationUrl :: String -> String
 stationUrl station = defUrl ++ station ++ ".TXT"
 
 getData :: String -> IO String
-getData url=
-        do (i,o,e,p) <- runInteractiveCommand ("curl " ++ defUrl ++ url ++ ".TXT")
-           exit <- waitForProcess p
-           let closeHandles = do hClose o
-                                 hClose i
-                                 hClose e
-           case exit of
-             ExitSuccess -> do str <- hGetContents o
-                               when (str == str) $ return ()
-                               closeHandles
-                               return str
-             _ -> do closeHandles
-                     return "Could not retrieve data"
+getData station = do
+    let request = getRequest (stationUrl station)
+    result <- simpleHTTP request
+    catch (getResponseBody result) errHandler
+    where errHandler :: IOException -> IO String
+          errHandler _ = return "<Could not retrieve data>"
 
 formatWeather :: [WeatherInfo] -> Monitor String
 formatWeather [(WI st ss y m d h w v sk tC tF dp r p)] =
