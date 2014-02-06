@@ -4,6 +4,7 @@
 
 _Bug fixes_
 
+  - `Weather` is now non-blocking and doesn't use curl (Ben Boeckel).
   - Fix for `Memory` monitor in 3.14 kernels (Ben Boeckel).
   - Fix for infinite loops in `AutoMPD` ([issue #76], [issue #111]).
   - More robust AC readings in `BatteryP`.
