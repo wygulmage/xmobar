@@ -646,15 +646,15 @@ something like:
 
 ### `Weather StationID Args RefreshRate`
 
-- Aliases to the Station ID: so `Weather "LIPB" []` can be used in template as `%LIPB%`
+- Aliases to the Station ID: so `Weather "LIPB" []` can be used in
+  template as `%LIPB%`
 - Args: default monitor arguments
 - Variables that can be used with the `-t`/`--template` argument:
 	    `station`, `stationState`, `year`, `month`, `day`, `hour`,
 	    `wind`, `visibility`, `skyCondition`, `tempC`, `tempF`,
 	    `dewPoint`, `rh`, `pressure`
 - Default template: `<station>: <tempC>C, rh <rh>% (<hour>)`
-- Requires `curl` in the `$PATH` to retrieve weather information from
-  `http://weather.noaa.gov`
+- Retrieves weather information from http://weather.noaa.gov.
 
 ### `Network Interface Args RefreshRate`
 
