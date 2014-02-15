@@ -954,10 +954,10 @@ more than one battery.
   The environment variables `MPD_HOST` and `MPD_PORT` are used to configure the
   mpd server to communicate with.
 - Variables that can be used with the `-t`/`--template` argument:
-             `bar`, `state`, `statei`, `volume`, `length`
+             `bar`, `state`, `statei`, `volume`, `length`,
              `lapsed`, `remaining`,
-             `plength` (playlist length), `ppos` (playlist position)
-             `name`, `artist`, `composer`, `performer`
+             `plength` (playlist length), `ppos` (playlist position),
+             `name`, `artist`, `composer`, `performer`,
              `album`, `title`, `track`, `file`, `genre`
 - Default template: `MPD: <state>`
 - Example (note that you need "--" to separate regular monitor options from
