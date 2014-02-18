@@ -28,13 +28,14 @@ import Actions
 import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Perm
+import Graphics.X11.Types (Button)
 
 data Widget = Icon String | Text String
 
 type ColorString = String
 
 -- | Runs the string parser
-parseString :: Config -> String -> IO [(Widget, ColorString, Maybe Action)]
+parseString :: Config -> String -> IO [(Widget, ColorString, Maybe [Action])]
 parseString c s =
     case parse (stringParser (fgColor c) Nothing) "" s of
       Left  _ -> return [(Text $ "Could not parse string: " ++ s
@@ -43,23 +44,28 @@ parseString c s =
       Right x -> return (concat x)
 
 -- | Gets the string and combines the needed parsers
-stringParser :: String -> Maybe Action
-                -> Parser [[(Widget, ColorString, Maybe Action)]]
+stringParser :: String -> Maybe [Action]
+                -> Parser [[(Widget, ColorString, Maybe [Action])]]
 stringParser c a = manyTill (textParser c a <|> try (iconParser c a) <|>
-                             try (actionParser c) <|> colorParser a) eof
+                             try (actionParser c a) <|> colorParser a) eof
 
 -- | Parses a maximal string without color markup.
-textParser :: String -> Maybe Action
-              -> Parser [(Widget, ColorString, Maybe Action)]
+textParser :: String -> Maybe [Action]
+              -> Parser [(Widget, ColorString, Maybe [Action])]
 textParser c a = do s <- many1 $
                           noneOf "<" <|>
                             try (notFollowedBy' (char '<')
                                   (try (string "fc=")  <|>
-                                   try (string "action=") <|>
-                                   try (string "/action>") <|>
+                                   try (tryChoice openings) <|>
+                                   try (tryChoice closings) <|>
                                    try (string "icon=") <|>
                                    string "/fc>"))
                     return [(Text s, c, a)]
+  where
+    openings = map (++ "=") buttons
+    closings = map (\s -> '/' : s ++ ">") buttons
+
+    tryChoice strs = choice $ map (try . string) strs
 
 
 -- | Wrapper for notFollowedBy that returns the result of the first parser.
@@ -70,28 +76,42 @@ notFollowedBy' p e = do x <- p
                         notFollowedBy $ try (e >> return '*')
                         return x
 
-iconParser :: String -> Maybe Action
-              -> Parser [(Widget, ColorString, Maybe Action)]
+iconParser :: String -> Maybe [Action]
+              -> Parser [(Widget, ColorString, Maybe [Action])]
 iconParser c a = do
   string "<icon="
   i <- manyTill (noneOf ">") (try (string "/>"))
   return [(Icon i, c, a)]
 
-actionParser :: String -> Parser [(Widget, ColorString, Maybe Action)]
-actionParser c = do
-  a <- between (string "<action=") (string ">") (many1 (noneOf ">"))
-  let a' = Just (Spawn a)
+actionParser :: String -> Maybe [Action] -> Parser [(Widget, ColorString, Maybe [Action])]
+actionParser c act = do
+  string "<"
+  button <- choice $ map (try . string) buttons
+  command <- between (string "=") (string ">") (many1 (noneOf ">"))
+  let a = Spawn (toButton button) command
+      a' = case act of
+        Nothing -> Just [a]
+        Just act' -> Just $ a : act'
   s <- manyTill (try (textParser c a') <|> try (iconParser c a') <|>
-                 try (colorParser a') <|> actionParser c)
-                (try $ string "</action>")
+                 try (colorParser a') <|> actionParser c a')
+                (try $ string $ "</" ++ button ++ ">")
   return (concat s)
 
+-- List of accepted buttons plus action for backward compatibility
+buttons :: [String]
+buttons = "action" : zipWith (++) (repeat "button") (map show ([1..5] :: [Int]))
+
+toButton :: String -> Button
+toButton s = case s of
+  "action" -> 1
+  _        -> read $ [last s]
+
 -- | Parsers a string wrapped in a color specification.
-colorParser :: Maybe Action -> Parser [(Widget, ColorString, Maybe Action)]
+colorParser :: Maybe [Action] -> Parser [(Widget, ColorString, Maybe [Action])]
 colorParser a = do
   c <- between (string "<fc=") (string ">") colors
   s <- manyTill (try (textParser c a) <|> try (iconParser c a) <|>
-                 try (colorParser a) <|> actionParser c) (try $ string "</fc>")
+                 try (colorParser a) <|> actionParser c a) (try $ string "</fc>")
   return (concat s)
 
 -- | Parses a color specification (hex or named)
