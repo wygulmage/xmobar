@@ -213,7 +213,7 @@ eventLoop tv xc@(XConf d r w fs is cfg) as signal = do
 
         action button x = do
           mapM_ runAction $
-            filter (\(Spawn b _) -> button == b) $
+            filter (\(Spawn b _) -> button `elem` b) $
             concatMap (\(a,_,_) -> a) $
             filter (\(_, from, to) -> x >= from && x <= to) as
           eventLoop tv xc as signal

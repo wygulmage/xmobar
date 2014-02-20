@@ -56,17 +56,11 @@ textParser c a = do s <- many1 $
                           noneOf "<" <|>
                             try (notFollowedBy' (char '<')
                                   (try (string "fc=")  <|>
-                                   try (tryChoice openings) <|>
-                                   try (tryChoice closings) <|>
+                                   try (string "action=") <|>
+                                   try (string "/action>") <|>
                                    try (string "icon=") <|>
                                    string "/fc>"))
                     return [(Text s, c, a)]
-  where
-    openings = map (++ "=") buttons
-    closings = map (\s -> '/' : s ++ ">") buttons
-
-    tryChoice strs = choice $ map (try . string) strs
-
 
 -- | Wrapper for notFollowedBy that returns the result of the first parser.
 --   Also works around the issue that, at least in Parsec 3.0.0, notFollowedBy
@@ -85,26 +79,22 @@ iconParser c a = do
 
 actionParser :: String -> Maybe [Action] -> Parser [(Widget, ColorString, Maybe [Action])]
 actionParser c act = do
-  string "<"
-  button <- choice $ map (try . string) buttons
-  command <- between (string "=") (string ">") (many1 (noneOf ">"))
-  let a = Spawn (toButton button) command
+  string "<action="
+  command <- choice [between (char '`') (char '`') (many1 (noneOf "`")),
+                   many1 (noneOf ">")]
+  buttons <- (char '>' >> return "1") <|> (space >> spaces >>
+    between (string "button=") (string ">") (many1 (oneOf "12345")))
+  let a = Spawn (toButtons buttons) command
       a' = case act of
         Nothing -> Just [a]
         Just act' -> Just $ a : act'
   s <- manyTill (try (textParser c a') <|> try (iconParser c a') <|>
                  try (colorParser a') <|> actionParser c a')
-                (try $ string $ "</" ++ button ++ ">")
+                (try $ string "</action>")
   return (concat s)
 
--- List of accepted buttons plus action for backward compatibility
-buttons :: [String]
-buttons = "action" : zipWith (++) (repeat "button") (map show ([1..5] :: [Int]))
-
-toButton :: String -> Button
-toButton s = case s of
-  "action" -> 1
-  _        -> read $ [last s]
+toButtons :: String -> [Button]
+toButtons s = map (\x -> read [x]) s
 
 -- | Parsers a string wrapped in a color specification.
 colorParser :: Maybe [Action] -> Parser [(Widget, ColorString, Maybe [Action])]

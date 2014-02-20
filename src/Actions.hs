@@ -17,7 +17,7 @@ import Control.Monad (void)
 import Text.Regex (Regex, subRegex, mkRegex, matchRegex)
 import Graphics.X11.Types (Button)
 
-data Action = Spawn Button String
+data Action = Spawn [Button] String
                 deriving (Eq)
 
 runAction :: Action -> IO ()
@@ -28,7 +28,7 @@ stripActions s = case matchRegex actionRegex s of
   Nothing -> s
   Just _  -> stripActions strippedOneLevel
   where
-      strippedOneLevel = subRegex actionRegex s $ "[\\1=\\2]\\3[\\4]"
+      strippedOneLevel = subRegex actionRegex s $ "[action=\\1\\2]\\3[/action]"
 
 actionRegex :: Regex
-actionRegex = mkRegex "<(action|button.)=([^>]*)>(.+)</(action|button.)>"
+actionRegex = mkRegex "<action=`?([^>`]*)`?( +button=[12345]+)?>(.+)</action>"
