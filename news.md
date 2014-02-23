@@ -2,6 +2,11 @@
 
 ## Version 0.20 ()
 
+_New features_
+
+  - Mouse actions now support multiple buttons, thanks to Marcin
+    Mikołajczyk.
+
 _Bug fixes_
 
   - `Weather` is now non-blocking and doesn't use curl (Ben Boeckel).
