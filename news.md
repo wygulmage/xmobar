@@ -6,6 +6,8 @@ _New features_
 
   - Mouse actions now support multiple buttons, thanks to Marcin
     Mikołajczyk.
+  - Non supported monitors are ignored in configuration files (see
+    [issue #139]), thanks to Adam Vogt.
 
 _Bug fixes_
 
@@ -23,6 +25,7 @@ _Bug fixes_
 [issue #76]: https://github.com/jaor/xmobar/issues/76
 [issue #111]: https://github.com/jaor/xmobar/issues/111
 [issue #133]: https://github.com/jaor/xmobar/issues/133
+[issue #139]: https://github.com/jaor/xmobar/issues/133
 
 ## Version 0.19 (October 27, 2013)
 
