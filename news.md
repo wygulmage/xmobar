@@ -1,16 +1,16 @@
 % xmobar - Release notes
 
-## Version 0.20 ()
+## Version 0.20 (March 10, 2014)
 
 _New features_
 
-  - Mouse actions now support multiple buttons, thanks to Marcin
-    Mikołajczyk.
+  - Mouse actions now support multiple buttons, by Marcin Mikołajczyk.
   - Non supported monitors are ignored in configuration files (see
-    [issue #139]), thanks to Adam Vogt.
+    [issue #139]), by Adam Vogt.
 
 _Bug fixes_
 
+  - `Disk` monitor now ignores non-existent devices (Reto Hablützel).
   - `Weather` is now non-blocking and doesn't use curl (Ben Boeckel).
   - Fix for `Memory` monitor in 3.14 kernels (Ben Boeckel).
   - Fix for infinite loops in `AutoMPD` ([issue #76], [issue #111]).
