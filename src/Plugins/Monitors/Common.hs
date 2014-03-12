@@ -47,6 +47,7 @@ module Plugins.Monitors.Common (
                        , showPercentWithColors
                        , showPercentsWithColors
                        , showPercentBar
+                       , showVerticalBar
                        , showLogBar
                        , showWithUnits
                        , takeDigits
@@ -63,6 +64,7 @@ import qualified Data.ByteString.Lazy.Char8 as B
 import Data.IORef
 import qualified Data.Map as Map
 import Data.List
+import Data.Char
 import Numeric
 import Text.ParserCombinators.Parsec
 import System.Console.GetOpt
@@ -448,6 +450,15 @@ showPercentBar v x = do
   let len = min bw $ round (fromIntegral bw * x)
   s <- colorizeString v (take len $ cycle bf)
   return $ s ++ take (bw - len) (cycle bb)
+
+showVerticalBar :: Float -> Monitor String
+showVerticalBar x = colorizeString x [convert x]
+  where convert :: Float -> Char
+        convert val
+          | t <= 9600 = ' '
+          | t > 9608 = chr 9608
+          | otherwise = chr t
+          where t = 9600 + ((round val) `div` 12)
 
 showLogBar :: Float -> Float -> Monitor String
 showLogBar f v = do
