@@ -175,7 +175,7 @@ usage = usageInfo header options ++ footer
 info :: String
 info = "xmobar " ++ showVersion version
         ++ "\n (C) 2007 - 2010 Andrea Rossato "
-        ++ "\n (C) 2010 - 2013 Jose A Ortega Ruiz\n "
+        ++ "\n (C) 2010 - 2014 Jose A Ortega Ruiz\n "
         ++ mail ++ "\n" ++ license
 
 mail :: String
@@ -188,7 +188,7 @@ license = "\nThis program is distributed in the hope that it will be useful," ++
           "\nSee the License for more details."
 
 doOpts :: Config -> [Opts] -> IO Config
-doOpts conf [] = 
+doOpts conf [] =
   return (conf {lowerOnStart = lowerOnStart conf && overrideRedirect conf})
 doOpts conf (o:oo) =
   case o of
@@ -217,4 +217,3 @@ doOpts conf (o:oo) =
                         "specified with the -" ++ c:" option\n")
         readStr str = [x | (x,t) <- reads str, ("","") <- lex t]
         doOpts' opts = doOpts opts oo
-

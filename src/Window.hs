@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Window
--- Copyright   :  (c) 2011-13 Jose A. Ortega Ruiz
+-- Copyright   :  (c) 2011-14 Jose A. Ortega Ruiz
 --             :  (c) 2012 Jochen Keil
 -- License     :  BSD-style (see LICENSE)
 --
@@ -40,7 +40,7 @@ createWin d fs c = do
   rootw <- rootWindow d dflt
   (as,ds) <- textExtents fs "0"
   let ht = as + ds + 4
-      r = setPosition (position c) srs (fi ht)
+      r = setPosition c (position c) srs (fi ht)
   win <- newWindow  d (defaultScreenOfDisplay d) rootw r (overrideRedirect c)
   setProperties c d win
   setStruts r c d win srs
@@ -54,13 +54,13 @@ repositionWin d win fs c = do
   srs <- getScreenInfo d
   (as,ds) <- textExtents fs "0"
   let ht = as + ds + 4
-      r = setPosition (position c) srs (fi ht)
+      r = setPosition c (position c) srs (fi ht)
   moveResizeWindow d win (rect_x r) (rect_y r) (rect_width r) (rect_height r)
   setStruts r c d win srs
   return r
 
-setPosition :: XPosition -> [Rectangle] -> Dimension -> Rectangle
-setPosition p rs ht =
+setPosition :: Config -> XPosition -> [Rectangle] -> Dimension -> Rectangle
+setPosition c p rs ht =
   case p' of
     Top -> Rectangle rx ry rw h
     TopP l r -> Rectangle (rx + fi l) ry (rw - fi l - fi r) h
@@ -71,11 +71,11 @@ setPosition p rs ht =
     BottomP l r -> Rectangle (rx + fi l) ny (rw - fi l - fi r) h
     BottomSize a i ch  -> Rectangle (ax a i) (ny' ch) (nw i) (mh ch)
     Static cx cy cw ch -> Rectangle (fi cx) (fi cy) (fi cw) (fi ch)
-    OnScreen _ p'' -> setPosition p'' [scr] ht
+    OnScreen _ p'' -> setPosition c p'' [scr] ht
   where
     (scr@(Rectangle rx ry rw rh), p') =
-      case p of OnScreen i x -> (fromMaybe (broadest rs) $ safeIndex i rs, x)
-                _ -> (broadest rs, p)
+      case p of OnScreen i x -> (fromMaybe (picker rs) $ safeIndex i rs, x)
+                _ -> (picker rs, p)
     ny = ry + fi (rh - ht)
     center i = rx + fi (div (remwid i) 2)
     right  i = rx + fi (remwid i)
@@ -89,7 +89,9 @@ setPosition p rs ht =
     mh h' = max (fi h') h
     ny' h' = ry + fi (rh - mh h')
     safeIndex i = lookup i . zip [0..]
-    broadest = maximumBy (compare `on` rect_width)
+    picker = if pickBroadest c
+             then maximumBy (compare `on` rect_width)
+             else head
 
 setProperties :: Config -> Display -> Window -> IO ()
 setProperties c d w = do

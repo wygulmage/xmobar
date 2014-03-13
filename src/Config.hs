@@ -58,6 +58,9 @@ data Config =
            , allDesktops :: Bool    -- ^ Tell the WM to map to all desktops
            , overrideRedirect :: Bool -- ^ Needed for dock behaviour in some
                                       --   non-tiling WMs
+           , pickBroadest :: Bool   -- ^ Use the broadest display
+                                    --   instead of the first one by
+                                    --   default
            , lowerOnStart :: Bool   -- ^ lower to the bottom of the
                                     --   window stack on initialization
            , persistent :: Bool     -- ^ Whether automatic hiding should
@@ -70,7 +73,7 @@ data Config =
                                     --   commands in the output template
                                     --   (default '%')
            , alignSep :: String     -- ^ Separators for left, center and
-                                    -- right text alignment
+                                    --   right text alignment
            , template :: String     -- ^ The output template
            } deriving (Read)
 
@@ -111,6 +114,7 @@ defaultConfig =
            , persistent = False
            , allDesktops = True
            , overrideRedirect = True
+           , pickBroadest = False
            , commands = [ Run $ Date "%a %b %_d %Y * %H:%M:%S" "theDate" 10
                         , Run StdinReader]
            , sepChar = "%"

@@ -237,7 +237,8 @@ startCommand sig (com,s,ss)
                            return (Just h,var)
     where is = s ++ "Updating..." ++ ss
 
-updateString :: Config -> TVar [String] -> IO [[(Widget, String, Maybe [Action])]]
+updateString :: Config -> TVar [String] ->
+                IO [[(Widget, String, Maybe [Action])]]
 updateString conf v = do
   s <- atomically $ readTVar v
   let l:c:r:_ = s ++ repeat ""

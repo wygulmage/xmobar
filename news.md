@@ -1,5 +1,15 @@
 % xmobar - Release notes
 
+## Version 0.20.1 (March 13, 2014)
+
+_New features_
+
+  - Back to picking by default the first available screen, with a new
+    configuration option, `pickBroadest`, for choosing the broadest
+    (see [issue #158]).
+
+[issue #158]: https://github.com/jaor/xmobar/issues/76
+
 ## Version 0.20 (March 10, 2014)
 
 _New features_

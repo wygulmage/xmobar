@@ -11,7 +11,7 @@ xmobar was inspired by the [Ion3] status bar, and supports similar
 features, like dynamic color management, icons, output templates, and
 extensibility through plugins.
 
-This page documents xmobar 0.20 (see [release notes]).
+This page documents xmobar 0.21 (see [release notes]).
 
 [This screenshot] shows xmobar running under [sawfish], with
 antialiased fonts. And [this one] is my desktop with [xmonad] and two
@@ -266,6 +266,12 @@ Other configuration options:
 :     If you're running xmobar in a tiling window manager, you might need
       to set this option to `False` so that it behaves as a docked
       application.  Defaults to `True`.
+
+`pickBroadest`
+:     When multiple displays are available, xmobar will choose by default
+      the first one to place itself.  With this flag set to `True`
+      (the default is `False`) it will choose the broadest one
+      instead.
 
 `persistent`
 :     When True the window status is fixed i.e. hiding or revealing is not
