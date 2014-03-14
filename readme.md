@@ -945,7 +945,7 @@ more than one battery.
     - `--highd` _number_ High threshold for dB. Defaults to -5.0.
     - `--lowd` _number_ Low threshold for dB. Defaults to -30.0.
 - Variables that can be used with the `-t`/`--template` argument:
-            `volume`, `volumebar`, `dB`, `status`
+            `volume`, `volumebar`, `volumevbar`, `dB`, `status`
 - Note that `dB` might only return 0 on your system. This is known
   to happen on systems with a pulseaudio backend.
 - Default template: `Vol: <volume>% <status>`
