@@ -1071,7 +1071,7 @@ more than one battery.
     - `-M`: file with the maximum brightness (default:
        max_brightness)
 - Variables that can be used with the `-t`/`--template` argument:
-	    `hbar`, `percent`, `bar`
+	    `vbar`, `percent`, `bar`
 - Default template: `<percent>`
 - Example:
 
