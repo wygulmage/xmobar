@@ -732,9 +732,9 @@ something like:
 - Aliases to `multicpu`
 - Args: default monitor arguments
 - Variables that can be used with the `-t`/`--template` argument:
-	    `autototal`, `autobar`, `autouser`, `autonice`,
-	    `autosystem`, `autoidle`, `total`, `bar`, `user`, `nice`,
-	    `system`, `idle`, `total0`, `bar0`, `user0`, `nice0`,
+	    `autototal`, `autobar`, `autovbar`, `autouser`, `autonice`,
+	    `autosystem`, `autoidle`, `total`, `bar`, `vbar`, `user`, `nice`,
+	    `system`, `idle`, `total0`, `bar0`, `vbar0`, `user0`, `nice0`,
 	    `system0`, `idle0`, ...
   The auto* variables automatically detect the number of CPUs on the system
   and display one entry for each.
