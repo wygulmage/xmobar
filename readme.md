@@ -767,7 +767,7 @@ something like:
     "AC/online")
 
 - Variables that can be used with the `-t`/`--template` argument:
-	    `left`, `leftbar`, `timeleft`, `watts`, `acstatus`
+	    `left`, `leftbar`, `leftvbar`, `timeleft`, `watts`, `acstatus`
 - Default template: `Batt: <watts>, <left>% / <timeleft>`
 - Example (note that you need "--" to separate regular monitor options from
   Battery's specific ones):
