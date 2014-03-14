@@ -19,7 +19,9 @@ import qualified Data.ByteString.Lazy.Char8 as B
 import Data.List (isPrefixOf, transpose, unfoldr)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 
+variables :: [String]
 variables = ["bar", "vbar","total","user","nice","system","idle"]
+vNum :: Int
 vNum = length variables
 
 multiCpuConfig :: IO MConfig

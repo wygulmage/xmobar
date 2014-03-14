@@ -724,7 +724,7 @@ something like:
 - Aliases to `cpu`
 - Args: default monitor arguments
 - Variables that can be used with the `-t`/`--template` argument:
-	    `total`, `bar`, `user`, `nice`, `system`, `idle`, `iowait`
+	    `total`, `bar`, `vbar`, `user`, `nice`, `system`, `idle`, `iowait`
 - Default template: `Cpu: <total>%`
 
 ### `MultiCpu Args RefreshRate`
