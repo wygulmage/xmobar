@@ -49,9 +49,9 @@ formatMem (r:fr:xs) =
     do let f = showDigits 0
            rr = 100 * r
        ub <- showPercentBar rr r
-       uvb <- showVerticalBar rr
+       uvb <- showVerticalBar rr r
        fb <- showPercentBar (100 - rr) (1 - r)
-       fvb <- showVerticalBar (100 - rr)
+       fvb <- showVerticalBar (100 - rr) ( 1 - r)
        rs <- showPercentWithColors r
        fs <- showPercentWithColors fr
        s <- mapM (showWithColors f) xs

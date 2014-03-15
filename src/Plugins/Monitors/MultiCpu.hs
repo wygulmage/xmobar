@@ -63,7 +63,7 @@ formatCpu xs
   | length xs < 4 = showPercentsWithColors $ replicate vNum 0.0
   | otherwise = let t = foldr (+) 0 $ take 3 xs
                 in do b <- showPercentBar (100 * t) t
-                      h <- showVerticalBar (100 * t)
+                      h <- showVerticalBar (100 * t) t
                       ps <- showPercentsWithColors (t:xs)
                       return (b:h:ps)
 

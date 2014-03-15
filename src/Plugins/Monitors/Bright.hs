@@ -77,7 +77,7 @@ runBright args = do
     NoFiles -> return "hurz"
     _ -> fmtPercent c >>= parseTemplate
   where fmtPercent :: Float -> Monitor [String]
-        fmtPercent c = do r <- showVerticalBar (100 * c)
+        fmtPercent c = do r <- showVerticalBar (100 * c) c
                           s <- showPercentWithColors c
                           t <- showPercentBar (100 * c) c
                           return [r,s,t]

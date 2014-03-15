@@ -174,7 +174,7 @@ runBatt' bfs args = do
           let x' = minimum [1, x]
           p <- showPercentWithColors x'
           b <- showPercentBar (100 * x') x'
-          vb <- showVerticalBar (100 * x')
+          vb <- showVerticalBar (100 * x') x'
           return [b, vb, p]
         fmtWatts x o s d = do
           ws <- showWithPadding $ showDigits d x ++ (if s then "W" else "")

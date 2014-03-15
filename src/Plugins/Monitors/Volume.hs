@@ -78,7 +78,7 @@ formatVolBar lo hi v =
 
 formatVolVBar :: Integer -> Integer -> Integer -> Monitor String
 formatVolVBar lo hi v =
-    showVerticalBar (100 * x) where x = percent v lo hi
+    showVerticalBar (100 * x) x where x = percent v lo hi
 
 switchHelper :: VolumeOpts
              -> (VolumeOpts -> Maybe String)

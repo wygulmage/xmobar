@@ -451,8 +451,8 @@ showPercentBar v x = do
   s <- colorizeString v (take len $ cycle bf)
   return $ s ++ take (bw - len) (cycle bb)
 
-showVerticalBar :: Float -> Monitor String
-showVerticalBar x = colorizeString x [convert x]
+showVerticalBar :: Float -> Float -> Monitor String
+showVerticalBar v x = colorizeString v [convert $ 100 * x]
   where convert :: Float -> Char
         convert val
           | t <= 9600 = ' '

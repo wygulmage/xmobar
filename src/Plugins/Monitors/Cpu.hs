@@ -47,7 +47,7 @@ formatCpu [] = return $ replicate 8 ""
 formatCpu xs = do
   let t = sum $ take 3 xs
   b <- showPercentBar (100 * t) t
-  v <- showVerticalBar (100 * t)
+  v <- showVerticalBar (100 * t) t
   ps <- showPercentsWithColors (t:xs)
   return (b:v:ps)
 
