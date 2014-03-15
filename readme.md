@@ -672,9 +672,9 @@ something like:
   `%eth0%`
 - Args: default monitor arguments
 - Variables that can be used with the `-t`/`--template` argument:
-  `dev`, `rx`, `tx`, `rxbar`, `txbar`. Reception and transmission
-  rates (`rx` and `tx`) are displayed in Kbytes per second, and you
-  can set the `-S` to "True" to make them displayed with units (the
+  `dev`, `rx`, `tx`, `rxbar`, `rxvbar`, `txbar`, `txvbar`. Reception and
+  transmission rates (`rx` and `tx`) are displayed in Kbytes per second,
+  and you can set the `-S` to "True" to make them displayed with units (the
   string "Kb/s").
 - Default template: `<dev>: <rx>KB|<tx>KB`
 
@@ -684,9 +684,9 @@ something like:
 - Aliases to "dynnetwork"
 - Args: default monitor arguments
 - Variables that can be used with the `-t`/`--template` argument:
-  `dev`, `rx`, `tx`, `rxbar`, `txbar`. Reception and transmission
-  rates (`rx` and `tx`) are displayed in Kbytes per second, and you
-  can set the `-S` to "True" to make them displayed with units (the
+  `dev`, `rx`, `tx`, `rxbar`, `rxvbar`, `txbar`, `txvbar`. Reception and
+  transmission rates (`rx` and `tx`) are displayed in Kbytes per second,
+  and you can set the `-S` to "True" to make them displayed with units (the
   string "Kb/s").
 - Default template: `<dev>: <rx>KB|<tx>KB`
 
