@@ -49,6 +49,7 @@ module Plugins.Monitors.Common (
                        , showPercentBar
                        , showVerticalBar
                        , showLogBar
+                       , showLogVBar
                        , showWithUnits
                        , takeDigits
                        , showDigits
@@ -470,3 +471,14 @@ showLogBar f v = do
                | x <= ll = 1 / bw
                | otherwise = f + logBase 2 (x / hh) / bw
   showPercentBar v $ choose v
+
+showLogVBar :: Float -> Float -> Monitor String
+showLogVBar f v = do
+  h <- fromIntegral `fmap` getConfigValue high
+  l <- fromIntegral `fmap` getConfigValue low
+  bw <- fromIntegral `fmap` getConfigValue barWidth
+  let [ll, hh] = sort [l, h]
+      choose x | x == 0.0 = 0
+               | x <= ll = 1 / bw
+               | otherwise = f + logBase 2 (x / hh) / bw
+  showVerticalBar v $ choose v
