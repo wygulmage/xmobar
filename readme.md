@@ -696,7 +696,7 @@ something like:
   "wlan0" []` can be used as `%wlan0wi%`
 - Args: default monitor arguments
 - Variables that can be used with the `-t`/`--template` argument:
-            `essid`, `quality`, `qualitybar`
+            `essid`, `quality`, `qualitybar`, `qualityvbar`
 - Default template: `<essid> <quality>`
 - Requires the C library [iwlib] (part of the wireless tools suite)
   installed in your system. In addition, to activate this plugin you
