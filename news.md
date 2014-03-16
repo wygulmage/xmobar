@@ -1,5 +1,12 @@
 % xmobar - Release notes
 
+## Version 0.21 ()
+
+_New features_
+
+  - Vertical bar indicators using unicode available for most monitors
+    (Eric Mrak).
+
 ## Version 0.20.1 (March 13, 2014)
 
 _New features_
