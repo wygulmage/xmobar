@@ -840,8 +840,9 @@ more than one battery.
 - Aliases to `disku`
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain `<size>`, `<free>`, `<used>`, `<freep>` or
-  `<usedp>`, `<freebar>` or `<usedbar>` for total, free, used, free
-  percentage and used percentage of the given file system capacity.
+  `<usedp>`, `<freebar>`, `<freevbar>`, `<usedbar>` or `<usedvbar>` for total,
+  free, used, free percentage and used percentage of the given file system
+  capacity.
 - Args: default monitor arguments. `-t`/`--template` is ignored.
 - Default template: none (you must specify a template for each file system).
 - Example:
@@ -855,7 +856,9 @@ more than one battery.
 - Aliases to `diskio`
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain `<total>`, `<read>`, `<write>` for total,
-  read and write speed, respectively.
+  read and write speed, respectively. There are also bar versions of each:
+  `<totalbar>`, `<totalvbar>`, `<readbar>`, `<readvbar>`, `<writebar>`, and
+  `<writevbar>`.
 - Args: default monitor arguments. `-t`/`--template` is ignored.
 - Default template: none (you must specify a template for each file system).
 - Example:
