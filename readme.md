@@ -848,7 +848,7 @@ more than one battery.
 - Example:
 
          DiskU [("/", "<used>/<size>"), ("sdb1", "<usedbar>")]
-               ["-L", "20", "-H", "50", "-m", "1", "-p", "3",]
+               ["-L", "20", "-H", "50", "-m", "1", "-p", "3"]
                20
 
 ### `DiskIO Disks Args RefreshRate`
@@ -996,7 +996,7 @@ more than one battery.
 
 ### `Mpris2 PlayerName Args RefreshRate`
 
-- Aliases to `mpris1`
+- Aliases to `mpris2`
 - Requires [dbus] and [text] packages.
   To activate, pass `--flags="with_mpris"` during compilation.
 - PlayerName: player supporting MPRIS v2 protocol, in lowercase.
