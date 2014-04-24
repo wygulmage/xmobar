@@ -1007,7 +1007,7 @@ more than one battery.
 - Default template: `<artist> - <title>`
 - Example:
 
-         Run Mpris2 "clementine" ["-t", "<artist> - [<composer>] <title>"] 10
+         Run Mpris2 "spotify" ["-t", "<artist> - [<composer>] <title>"] 10
 
 ### `Mail Args Alias`
 
