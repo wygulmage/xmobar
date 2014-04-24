@@ -1,7 +1,6 @@
 name:               xmobar
-version:            0.20.1
-homepage:           http://projects.haskell.org/xmobar/
-bug-reports:        http://code.google.com/p/xmobar/issues
+version:            0.21
+homepage:           http://xmobar.org
 synopsis:           A Minimalistic Text Based Status Bar
 description: 	    Xmobar is a minimalistic text based status bar.
 		    .
@@ -11,8 +10,9 @@ description: 	    Xmobar is a minimalistic text based status bar.
 category:           System
 license:            BSD3
 license-file:       license
-author:             Andrea Rossato, Jose A. Ortega Ruiz
+author:             Andrea Rossato and Jose A. Ortega Ruiz
 maintainer:         Jose A. Ortega Ruiz <jao@gnu.org>
+bug-reports:        https://github.com/jaor/xmobar/issues
 cabal-version:      >= 1.6
 build-type:         Simple
 
