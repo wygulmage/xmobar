@@ -4,8 +4,9 @@
 
 _New features_
 
-  - Vertical bar indicators using unicode available for most monitors
-    (Eric Mrak).
+  - Vertical bar indicators using unicode available for most monitors,
+    by Eric Mrak.
+  - `CoreTemp`: support for linux 3.15, by Tomáš Janoušek.
 
 ## Version 0.20.1 (March 13, 2014)
 
