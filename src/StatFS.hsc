@@ -54,7 +54,7 @@ data CStatfs
 #ifdef IS_BSD_SYSTEM
 foreign import ccall unsafe "sys/mount.h statfs"
 #else
-foreign import ccall unsafe "sys/statvfs.h statvfs"
+foreign import ccall unsafe "sys/vfs.h statvfs"
 #endif
   c_statfs :: CString -> Ptr CStatfs -> IO CInt
 
