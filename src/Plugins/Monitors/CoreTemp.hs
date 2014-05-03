@@ -41,4 +41,4 @@ runCoreTemp _ = do
        lbl  = Just ("_label", read . (dropWhile (not . isDigit)))
        divisor = 1e3 :: Double
        show' = showDigits (max 0 dn)
-   checkedDataRetrieval failureMessage path lbl (/divisor) show'
+   checkedDataRetrieval failureMessage [path] lbl (/divisor) show'
