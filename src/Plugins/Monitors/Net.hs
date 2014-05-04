@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Net
--- Copyright   :  (c) 2011, 2012, 2013 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2011, 2012, 2013, 2014 Jose Antonio Ortega Ruiz
 --                (c) 2007-2010 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -67,7 +67,7 @@ existingDevs = getDirectoryContents "/sys/class/net" >>= filterM isDev
 isUp :: String -> IO Bool
 isUp d = do
   operstate <- B.readFile (operstateDir d)
-  return $ "up" == (B.unpack . head . B.lines) operstate
+  return $ (B.unpack . head . B.lines) operstate `elem`  ["up", "unknown"]
 
 readNetDev :: [String] -> IO NetDev
 readNetDev (d:x:y:_) = do
