@@ -8,6 +8,13 @@ _New features_
     by Eric Mrak.
   - `CoreTemp`: support for linux 3.15, by Tomáš Janoušek.
 
+_Bug fixes_
+
+  - `Network` now reports status for ppp connections (see
+    [issue #89]).
+
+[issue #89]: https://github.com/jaor/xmobar/issues/89
+
 ## Version 0.20.1 (March 13, 2014)
 
 _New features_
@@ -16,7 +23,7 @@ _New features_
     configuration option, `pickBroadest`, for choosing the broadest
     (see [issue #158]).
 
-[issue #158]: https://github.com/jaor/xmobar/issues/76
+[issue #158]: https://github.com/jaor/xmobar/issues/158
 
 ## Version 0.20 (March 10, 2014)
 
