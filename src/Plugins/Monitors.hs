@@ -35,6 +35,7 @@ import Plugins.Monitors.CoreTemp
 import Plugins.Monitors.Disk
 import Plugins.Monitors.Top
 import Plugins.Monitors.Uptime
+import Plugins.Monitors.CatInt
 #ifdef IWLIB
 import Plugins.Monitors.Wireless
 #endif
@@ -69,6 +70,7 @@ data Monitors = Weather      Station     Args Rate
               | TopProc      Args        Rate
               | TopMem       Args        Rate
               | Uptime       Args        Rate
+              | CatInt       Int FilePath Args Rate
 #ifdef IWLIB
               | Wireless Interface  Args Rate
 #endif
@@ -116,6 +118,7 @@ instance Exec Monitors where
     alias (DiskU _ _ _) = "disku"
     alias (DiskIO _ _ _) = "diskio"
     alias (Uptime _ _) = "uptime"
+    alias (CatInt n _ _ _) = "cat" ++ (show n)
 #ifdef IWLIB
     alias (Wireless i _ _) = i ++ "wi"
 #endif
@@ -151,6 +154,7 @@ instance Exec Monitors where
     start (DiskU s a r) = runM a diskUConfig (runDiskU s) r
     start (DiskIO s a r) = startDiskIO s a r
     start (Uptime a r) = runM a uptimeConfig runUptime r
+    start (CatInt _ s a r) = runM a catIntConfig (runCatInt s) r
 #ifdef IWLIB
     start (Wireless i a r) = runM (a ++ [i]) wirelessConfig runWireless r
 #endif

@@ -1100,6 +1100,16 @@ more than one battery.
 
 	Run Locks
 
+### `CatInt n fn`
+
+- Reads and displays an integer from the file whose path is `fn`
+  (especially useful with files in `/sys`).
+- Aliases as `catn` (e.g. `Cat 0` as `cat0`, etc.) so you can
+  have several.
+- Example:
+
+    Run CatInt 0 "/sys/devices/platform/thinkpad_hwmon/fan1_input" [] 50
+
 ## Executing External Commands
 
 In order to execute an external command you can either write the
