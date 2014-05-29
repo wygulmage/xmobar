@@ -25,6 +25,7 @@ import Runnable
 import Commands
 import Actions
 
+import Control.Monad (guard, mzero)
 import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Perm
@@ -43,11 +44,20 @@ parseString c s =
                           , Nothing)]
       Right x -> return (concat x)
 
+allParsers :: ColorString
+           -> Maybe [Action]
+           -> Parser [(Widget, ColorString, Maybe [Action])]
+allParsers c a =
+        textParser c a
+  <|> try (iconParser c a)
+  <|> try (rawParser c a)
+  <|> try (actionParser c a)
+  <|> colorParser a
+
 -- | Gets the string and combines the needed parsers
 stringParser :: String -> Maybe [Action]
                 -> Parser [[(Widget, ColorString, Maybe [Action])]]
-stringParser c a = manyTill (textParser c a <|> try (iconParser c a) <|>
-                             try (actionParser c a) <|> colorParser a) eof
+stringParser c a = manyTill (allParsers c a) eof
 
 -- | Parses a maximal string without color markup.
 textParser :: String -> Maybe [Action]
@@ -59,8 +69,29 @@ textParser c a = do s <- many1 $
                                    try (string "action=") <|>
                                    try (string "/action>") <|>
                                    try (string "icon=") <|>
+                                   try (string "raw=") <|>
                                    string "/fc>"))
                     return [(Text s, c, a)]
+
+-- | Parse a "raw" tag, which we use to prevent other tags from creeping in.
+-- The format here is net-string-esque: a literal "<raw=" followed by a
+-- string of digits (base 10) denoting the length of the raw string,
+-- a literal ":" as digit-string-terminator, the raw string itself, and
+-- then a literal "/>".
+rawParser :: ColorString
+          -> Maybe [Action]
+          -> Parser [(Widget, ColorString, Maybe [Action])]
+rawParser c a = do
+  string "<raw="
+  lenstr <- many1 digit
+  char ':'
+  case reads lenstr of
+    [(len,[])] -> do
+      guard ((len :: Integer) <= (fromIntegral (maxBound :: Int)))
+      s <- count (fromIntegral len) anyChar
+      string "/>"
+      return [(Text s, c, a)]
+    _ -> mzero
 
 -- | Wrapper for notFollowedBy that returns the result of the first parser.
 --   Also works around the issue that, at least in Parsec 3.0.0, notFollowedBy
@@ -88,9 +119,7 @@ actionParser c act = do
       a' = case act of
         Nothing -> Just [a]
         Just act' -> Just $ a : act'
-  s <- manyTill (try (textParser c a') <|> try (iconParser c a') <|>
-                 try (colorParser a') <|> actionParser c a')
-                (try $ string "</action>")
+  s <- manyTill (allParsers c a') (try $ string "</action>")
   return (concat s)
 
 toButtons :: String -> [Button]
@@ -100,8 +129,7 @@ toButtons s = map (\x -> read [x]) s
 colorParser :: Maybe [Action] -> Parser [(Widget, ColorString, Maybe [Action])]
 colorParser a = do
   c <- between (string "<fc=") (string ">") colors
-  s <- manyTill (try (textParser c a) <|> try (iconParser c a) <|>
-                 try (colorParser a) <|> actionParser c a) (try $ string "</fc>")
+  s <- manyTill (allParsers c a) (try $ string "</fc>")
   return (concat s)
 
 -- | Parses a color specification (hex or named)

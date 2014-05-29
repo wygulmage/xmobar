@@ -202,6 +202,22 @@ For the output template:
   (left mouse button). Using old syntax (without backticks surrounding `command`)
   will result in `button` attribute being ignored.
 
+- `<raw=len:str/>` allows the encapsulation of arbitrary text `str` (which
+  must be `len` `Char`s long, where `len` is encoded as a decimal sequence).
+  Careful use of this and `UnsafeStdinReader`, for example, permits window
+  managers to feed xmobar strings with `<action>` tags mixed with un-trusted
+  content (e.g. window titles).  For example, if xmobar is invoked as
+
+    ```xmobar -c "[Run UnsafeStdinReader]" -t "%UnsafeStdinReader%"```
+
+  and receives on standard input the line
+
+    ```<action=`echo test` button=1><raw=41:<action=`echo mooo`
+button=1>foo</action>/></action>```
+
+  then it will display the text ```<action=`echo mooo` button=1>foo</action>```,
+  which, when clicked, will cause `test` to be echoed.
+
 Other configuration options:
 
 `font`
