@@ -7,6 +7,10 @@ _New features_
   - Vertical bar indicators using unicode available for most monitors,
     by Eric Mrak.
   - `CoreTemp`: support for linux 3.15, by Tomáš Janoušek.
+  - New `CatInt` monitor, displaying integer values read from a file,
+    by Nathaniel Wesley Filardo.
+  - New `<raw>` tag for safer input parsing, also by Nathaniel.
+
 
 _Bug fixes_
 
