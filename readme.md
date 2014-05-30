@@ -1257,6 +1257,19 @@ can be used in the output template as `%mydate%`
 
 [here]: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Hooks-DynamicLog.html
 
+<font size="+1">**`UnsafeXMonadLog`**</font>
+
+- Aliases to UnsafeXMonadLog
+- Similar to StdinReader versus UnsafeStdinReader, this does not strip `<action
+  ...>` tags from XMonad's `_XMONAD_LOG`.
+- It is advised that you still use `xmobarStrip` for the ppTitle in your
+  logHook:
+
+        myPP = defaultPP { ppTitle = xmobarStrip }
+        main = xmonad $ defaultConfig {
+          logHook = dynamicLogString myPP >>= xmonadPropLog
+        }
+
 Plugins
 =======
 
