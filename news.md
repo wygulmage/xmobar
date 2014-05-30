@@ -10,7 +10,8 @@ _New features_
   - New `CatInt` monitor, displaying integer values read from a file,
     by Nathaniel Wesley Filardo.
   - New `<raw>` tag for safer input parsing, also by Nathaniel.
-
+  - New `UnsafeXMonadLog` monitor (by Eric Mrak) and their xproperty
+    counterparts, `UnsafeXPropertyLog` and `UnsafeNamedXPropertyLog`.
 
 _Bug fixes_
 

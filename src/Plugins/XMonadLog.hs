@@ -33,7 +33,9 @@ import Actions (stripActions)
 data XMonadLog = XMonadLog
                | UnsafeXMonadLog
                | XPropertyLog String
+               | UnsafeXPropertyLog String
                | NamedXPropertyLog String String
+               | UnsafeNamedXPropertyLog String String
     deriving (Read, Show)
 
 instance Exec XMonadLog where
@@ -41,16 +43,22 @@ instance Exec XMonadLog where
     alias UnsafeXMonadLog = "UnsafeXMonadLog"
     alias (XPropertyLog atom) = atom
     alias (NamedXPropertyLog _ name) = name
+    alias (UnsafeXPropertyLog atom) = atom
+    alias (UnsafeNamedXPropertyLog _ name) = name
 
     start x cb = do
         let atom = case x of
-                XMonadLog             -> "_XMONAD_LOG"
-                UnsafeXMonadLog       -> "_XMONAD_LOG"
-                XPropertyLog      a   -> a
+                XMonadLog -> "_XMONAD_LOG"
+                UnsafeXMonadLog -> "_XMONAD_LOG"
+                XPropertyLog a -> a
+                UnsafeXPropertyLog a -> a
                 NamedXPropertyLog a _ -> a
+                UnsafeNamedXPropertyLog a _ -> a
             sanitize = case x of
-                UnsafeXMonadLog       -> id
-                _                     -> stripActions
+                UnsafeXMonadLog -> id
+                UnsafeXPropertyLog _ -> id
+                UnsafeNamedXPropertyLog _ _ -> id
+                _ -> stripActions
 
         d <- openDisplay ""
         xlog <- internAtom d atom False

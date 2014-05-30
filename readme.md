@@ -1075,9 +1075,23 @@ more than one battery.
 
 [samples/xmonadpropwrite.hs script]: https://github.com/jaor/xmobar/raw/master/samples/xmonadpropwrite.hs
 
+### `UnsafeXPropertyLog PropName`
+
+- Aliases to `PropName`
+- Same as `XPropertyLog`, but the input is not filtered to avoid
+  injection of actions (cf. `UnsafeXMonadLog`).  The program writing
+  the value of the read property is responsible of performing any
+  needed cleanups.
+
 ### `NamedXPropertyLog PropName Alias`
 
-- Same as XPropertyLog, but a custom alias can be specified.
+- Aliases to `Alias`
+- Same as `XPropertyLog`, but a custom alias can be specified.
+
+### `NamedXPropertyLog PropName Alias`
+
+- Aliases to `Alias`
+- Same as `UnsafeXPropertyLog`, but a custom alias can be specified.
 
 ### `Brightness Args RefreshRate`
 
