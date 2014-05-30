@@ -31,20 +31,27 @@ import XUtil (nextEvent')
 import Actions (stripActions)
 
 data XMonadLog = XMonadLog
+               | UnsafeXMonadLog
                | XPropertyLog String
                | NamedXPropertyLog String String
     deriving (Read, Show)
 
 instance Exec XMonadLog where
     alias XMonadLog = "XMonadLog"
+    alias UnsafeXMonadLog = "UnsafeXMonadLog"
     alias (XPropertyLog atom) = atom
     alias (NamedXPropertyLog _ name) = name
 
     start x cb = do
         let atom = case x of
                 XMonadLog             -> "_XMONAD_LOG"
+                UnsafeXMonadLog       -> "_XMONAD_LOG"
                 XPropertyLog      a   -> a
                 NamedXPropertyLog a _ -> a
+            sanitize = case x of
+                UnsafeXMonadLog       -> id
+                _                     -> stripActions
+
         d <- openDisplay ""
         xlog <- internAtom d atom False
 
@@ -53,7 +60,7 @@ instance Exec XMonadLog where
 
         let update = do
                         mwp <- getWindowProperty8 d xlog root
-                        maybe (return ()) (cb . stripActions. decodeCChar) mwp
+                        maybe (return ()) (cb . sanitize . decodeCChar) mwp
 
         update
 
