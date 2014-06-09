@@ -62,9 +62,9 @@ instance Exec Mail where
             atomically $ modifyTVar v (S.union s)
 
         changeLoop (mapM (fmap S.size . readTVar) vs) $ \ns ->
-            cb . unwords $ [m ++ ":" ++  show n
-                                    | (m, n) <- zip ts ns
-                                    , n /= 0 ]
+            cb . unwords $ [m ++ show n
+                            | (m, n) <- zip ts ns
+                            , n /= 0 ]
 
 handle :: TVar (Set String) -> Event -> IO ()
 handle v e = atomically $ modifyTVar v $ case e of
