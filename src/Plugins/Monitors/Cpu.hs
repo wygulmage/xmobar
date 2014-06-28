@@ -24,12 +24,12 @@ cpuConfig = mkMConfig
        "Cpu: <total>%"
        ["bar","vbar","total","user","nice","system","idle","iowait"]
 
-type CpuDataRef = IORef [Float]
+type CpuDataRef = IORef [Int]
 
-cpuData :: IO [Float]
+cpuData :: IO [Int]
 cpuData = cpuParser `fmap` B.readFile "/proc/stat"
 
-cpuParser :: B.ByteString -> [Float]
+cpuParser :: B.ByteString -> [Int]
 cpuParser = map (read . B.unpack) . tail . B.words . head . B.lines
 
 parseCpu :: CpuDataRef -> IO [Float]
@@ -38,8 +38,8 @@ parseCpu cref =
        b <- cpuData
        writeIORef cref b
        let dif = zipWith (-) b a
-           tot = foldr (+) 0 dif
-           percent = map (/ tot) dif
+           tot = fromIntegral $ foldr (+) 0 dif
+           percent = map (/ tot) (map fromIntegral dif)
        return percent
 
 formatCpu :: [Float] -> Monitor [String]
