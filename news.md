@@ -17,6 +17,7 @@ _Bug fixes_
 
   - `Network` now reports status for ppp connections (see
     [issue #89]).
+  - Fix for very long running `Cpu` monitors, by Robert J Macomber.
 
 [issue #89]: https://github.com/jaor/xmobar/issues/89
 
