@@ -688,10 +688,10 @@ something like:
   `%eth0%`
 - Args: default monitor arguments
 - Variables that can be used with the `-t`/`--template` argument:
-  `dev`, `rx`, `tx`, `rxbar`, `rxvbar`, `txbar`, `txvbar`. Reception and
-  transmission rates (`rx` and `tx`) are displayed in Kbytes per second,
-  and you can set the `-S` to "True" to make them displayed with units (the
-  string "Kb/s").
+  `dev`, `rx`, `tx`, `rxbar`, `rxvbar`, `txbar`, `txvbar`. Reception
+  and transmission rates (`rx` and `tx`) are displayed by default as
+  Kb/s, without any suffixes, but you can set the `-S` to "True" to
+  make them displayed with adaptive units (Kb/s, Mb/s, etc.).
 - Default template: `<dev>: <rx>KB|<tx>KB`
 
 ### `DynNetwork Args RefreshRate`
@@ -1408,16 +1408,16 @@ Andrea Rossato originally designed and implemented xmobar up to
 version 0.11.1. Since then, it is maintained and developed by [jao],
 with the help of the greater xmobar and Haskell communities.
 
-In particular, xmobar [incorporates patches] by Ben Boeckel, Roman
-Cheplyaka, Patrick Chilton, Nathaniel Wesley Filardo, John Goerzen,
-Reto Hablützel, Juraj Hercek, Tomas Janousek, Spencer Janssen, Jochen
-Keil, Lennart Kolmodin, Krzysztof Kosciuszkiewicz, Dmitry Kurochkin,
-Todd Lunter, Robert J. Macomber, Dmitry Malikov, David McLean, Marcin
-Mikołajczyk, Eric Mrak, Thiago Negri, Edward O'Callaghan, Svein Ove,
-Martin Perner, Jens Petersen, Alexander Polakov, Petr Rockai, Peter
-Simons, Andrew Sackville-West, Alexander Solovyov, John Soros, Artem
-Tarasov, Sergei Trofimovich, Thomas Tuegel, Jan Vornberger, Daniel
-Wagner and Norbert Zeh.
+In particular, xmobar [incorporates patches] by Axel Angel, Ben
+Boeckel, Roman Cheplyaka, Patrick Chilton, Nathaniel Wesley Filardo,
+John Goerzen, Reto Hablützel, Juraj Hercek, Tomas Janousek, Spencer
+Janssen, Jochen Keil, Lennart Kolmodin, Krzysztof Kosciuszkiewicz,
+Dmitry Kurochkin, Todd Lunter, Robert J. Macomber, Dmitry Malikov,
+David McLean, Marcin Mikołajczyk, Eric Mrak, Thiago Negri, Edward
+O'Callaghan, Svein Ove, Martin Perner, Jens Petersen, Alexander
+Polakov, Petr Rockai, Peter Simons, Andrew Sackville-West, Alexander
+Solovyov, John Soros, Artem Tarasov, Sergei Trofimovich, Thomas
+Tuegel, Jan Vornberger, Daniel Wagner and Norbert Zeh.
 
 [jao]: http://jao.io
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors

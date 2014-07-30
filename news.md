@@ -1,5 +1,12 @@
 % xmobar - Release notes
 
+## Version 0.22 ()
+
+_New features_
+
+  - `Net` plugin has now adaptive units (`-S` is used now to switch
+    them on), by Axel Angel.
+
 ## Version 0.21 (Jul 1, 2014)
 
 _New features_
