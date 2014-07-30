@@ -28,6 +28,15 @@ import System.FilePath ((</>))
 
 import qualified Data.ByteString.Lazy.Char8 as B
 
+data UnitPerSec = Bs | KBs | MBs | GBs deriving (Eq,Enum,Ord)
+data NetValue = NetValue Float UnitPerSec deriving (Eq,Show)
+
+instance Show UnitPerSec where
+    show Bs  = "B/s"
+    show KBs = "KB/s"
+    show MBs = "MB/s"
+    show GBs = "GB/s"
+
 data NetDev = NA
             | NI String
             | ND String Float Float deriving (Eq,Show,Read)
@@ -74,7 +83,7 @@ readNetDev (d:x:y:_) = do
   up <- isUp d
   return (if up then ND d (r x) (r y) else NI d)
     where r s | s == "" = 0
-              | otherwise = read s / 1024
+              | otherwise = read s
 
 readNetDev _ = return NA
 
@@ -101,10 +110,12 @@ formatNet :: Float -> Monitor (String, String, String)
 formatNet d = do
     s <- getConfigValue useSuffix
     dd <- getConfigValue decDigits
-    let str = if s then (++"Kb/s") . showDigits dd else showDigits dd
+    let str True v = showDigits dd d' ++ show u
+            where (NetValue d' u) = byteNetVal v
+        str False v = showDigits dd $ v / 1024
     b <- showLogBar 0.9 d
     vb <- showLogVBar 0.9 d
-    x <- showWithColors str d
+    x <- showWithColors (str s) d
     return (x, b, vb)
 
 printNet :: NetDev -> Monitor String
@@ -159,3 +170,10 @@ startDynNet a r cb = do
             _ <- parseNet nref d
             return (nref, d)
   runM a netConfig (runNets refs) r cb
+
+byteNetVal :: Float -> NetValue
+byteNetVal v
+    | v < 1024**1 = NetValue v Bs
+    | v < 1024**2 = NetValue (v/1024**1) KBs
+    | v < 1024**3 = NetValue (v/1024**2) MBs
+    | otherwise   = NetValue (v/1024**3) GBs
