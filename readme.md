@@ -1220,6 +1220,13 @@ can be used in the output template as `%mydate%`
 - Reads its displayed output from the given pipe.
 - Prefix an optional default text separated by a colon
 
+<font size="+1">**`MarqueePipeReader "default text:/path/to/pipe" (length, rate, sep) Alias`**</font>
+
+- Generally equivalent to PipeReader
+- Text is displayed as marquee with the specified length, rate in 10th seconds and separator when it wraps around
+
+        Run MarqueePipeReader "/tmp/testpipe" (10, 7, "+") "mpipe"
+
 <font size="+1">
 **`BufferedPipeReader Alias [(Timeout, Bool, "/path/to/pipe1"), ..]`**
 </font>

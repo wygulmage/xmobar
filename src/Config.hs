@@ -30,6 +30,7 @@ import Plugins.Monitors
 import Plugins.Date
 import Plugins.PipeReader
 import Plugins.BufferedPipeReader
+import Plugins.MarqueePipeReader
 import Plugins.CommandReader
 import Plugins.StdinReader
 import Plugins.XMonadLog
@@ -136,6 +137,6 @@ infixr :*:
 -- this function's type signature.
 runnableTypes :: Command :*: Monitors :*: Date :*: PipeReader :*: BufferedPipeReader :*: CommandReader :*: StdinReader :*: XMonadLog :*: EWMH :*: Kbd :*: Locks :*:
                  Mail :*: MBox :*:
-                 DateZone :*:
+                 DateZone :*: MarqueePipeReader :*:
                  ()
 runnableTypes = undefined
