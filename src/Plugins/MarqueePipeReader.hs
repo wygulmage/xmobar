@@ -24,9 +24,9 @@ import Control.Monad(forever, unless)
 
 type Length = Int       -- length of the text to display
 type Rate = Int         -- delay in tenth seconds 
-type Seperator = String -- if text wraps around, use separator
+type Separator = String -- if text wraps around, use separator
 
-data MarqueePipeReader = MarqueePipeReader String (Length, Rate, Seperator) String
+data MarqueePipeReader = MarqueePipeReader String (Length, Rate, Separator) String
     deriving (Read, Show)
 
 instance Exec MarqueePipeReader where
@@ -50,7 +50,7 @@ pipeToChan h chan = do
     line <- hGetLineSafe h 
     atomically $ writeTChan chan line
 
-writer :: String -> Seperator -> Length -> Rate -> TChan String -> (String -> IO ()) -> IO ()
+writer :: String -> Separator -> Length -> Rate -> TChan String -> (String -> IO ()) -> IO ()
 writer txt sep len rate chan cb = do 
     cb (take len txt)
     mbnext <- atomically $ tryReadTChan chan
