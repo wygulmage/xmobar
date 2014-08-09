@@ -1223,7 +1223,8 @@ can be used in the output template as `%mydate%`
 <font size="+1">**`MarqueePipeReader "default text:/path/to/pipe" (length, rate, sep) Alias`**</font>
 
 - Generally equivalent to PipeReader
-- Text is displayed as marquee with the specified length, rate in 10th seconds and separator when it wraps around
+- Text is displayed as marquee with the specified length, rate in 10th
+  seconds and separator when it wraps around
 
         Run MarqueePipeReader "/tmp/testpipe" (10, 7, "+") "mpipe"
 
