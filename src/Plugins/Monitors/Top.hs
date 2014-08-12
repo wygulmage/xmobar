@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Top
--- Copyright   :  (c) Jose A Ortega Ruiz
+-- Copyright   :  (c) 2010, 2011, 2012, 2013, 2014 Jose A Ortega Ruiz
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A Ortega Ruiz <jao@gnu.org>
@@ -101,7 +101,7 @@ meminfos = handleProcesses meminfo
 
 showMemInfo :: Float -> MemInfo -> Monitor [String]
 showMemInfo scale (nm, rss) =
-  showInfo nm (showWithUnits 2 1 rss) (100 * rss / sc)
+  showInfo nm (showWithUnits 3 1 rss) (100 * rss / sc)
   where sc = if scale > 0 then scale else 100
 
 showMemInfos :: [MemInfo] -> Monitor [[String]]
