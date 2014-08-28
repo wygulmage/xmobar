@@ -37,7 +37,8 @@ weatherConfig = mkMConfig
        , "skyCondition"
        , "tempC"
        , "tempF"
-       , "dewPoint"
+       , "dewPointC"
+       , "dewPointF"
        , "rh"
        , "pressure"
        ]
@@ -54,7 +55,8 @@ data WeatherInfo =
        , skyCondition :: String
        , tempC        :: Int
        , tempF        :: Int
-       , dewPoint     :: String
+       , dewPointC    :: Int
+       , dewPointF    :: Int
        , humidity     :: Int
        , pressure     :: Int
        } deriving (Show)
@@ -117,13 +119,15 @@ parseData =
        sk <- getAfterString "Sky conditions: "
        skipTillString "Temperature: "
        (tC,tF) <- pTemp
-       dp <- getAfterString "Dew Point: "
+       skipTillString "Dew Point: "
+       -- dp <- getAfterString "Dew Point: "
+       (dC, dF) <- pTemp
        skipTillString "Relative Humidity: "
        rh <- pRh
        skipTillString "Pressure (altimeter): "
        p <- pPressure
        manyTill skipRestOfLine eof
-       return [WI st ss y m d h w v sk tC tF dp rh p]
+       return [WI st ss y m d h w v sk tC tF dC dF rh p]
 
 defUrl :: String
 defUrl = "http://weather.noaa.gov/pub/data/observations/metar/decoded/"
@@ -139,10 +143,10 @@ getData station = do
           errHandler _ = return "<Could not retrieve data>"
 
 formatWeather :: [WeatherInfo] -> Monitor String
-formatWeather [WI st ss y m d h w v sk tC tF dp r p] =
+formatWeather [WI st ss y m d h w v sk tC tF dC dF r p] =
     do cel <- showWithColors show tC
        far <- showWithColors show tF
-       parseTemplate [st, ss, y, m, d, h, w, v, sk, cel, far, dp, show r , show p ]
+       parseTemplate [st, ss, y, m, d, h, w, v, sk, cel, far, show dC, show dF, show r , show p ]
 formatWeather _ = getConfigValue naString
 
 runWeather :: [String] -> Monitor String

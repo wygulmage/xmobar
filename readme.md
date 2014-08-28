@@ -678,7 +678,7 @@ something like:
 - Variables that can be used with the `-t`/`--template` argument:
 	    `station`, `stationState`, `year`, `month`, `day`, `hour`,
 	    `wind`, `visibility`, `skyCondition`, `tempC`, `tempF`,
-	    `dewPoint`, `rh`, `pressure`
+	    `dewPointC`, `dewPointF`, `rh`, `pressure`
 - Default template: `<station>: <tempC>C, rh <rh>% (<hour>)`
 - Retrieves weather information from http://weather.noaa.gov.
 
