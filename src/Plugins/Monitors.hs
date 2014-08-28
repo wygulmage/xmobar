@@ -108,15 +108,15 @@ instance Exec Monitors where
     alias (Cpu _ _) = "cpu"
     alias (MultiCpu _ _) = "multicpu"
     alias (Battery _ _) = "battery"
-    alias (BatteryP _ _ _)= "battery"
+    alias (BatteryP {})= "battery"
     alias (BatteryN _ _ _ a)= a
     alias (Brightness _ _) = "bright"
     alias (CpuFreq _ _) = "cpufreq"
     alias (TopProc _ _) = "top"
     alias (TopMem _ _) = "topmem"
     alias (CoreTemp _ _) = "coretemp"
-    alias (DiskU _ _ _) = "disku"
-    alias (DiskIO _ _ _) = "diskio"
+    alias (DiskU {}) = "disku"
+    alias (DiskIO {}) = "diskio"
     alias (Uptime _ _) = "uptime"
     alias (CatInt n _ _ _) = "cat" ++ show n
 #ifdef IWLIB

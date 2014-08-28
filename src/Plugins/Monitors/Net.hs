@@ -51,8 +51,8 @@ instance Ord NetDev where
     compare NA _               = LT
     compare _  NA              = GT
     compare (NI _) (NI _)      = EQ
-    compare (NI _) (ND _ _ _)  = LT
-    compare (ND _ _ _) (NI _)  = GT
+    compare (NI _) (ND {})     = LT
+    compare (ND {}) (NI _)     = GT
     compare (ND _ x1 y1) (ND _ x2 y2) =
         if downcmp /= EQ
            then downcmp
