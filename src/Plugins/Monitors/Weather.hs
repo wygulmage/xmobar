@@ -120,7 +120,6 @@ parseData =
        skipTillString "Temperature: "
        (tC,tF) <- pTemp
        skipTillString "Dew Point: "
-       -- dp <- getAfterString "Dew Point: "
        (dC, dF) <- pTemp
        skipTillString "Relative Humidity: "
        rh <- pRh
