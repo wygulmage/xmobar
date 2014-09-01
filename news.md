@@ -8,7 +8,8 @@ _New features_
   - `Network` monitor has now adaptive units (`-S` is used now to
     switch them on), by Axel Angel.
   - `Weather` now offers `dewPointC` and `dewPointF` instead of
-    `dewPoint`, by Tony Morris.
+    `dewPoint`, and the new `windCardinal`, `windAzimuth`, `windMph`
+    and `windKnots` variables, by Tony Morris.
 
 ## Version 0.21 (Jul 1, 2014)
 
