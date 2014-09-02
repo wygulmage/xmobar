@@ -152,6 +152,10 @@ Otherwise, you'll need to install them yourself.
 :    Support for other timezones. Enables the DateZone plugin.
      Requires [timezone-olson] and [timezone-series] package.
 
+`with_xpm`
+:    Support for xpm image file format. This will allow loading .xpm files in `<icon>`.
+     Requires the [libXpm] C library.
+
 `all_extensions`
 :    Enables all the extensions above.
 
@@ -1495,3 +1499,4 @@ Copyright &copy; 2007-2010 Andrea Rossato
 [alsa-mixer]: http://hackage.haskell.org/package/alsa-mixer
 [timezone-olson]: http://hackage.haskell.org/package/timezone-olson
 [timezone-series]: http://hackage.haskell.org/package/timezone-series
+[libXpm]: http://cgit.freedesktop.org/xorg/lib/libXpm
