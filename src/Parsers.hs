@@ -180,9 +180,6 @@ stripComments :: String -> String
 stripComments =
   unlines . map (drop 5 . strip False . (replicate 5 ' '++)) . lines
     where strip m ('-':'-':xs) = if m then "--" ++ strip m xs else ""
-          strip m ('\\':xss) = case xss of
-                                '\\':xs -> '\\' : strip m xs
-                                _ -> strip m $ drop 1 xss
           strip m ('"':xs) = '"': strip (not m) xs
           strip m (x:xs) = x : strip m xs
           strip _ [] = []
@@ -249,8 +246,20 @@ parseConfig = runParser parseConf fields "Config" . stripComments
       readCommands = manyTill anyChar (try commandsEnd) >>=
                         read' commandsErr . flip (++) "]"
 
-      strField e n = field e n . between (strDel "start" n) (strDel "end" n) .
-                     many $ noneOf "\"\n\r"
+      strField e n = field e n strMulti
+
+      strMulti = do
+          scan '"'
+          where
+            scan lead = do
+                spaces
+                char lead
+                s <- manyTill anyChar (rowCont <|> unescQuote)
+                ( char '"' >> return s )
+                    <|> ( scan '\\' >>= return . (s ++) )
+            rowCont    = try $ (char '\\') >> (string "\n")
+            unescQuote = (lookAhead $ noneOf "\\") >> (lookAhead $ string "\"")
+
       strDel t n = char '"' <?> strErr t n
       strErr t n = "the " ++ t ++ " of the string field " ++ n ++
                        " - a double quote (\")."
