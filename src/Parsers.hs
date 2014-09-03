@@ -25,7 +25,7 @@ import Runnable
 import Commands
 import Actions
 
-import Control.Monad (guard, mzero)
+import Control.Monad (guard, mzero, liftM)
 import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Perm
@@ -248,21 +248,15 @@ parseConfig = runParser parseConf fields "Config" . stripComments
 
       strField e n = field e n strMulti
 
-      strMulti = do
-          scan '"'
+      strMulti = scan '"'
           where
             scan lead = do
                 spaces
                 char lead
                 s <- manyTill anyChar (rowCont <|> unescQuote)
-                ( char '"' >> return s )
-                    <|> ( scan '\\' >>= return . (s ++) )
-            rowCont    = try $ (char '\\') >> (string "\n")
-            unescQuote = (lookAhead $ noneOf "\\") >> (lookAhead $ string "\"")
-
-      strDel t n = char '"' <?> strErr t n
-      strErr t n = "the " ++ t ++ " of the string field " ++ n ++
-                       " - a double quote (\")."
+                (char '"' >> return s) <|> liftM (s ++) (scan '\\')
+            rowCont    = try $ char '\\' >> string "\n"
+            unescQuote = lookAhead (noneOf "\\") >> lookAhead (string "\"")
 
       wrapSkip   x = many space >> x >>= \r -> many space >> return r
       sepEndSpc    = mapM_ (wrapSkip . try . string)
