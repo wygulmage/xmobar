@@ -10,6 +10,8 @@ _New features_
   - `Weather` now offers `dewPointC` and `dewPointF` instead of
     `dewPoint`, and the new `windCardinal`, `windAzimuth`, `windMph`
     and `windKnots` variables, by Tony Morris.
+  - Strings in the configuration file can now span multiple lines
+    using Haskell-style multiline script, thanks to dunric
 
 ## Version 0.21 (Jul 1, 2014)
 
