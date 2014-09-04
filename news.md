@@ -12,6 +12,8 @@ _New features_
     and `windKnots` variables, by Tony Morris.
   - Strings in the configuration file can now span multiple lines
     using Haskell-style multiline script, thanks to dunric
+  - Icons can now be also xpm files (if xmobar is compiled with
+    `with_xpm`), thanks to Alexander Shabalin.
 
 ## Version 0.21 (Jul 1, 2014)
 
