@@ -1,4 +1,16 @@
 {-# LANGUAGE FlexibleContexts, ForeignFunctionInterface #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  XPMFile
+-- Copyright   :  (C) 2014 Alexander Shabalin
+-- License     :  BSD3
+--
+-- Maintainer  :  jao@gnu.org
+-- Stability   :  unstable
+-- Portability :  unportable
+--
+-----------------------------------------------------------------------------
+
 module XPMFile(readXPMFile) where
 
 import Control.Monad.Except(MonadError(..))
