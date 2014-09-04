@@ -66,6 +66,10 @@ flag with_dbus
   description: Publish a service on the session bus for controlling xmobar.
   default: False
 
+flag with_xpm
+  description: Enable usage of xpm for icons
+  default: False
+
 flag with_threaded
   description: Use threaded runtime.
   default: False
@@ -166,3 +170,8 @@ executable xmobar
        build-depends: dbus >= 0.10
        other-modules: IPC.DBus
        cpp-options: -DDBUS
+
+    if flag(with_xpm) || flag(all_extensions)
+       extra-libraries: Xpm
+       other-modules: XPMFile
+       cpp-options: -DXPM

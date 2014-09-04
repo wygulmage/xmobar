@@ -152,6 +152,10 @@ Otherwise, you'll need to install them yourself.
 :    Support for other timezones. Enables the DateZone plugin.
      Requires [timezone-olson] and [timezone-series] package.
 
+`with_xpm`
+:    Support for xpm image file format. This will allow loading .xpm files in `<icon>`.
+     Requires the [libXpm] C library.
+
 `all_extensions`
 :    Enables all the extensions above.
 
@@ -195,7 +199,8 @@ For the output template:
 - `<fc=#FF0000>string</fc>` will print `string` with `#FF0000` color
   (red).
 
-- `<icon=/path/to/icon.xbm/>` will insert the given bitmap.
+- `<icon=/path/to/icon.xbm/>` will insert the given bitmap. XPM image
+  format is also supported when compiled with `--flags="with_xpm"`.
 
 - ```<action=`command` button=12345>``` will execute given command when
   clicked with specified buttons. If not specified, button is equal to 1
@@ -482,7 +487,8 @@ form:
 
      <icon=/path/to/bitmap.xbm/>
 
-which will produce the expected result.
+which will produce the expected result. Accepted image formats are XBM
+and XPM (when `with_xpm` flag is enabled).
 
 It's also possible to use action directives of the form:
 
@@ -1495,3 +1501,4 @@ Copyright &copy; 2007-2010 Andrea Rossato
 [alsa-mixer]: http://hackage.haskell.org/package/alsa-mixer
 [timezone-olson]: http://hackage.haskell.org/package/timezone-olson
 [timezone-series]: http://hackage.haskell.org/package/timezone-series
+[libXpm]: http://cgit.freedesktop.org/xorg/lib/libXpm

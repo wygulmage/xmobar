@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Bitmap
@@ -15,7 +16,10 @@ module Bitmap
  , drawBitmap
  , Bitmap(..)) where
 
+import Control.Applicative((<|>))
 import Control.Monad
+import Control.Monad.Except(MonadError(..), runExceptT)
+import Control.Monad.Trans(MonadIO(..))
 import Data.Map hiding (foldr, map, filter)
 import Graphics.X11.Xlib
 import System.Directory (doesFileExist)
@@ -24,9 +28,17 @@ import ColorCache
 import Parsers (Widget(..))
 import Actions (Action)
 
+#ifdef XPM
+import XPMFile(readXPMFile)
+#endif
+
+data BitmapType = Mono Pixel | Poly
+
 data Bitmap = Bitmap { width  :: Dimension
                      , height :: Dimension
                      , pixmap :: Pixmap
+                     , shapePixmap :: Maybe Pixmap
+                     , bitmapType :: BitmapType
                      }
 
 updateCache :: Display -> Window -> Map FilePath Bitmap ->
@@ -41,21 +53,48 @@ updateCache dpy win cache ps = do
                              return $ maybe m (\b -> insert path b m) bitmap
   foldM go cache paths
 
+readBitmapFile'
+    :: (MonadError String m, MonadIO m)
+    => Display
+    -> Drawable
+    -> String
+    -> m (Dimension, Dimension, Pixmap)
+readBitmapFile' d w p = do
+   res <- liftIO $ readBitmapFile d w p
+   case res of
+    Left err -> throwError err
+    Right (bw, bh, bp, _, _) -> return (bw, bh, bp)
+
 loadBitmap :: Display -> Drawable -> FilePath -> IO (Maybe Bitmap)
 loadBitmap d w p = do
     exist <- doesFileExist p
     if exist
        then do
-            bmap <- readBitmapFile d w p
-            case bmap of
-                 Right (bw, bh, bp, _, _) -> do
-                     addFinalizer bp (freePixmap d bp)
-                     return $ Just $ Bitmap bw bh bp
+            res <- runExceptT $
+                    tryXBM
+#ifdef XPM
+                <|> tryXPM
+#endif
+            case res of
+                 Right b -> return $ Just b
                  Left err -> do
                      putStrLn err
                      return Nothing
        else
            return Nothing
+ where tryXBM = do
+           (bw, bh, bp) <- readBitmapFile' d w p
+           liftIO $ addFinalizer bp (freePixmap d bp)
+           return $ Bitmap bw bh bp Nothing (Mono 1)
+#ifdef XPM
+       tryXPM = do
+           (bw, bh, bp, mbpm) <- readXPMFile d w p
+           liftIO $ addFinalizer bp (freePixmap d bp)
+           case mbpm of
+                Nothing -> return ()
+                Just bpm -> liftIO $ addFinalizer bpm (freePixmap d bpm)
+           return $ Bitmap bw bh bp mbpm Poly
+#endif
 
 drawBitmap :: Display -> Drawable -> GC -> String -> String
               -> Position -> Position -> Bitmap -> IO ()
@@ -63,6 +102,13 @@ drawBitmap d p gc fc bc x y i =
     withColors d [fc, bc] $ \[fc', bc'] -> do
     let w = width i
         h = height i
+        y' = 1 + y - fromIntegral h `div` 2
     setForeground d gc fc'
     setBackground d gc bc'
-    copyPlane d (pixmap i) p gc 0 0 w h x (1 + y - fromIntegral h `div` 2)  1
+    case (shapePixmap i) of
+         Nothing -> return ()
+         Just mask -> setClipOrigin d gc x y' >> setClipMask d gc mask
+    case bitmapType i of
+         Poly -> copyArea d (pixmap i) p gc 0 0 w h x y'
+         Mono pl -> copyPlane d (pixmap i) p gc 0 0 w h x y' pl
+    setClipMask d gc 0
