@@ -199,7 +199,8 @@ For the output template:
 - `<fc=#FF0000>string</fc>` will print `string` with `#FF0000` color
   (red).
 
-- `<icon=/path/to/icon.xbm/>` will insert the given bitmap.
+- `<icon=/path/to/icon.xbm/>` will insert the given bitmap. XPM image
+  format is also supported when compiled with `--flags="with_xpm"`.
 
 - ```<action=`command` button=12345>``` will execute given command when
   clicked with specified buttons. If not specified, button is equal to 1
@@ -486,7 +487,8 @@ form:
 
      <icon=/path/to/bitmap.xbm/>
 
-which will produce the expected result.
+which will produce the expected result. Accepted image formats are XBM
+and XPM (when `with_xpm` flag is enabled).
 
 It's also possible to use action directives of the form:
 
