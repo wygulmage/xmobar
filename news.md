@@ -15,6 +15,12 @@ _New features_
   - Icons can now be also xpm files (if xmobar is compiled with
     `with_xpm`), thanks to Alexander Shabalin.
 
+_Bug fixes_
+
+  - Not colorizing total disk size in `DiskU` ([issue #189]).
+
+[issue #189]: https://github.com/jaor/xmobar/issues/89
+
 ## Version 0.21 (Jul 1, 2014)
 
 _New features_

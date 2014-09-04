@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Disk
--- Copyright   :  (c) 2010, 2011, 2012 Jose A Ortega Ruiz
+-- Copyright   :  (c) 2010, 2011, 2012, 2014 Jose A Ortega Ruiz
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A Ortega Ruiz <jao@gnu.org>
@@ -164,16 +164,16 @@ runDiskU' :: String -> String -> Monitor String
 runDiskU' tmp path = do
   setConfigValue tmp template
   [total, free, diff] <-  io (handle ign $ fsStats path)
-  let strs = map sizeToStr [total, free, diff]
+  let strs = map sizeToStr [free, diff]
       freep = if total > 0 then free * 100 `div` total else 0
       fr = fromIntegral freep / 100
-  s <- zipWithM showWithColors' strs [100, freep, 100 - freep]
+  s <- zipWithM showWithColors' strs [freep, 100 - freep]
   sp <- showPercentsWithColors [fr, 1 - fr]
   fb <- showPercentBar (fromIntegral freep) fr
   fvb <- showVerticalBar (fromIntegral freep) fr
   ub <- showPercentBar (fromIntegral $ 100 - freep) (1 - fr)
   uvb <- showVerticalBar (fromIntegral $ 100 - freep) (1 - fr)
-  parseTemplate $ s ++ sp ++ [fb,fvb,ub,uvb]
+  parseTemplate $ [sizeToStr total] ++ s ++ sp ++ [fb,fvb,ub,uvb]
   where ign = const (return [0, 0, 0]) :: SomeException -> IO [Integer]
 
 
