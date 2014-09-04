@@ -79,7 +79,7 @@ executable xmobar
     main-is:            Main.hs
     other-modules:
       Xmobar, Actions, Bitmap, Config, Parsers, Commands, Localize,
-      XUtil, StatFS, Runnable, ColorCache, Window, Signal,
+      XUtil, XPMFile, StatFS, Runnable, ColorCache, Window, Signal,
       Plugins, Plugins.BufferedPipeReader,
       Plugins.CommandReader, Plugins.Date, Plugins.EWMH,
       Plugins.PipeReader, Plugins.MarqueePipeReader,
