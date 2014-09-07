@@ -24,7 +24,7 @@ import System.Console.GetOpt
 
 volumeConfig :: IO MConfig
 volumeConfig = mkMConfig "Vol: <volume>% <status>"
-                         ["volume", "volumebar", "volumevbar", "dB","status"]
+                         ["volume", "volumebar", "volumevbar", "dB","status", "volumedstr"]
 
 
 data VolumeOpts = VolumeOpts
@@ -34,6 +34,7 @@ data VolumeOpts = VolumeOpts
     , offColor :: Maybe String
     , highDbThresh :: Float
     , lowDbThresh :: Float
+    , volumeDynamicString :: Maybe DynamicString
     }
 
 defaultOpts :: VolumeOpts
@@ -44,6 +45,7 @@ defaultOpts = VolumeOpts
     , offColor = Just "red"
     , highDbThresh = -5.0
     , lowDbThresh = -30.0
+    , volumeDynamicString = Nothing
     }
 
 options :: [OptDescr (VolumeOpts -> VolumeOpts)]
@@ -54,6 +56,8 @@ options =
     , Option "" ["highd"] (ReqArg (\x o -> o { highDbThresh = read x }) "") ""
     , Option "C" ["onc"] (ReqArg (\x o -> o { onColor = Just x }) "") ""
     , Option "c" ["offc"] (ReqArg (\x o -> o { offColor = Just x }) "") ""
+    , Option "" ["volume-dynamic-string"] (ReqArg (\x o ->
+       o { volumeDynamicString = Just $ parseDynamicString x }) "") ""
     ]
 
 parseOpts :: [String] -> IO VolumeOpts
@@ -79,6 +83,10 @@ formatVolBar lo hi v =
 formatVolVBar :: Integer -> Integer -> Integer -> Monitor String
 formatVolVBar lo hi v =
     showVerticalBar (100 * x) x where x = percent v lo hi
+
+formatVolDStr :: Maybe DynamicString -> Integer -> Integer -> Integer -> Monitor String
+formatVolDStr dstr lo hi v =
+    showDynamicString dstr $ percent v lo hi
 
 switchHelper :: VolumeOpts
              -> (VolumeOpts -> Maybe String)
@@ -126,7 +134,8 @@ runVolume mixerName controlName argv = do
     v <- liftMonitor $ liftM3 formatVolVBar lo hi val
     d <- getFormatDB opts db
     s <- getFormatSwitch opts sw
-    parseTemplate [p, b, v, d, s]
+    dstr <- liftMonitor $ liftM3 (formatVolDStr $ volumeDynamicString opts) lo hi val
+    parseTemplate [p, b, v, d, s, dstr]
 
   where
 

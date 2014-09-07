@@ -25,8 +25,34 @@ import Data.Time.Clock (UTCTime, getCurrentTime, diffUTCTime)
 import Control.Monad (forM, filterM, liftM)
 import System.Directory (getDirectoryContents, doesFileExist)
 import System.FilePath ((</>))
+import System.Console.GetOpt
 
 import qualified Data.ByteString.Lazy.Char8 as B
+
+data NetOpts = NetOpts
+  { rxDynamicString :: Maybe DynamicString
+  , txDynamicString :: Maybe DynamicString
+  }
+
+defaultOpts :: NetOpts
+defaultOpts = NetOpts
+  { rxDynamicString = Nothing
+  , txDynamicString = Nothing
+  }
+
+options :: [OptDescr (NetOpts -> NetOpts)]
+options =
+  [ Option "" ["rx-dynamic-string"] (ReqArg (\x o ->
+     o { rxDynamicString = Just $ parseDynamicString x }) "") ""
+  , Option "" ["tx-dynamic-string"] (ReqArg (\x o ->
+     o { txDynamicString = Just $ parseDynamicString x }) "") ""
+  ]
+
+parseOpts :: [String] -> IO NetOpts
+parseOpts argv =
+  case getOpt Permute options argv of
+    (o, _, []) -> return $ foldr id defaultOpts o
+    (_, _, errs) -> ioError . userError $ concat errs
 
 data UnitPerSec = Bs | KBs | MBs | GBs deriving (Eq,Enum,Ord)
 data NetValue = NetValue Float UnitPerSec deriving (Eq,Show)
@@ -62,7 +88,7 @@ instance Ord NetDev where
 netConfig :: IO MConfig
 netConfig = mkMConfig
     "<dev>: <rx>KB|<tx>KB"      -- template
-    ["dev", "rx", "tx", "rxbar", "rxvbar", "txbar", "txvbar"]     -- available replacements
+    ["dev", "rx", "tx", "rxbar", "rxvbar", "rxdstr", "txbar", "txvbar", "txdstr"]     -- available replacements
 
 operstateDir :: String -> FilePath
 operstateDir d = "/sys/class/net" </> d </> "operstate"
@@ -106,8 +132,8 @@ findNetDev dev = do
         isDev (NI d) = d == dev
         isDev NA = False
 
-formatNet :: Float -> Monitor (String, String, String)
-formatNet d = do
+formatNet :: Maybe DynamicString -> Float -> Monitor (String, String, String, String)
+formatNet mdstr d = do
     s <- getConfigValue useSuffix
     dd <- getConfigValue decDigits
     let str True v = showDigits dd d' ++ show u
@@ -115,16 +141,17 @@ formatNet d = do
         str False v = showDigits dd $ v / 1024
     b <- showLogBar 0.9 d
     vb <- showLogVBar 0.9 d
+    dstr <- showLogDynamicString mdstr 0.9 d
     x <- showWithColors (str s) d
-    return (x, b, vb)
+    return (x, b, vb, dstr)
 
-printNet :: NetDev -> Monitor String
-printNet nd =
+printNet :: NetOpts -> NetDev -> Monitor String
+printNet opts nd =
   case nd of
     ND d r t -> do
-        (rx, rb, rvb) <- formatNet r
-        (tx, tb, tvb) <- formatNet t
-        parseTemplate [d,rx,tx,rb,rvb,tb,tvb]
+        (rx, rb, rvb, rdstr) <- formatNet (rxDynamicString opts) r
+        (tx, tb, tvb, tdstr) <- formatNet (txDynamicString opts) t
+        parseTemplate [d,rx,tx,rb,rvb,rdstr,tb,tvb,tdstr]
     NI _ -> return ""
     NA -> getConfigValue naString
 
@@ -144,13 +171,19 @@ parseNet nref nd = do
   return $ diffRate n0 n1
 
 runNet :: NetDevRef -> String -> [String] -> Monitor String
-runNet nref i _ = io (parseNet nref i) >>= printNet
+runNet nref i argv = do
+  dev <- io $ parseNet nref i
+  opts <- io $ parseOpts argv
+  printNet opts dev
 
 parseNets :: [(NetDevRef, String)] -> IO [NetDev]
 parseNets = mapM $ uncurry parseNet
 
 runNets :: [(NetDevRef, String)] -> [String] -> Monitor String
-runNets refs _ = io (parseActive refs) >>= printNet
+runNets refs argv = do
+  dev <- io $ parseActive refs
+  opts <- io $ parseOpts argv
+  printNet opts dev
     where parseActive refs' = liftM selectActive (parseNets refs') 
           selectActive = maximum
 

@@ -25,16 +25,67 @@ import qualified Data.ByteString.Lazy.Char8 as B
 import Data.List (isPrefixOf, find)
 import Data.Maybe (catMaybes)
 import System.Directory (canonicalizePath, doesFileExist)
+import System.Console.GetOpt
+
+data DiskIOOpts = DiskIOOpts
+  { totalDynamicString :: Maybe DynamicString
+  , writeDynamicString :: Maybe DynamicString
+  , readDynamicString :: Maybe DynamicString
+  }
+
+parseDiskIOOpts :: [String] -> IO DiskIOOpts
+parseDiskIOOpts argv =
+  case getOpt Permute options argv of
+    (o, _, []) -> return $ foldr id defaultOpts o
+    (_, _, errs) -> ioError . userError $ concat errs
+ where defaultOpts = DiskIOOpts
+          { totalDynamicString = Nothing
+          , writeDynamicString = Nothing
+          , readDynamicString = Nothing
+          }
+       options =
+          [ Option "" ["total-dynamic-string"] (ReqArg (\x o ->
+             o { totalDynamicString = Just $ parseDynamicString x}) "") ""
+          , Option "" ["write-dynamic-string"] (ReqArg (\x o ->
+             o { writeDynamicString = Just $ parseDynamicString x}) "") ""
+          , Option "" ["read-dynamic-string"] (ReqArg (\x o ->
+             o { readDynamicString = Just $ parseDynamicString x}) "") ""
+          ]
 
 diskIOConfig :: IO MConfig
 diskIOConfig = mkMConfig "" ["total", "read", "write"
                             ,"totalbar", "readbar", "writebar"
                             ,"totalvbar", "readvbar", "writevbar"
+                            ,"totaldstr", "readdstr", "writedstr"
                             ]
+
+data DiskUOpts = DiskUOpts
+  { freeDynamicString :: Maybe DynamicString
+  , usedDynamicString :: Maybe DynamicString
+  }
+
+parseDiskUOpts :: [String] -> IO DiskUOpts
+parseDiskUOpts argv =
+  case getOpt Permute options argv of
+    (o, _, []) -> return $ foldr id defaultOpts o
+    (_, _, errs) -> ioError . userError $ concat errs
+ where defaultOpts = DiskUOpts
+          { freeDynamicString = Nothing
+          , usedDynamicString = Nothing
+          }
+       options =
+          [ Option "" ["free-dynamic-string"] (ReqArg (\x o ->
+             o { freeDynamicString = Just $ parseDynamicString x}) "") ""
+          , Option "" ["used-dynamic-string"] (ReqArg (\x o ->
+             o { usedDynamicString = Just $ parseDynamicString x}) "") ""
+          ]
 
 diskUConfig :: IO MConfig
 diskUConfig = mkMConfig ""
-              ["size", "free", "used", "freep", "usedp", "freebar", "freevbar", "usedbar", "usedvbar"]
+              [ "size", "free", "used", "freep", "usedp"
+              , "freebar", "freevbar", "freedstr"
+              , "usedbar", "usedvbar", "useddstr"
+              ]
 
 type DevName = String
 type Path = String
@@ -127,19 +178,22 @@ devTemplates disks mounted dat =
                          Nothing -> [0, 0, 0]
                          Just (_, xs) -> xs
 
-runDiskIO' :: (String, [Float]) -> Monitor String
-runDiskIO' (tmp, xs) = do
+runDiskIO' :: DiskIOOpts -> (String, [Float]) -> Monitor String
+runDiskIO' opts (tmp, xs) = do
   s <- mapM (showWithColors speedToStr) xs
   b <- mapM (showLogBar 0.8) xs
   vb <- mapM (showLogVBar 0.8) xs
+  dstr <- mapM (\(f,v) -> showLogDynamicString (f opts) 0.8 v)
+        $ zip [totalDynamicString, readDynamicString, writeDynamicString] xs
   setConfigValue tmp template
-  parseTemplate $ s ++ b ++ vb
+  parseTemplate $ s ++ b ++ vb ++ dstr
 
 runDiskIO :: DevDataRef -> [(String, String)] -> [String] -> Monitor String
-runDiskIO dref disks _ = do
+runDiskIO dref disks argv = do
+  opts <- io $ parseDiskIOOpts argv
   dev <- io $ mountedOrDiskDevices (map fst disks)
   dat <- io $ mountedData dref (map fst dev)
-  strs <- mapM runDiskIO' $ devTemplates disks dev dat
+  strs <- mapM (runDiskIO' opts) $ devTemplates disks dev dat
   return $ unwords strs
 
 startDiskIO :: [(String, String)] ->
@@ -160,8 +214,8 @@ fsStats path = do
                   used = fsStatBytesUsed f
               in return [tot, free, used]
 
-runDiskU' :: String -> String -> Monitor String
-runDiskU' tmp path = do
+runDiskU' :: DiskUOpts -> String -> String -> Monitor String
+runDiskU' opts tmp path = do
   setConfigValue tmp template
   [total, free, diff] <-  io (handle ign $ fsStats path)
   let strs = map sizeToStr [free, diff]
@@ -171,14 +225,17 @@ runDiskU' tmp path = do
   sp <- showPercentsWithColors [fr, 1 - fr]
   fb <- showPercentBar (fromIntegral freep) fr
   fvb <- showVerticalBar (fromIntegral freep) fr
+  fdstr <- showDynamicString (freeDynamicString opts) fr
   ub <- showPercentBar (fromIntegral $ 100 - freep) (1 - fr)
   uvb <- showVerticalBar (fromIntegral $ 100 - freep) (1 - fr)
-  parseTemplate $ [sizeToStr total] ++ s ++ sp ++ [fb,fvb,ub,uvb]
+  udstr <- showDynamicString (usedDynamicString opts) (1 - fr)
+  parseTemplate $ [sizeToStr total] ++ s ++ sp ++ [fb,fvb,fdstr,ub,uvb,udstr]
   where ign = const (return [0, 0, 0]) :: SomeException -> IO [Integer]
 
 
 runDiskU :: [(String, String)] -> [String] -> Monitor String
-runDiskU disks _ = do
+runDiskU disks argv = do
   devs <- io $ mountedDevices (map fst disks)
-  strs <- mapM (\(d, p) -> runDiskU' (findTempl d p disks) p) devs
+  opts <- io $ parseDiskUOpts argv
+  strs <- mapM (\(d, p) -> runDiskU' opts (findTempl d p disks) p) devs
   return $ unwords strs

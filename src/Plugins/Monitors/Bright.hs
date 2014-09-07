@@ -26,18 +26,22 @@ import Plugins.Monitors.Common
 data BrightOpts = BrightOpts { subDir :: String
                              , currBright :: String
                              , maxBright :: String
+                             , curBrightDynamicString :: Maybe DynamicString
                              }
 
 defaultOpts :: BrightOpts
 defaultOpts = BrightOpts { subDir = "acpi_video0"
                          , currBright = "actual_brightness"
                          , maxBright = "max_brightness"
+                         , curBrightDynamicString = Nothing
                          }
 
 options :: [OptDescr (BrightOpts -> BrightOpts)]
 options = [ Option "D" ["device"] (ReqArg (\x o -> o { subDir = x }) "") ""
           , Option "C" ["curr"] (ReqArg (\x o -> o { currBright = x }) "") ""
           , Option "M" ["max"] (ReqArg (\x o -> o { maxBright = x }) "") ""
+          , Option "" ["brightness-dynamic-string"] (ReqArg (\x o ->
+             o { curBrightDynamicString = Just $ parseDynamicString x }) "") ""
           ]
 
 -- from Batt.hs
@@ -52,7 +56,7 @@ sysDir = "/sys/class/backlight/"
 
 brightConfig :: IO MConfig
 brightConfig = mkMConfig "<percent>" -- template
-                         ["vbar", "percent", "bar"] -- replacements
+                         ["vbar", "percent", "bar", "dstr"] -- replacements
 
 data Files = Files { fCurr :: String
                    , fMax :: String
@@ -76,12 +80,13 @@ runBright args = do
   c <- io $ readBright f
   case f of
     NoFiles -> return "hurz"
-    _ -> fmtPercent c >>= parseTemplate
-  where fmtPercent :: Float -> Monitor [String]
-        fmtPercent c = do r <- showVerticalBar (100 * c) c
-                          s <- showPercentWithColors c
-                          t <- showPercentBar (100 * c) c
-                          return [r,s,t]
+    _ -> fmtPercent opts c >>= parseTemplate
+  where fmtPercent :: BrightOpts -> Float -> Monitor [String]
+        fmtPercent opts c = do r <- showVerticalBar (100 * c) c
+                               s <- showPercentWithColors c
+                               t <- showPercentBar (100 * c) c
+                               d <- showDynamicString (curBrightDynamicString opts) c
+                               return [r,s,t,d]
 
 readBright :: Files -> IO Float
 readBright NoFiles = return 0

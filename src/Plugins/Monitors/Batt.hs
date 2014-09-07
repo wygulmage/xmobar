@@ -34,6 +34,9 @@ data BattOpts = BattOpts
   , highThreshold :: Float
   , onlineFile :: FilePath
   , scale :: Float
+  , onDynamicString :: Maybe DynamicString
+  , offDynamicString :: Maybe DynamicString
+  , idleDynamicString :: Maybe DynamicString
   }
 
 defaultOpts :: BattOpts
@@ -49,6 +52,9 @@ defaultOpts = BattOpts
   , highThreshold = -10
   , onlineFile = "AC/online"
   , scale = 1e6
+  , onDynamicString = Nothing
+  , offDynamicString = Nothing
+  , idleDynamicString = Nothing
   }
 
 options :: [OptDescr (BattOpts -> BattOpts)]
@@ -64,6 +70,12 @@ options =
   , Option "H" ["hight"] (ReqArg (\x o -> o { highThreshold = read x }) "") ""
   , Option "f" ["online"] (ReqArg (\x o -> o { onlineFile = x }) "") ""
   , Option "s" ["scale"] (ReqArg (\x o -> o {scale = read x}) "") ""
+  , Option "" ["on-dynamic-string"] (ReqArg (\x o ->
+     o { onDynamicString = Just $ parseDynamicString x }) "") ""
+  , Option "" ["off-dynamic-string"] (ReqArg (\x o ->
+     o { offDynamicString = Just $ parseDynamicString x }) "") ""
+  , Option "" ["idle-dynamic-string"] (ReqArg (\x o ->
+     o { idleDynamicString = Just $ parseDynamicString x }) "") ""
   ]
 
 parseOpts :: [String] -> IO BattOpts
@@ -72,7 +84,9 @@ parseOpts argv =
     (o, _, []) -> return $ foldr id defaultOpts o
     (_, _, errs) -> ioError . userError $ concat errs
 
-data Result = Result Float Float Float String | NA
+data Status = Charging | Discharging | Idle
+
+data Result = Result Float Float Float Status | NA
 
 sysDir :: FilePath
 sysDir = "/sys/class/power_supply"
@@ -80,7 +94,7 @@ sysDir = "/sys/class/power_supply"
 battConfig :: IO MConfig
 battConfig = mkMConfig
        "Batt: <watts>, <left>% / <timeleft>" -- template
-       ["leftbar", "leftvbar", "left", "acstatus", "timeleft", "watts"] -- replacements
+       ["leftbar", "leftvbar", "left", "acstatus", "timeleft", "watts", "leftdstr"] -- replacements
 
 data Files = Files
   { fFull :: String
@@ -150,10 +164,10 @@ readBatteries opts bfs =
            time = if idle then 0 else sum $ map time' bats
            mwatts = if idle then 1 else sign * watts
            time' b = (if ac then full b - now b else now b) / mwatts
-           acstr | idle      = idleString opts
-                 | ac        = onString opts
-                 | otherwise = offString opts
-       return $ if isNaN left then NA else Result left watts time acstr
+           acst | idle      = Idle
+                | ac        = Charging
+                | otherwise = Discharging
+       return $ if isNaN left then NA else Result left watts time acst
 
 runBatt :: [String] -> Monitor String
 runBatt = runBatt' ["BAT0","BAT1","BAT2"]
@@ -168,7 +182,8 @@ runBatt' bfs args = do
     Result x w t s ->
       do l <- fmtPercent x
          ws <- fmtWatts w opts suffix d
-         parseTemplate (l ++ [s, fmtTime $ floor t, ws])
+         si <- getDynamicString opts s x
+         parseTemplate (l ++ [fmtStatus opts s, fmtTime $ floor t, ws, si])
     NA -> getConfigValue naString
   where fmtPercent :: Float -> Monitor [String]
         fmtPercent x = do
@@ -185,9 +200,18 @@ runBatt' bfs args = do
                                     then minutes else '0' : minutes
           where hours = show (x `div` 3600)
                 minutes = show ((x `mod` 3600) `div` 60)
+        fmtStatus opts Idle = idleString opts
+        fmtStatus opts Charging = onString opts
+        fmtStatus opts Discharging = offString opts
         maybeColor Nothing str = str
         maybeColor (Just c) str = "<fc=" ++ c ++ ">" ++ str ++ "</fc>"
         color x o | x >= 0 = maybeColor (posColor o)
                   | -x >= highThreshold o = maybeColor (highWColor o)
                   | -x >= lowThreshold o = maybeColor (mediumWColor o)
                   | otherwise = maybeColor (lowWColor o)
+        getDynamicString opts status x = do
+          let x' = minimum [1, x]
+          case status of
+               Idle -> showDynamicString (idleDynamicString opts) x'
+               Charging -> showDynamicString (onDynamicString opts) x'
+               Discharging -> showDynamicString (offDynamicString opts) x'
