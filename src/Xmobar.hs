@@ -296,7 +296,7 @@ drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
     printStrings p gc fs 1 R =<< strLn right
     printStrings p gc fs 1 C =<< strLn center
     -- draw 1 pixel border if requested
-    io $ drawBorder (border c) d p gc bdcolor wid ht
+    io $ drawBorder (border c) (borderWidth c) d p gc bdcolor wid ht
     -- copy the pixmap with the new string to the window
     io $ copyArea   d p w gc 0 0 wid ht 0 0
     -- free up everything (we do not want to leak memory!)
@@ -315,9 +315,10 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
                Text t -> io $ textExtents fontst t
                Icon _ -> return (0, 0)
   let (conf,d)             = (config &&& display) r
+      boffs                = borderOffset (border conf) (borderWidth conf)
       Rectangle _ _ wid ht = rect r
       totSLen              = foldr (\(_,_,len) -> (+) len) 0 sl
-      valign               = -1 + (fi ht + fi (as + ds)) `div` 2
+      valign               = boffs-1 + (fi ht + fi (as + ds)) `div` 2
       remWidth             = fi wid - fi totSLen
       offset               = case a of
                                C -> (remWidth + offs) `div` 2

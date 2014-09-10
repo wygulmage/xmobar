@@ -54,6 +54,7 @@ data Config =
            , position :: XPosition  -- ^ Top Bottom or Static
            , border :: Border       -- ^ NoBorder TopB BottomB or FullB
            , borderColor :: String  -- ^ Border color
+           , borderWidth :: Int     -- ^ Border width
            , hideOnStart :: Bool    -- ^ Hide (Unmap) the window on
                                     --   initialization
            , allDesktops :: Bool    -- ^ Tell the WM to map to all desktops
@@ -110,6 +111,7 @@ defaultConfig =
            , position = Top
            , border = NoBorder
            , borderColor = "#BFBFBF"
+           , borderWidth = 1
            , hideOnStart = False
            , lowerOnStart = True
            , persistent = False

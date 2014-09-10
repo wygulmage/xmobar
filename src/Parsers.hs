@@ -199,8 +199,8 @@ parseConfig = runParser parseConf fields "Config" . stripComments
 
       perms = permute $ Config
               <$?> pFont <|?> pBgColor <|?> pFgColor <|?> pPosition
-              <|?> pBorder <|?> pBdColor <|?> pHideOnStart <|?> pAllDesktops
-              <|?> pOverrideRedirect <|?> pPickBroadest
+              <|?> pBorder <|?> pBdColor <|?> pBdWidth <|?> pHideOnStart
+              <|?> pAllDesktops <|?> pOverrideRedirect <|?> pPickBroadest
               <|?> pLowerOnStart <|?> pPersistent
               <|?> pCommands <|?> pSepChar <|?> pAlignSep <|?> pTemplate
 
@@ -224,6 +224,7 @@ parseConfig = runParser parseConf fields "Config" . stripComments
       pLowerOnStart = readField lowerOnStart "lowerOnStart"
       pPersistent = readField persistent "persistent"
       pBorder = readField border "border"
+      pBdWidth = readField borderWidth "borderWidth"
       pAllDesktops = readField allDesktops "allDesktops"
       pOverrideRedirect = readField overrideRedirect "overrideRedirect"
       pPickBroadest = readField pickBroadest "pickBroadest"

@@ -164,20 +164,22 @@ getStaticStrutValues (Static cx cy cw ch) rwh
           xe = xs + cw
 getStaticStrutValues _ _ = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-drawBorder :: Border -> Display -> Drawable -> GC -> Pixel
+drawBorder :: Border -> Int -> Display -> Drawable -> GC -> Pixel
               -> Dimension -> Dimension -> IO ()
-drawBorder b d p gc c wi ht =  case b of
+drawBorder b lw d p gc c wi ht =  case b of
   NoBorder -> return ()
-  TopB       -> drawBorder (TopBM 0) d p gc c w h
-  BottomB    -> drawBorder (BottomBM 0) d p gc c w h
-  FullB      -> drawBorder (FullBM 0) d p gc c w h
-  TopBM m    -> sf >> drawLine d p gc 0 (fi m) (fi w) 0
-  BottomBM m -> let rw = fi h - fi m in
-                 sf >> drawLine d p gc 0 rw (fi w) rw
-  FullBM m   -> let pad = 2 * fi m; mp = fi m in
-                 sf >> drawRectangle d p gc mp mp (w - pad) (h - pad)
-  where sf = setForeground d gc c
-        (w, h) = (wi - 1, ht - 1)
+  TopB       -> drawBorder (TopBM 0) lw d p gc c wi ht
+  BottomB    -> drawBorder (BottomBM 0) lw d p gc c wi ht
+  FullB      -> drawBorder (FullBM 0) lw d p gc c wi ht
+  TopBM m    -> sf >> sla >> drawLine d p gc 0 (fi m + boff) (fi wi) (fi m + boff)
+  BottomBM m -> let rw = fi ht - fi m + boff in
+                 sf >> sla >> drawLine d p gc 0 rw (fi wi) rw
+  FullBM m   -> let pad = 2 * fi m + 2 * fi boff'; mp = fi m + fi boff' in
+                 sf >> sla >> drawRectangle d p gc mp mp (wi - pad) (ht - pad)
+  where sf    = setForeground d gc c
+        sla   = setLineAttributes d gc (fi lw) lineSolid capNotLast joinMiter
+        boff  = borderOffset b lw
+        boff' = calcBorderOffset lw :: Int
 
 hideWindow :: Display -> Window -> IO ()
 hideWindow d w = do
@@ -193,3 +195,18 @@ showWindow r c d w = do
 isMapped :: Display -> Window -> IO Bool
 isMapped d w = ism <$> getWindowAttributes d w
     where ism (WindowAttributes { wa_map_state = wms }) = wms /= waIsUnmapped
+
+borderOffset :: (Integral a) => Border -> Int -> a
+borderOffset b lw =
+  case b of
+    BottomB    -> negate boffs
+    BottomBM _ -> negate boffs
+    TopB       -> boffs
+    TopBM _    -> boffs
+    _          -> 0
+  where boffs = calcBorderOffset lw
+
+calcBorderOffset :: (Integral a) => Int -> a
+calcBorderOffset = ceiling . (/2) . toDouble
+  where toDouble = fi :: (Integral a) => a -> Double
+

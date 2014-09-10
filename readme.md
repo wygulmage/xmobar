@@ -312,6 +312,9 @@ Other configuration options:
 `borderColor`
 :     Border color.
 
+`borderWidth`
+:     Border width in pixels.
+
 `commands`
 :    For setting the options of the programs to run (optional).
 
