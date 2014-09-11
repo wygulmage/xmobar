@@ -77,6 +77,17 @@ pTime = do y <- getNumbersAsString
            char ' '
            return (y, m, d ,h:hh:":"++mi:mimi)
 
+-- Occasionally there is no wind and a METAR report gives simply, "Wind: 0"
+pWind0 ::
+  (
+    String -- cardinal direction
+  , String -- azimuth direction
+  , String -- speed (MPH)
+  , String -- speed (knot)
+  )       
+pWind0 =
+  ("∘", "0", "0", "0")
+
 pWind ::
   Parser (
     String -- cardinal direction
@@ -86,6 +97,8 @@ pWind ::
   )       
 pWind =
   let tospace = manyTill anyChar (char ' ')
+      wind0 = do manyTill skipRestOfLine (string "Wind: 0")
+                 return pWind0
       wind = do manyTill skipRestOfLine (string "Wind: from the ")
                 cardinal <- tospace
                 char '('
@@ -96,7 +109,7 @@ pWind =
                 knot <- tospace
                 manyTill anyChar newline
                 return (cardinal, azimuth, mph, knot)
-  in try wind <|> return ("a", "b", "c", "d")
+  in try wind0 <|> wind
 
 pTemp :: Parser (Int, Int)
 pTemp = do let num = digit <|> char '-' <|> char '.'
