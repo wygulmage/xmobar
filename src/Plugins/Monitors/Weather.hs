@@ -86,7 +86,7 @@ pWind0 ::
   , String -- speed (knot)
   )       
 pWind0 =
-  ("∘", "0", "0", "0")
+  ("μ", "μ", "0", "0")
 
 pWind ::
   Parser (
