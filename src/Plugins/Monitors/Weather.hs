@@ -77,7 +77,7 @@ pTime = do y <- getNumbersAsString
            char ' '
            return (y, m, d ,h:hh:":"++mi:mimi)
 
--- Occasionally there is no wind and a METAR report gives simply, "Wind: 0"
+-- Occasionally there is no wind and a METAR report gives simply, "Wind: Calm:0"
 pWind0 ::
   (
     String -- cardinal direction
@@ -97,7 +97,7 @@ pWind ::
   )       
 pWind =
   let tospace = manyTill anyChar (char ' ')
-      wind0 = do manyTill skipRestOfLine (string "Wind: 0")
+      wind0 = do manyTill skipRestOfLine (string "Wind: Calm:0")
                  return pWind0
       wind = do manyTill skipRestOfLine (string "Wind: from the ")
                 cardinal <- tospace
