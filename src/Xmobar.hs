@@ -151,7 +151,7 @@ eventLoop tv xc@(XConf d r w fs is cfg) as signal = do
       case typ of
          Wakeup -> do
             str <- updateString cfg tv
-            xc' <- updateCache d w is str >>= \c -> return xc { iconS = c }
+            xc' <- updateCache d w is (iconRoot cfg) str >>= \c -> return xc { iconS = c }
             as' <- updateActions xc r str
             runX xc' $ drawInWin r str
             eventLoop tv xc' as' signal

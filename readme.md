@@ -319,6 +319,11 @@ Other configuration options:
 `borderWidth`
 :     Border width in pixels.
 
+`iconRoot`
+:     Root folder where icons are stored. For <icon=path/>
+      if path start with `"/"`, `"./"` or `"../"` it is interpreted as it is.
+      Otherwise it will have `iconRoot ++ "/"` prepended to it. Default is `"."`.
+
 `commands`
 :    For setting the options of the programs to run (optional).
 
@@ -495,7 +500,8 @@ form:
      <icon=/path/to/bitmap.xbm/>
 
 which will produce the expected result. Accepted image formats are XBM
-and XPM (when `with_xpm` flag is enabled).
+and XPM (when `with_xpm` flag is enabled). If path does not start with
+`"/"`, `"./"`, `"../"` it will have `iconRoot ++ "/"` prepended to it.
 
 It's also possible to use action directives of the form:
 

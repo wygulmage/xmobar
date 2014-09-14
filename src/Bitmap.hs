@@ -23,6 +23,7 @@ import Control.Monad.Trans(MonadIO(..))
 import Data.Map hiding (foldr, map, filter)
 import Graphics.X11.Xlib
 import System.Directory (doesFileExist)
+import System.FilePath ((</>))
 import System.Mem.Weak ( addFinalizer )
 import ColorCache
 import Parsers (Widget(..))
@@ -41,15 +42,19 @@ data Bitmap = Bitmap { width  :: Dimension
                      , bitmapType :: BitmapType
                      }
 
-updateCache :: Display -> Window -> Map FilePath Bitmap ->
+updateCache :: Display -> Window -> Map FilePath Bitmap -> FilePath ->
                [[(Widget, String, Maybe [Action])]] -> IO (Map FilePath Bitmap)
-updateCache dpy win cache ps = do
+updateCache dpy win cache iconRoot ps = do
   let paths = map (\(Icon p, _, _) -> p) . concatMap (filter icons) $ ps
       icons (Icon _, _, _) = True
       icons _ = False
+      expandPath path@('/':_) = path
+      expandPath path@('.':'/':_) = path
+      expandPath path@('.':'.':'/':_) = path
+      expandPath path = iconRoot </> path
       go m path = if member path m
                      then return m
-                     else do bitmap <- loadBitmap dpy win path
+                     else do bitmap <- loadBitmap dpy win $ expandPath path
                              return $ maybe m (\b -> insert path b m) bitmap
   foldM go cache paths
 

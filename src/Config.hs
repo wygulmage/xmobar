@@ -67,6 +67,7 @@ data Config =
                                     --   window stack on initialization
            , persistent :: Bool     -- ^ Whether automatic hiding should
                                     --   be enabled or disabled
+           , iconRoot :: FilePath   -- ^ Root folder for icons
            , commands :: [Runnable] -- ^ For setting the command,
                                     --   the command arguments
                                     --   and refresh rate for the programs
@@ -118,6 +119,7 @@ defaultConfig =
            , allDesktops = True
            , overrideRedirect = True
            , pickBroadest = False
+           , iconRoot = "."
            , commands = [ Run $ Date "%a %b %_d %Y * %H:%M:%S" "theDate" 10
                         , Run StdinReader]
            , sepChar = "%"
