@@ -1433,10 +1433,10 @@ Janssen, Jochen Keil, Lennart Kolmodin, Krzysztof Kosciuszkiewicz,
 Dmitry Kurochkin, Todd Lunter, Robert J. Macomber, Dmitry Malikov,
 David McLean, Marcin Mikołajczyk, Tony Morris, Eric Mrak, Thiago
 Negri, Edward O'Callaghan, Svein Ove, Martin Perner, Jens Petersen,
-Alexander Polakov, Petr Rockai, Alexander Shabalin, Peter Simons,
-Andrew Sackville-West, Alexander Solovyov, John Soros, Artem Tarasov,
-Sergei Trofimovich, Thomas Tuegel, Jan Vornberger, Daniel Wagner and
-Norbert Zeh.
+Alexander Polakov, Petr Rockai, Andrew Sackville-West, Alexander
+Shabalin, Peter Simons, Alexander Solovyov, John Soros, Travis Staton,
+Artem Tarasov, Sergei Trofimovich, Thomas Tuegel, Jan Vornberger,
+Daniel Wagner and Norbert Zeh.
 
 [jao]: http://jao.io
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors

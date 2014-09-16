@@ -14,6 +14,8 @@ _New features_
     using Haskell-style multiline script, thanks to dunric
   - Icons can now be also xpm files (if xmobar is compiled with
     `with_xpm`), thanks to Alexander Shabalin.
+  - New `borderWidth` option to set xmobar's boder width, thanks to
+    Travis Staton.
 
 _Bug fixes_
 
