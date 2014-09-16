@@ -30,22 +30,30 @@ locks = [ ( xK_Caps_Lock,   "CAPS"   )
         , ( xK_Scroll_Lock, "SCROLL" )
         ]
 
+run' :: Display -> Window -> IO String
+run' d root = do
+    modMap <- getModifierMapping d
+    ( _, _, _, _, _, _, _, m ) <- queryPointer d root
+
+    ls <- filterM ( \( ks, _ ) -> do
+        kc <- keysymToKeycode d ks
+        return $ case find (elem kc . snd) modMap of
+            Nothing       -> False
+            Just ( i, _ ) -> testBit m (fromIntegral i)
+        ) locks
+
+    return $ unwords $ map snd ls
+
 instance Exec Locks where
     alias Locks = "locks"
     rate Locks = 2
-    run Locks = do
+    start Locks cb = do
         d <- openDisplay ""
         root <- rootWindow d (defaultScreen d)
 
-        modMap <- getModifierMapping d
-        ( _, _, _, _, _, _, _, m ) <- queryPointer d root
+        forever $ do
+            cb =<< run' d root
+            tenthSeconds $ rate Locks
 
-        ls <- filterM ( \( ks, _ ) -> do
-            kc <- keysymToKeycode d ks
-            return $ case find (elem kc . snd) modMap of
-                Nothing       -> False
-                Just ( i, _ ) -> testBit m (fromIntegral i)
-            ) locks
         closeDisplay d
-
-        return $ unwords $ map snd ls
+        return ()
