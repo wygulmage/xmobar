@@ -12,7 +12,7 @@
 
 module Actions (Action(..), runAction, stripActions) where
 
-import System.Process (runCommand)
+import System.Process (system)
 import Control.Monad (void)
 import Text.Regex (Regex, subRegex, mkRegex, matchRegex)
 import Graphics.X11.Types (Button)
@@ -21,7 +21,7 @@ data Action = Spawn [Button] String
                 deriving (Eq)
 
 runAction :: Action -> IO ()
-runAction (Spawn _ s) = void $ runCommand s
+runAction (Spawn _ s) = void $ system (s ++ "&")
 
 stripActions :: String -> String
 stripActions s = case matchRegex actionRegex s of
