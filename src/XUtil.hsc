@@ -72,7 +72,7 @@ hGetLineSafe = hGetLine
 data XFont = Core FontStruct
            | Utf8 FontSet
 #ifdef XFT
-           | Xft  AXftFont
+           | Xft  [AXftFont]
 #endif
 
 -- | When initFont gets a font name that starts with 'xft:' it switchs
@@ -118,12 +118,22 @@ initUtf8Font d s = do
             fallBack = const $ createFontSet d miscFixedFont
 
 #ifdef XFT
-initXftFont :: Display -> String -> IO AXftFont
+initXftFont :: Display -> String -> IO [AXftFont]
 initXftFont d s = do
   setupLocale
-  f <- openAXftFont d (defaultScreenOfDisplay d) (drop 4 s)
-  addFinalizer f (closeAXftFont d f)
-  return f
+  let fontNames = wordsBy (== ',') (drop 4 s)
+  fonts <- mapM openFont fontNames
+  return fonts
+  where 
+    openFont fontName = do
+        f <- openAXftFont d (defaultScreenOfDisplay d) fontName
+        addFinalizer f (closeAXftFont d f)
+        return f
+    wordsBy p str = case dropWhile p str of
+                        ""   -> []
+                        str' -> w : wordsBy p str''
+                                where
+                                    (w, str'') = break p str'
 #endif
 
 textWidth :: Display -> XFont -> String -> IO Int
@@ -131,7 +141,7 @@ textWidth _   (Utf8 fs) s = return $ fi $ wcTextEscapement fs s
 textWidth _   (Core fs) s = return $ fi $ Xlib.textWidth fs s
 #ifdef XFT
 textWidth dpy (Xft xftdraw) s = do
-    gi <- xftTxtExtents dpy xftdraw s
+    gi <- xftTxtExtents' dpy xftdraw s
     return $ xglyphinfo_xOff gi
 #endif
 
@@ -145,9 +155,9 @@ textExtents (Utf8 fs) s = do
       descent = fi $ rect_height rl + (fi $ rect_y rl)
   return (ascent, descent)
 #ifdef XFT
-textExtents (Xft xftfont) _ = do
-  ascent  <- fi `fmap` xft_ascent  xftfont
-  descent <- fi `fmap` xft_descent xftfont
+textExtents (Xft xftfonts) _ = do
+  ascent  <- fi `fmap` xft_ascent'  xftfonts
+  descent <- fi `fmap` xft_descent' xftfonts
   return (ascent, descent)
 #endif
 
@@ -167,15 +177,15 @@ printString d p (Utf8 fs) gc fc bc x y s =
       io $ wcDrawImageString d p fs gc x y s
 
 #ifdef XFT
-printString dpy drw fs@(Xft font) _ fc bc x y s = do
+printString dpy drw fs@(Xft fonts) _ fc bc x y s = do
   (a,d)  <- textExtents fs s
-  gi <- xftTxtExtents dpy font s
+  gi <- xftTxtExtents' dpy fonts s
   withDrawingColors dpy drw fc bc $ \draw -> \fc' -> \bc' ->
     (drawXftRect draw bc' (x + 1 - fi (xglyphinfo_x gi))
                           (y - (a + d) + 1)
                           (xglyphinfo_xOff gi)
                           (a + d)) >>
-    (drawXftString draw fc' font x (y - 2) s)
+    (drawXftString' draw fc' fonts x (y - 2) s)
 #endif
 
 

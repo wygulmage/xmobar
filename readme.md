@@ -124,6 +124,10 @@ Otherwise, you'll need to install them yourself.
 
         font = "xft:Times New Roman-10:italic"
 
+     Or to have fallback fonts, just separate them by commas:
+
+        font = "xft:Open Sans:size=9,WenQuanYi Zen Hei:size=9"
+
 `with_mpd`
 :    Enables support for the [MPD] daemon. Requires the [libmpd] package.
 
