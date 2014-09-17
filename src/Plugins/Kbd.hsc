@@ -276,6 +276,9 @@ xkbUseCoreKbd = #const XkbUseCoreKbd
 xkbStateNotify :: CUInt
 xkbStateNotify = #const XkbStateNotify
 
+xkbIndicatorStateNotify :: CUInt
+xkbIndicatorStateNotify = #const XkbIndicatorStateNotify
+
 xkbMapNotify :: CUInt
 xkbMapNotify = #const XkbMapNotify
 

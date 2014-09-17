@@ -20,6 +20,8 @@ import Data.Bits
 import Control.Monad
 import Graphics.X11.Xlib.Extras
 import Plugins
+import Plugins.Kbd
+import XUtil (nextEvent')
 
 data Locks = Locks
     deriving (Read, Show)
@@ -46,14 +48,17 @@ run' d root = do
 
 instance Exec Locks where
     alias Locks = "locks"
-    rate Locks = 2
     start Locks cb = do
         d <- openDisplay ""
         root <- rootWindow d (defaultScreen d)
+        _ <- xkbSelectEventDetails d xkbUseCoreKbd xkbIndicatorStateNotify m m
 
-        forever $ do
+        allocaXEvent $ \ep -> forever $ do
             cb =<< run' d root
-            tenthSeconds $ rate Locks
+            nextEvent' d ep
+            getEvent ep
 
         closeDisplay d
         return ()
+      where
+        m = xkbAllStateComponentsMask
