@@ -19,9 +19,12 @@ _New features_
 
 _Bug fixes_
 
+  - Much more efficient implementation of the `Locks` plugin, thanks
+    to Anton Vorontsov (see [pull request #195]).
   - Not colorizing total disk size in `DiskU` ([issue #189]).
 
 [issue #189]: https://github.com/jaor/xmobar/issues/89
+[pull request #195]: https://github.com/jaor/xmobar/pull/195
 
 ## Version 0.21 (Jul 1, 2014)
 
