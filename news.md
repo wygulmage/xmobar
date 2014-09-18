@@ -16,17 +16,21 @@ _New features_
     `with_xpm`), thanks to Alexander Shabalin.
   - New `borderWidth` option to set xmobar's boder width, thanks to
     Travis Staton.
+  - Support for multiple Xft fonts, thanks to Phil Xiaojun Hu and
+    Cedric staub (see [pull request #196]).
 
 _Bug fixes_
 
   - Much more efficient implementation of the `Locks` plugin, thanks
     to Anton Vorontsov (see [pull request #195]).
   - Not colorizing total disk size in `DiskU` ([issue #189]).
-  - Avoiding zombies on click actions ([issue #181]).
+  - Avoiding zombies on click actions, thanks to Phil Xiaojun Hu
+    ([issue #181]).
 
 [issue #181]: https://github.com/jaor/xmobar/issues/181
 [issue #189]: https://github.com/jaor/xmobar/issues/189
 [pull request #195]: https://github.com/jaor/xmobar/pull/195
+[pull request #196]: https://github.com/jaor/xmobar/pull/196
 
 ## Version 0.21 (Jul 1, 2014)
 

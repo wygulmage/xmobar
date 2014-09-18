@@ -1440,7 +1440,7 @@ Negri, Edward O'Callaghan, Svein Ove, Martin Perner, Jens Petersen,
 Alexander Polakov, Petr Rockai, Andrew Sackville-West, Alexander
 Shabalin, Peter Simons, Alexander Solovyov, John Soros, Travis Staton,
 Artem Tarasov, Sergei Trofimovich, Thomas Tuegel, Jan Vornberger,
-Anton Vorontsov, Daniel Wagner and Norbert Zeh.
+Anton Vorontsov, Daniel Wagner, Phil Xiaojun Hu and Norbert Zeh.
 
 [jao]: http://jao.io
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
