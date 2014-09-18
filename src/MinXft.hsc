@@ -2,7 +2,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: MinXft
--- Copyright: (c) 2012 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2012, 2014 Jose Antonio Ortega Ruiz
 --            (c) Clemens Fruhwirth <clemens@endorphin.org> 2007
 -- License: BSD3-style (see LICENSE)
 --
@@ -106,7 +106,7 @@ xftTxtExtents d f string =
       peek cglyph
 
 xftTxtExtents' :: Display -> [AXftFont] -> String -> IO XGlyphInfo
-xftTxtExtents' d fs string = do  
+xftTxtExtents' d fs string = do
     chunks <- getChunks d fs string
     let (_, _, gi, _, _) = last chunks
     return gi
@@ -162,47 +162,54 @@ drawXftString d c f x y string =
     withArrayLen (map fi (UTF8.encode string))
       (\len ptr -> cXftDrawStringUtf8 d c f (fi x) (fi y) ptr (fi len))
 
-drawXftString' :: (Integral a1, Integral a) =>
-                  AXftDraw -> AXftColor -> [AXftFont] -> a -> a1 -> String -> IO ()
+drawXftString' :: AXftDraw ->
+                  AXftColor ->
+                  [AXftFont] ->
+                  Integer ->
+                  Integer ->
+                  String -> IO ()
 drawXftString' d c fs x y string = do
     display <- c_xftDrawDisplay d
     chunks <- getChunks display fs string
-    mapM_ (\(f, s, gi, xo, yo) -> drawXftString d c f (x+xo) (y+yo) s) chunks
+    mapM_ (\(f, s, _, xo, yo) -> drawXftString d c f (x+xo) (y+yo) s) chunks
 
 -- Split string and determine fonts/offsets for individual parts
+getChunks :: Display -> [AXftFont] -> [Char] ->
+             IO [(AXftFont, String, XGlyphInfo, Integer, Integer)]
 getChunks disp fts str = do
     chunks <- getFonts disp fts str
-    getOffsets disp (XGlyphInfo 0 0 0 0 0 0) chunks
+    getOffsets (XGlyphInfo 0 0 0 0 0 0) chunks
   where
     -- Split string and determine fonts for individual parts
     getFonts _ [] _ = return []
     getFonts _ _ [] = return []
-    getFonts _ [ft] str = return [(ft, str)]
-    getFonts disp fonts@(ft:fts) str = do
+    getFonts _ [ft] s = return [(ft, s)]
+    getFonts d fonts@(ft:_) s = do
         -- Determine which glyph can be rendered by current font
-        glyphs <- mapM (xftCharExists disp ft) str
+        glyphs <- mapM (xftCharExists d ft) s
         -- Split string into parts that can/cannot be rendered
-        let splits = split (runs glyphs) str
+        let splits = split (runs glyphs) s
         -- Determine which font to render each chunk with
-        concat `fmap` mapM (getFont disp fonts) splits
+        concat `fmap` mapM (getFont d fonts) splits
 
     -- Determine fonts for substrings
-    getFont _ [ft] (_, str) = return [(ft, str)] -- Last font, use it
-    getFont _ (ft:fts) (True, str) = return [(ft, str)] -- Current font can render this substring
-    getFont disp (ft:fts) (False, str) = getFonts disp fts str -- Fallback to next font
+    getFont _ [] _ = return []
+    getFont _ [ft] (_, s) = return [(ft, s)] -- Last font, use it
+    getFont _ (ft:_) (True, s) = return [(ft, s)] -- Current font can render this substring
+    getFont d (_:fs) (False, s) = getFonts d fs s -- Fallback to next font
 
     -- Helpers
     runs [] = []
     runs (x:xs) = let (h, t) = span (==x) xs in (x, length h + 1) : runs t
     split [] _ = []
-    split ((x, c):xs) str = let (h, t) = splitAt c str in (x, h) : split xs t
+    split ((x, c):xs) s = let (h, t) = splitAt c s in (x, h) : split xs t
 
     -- Determine coordinates for chunks using extents
-    getOffsets disp _ [] = return []
-    getOffsets disp (XGlyphInfo w h x y xo yo) ((f, s):chunks) = do
-        (XGlyphInfo w' h' x' y' xo' yo') <- xftTxtExtents disp f s
+    getOffsets _ [] = return []
+    getOffsets (XGlyphInfo _ _ x y xo yo) ((f, s):chunks) = do
+        (XGlyphInfo w' h' _ _ xo' yo') <- xftTxtExtents disp f s
         let gi = XGlyphInfo (xo+w') (yo+h') x y (xo+xo') (yo+yo')
-        rest <- getOffsets disp gi chunks
+        rest <- getOffsets gi chunks
         return $ (f, s, gi, fromIntegral xo, fromIntegral yo) : rest
 
 foreign import ccall "XftDrawRect"

@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  XUtil
--- Copyright   :  (C) 2011, 2012, 2013 Jose Antonio Ortega Ruiz
+-- Copyright   :  (C) 2011, 2012, 2013, 2014 Jose Antonio Ortega Ruiz
 --                (C) 2007 Andrea Rossato
 -- License     :  BSD3
 --
@@ -124,7 +124,7 @@ initXftFont d s = do
   let fontNames = wordsBy (== ',') (drop 4 s)
   fonts <- mapM openFont fontNames
   return fonts
-  where 
+  where
     openFont fontName = do
         f <- openAXftFont d (defaultScreenOfDisplay d) fontName
         addFinalizer f (closeAXftFont d f)
@@ -185,7 +185,7 @@ printString dpy drw fs@(Xft fonts) _ fc bc x y s = do
                           (y - (a + d) + 1)
                           (xglyphinfo_xOff gi)
                           (a + d)) >>
-    (drawXftString' draw fc' fonts x (y - 2) s)
+    (drawXftString' draw fc' fonts (toInteger x) (toInteger (y - 2)) s)
 #endif
 
 
