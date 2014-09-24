@@ -22,7 +22,7 @@ import Control.Concurrent (threadDelay)
 
 mpdConfig :: IO MConfig
 mpdConfig = mkMConfig "MPD: <state>"
-              [ "bar", "vbar", "state", "statei", "volume", "length"
+              [ "bar", "vbar", "ipat", "state", "statei", "volume", "length"
               , "lapsed", "remaining", "plength", "ppos", "file"
               , "name", "artist", "composer", "performer"
               , "album", "title", "track", "genre"
@@ -32,6 +32,7 @@ data MOpts = MOpts
   { mPlaying :: String
   , mStopped :: String
   , mPaused :: String
+  , mLapsedIconPattern :: Maybe IconPattern
   }
 
 defaultOpts :: MOpts
@@ -39,6 +40,7 @@ defaultOpts = MOpts
   { mPlaying = ">>"
   , mStopped = "><"
   , mPaused = "||"
+  , mLapsedIconPattern = Nothing
   }
 
 options :: [OptDescr (MOpts -> MOpts)]
@@ -46,6 +48,8 @@ options =
   [ Option "P" ["playing"] (ReqArg (\x o -> o { mPlaying = x }) "") ""
   , Option "S" ["stopped"] (ReqArg (\x o -> o { mStopped = x }) "") ""
   , Option "Z" ["paused"] (ReqArg (\x o -> o { mPaused = x }) "") ""
+  , Option "" ["lapsed-icon-pattern"] (ReqArg (\x o ->
+     o { mLapsedIconPattern = Just $ parseIconPattern x }) "") ""
   ]
 
 runMPD :: [String] -> Monitor String
@@ -87,7 +91,8 @@ parseMPD (Right st) song opts = do
   songData <- parseSong song
   bar <- showPercentBar (100 * b) b
   vbar <- showVerticalBar (100 * b) b
-  return $ [bar, vbar, ss, si, vol, len, lap, remain, plen, ppos] ++ songData
+  ipat <- showIconPattern (mLapsedIconPattern opts) b
+  return $ [bar, vbar, ipat, ss, si, vol, len, lap, remain, plen, ppos] ++ songData
   where s = M.stState st
         ss = show s
         si = stateGlyph s opts

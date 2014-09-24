@@ -14,15 +14,39 @@
 
 module Plugins.Monitors.Wireless (wirelessConfig, runWireless)  where
 
+import System.Console.GetOpt
+
 import Plugins.Monitors.Common
 import IWlib
 
+data WirelessOpts = WirelessOpts
+  { qualityIconPattern :: Maybe IconPattern
+  }
+
+defaultOpts :: WirelessOpts
+defaultOpts = WirelessOpts
+  { qualityIconPattern = Nothing
+  }
+
+options :: [OptDescr (WirelessOpts -> WirelessOpts)]
+options =
+  [ Option "" ["quality-icon-pattern"] (ReqArg (\d opts ->
+     opts { qualityIconPattern = Just $ parseIconPattern d }) "") ""
+  ]
+
+parseOpts :: [String] -> IO WirelessOpts
+parseOpts argv =
+  case getOpt Permute options argv of
+       (o, _, []) -> return $ foldr id defaultOpts o
+       (_, _, errs) -> ioError . userError $ concat errs
+
 wirelessConfig :: IO MConfig
 wirelessConfig =
-  mkMConfig "<essid> <quality>" ["essid", "quality", "qualitybar", "qualityvbar"]
+  mkMConfig "<essid> <quality>" ["essid", "quality", "qualitybar", "qualityvbar", "qualityipat"]
 
-runWireless :: [String] -> Monitor String
-runWireless (iface:_) = do
+runWireless :: String -> [String] -> Monitor String
+runWireless iface args = do
+  opts <- io $ parseOpts args
   wi <- io $ getWirelessInfo iface
   na <- getConfigValue naString
   let essid = wiEssid wi
@@ -34,5 +58,5 @@ runWireless (iface:_) = do
        else showWithPadding ""
   qb <- showPercentBar qlty (qlty / 100)
   qvb <- showVerticalBar qlty (qlty / 100)
-  parseTemplate [ep, q, qb, qvb]
-runWireless _ = getConfigValue naString
+  qipat <- showIconPattern (qualityIconPattern opts) (qlty / 100)
+  parseTemplate [ep, q, qb, qvb, qipat]

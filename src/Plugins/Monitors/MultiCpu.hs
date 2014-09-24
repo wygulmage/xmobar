@@ -19,9 +19,35 @@ import Control.Applicative ((<$>))
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.List (isPrefixOf, transpose, unfoldr)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
+import System.Console.GetOpt
+
+data MultiCpuOpts = MultiCpuOpts
+  { loadIconPatterns :: [IconPattern]
+  , loadIconPattern :: Maybe IconPattern
+  }
+
+defaultOpts :: MultiCpuOpts
+defaultOpts = MultiCpuOpts
+  { loadIconPatterns = []
+  , loadIconPattern = Nothing
+  }
+
+options :: [OptDescr (MultiCpuOpts -> MultiCpuOpts)]
+options =
+  [ Option "" ["load-icon-pattern"] (ReqArg (\x o ->
+     o { loadIconPattern = Just $ parseIconPattern x }) "") ""
+  , Option "" ["load-icon-patterns"] (ReqArg (\x o ->
+     o { loadIconPatterns = parseIconPattern x : loadIconPatterns o }) "") ""
+  ]
+
+parseOpts :: [String] -> IO MultiCpuOpts
+parseOpts argv =
+  case getOpt Permute options argv of
+    (o, _, []) -> return $ foldr id defaultOpts o
+    (_, _, errs) -> ioError . userError $ concat errs
 
 variables :: [String]
-variables = ["bar", "vbar","total","user","nice","system","idle"]
+variables = ["bar", "vbar","ipat","total","user","nice","system","idle"]
 vNum :: Int
 vNum = length variables
 
@@ -55,18 +81,23 @@ percent b a = if tot > 0 then map (/ tot) $ take 4 dif else [0, 0, 0, 0]
   where dif = zipWith (-) b a
         tot = sum dif
 
-formatMultiCpus :: [[Float]] -> Monitor [String]
-formatMultiCpus [] = return []
-formatMultiCpus xs = concat <$> mapM formatCpu xs
+formatMultiCpus :: MultiCpuOpts -> [[Float]] -> Monitor [String]
+formatMultiCpus _ [] = return []
+formatMultiCpus opts xs = concat <$> mapM (\(i, x) -> formatCpu opts i x) (zip [0..] xs)
 
-formatCpu :: [Float] -> Monitor [String]
-formatCpu xs
+formatCpu :: MultiCpuOpts -> Int -> [Float] -> Monitor [String]
+formatCpu opts i xs
   | length xs < 4 = showPercentsWithColors $ replicate vNum 0.0
   | otherwise = let t = sum $ take 3 xs
                 in do b <- showPercentBar (100 * t) t
                       h <- showVerticalBar (100 * t) t
+                      d <- showIconPattern tryString t
                       ps <- showPercentsWithColors (t:xs)
-                      return (b:h:ps)
+                      return (b:h:d:ps)
+  where tryString
+          | i == 0 = loadIconPattern opts
+          | i <= length (loadIconPatterns opts) = Just $ (loadIconPatterns opts) !! (i - 1)
+          | otherwise = Nothing
 
 splitEvery :: (Eq a) => Int -> [a] -> [[a]]
 splitEvery n = unfoldr (\x -> if null x then Nothing else Just $ splitAt n x)
@@ -79,9 +110,10 @@ formatAutoCpus [] = return $ replicate vNum ""
 formatAutoCpus xs = return $ map unwords (groupData xs)
 
 runMultiCpu :: CpuDataRef -> [String] -> Monitor String
-runMultiCpu cref _ =
+runMultiCpu cref argv =
   do c <- io $ parseCpuData cref
-     l <- formatMultiCpus c
+     opts <- io $ parseOpts argv
+     l <- formatMultiCpus opts c
      a <- formatAutoCpus l
      parseTemplate $ a ++ l
 

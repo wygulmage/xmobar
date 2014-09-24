@@ -18,11 +18,33 @@ module Plugins.Monitors.Cpu (startCpu) where
 import Plugins.Monitors.Common
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
+import System.Console.GetOpt
+
+data CpuOpts = CpuOpts
+  { loadIconPattern :: Maybe IconPattern
+  }
+
+defaultOpts :: CpuOpts
+defaultOpts = CpuOpts
+  { loadIconPattern = Nothing
+  }
+
+options :: [OptDescr (CpuOpts -> CpuOpts)]
+options =
+  [ Option "" ["load-icon-pattern"] (ReqArg (\x o ->
+     o { loadIconPattern = Just $ parseIconPattern x }) "") ""
+  ]
+
+parseOpts :: [String] -> IO CpuOpts
+parseOpts argv =
+  case getOpt Permute options argv of
+    (o, _, []) -> return $ foldr id defaultOpts o
+    (_, _, errs) -> ioError . userError $ concat errs
 
 cpuConfig :: IO MConfig
 cpuConfig = mkMConfig
        "Cpu: <total>%"
-       ["bar","vbar","total","user","nice","system","idle","iowait"]
+       ["bar","vbar","ipat","total","user","nice","system","idle","iowait"]
 
 type CpuDataRef = IORef [Int]
 
@@ -42,19 +64,21 @@ parseCpu cref =
            percent = map ((/ tot) . fromIntegral) dif
        return percent
 
-formatCpu :: [Float] -> Monitor [String]
-formatCpu [] = return $ replicate 8 ""
-formatCpu xs = do
+formatCpu :: CpuOpts -> [Float] -> Monitor [String]
+formatCpu _ [] = return $ replicate 8 ""
+formatCpu opts xs = do
   let t = sum $ take 3 xs
   b <- showPercentBar (100 * t) t
   v <- showVerticalBar (100 * t) t
+  d <- showIconPattern (loadIconPattern opts) t
   ps <- showPercentsWithColors (t:xs)
-  return (b:v:ps)
+  return (b:v:d:ps)
 
 runCpu :: CpuDataRef -> [String] -> Monitor String
-runCpu cref _ =
+runCpu cref argv =
     do c <- io (parseCpu cref)
-       l <- formatCpu c
+       opts <- io $ parseOpts argv
+       l <- formatCpu opts c
        parseTemplate l
 
 startCpu :: [String] -> Int -> (String -> IO ()) -> IO ()

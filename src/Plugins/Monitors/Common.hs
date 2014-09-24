@@ -40,6 +40,8 @@ module Plugins.Monitors.Common (
                        , parseTemplate'
                        -- ** String Manipulation
                        -- $strings
+                       , IconPattern
+                       , parseIconPattern
                        , padString
                        , showWithPadding
                        , showWithColors
@@ -48,8 +50,10 @@ module Plugins.Monitors.Common (
                        , showPercentsWithColors
                        , showPercentBar
                        , showVerticalBar
+                       , showIconPattern
                        , showLogBar
                        , showLogVBar
+                       , showLogIconPattern
                        , showWithUnits
                        , takeDigits
                        , showDigits
@@ -348,6 +352,18 @@ combine m ((s,ts,ss):xs) =
 
 -- $strings
 
+type IconPattern = Int -> String
+
+parseIconPattern :: String -> IconPattern
+parseIconPattern path =
+    let spl = splitOnPercent path
+    in \i -> concat $ intersperse (show i) spl
+  where splitOnPercent [] = [[]]
+        splitOnPercent ('%':'%':xs) = [] : splitOnPercent xs
+        splitOnPercent (x:xs) =
+            let rest = splitOnPercent xs
+            in (x : head rest) : tail rest
+
 type Pos = (Int, Int)
 
 takeDigits :: Int -> Float -> Float
@@ -453,6 +469,15 @@ showPercentBar v x = do
   s <- colorizeString v (take len $ cycle bf)
   return $ s ++ take (bw - len) (cycle bb)
 
+showIconPattern :: Maybe IconPattern -> Float -> Monitor String
+showIconPattern Nothing _ = return ""
+showIconPattern (Just str) x = return $ str $ convert $ 100 * x
+  where convert val
+          | t <= 0 = 0
+          | t > 8 = 8
+          | otherwise = t
+          where t = round val `div` 12
+
 showVerticalBar :: Float -> Float -> Monitor String
 showVerticalBar v x = colorizeString v [convert $ 100 * x]
   where convert :: Float -> Char
@@ -485,3 +510,14 @@ showLogVBar f v = do
                | x <= ll = 1 / bw
                | otherwise = f + logBase 2 (x / hh) / bw
   showVerticalBar v $ choose v
+
+showLogIconPattern :: Maybe IconPattern -> Float -> Float -> Monitor String
+showLogIconPattern str f v = do
+  h <- fromIntegral `fmap` getConfigValue high
+  l <- fromIntegral `fmap` getConfigValue low
+  bw <- fromIntegral `fmap` getConfigValue barWidth
+  let [ll, hh] = sort [l, h]
+      choose x | x == 0.0 = 0
+               | x <= ll = 1 / bw
+               | otherwise = f + logBase 2 (x / hh) / bw
+  showIconPattern str $ choose v

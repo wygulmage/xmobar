@@ -549,6 +549,23 @@ Monitors have default aliases.  The sections below describe every
 monitor in turn, but before we provide a list of the configuration
 options (or *monitor arguments*) they all share.
 
+### Icon patterns
+
+Some monitors allow usage of strings that depend on some integer value
+from 0 to 8 by replacing all occurences of `"%%"` with it
+(i.e. `"<icon=/path/to/icon_%%.xpm/>"` will be interpreted
+as `"<icon=/path/to/icon_3.xpm/>"` when the value is `3`, also `"%"` is interpreted
+as `"%"`, `"%%"` as `"3"`, `"%%%"` as `"3%"`, `"%%%%"` as `"33"` and so on). Essentially
+it allows to replace vertical bars with custom icons. For example,
+
+    Run Brightness
+      [ "-t", "<ipat>"
+      , "--"
+      , "--brightness-icon-pattern", "<icon=bright_%%.xpm/>"
+      ] 30
+
+Will display `bright_0.xpm` to `bright_8.xpm` depending on current brightness
+value.
 
 ### Default Monitor Arguments
 
@@ -700,33 +717,38 @@ something like:
 
 - Aliases to the interface name: so `Network "eth0" []` can be used as
   `%eth0%`
-- Args: default monitor arguments
+- Args: default monitor arguments, plus:
+  - `--rx-icon-pattern`: dynamic string for reception rate in `rxipat`.
+  - `--tx-icon-pattern`: dynamic string for transmission rate in `txipat`.
 - Variables that can be used with the `-t`/`--template` argument:
-  `dev`, `rx`, `tx`, `rxbar`, `rxvbar`, `txbar`, `txvbar`. Reception
-  and transmission rates (`rx` and `tx`) are displayed by default as
-  Kb/s, without any suffixes, but you can set the `-S` to "True" to
-  make them displayed with adaptive units (Kb/s, Mb/s, etc.).
+  `dev`, `rx`, `tx`, `rxbar`, `rxvbar`, `rxipat`, `txbar`, `txvbar`,
+  `txipat`. Reception and transmission rates (`rx` and `tx`) are displayed
+  by default as Kb/s, without any suffixes, but you can set the `-S` to
+  "True" to make them displayed with adaptive units (Kb/s, Mb/s, etc.).
 - Default template: `<dev>: <rx>KB|<tx>KB`
 
 ### `DynNetwork Args RefreshRate`
 
 - Active interface is detected automatically
 - Aliases to "dynnetwork"
-- Args: default monitor arguments
+- Args: default monitor arguments, plus:
+  - `--rx-icon-pattern`: dynamic string for reception rate in `rxipat`.
+  - `--tx-icon-pattern`: dynamic string for transmission rate in `txipat`.
 - Variables that can be used with the `-t`/`--template` argument:
-  `dev`, `rx`, `tx`, `rxbar`, `rxvbar`, `txbar`, `txvbar`. Reception and
-  transmission rates (`rx` and `tx`) are displayed in Kbytes per second,
-  and you can set the `-S` to "True" to make them displayed with units (the
-  string "Kb/s").
+  `dev`, `rx`, `tx`, `rxbar`, `rxvbar`, `rxipat`, `txbar`, `txvbar`,
+  `txipat`. Reception and transmission rates (`rx` and `tx`) are displayed
+  in Kbytes per second, and you can set the `-S` to "True" to make them
+  displayed with units (the string "Kb/s").
 - Default template: `<dev>: <rx>KB|<tx>KB`
 
 ### `Wireless Interface Args RefreshRate`
 
 - Aliases to the interface name with the suffix "wi": thus, `Wireless
   "wlan0" []` can be used as `%wlan0wi%`
-- Args: default monitor arguments
+- Args: default monitor arguments, plus:
+  - `--quality-icon-pattern`: dynamic string for connection quality in `qualityipat`.
 - Variables that can be used with the `-t`/`--template` argument:
-            `essid`, `quality`, `qualitybar`, `qualityvbar`
+            `essid`, `quality`, `qualitybar`, `qualityvbar`, `qualityipat`
 - Default template: `<essid> <quality>`
 - Requires the C library [iwlib] (part of the wireless tools suite)
   installed in your system. In addition, to activate this plugin you
@@ -735,10 +757,13 @@ something like:
 ### `Memory Args RefreshRate`
 
 - Aliases to `memory`
-- Args: default monitor arguments
+- Args: default monitor arguments, plus:
+  - `--used-icon-pattern`: dynamic string for used memory ratio in `usedipat`.
+  - `--free-icon-pattern`: dynamic string for free memory ratio in `freeipat`.
 - Variables that can be used with the `-t`/`--template` argument:
              `total`, `free`, `buffer`, `cache`, `rest`, `used`,
-             `usedratio`, `usedbar`, `usedvbar`, `freeratio`, `freebar`, `freevbar`
+             `usedratio`, `usedbar`, `usedvbar`, `usedipat`,
+             `freeratio`, `freebar`, `freevbar`, `freeipat`
 - Default template: `Mem: <usedratio>% (<cache>M)`
 
 ### `Swap Args RefreshRate`
@@ -752,19 +777,24 @@ something like:
 ### `Cpu Args RefreshRate`
 
 - Aliases to `cpu`
-- Args: default monitor arguments
+- Args: default monitor arguments, plus:
+  - `--load-icon-pattern`: dynamic string for cpu load in `ipat`.
 - Variables that can be used with the `-t`/`--template` argument:
-	    `total`, `bar`, `vbar`, `user`, `nice`, `system`, `idle`, `iowait`
+	    `total`, `bar`, `vbar`, `ipat`, `user`, `nice`, `system`, `idle`, `iowait`
 - Default template: `Cpu: <total>%`
 
 ### `MultiCpu Args RefreshRate`
 
 - Aliases to `multicpu`
-- Args: default monitor arguments
+- Args: default monitor arguments, plus:
+  - `--load-icon-pattern`: dynamic string for overall cpu load in `ipat`.
+  - `--load-icon-patterns`: dynamic string for each cpu load in `autoipat`, `ipat{i}`.
+                              This option can be specified several times. nth option
+                              corresponds to nth cpu.
 - Variables that can be used with the `-t`/`--template` argument:
-	    `autototal`, `autobar`, `autovbar`, `autouser`, `autonice`,
-	    `autosystem`, `autoidle`, `total`, `bar`, `vbar`, `user`, `nice`,
-	    `system`, `idle`, `total0`, `bar0`, `vbar0`, `user0`, `nice0`,
+	    `autototal`, `autobar`, `autovbar`, `autoipat`, `autouser`, `autonice`,
+	    `autosystem`, `autoidle`, `total`, `bar`, `vbar`, `ipat`, `user`, `nice`,
+	    `system`, `idle`, `total0`, `bar0`, `vbar0`, `ipat0`, `user0`, `nice0`,
 	    `system0`, `idle0`, ...
   The auto* variables automatically detect the number of CPUs on the system
   and display one entry for each.
@@ -795,9 +825,15 @@ something like:
   - `-p`: color to display positive power (battery charging)
   - `-f`: file in `/sys/class/power_supply` with AC info (default:
     "AC/online")
+  - `--on-icon-pattern`: dynamic string for current battery charge
+    when AC is "on" in `leftipat`.
+  - `--off-icon-pattern`: dynamic string for current battery charge
+    when AC is "off" in `leftipat`.
+  - `--idle-icon-pattern`: dynamic string for current battery charge
+    when AC is "idle" in `leftipat`.
 
 - Variables that can be used with the `-t`/`--template` argument:
-	    `left`, `leftbar`, `leftvbar`, `timeleft`, `watts`, `acstatus`
+	    `left`, `leftbar`, `leftvbar`, `leftipat`, `timeleft`, `watts`, `acstatus`
 - Default template: `Batt: <watts>, <left>% / <timeleft>`
 - Example (note that you need "--" to separate regular monitor options from
   Battery's specific ones):
@@ -870,10 +906,12 @@ more than one battery.
 - Aliases to `disku`
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain `<size>`, `<free>`, `<used>`, `<freep>` or
-  `<usedp>`, `<freebar>`, `<freevbar>`, `<usedbar>` or `<usedvbar>` for total,
-  free, used, free percentage and used percentage of the given file system
-  capacity.
-- Args: default monitor arguments. `-t`/`--template` is ignored.
+  `<usedp>`, `<freebar>`, `<freevbar>`, `<freeipat>`, `<usedbar>`,
+  `<usedvbar>` or `<usedipat>` for total, free, used, free percentage and
+  used percentage of the given file system capacity.
+- Args: default monitor arguments. `-t`/`--template` is ignored. Plus
+  - `--free-icon-pattern`: dynamic string for free disk space in `freeipat`.
+  - `--used-icon-pattern`: dynamic string for used disk space in `usedipat`.
 - Default template: none (you must specify a template for each file system).
 - Example:
 
@@ -887,9 +925,13 @@ more than one battery.
 - Disks: list of pairs of the form (device or mount point, template),
   where the template can contain `<total>`, `<read>`, `<write>` for total,
   read and write speed, respectively. There are also bar versions of each:
-  `<totalbar>`, `<totalvbar>`, `<readbar>`, `<readvbar>`, `<writebar>`, and
-  `<writevbar>`.
-- Args: default monitor arguments. `-t`/`--template` is ignored.
+  `<totalbar>`, `<totalvbar>`, `<totalipat>`,
+  `<readbar>`, `<readvbar>`, `<readipat>`,
+  `<writebar>`, `<writevbar>`, and `<writeipat>`.
+- Args: default monitor arguments. `-t`/`--template` is ignored. Plus
+  - `--total-icon-pattern`: dynamic string for total disk I/O in `<totalipat>`.
+  - `--write-icon-pattern`: dynamic string for write disk I/O in `<writeipat>`.
+  - `--read-icon-pattern`: dynamic string for read disk I/O in `<readipat>`.
 - Default template: none (you must specify a template for each file system).
 - Example:
 
@@ -977,8 +1019,9 @@ more than one battery.
         - Long option: `--offc`
     - `--highd` _number_ High threshold for dB. Defaults to -5.0.
     - `--lowd` _number_ Low threshold for dB. Defaults to -30.0.
+    - `--volume-icon-pattern` _string_ dynamic string for current volume in `volumeipat`.
 - Variables that can be used with the `-t`/`--template` argument:
-            `volume`, `volumebar`, `volumevbar`, `dB`, `status`
+            `volume`, `volumebar`, `volumevbar`, `volumeipat`, `dB`, `status`
 - Note that `dB` might only return 0 on your system. This is known
   to happen on systems with a pulseaudio backend.
 - Default template: `Vol: <volume>% <status>`
@@ -995,9 +1038,10 @@ more than one battery.
   `-P`, `-S` and `-Z`, with an string argument, to represent the
   playing, stopped and paused states in the `statei` template field.
   The environment variables `MPD_HOST` and `MPD_PORT` are used to configure the
-  mpd server to communicate with.
+  mpd server to communicate with. Also available:
+  - `lapsed-icon-pattern`: dynamic string for current track position in `ipat`.
 - Variables that can be used with the `-t`/`--template` argument:
-             `bar`, `vbar`, `state`, `statei`, `volume`, `length`,
+             `bar`, `vbar`, `ipat`, `state`, `statei`, `volume`, `length`,
              `lapsed`, `remaining`,
              `plength` (playlist length), `ppos` (playlist position),
              `name`, `artist`, `composer`, `performer`,
@@ -1117,8 +1161,9 @@ more than one battery.
        actual_brightness)
     - `-M`: file with the maximum brightness (default:
        max_brightness)
+    - `--brightness-icon-pattern`: dynamic string for current brightness in `ipat`.
 - Variables that can be used with the `-t`/`--template` argument:
-	    `vbar`, `percent`, `bar`
+	    `vbar`, `percent`, `bar`, `ipat`
 - Default template: `<percent>`
 - Example:
 
