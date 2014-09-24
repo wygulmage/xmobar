@@ -19,22 +19,22 @@ import qualified Data.Map as M
 import System.Console.GetOpt
 
 data MemOpts = MemOpts
-  { usedDynamicString :: Maybe DynamicString
-  , freeDynamicString :: Maybe DynamicString
+  { usedIconPattern :: Maybe IconPattern
+  , freeIconPattern :: Maybe IconPattern
   }
 
 defaultOpts :: MemOpts
 defaultOpts = MemOpts
-  { usedDynamicString = Nothing
-  , freeDynamicString = Nothing
+  { usedIconPattern = Nothing
+  , freeIconPattern = Nothing
   }
 
 options :: [OptDescr (MemOpts -> MemOpts)]
 options =
-  [ Option "" ["used-dynamic-string"] (ReqArg (\x o ->
-     o { usedDynamicString = Just $ parseDynamicString x }) "") ""
-  , Option "" ["free-dynamic-string"] (ReqArg (\x o ->
-     o { freeDynamicString = Just $ parseDynamicString x }) "") ""
+  [ Option "" ["used-icon-pattern"] (ReqArg (\x o ->
+     o { usedIconPattern = Just $ parseIconPattern x }) "") ""
+  , Option "" ["free-icon-pattern"] (ReqArg (\x o ->
+     o { freeIconPattern = Just $ parseIconPattern x }) "") ""
   ]
 
 parseOpts :: [String] -> IO MemOpts
@@ -46,7 +46,7 @@ parseOpts argv =
 memConfig :: IO MConfig
 memConfig = mkMConfig
        "Mem: <usedratio>% (<cache>M)" -- template
-       ["usedbar", "usedvbar", "useddstr", "freebar", "freevbar", "freedstr", "usedratio", "freeratio",
+       ["usedbar", "usedvbar", "usedipat", "freebar", "freevbar", "freeipat", "usedratio", "freeratio",
         "total", "free", "buffer", "cache", "rest", "used"] -- available replacements
 
 fileMEM :: IO String
@@ -76,14 +76,14 @@ formatMem opts (r:fr:xs) =
            rr = 100 * r
        ub <- showPercentBar rr r
        uvb <- showVerticalBar rr r
-       udstr <- showDynamicString (usedDynamicString opts) r
+       uipat <- showIconPattern (usedIconPattern opts) r
        fb <- showPercentBar (100 - rr) (1 - r)
        fvb <- showVerticalBar (100 - rr) ( 1 - r)
-       fdstr <- showDynamicString (freeDynamicString opts) (1 - r)
+       fipat <- showIconPattern (freeIconPattern opts) (1 - r)
        rs <- showPercentWithColors r
        fs <- showPercentWithColors fr
        s <- mapM (showWithColors f) xs
-       return (ub:uvb:udstr:fb:fvb:fdstr:rs:fs:s)
+       return (ub:uvb:uipat:fb:fvb:fipat:rs:fs:s)
 formatMem _ _ = replicate 10 `fmap` getConfigValue naString
 
 runMem :: [String] -> Monitor String

@@ -20,18 +20,18 @@ import Plugins.Monitors.Common
 import IWlib
 
 data WirelessOpts = WirelessOpts
-  { qualityDynamicString :: Maybe DynamicString
+  { qualityIconPattern :: Maybe IconPattern
   }
 
 defaultOpts :: WirelessOpts
 defaultOpts = WirelessOpts
-  { qualityDynamicString = Nothing
+  { qualityIconPattern = Nothing
   }
 
 options :: [OptDescr (WirelessOpts -> WirelessOpts)]
 options =
-  [ Option "" ["quality-dynamic-string"] (ReqArg (\d opts ->
-     opts { qualityDynamicString = Just $ parseDynamicString d }) "") ""
+  [ Option "" ["quality-icon-pattern"] (ReqArg (\d opts ->
+     opts { qualityIconPattern = Just $ parseIconPattern d }) "") ""
   ]
 
 parseOpts :: [String] -> IO WirelessOpts
@@ -42,7 +42,7 @@ parseOpts argv =
 
 wirelessConfig :: IO MConfig
 wirelessConfig =
-  mkMConfig "<essid> <quality>" ["essid", "quality", "qualitybar", "qualityvbar", "qualitydstr"]
+  mkMConfig "<essid> <quality>" ["essid", "quality", "qualitybar", "qualityvbar", "qualityipat"]
 
 runWireless :: String -> [String] -> Monitor String
 runWireless iface args = do
@@ -58,5 +58,5 @@ runWireless iface args = do
        else showWithPadding ""
   qb <- showPercentBar qlty (qlty / 100)
   qvb <- showVerticalBar qlty (qlty / 100)
-  qdstr <- showDynamicString (qualityDynamicString opts) (qlty / 100)
-  parseTemplate [ep, q, qb, qvb, qdstr]
+  qipat <- showIconPattern (qualityIconPattern opts) (qlty / 100)
+  parseTemplate [ep, q, qb, qvb, qipat]

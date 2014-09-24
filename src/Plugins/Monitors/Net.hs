@@ -30,22 +30,22 @@ import System.Console.GetOpt
 import qualified Data.ByteString.Lazy.Char8 as B
 
 data NetOpts = NetOpts
-  { rxDynamicString :: Maybe DynamicString
-  , txDynamicString :: Maybe DynamicString
+  { rxIconPattern :: Maybe IconPattern
+  , txIconPattern :: Maybe IconPattern
   }
 
 defaultOpts :: NetOpts
 defaultOpts = NetOpts
-  { rxDynamicString = Nothing
-  , txDynamicString = Nothing
+  { rxIconPattern = Nothing
+  , txIconPattern = Nothing
   }
 
 options :: [OptDescr (NetOpts -> NetOpts)]
 options =
-  [ Option "" ["rx-dynamic-string"] (ReqArg (\x o ->
-     o { rxDynamicString = Just $ parseDynamicString x }) "") ""
-  , Option "" ["tx-dynamic-string"] (ReqArg (\x o ->
-     o { txDynamicString = Just $ parseDynamicString x }) "") ""
+  [ Option "" ["rx-icon-pattern"] (ReqArg (\x o ->
+     o { rxIconPattern = Just $ parseIconPattern x }) "") ""
+  , Option "" ["tx-icon-pattern"] (ReqArg (\x o ->
+     o { txIconPattern = Just $ parseIconPattern x }) "") ""
   ]
 
 parseOpts :: [String] -> IO NetOpts
@@ -88,7 +88,7 @@ instance Ord NetDev where
 netConfig :: IO MConfig
 netConfig = mkMConfig
     "<dev>: <rx>KB|<tx>KB"      -- template
-    ["dev", "rx", "tx", "rxbar", "rxvbar", "rxdstr", "txbar", "txvbar", "txdstr"]     -- available replacements
+    ["dev", "rx", "tx", "rxbar", "rxvbar", "rxipat", "txbar", "txvbar", "txipat"]     -- available replacements
 
 operstateDir :: String -> FilePath
 operstateDir d = "/sys/class/net" </> d </> "operstate"
@@ -132,8 +132,8 @@ findNetDev dev = do
         isDev (NI d) = d == dev
         isDev NA = False
 
-formatNet :: Maybe DynamicString -> Float -> Monitor (String, String, String, String)
-formatNet mdstr d = do
+formatNet :: Maybe IconPattern -> Float -> Monitor (String, String, String, String)
+formatNet mipat d = do
     s <- getConfigValue useSuffix
     dd <- getConfigValue decDigits
     let str True v = showDigits dd d' ++ show u
@@ -141,17 +141,17 @@ formatNet mdstr d = do
         str False v = showDigits dd $ v / 1024
     b <- showLogBar 0.9 d
     vb <- showLogVBar 0.9 d
-    dstr <- showLogDynamicString mdstr 0.9 d
+    ipat <- showLogIconPattern mipat 0.9 d
     x <- showWithColors (str s) d
-    return (x, b, vb, dstr)
+    return (x, b, vb, ipat)
 
 printNet :: NetOpts -> NetDev -> Monitor String
 printNet opts nd =
   case nd of
     ND d r t -> do
-        (rx, rb, rvb, rdstr) <- formatNet (rxDynamicString opts) r
-        (tx, tb, tvb, tdstr) <- formatNet (txDynamicString opts) t
-        parseTemplate [d,rx,tx,rb,rvb,rdstr,tb,tvb,tdstr]
+        (rx, rb, rvb, ripat) <- formatNet (rxIconPattern opts) r
+        (tx, tb, tvb, tipat) <- formatNet (txIconPattern opts) t
+        parseTemplate [d,rx,tx,rb,rvb,ripat,tb,tvb,tipat]
     NI _ -> return ""
     NA -> getConfigValue naString
 

@@ -28,9 +28,9 @@ import System.Directory (canonicalizePath, doesFileExist)
 import System.Console.GetOpt
 
 data DiskIOOpts = DiskIOOpts
-  { totalDynamicString :: Maybe DynamicString
-  , writeDynamicString :: Maybe DynamicString
-  , readDynamicString :: Maybe DynamicString
+  { totalIconPattern :: Maybe IconPattern
+  , writeIconPattern :: Maybe IconPattern
+  , readIconPattern :: Maybe IconPattern
   }
 
 parseDiskIOOpts :: [String] -> IO DiskIOOpts
@@ -39,29 +39,29 @@ parseDiskIOOpts argv =
     (o, _, []) -> return $ foldr id defaultOpts o
     (_, _, errs) -> ioError . userError $ concat errs
  where defaultOpts = DiskIOOpts
-          { totalDynamicString = Nothing
-          , writeDynamicString = Nothing
-          , readDynamicString = Nothing
+          { totalIconPattern = Nothing
+          , writeIconPattern = Nothing
+          , readIconPattern = Nothing
           }
        options =
-          [ Option "" ["total-dynamic-string"] (ReqArg (\x o ->
-             o { totalDynamicString = Just $ parseDynamicString x}) "") ""
-          , Option "" ["write-dynamic-string"] (ReqArg (\x o ->
-             o { writeDynamicString = Just $ parseDynamicString x}) "") ""
-          , Option "" ["read-dynamic-string"] (ReqArg (\x o ->
-             o { readDynamicString = Just $ parseDynamicString x}) "") ""
+          [ Option "" ["total-icon-pattern"] (ReqArg (\x o ->
+             o { totalIconPattern = Just $ parseIconPattern x}) "") ""
+          , Option "" ["write-icon-pattern"] (ReqArg (\x o ->
+             o { writeIconPattern = Just $ parseIconPattern x}) "") ""
+          , Option "" ["read-icon-pattern"] (ReqArg (\x o ->
+             o { readIconPattern = Just $ parseIconPattern x}) "") ""
           ]
 
 diskIOConfig :: IO MConfig
 diskIOConfig = mkMConfig "" ["total", "read", "write"
                             ,"totalbar", "readbar", "writebar"
                             ,"totalvbar", "readvbar", "writevbar"
-                            ,"totaldstr", "readdstr", "writedstr"
+                            ,"totalipat", "readipat", "writeipat"
                             ]
 
 data DiskUOpts = DiskUOpts
-  { freeDynamicString :: Maybe DynamicString
-  , usedDynamicString :: Maybe DynamicString
+  { freeIconPattern :: Maybe IconPattern
+  , usedIconPattern :: Maybe IconPattern
   }
 
 parseDiskUOpts :: [String] -> IO DiskUOpts
@@ -70,21 +70,21 @@ parseDiskUOpts argv =
     (o, _, []) -> return $ foldr id defaultOpts o
     (_, _, errs) -> ioError . userError $ concat errs
  where defaultOpts = DiskUOpts
-          { freeDynamicString = Nothing
-          , usedDynamicString = Nothing
+          { freeIconPattern = Nothing
+          , usedIconPattern = Nothing
           }
        options =
-          [ Option "" ["free-dynamic-string"] (ReqArg (\x o ->
-             o { freeDynamicString = Just $ parseDynamicString x}) "") ""
-          , Option "" ["used-dynamic-string"] (ReqArg (\x o ->
-             o { usedDynamicString = Just $ parseDynamicString x}) "") ""
+          [ Option "" ["free-icon-pattern"] (ReqArg (\x o ->
+             o { freeIconPattern = Just $ parseIconPattern x}) "") ""
+          , Option "" ["used-icon-pattern"] (ReqArg (\x o ->
+             o { usedIconPattern = Just $ parseIconPattern x}) "") ""
           ]
 
 diskUConfig :: IO MConfig
 diskUConfig = mkMConfig ""
               [ "size", "free", "used", "freep", "usedp"
-              , "freebar", "freevbar", "freedstr"
-              , "usedbar", "usedvbar", "useddstr"
+              , "freebar", "freevbar", "freeipat"
+              , "usedbar", "usedvbar", "usedipat"
               ]
 
 type DevName = String
@@ -183,10 +183,10 @@ runDiskIO' opts (tmp, xs) = do
   s <- mapM (showWithColors speedToStr) xs
   b <- mapM (showLogBar 0.8) xs
   vb <- mapM (showLogVBar 0.8) xs
-  dstr <- mapM (\(f,v) -> showLogDynamicString (f opts) 0.8 v)
-        $ zip [totalDynamicString, readDynamicString, writeDynamicString] xs
+  ipat <- mapM (\(f,v) -> showLogIconPattern (f opts) 0.8 v)
+        $ zip [totalIconPattern, readIconPattern, writeIconPattern] xs
   setConfigValue tmp template
-  parseTemplate $ s ++ b ++ vb ++ dstr
+  parseTemplate $ s ++ b ++ vb ++ ipat
 
 runDiskIO :: DevDataRef -> [(String, String)] -> [String] -> Monitor String
 runDiskIO dref disks argv = do
@@ -225,11 +225,11 @@ runDiskU' opts tmp path = do
   sp <- showPercentsWithColors [fr, 1 - fr]
   fb <- showPercentBar (fromIntegral freep) fr
   fvb <- showVerticalBar (fromIntegral freep) fr
-  fdstr <- showDynamicString (freeDynamicString opts) fr
+  fipat <- showIconPattern (freeIconPattern opts) fr
   ub <- showPercentBar (fromIntegral $ 100 - freep) (1 - fr)
   uvb <- showVerticalBar (fromIntegral $ 100 - freep) (1 - fr)
-  udstr <- showDynamicString (usedDynamicString opts) (1 - fr)
-  parseTemplate $ [sizeToStr total] ++ s ++ sp ++ [fb,fvb,fdstr,ub,uvb,udstr]
+  uipat <- showIconPattern (usedIconPattern opts) (1 - fr)
+  parseTemplate $ [sizeToStr total] ++ s ++ sp ++ [fb,fvb,fipat,ub,uvb,uipat]
   where ign = const (return [0, 0, 0]) :: SomeException -> IO [Integer]
 
 

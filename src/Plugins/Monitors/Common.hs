@@ -40,8 +40,8 @@ module Plugins.Monitors.Common (
                        , parseTemplate'
                        -- ** String Manipulation
                        -- $strings
-                       , DynamicString
-                       , parseDynamicString
+                       , IconPattern
+                       , parseIconPattern
                        , padString
                        , showWithPadding
                        , showWithColors
@@ -50,10 +50,10 @@ module Plugins.Monitors.Common (
                        , showPercentsWithColors
                        , showPercentBar
                        , showVerticalBar
-                       , showDynamicString
+                       , showIconPattern
                        , showLogBar
                        , showLogVBar
-                       , showLogDynamicString
+                       , showLogIconPattern
                        , showWithUnits
                        , takeDigits
                        , showDigits
@@ -352,10 +352,10 @@ combine m ((s,ts,ss):xs) =
 
 -- $strings
 
-type DynamicString = Int -> String
+type IconPattern = Int -> String
 
-parseDynamicString :: String -> DynamicString
-parseDynamicString path =
+parseIconPattern :: String -> IconPattern
+parseIconPattern path =
     let spl = splitOnPercent path
     in \i -> concat $ intersperse (show i) spl
   where splitOnPercent [] = [[]]
@@ -469,9 +469,9 @@ showPercentBar v x = do
   s <- colorizeString v (take len $ cycle bf)
   return $ s ++ take (bw - len) (cycle bb)
 
-showDynamicString :: Maybe DynamicString -> Float -> Monitor String
-showDynamicString Nothing _ = return ""
-showDynamicString (Just str) x = return $ str $ convert $ 100 * x
+showIconPattern :: Maybe IconPattern -> Float -> Monitor String
+showIconPattern Nothing _ = return ""
+showIconPattern (Just str) x = return $ str $ convert $ 100 * x
   where convert val
           | t <= 0 = 0
           | t > 8 = 8
@@ -511,8 +511,8 @@ showLogVBar f v = do
                | otherwise = f + logBase 2 (x / hh) / bw
   showVerticalBar v $ choose v
 
-showLogDynamicString :: Maybe DynamicString -> Float -> Float -> Monitor String
-showLogDynamicString str f v = do
+showLogIconPattern :: Maybe IconPattern -> Float -> Float -> Monitor String
+showLogIconPattern str f v = do
   h <- fromIntegral `fmap` getConfigValue high
   l <- fromIntegral `fmap` getConfigValue low
   bw <- fromIntegral `fmap` getConfigValue barWidth
@@ -520,4 +520,4 @@ showLogDynamicString str f v = do
       choose x | x == 0.0 = 0
                | x <= ll = 1 / bw
                | otherwise = f + logBase 2 (x / hh) / bw
-  showDynamicString str $ choose v
+  showIconPattern str $ choose v

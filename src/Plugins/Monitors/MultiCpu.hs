@@ -22,22 +22,22 @@ import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import System.Console.GetOpt
 
 data MultiCpuOpts = MultiCpuOpts
-  { loadDynamicStrings :: [DynamicString]
-  , loadDynamicString :: Maybe DynamicString
+  { loadIconPatterns :: [IconPattern]
+  , loadIconPattern :: Maybe IconPattern
   }
 
 defaultOpts :: MultiCpuOpts
 defaultOpts = MultiCpuOpts
-  { loadDynamicStrings = []
-  , loadDynamicString = Nothing
+  { loadIconPatterns = []
+  , loadIconPattern = Nothing
   }
 
 options :: [OptDescr (MultiCpuOpts -> MultiCpuOpts)]
 options =
-  [ Option "" ["load-dynamic-string"] (ReqArg (\x o ->
-     o { loadDynamicString = Just $ parseDynamicString x }) "") ""
-  , Option "" ["load-dynamic-strings"] (ReqArg (\x o ->
-     o { loadDynamicStrings = parseDynamicString x : loadDynamicStrings o }) "") ""
+  [ Option "" ["load-icon-pattern"] (ReqArg (\x o ->
+     o { loadIconPattern = Just $ parseIconPattern x }) "") ""
+  , Option "" ["load-icon-patterns"] (ReqArg (\x o ->
+     o { loadIconPatterns = parseIconPattern x : loadIconPatterns o }) "") ""
   ]
 
 parseOpts :: [String] -> IO MultiCpuOpts
@@ -47,7 +47,7 @@ parseOpts argv =
     (_, _, errs) -> ioError . userError $ concat errs
 
 variables :: [String]
-variables = ["bar", "vbar","dstr","total","user","nice","system","idle"]
+variables = ["bar", "vbar","ipat","total","user","nice","system","idle"]
 vNum :: Int
 vNum = length variables
 
@@ -91,12 +91,12 @@ formatCpu opts i xs
   | otherwise = let t = sum $ take 3 xs
                 in do b <- showPercentBar (100 * t) t
                       h <- showVerticalBar (100 * t) t
-                      d <- showDynamicString tryString t
+                      d <- showIconPattern tryString t
                       ps <- showPercentsWithColors (t:xs)
                       return (b:h:d:ps)
   where tryString
-          | i == 0 = loadDynamicString opts
-          | i <= length (loadDynamicStrings opts) = Just $ (loadDynamicStrings opts) !! (i - 1)
+          | i == 0 = loadIconPattern opts
+          | i <= length (loadIconPatterns opts) = Just $ (loadIconPatterns opts) !! (i - 1)
           | otherwise = Nothing
 
 splitEvery :: (Eq a) => Int -> [a] -> [[a]]

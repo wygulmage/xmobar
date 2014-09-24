@@ -34,9 +34,9 @@ data BattOpts = BattOpts
   , highThreshold :: Float
   , onlineFile :: FilePath
   , scale :: Float
-  , onDynamicString :: Maybe DynamicString
-  , offDynamicString :: Maybe DynamicString
-  , idleDynamicString :: Maybe DynamicString
+  , onIconPattern :: Maybe IconPattern
+  , offIconPattern :: Maybe IconPattern
+  , idleIconPattern :: Maybe IconPattern
   }
 
 defaultOpts :: BattOpts
@@ -52,9 +52,9 @@ defaultOpts = BattOpts
   , highThreshold = -10
   , onlineFile = "AC/online"
   , scale = 1e6
-  , onDynamicString = Nothing
-  , offDynamicString = Nothing
-  , idleDynamicString = Nothing
+  , onIconPattern = Nothing
+  , offIconPattern = Nothing
+  , idleIconPattern = Nothing
   }
 
 options :: [OptDescr (BattOpts -> BattOpts)]
@@ -70,12 +70,12 @@ options =
   , Option "H" ["hight"] (ReqArg (\x o -> o { highThreshold = read x }) "") ""
   , Option "f" ["online"] (ReqArg (\x o -> o { onlineFile = x }) "") ""
   , Option "s" ["scale"] (ReqArg (\x o -> o {scale = read x}) "") ""
-  , Option "" ["on-dynamic-string"] (ReqArg (\x o ->
-     o { onDynamicString = Just $ parseDynamicString x }) "") ""
-  , Option "" ["off-dynamic-string"] (ReqArg (\x o ->
-     o { offDynamicString = Just $ parseDynamicString x }) "") ""
-  , Option "" ["idle-dynamic-string"] (ReqArg (\x o ->
-     o { idleDynamicString = Just $ parseDynamicString x }) "") ""
+  , Option "" ["on-icon-pattern"] (ReqArg (\x o ->
+     o { onIconPattern = Just $ parseIconPattern x }) "") ""
+  , Option "" ["off-icon-pattern"] (ReqArg (\x o ->
+     o { offIconPattern = Just $ parseIconPattern x }) "") ""
+  , Option "" ["idle-icon-pattern"] (ReqArg (\x o ->
+     o { idleIconPattern = Just $ parseIconPattern x }) "") ""
   ]
 
 parseOpts :: [String] -> IO BattOpts
@@ -94,7 +94,7 @@ sysDir = "/sys/class/power_supply"
 battConfig :: IO MConfig
 battConfig = mkMConfig
        "Batt: <watts>, <left>% / <timeleft>" -- template
-       ["leftbar", "leftvbar", "left", "acstatus", "timeleft", "watts", "leftdstr"] -- replacements
+       ["leftbar", "leftvbar", "left", "acstatus", "timeleft", "watts", "leftipat"] -- replacements
 
 data Files = Files
   { fFull :: String
@@ -182,7 +182,7 @@ runBatt' bfs args = do
     Result x w t s ->
       do l <- fmtPercent x
          ws <- fmtWatts w opts suffix d
-         si <- getDynamicString opts s x
+         si <- getIconPattern opts s x
          parseTemplate (l ++ [fmtStatus opts s, fmtTime $ floor t, ws, si])
     NA -> getConfigValue naString
   where fmtPercent :: Float -> Monitor [String]
@@ -209,9 +209,9 @@ runBatt' bfs args = do
                   | -x >= highThreshold o = maybeColor (highWColor o)
                   | -x >= lowThreshold o = maybeColor (mediumWColor o)
                   | otherwise = maybeColor (lowWColor o)
-        getDynamicString opts status x = do
+        getIconPattern opts status x = do
           let x' = minimum [1, x]
           case status of
-               Idle -> showDynamicString (idleDynamicString opts) x'
-               Charging -> showDynamicString (onDynamicString opts) x'
-               Discharging -> showDynamicString (offDynamicString opts) x'
+               Idle -> showIconPattern (idleIconPattern opts) x'
+               Charging -> showIconPattern (onIconPattern opts) x'
+               Discharging -> showIconPattern (offIconPattern opts) x'

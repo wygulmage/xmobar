@@ -21,18 +21,18 @@ import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import System.Console.GetOpt
 
 data CpuOpts = CpuOpts
-  { loadDynamicString :: Maybe DynamicString
+  { loadIconPattern :: Maybe IconPattern
   }
 
 defaultOpts :: CpuOpts
 defaultOpts = CpuOpts
-  { loadDynamicString = Nothing
+  { loadIconPattern = Nothing
   }
 
 options :: [OptDescr (CpuOpts -> CpuOpts)]
 options =
-  [ Option "" ["load-dynamic-string"] (ReqArg (\x o ->
-     o { loadDynamicString = Just $ parseDynamicString x }) "") ""
+  [ Option "" ["load-icon-pattern"] (ReqArg (\x o ->
+     o { loadIconPattern = Just $ parseIconPattern x }) "") ""
   ]
 
 parseOpts :: [String] -> IO CpuOpts
@@ -44,7 +44,7 @@ parseOpts argv =
 cpuConfig :: IO MConfig
 cpuConfig = mkMConfig
        "Cpu: <total>%"
-       ["bar","vbar","dstr","total","user","nice","system","idle","iowait"]
+       ["bar","vbar","ipat","total","user","nice","system","idle","iowait"]
 
 type CpuDataRef = IORef [Int]
 
@@ -70,7 +70,7 @@ formatCpu opts xs = do
   let t = sum $ take 3 xs
   b <- showPercentBar (100 * t) t
   v <- showVerticalBar (100 * t) t
-  d <- showDynamicString (loadDynamicString opts) t
+  d <- showIconPattern (loadIconPattern opts) t
   ps <- showPercentsWithColors (t:xs)
   return (b:v:d:ps)
 

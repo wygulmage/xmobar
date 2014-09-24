@@ -24,7 +24,7 @@ import System.Console.GetOpt
 
 volumeConfig :: IO MConfig
 volumeConfig = mkMConfig "Vol: <volume>% <status>"
-                         ["volume", "volumebar", "volumevbar", "dB","status", "volumedstr"]
+                         ["volume", "volumebar", "volumevbar", "dB","status", "volumeipat"]
 
 
 data VolumeOpts = VolumeOpts
@@ -34,7 +34,7 @@ data VolumeOpts = VolumeOpts
     , offColor :: Maybe String
     , highDbThresh :: Float
     , lowDbThresh :: Float
-    , volumeDynamicString :: Maybe DynamicString
+    , volumeIconPattern :: Maybe IconPattern
     }
 
 defaultOpts :: VolumeOpts
@@ -45,7 +45,7 @@ defaultOpts = VolumeOpts
     , offColor = Just "red"
     , highDbThresh = -5.0
     , lowDbThresh = -30.0
-    , volumeDynamicString = Nothing
+    , volumeIconPattern = Nothing
     }
 
 options :: [OptDescr (VolumeOpts -> VolumeOpts)]
@@ -56,8 +56,8 @@ options =
     , Option "" ["highd"] (ReqArg (\x o -> o { highDbThresh = read x }) "") ""
     , Option "C" ["onc"] (ReqArg (\x o -> o { onColor = Just x }) "") ""
     , Option "c" ["offc"] (ReqArg (\x o -> o { offColor = Just x }) "") ""
-    , Option "" ["volume-dynamic-string"] (ReqArg (\x o ->
-       o { volumeDynamicString = Just $ parseDynamicString x }) "") ""
+    , Option "" ["volume-icon-pattern"] (ReqArg (\x o ->
+       o { volumeIconPattern = Just $ parseIconPattern x }) "") ""
     ]
 
 parseOpts :: [String] -> IO VolumeOpts
@@ -84,9 +84,9 @@ formatVolVBar :: Integer -> Integer -> Integer -> Monitor String
 formatVolVBar lo hi v =
     showVerticalBar (100 * x) x where x = percent v lo hi
 
-formatVolDStr :: Maybe DynamicString -> Integer -> Integer -> Integer -> Monitor String
-formatVolDStr dstr lo hi v =
-    showDynamicString dstr $ percent v lo hi
+formatVolDStr :: Maybe IconPattern -> Integer -> Integer -> Integer -> Monitor String
+formatVolDStr ipat lo hi v =
+    showIconPattern ipat $ percent v lo hi
 
 switchHelper :: VolumeOpts
              -> (VolumeOpts -> Maybe String)
@@ -134,8 +134,8 @@ runVolume mixerName controlName argv = do
     v <- liftMonitor $ liftM3 formatVolVBar lo hi val
     d <- getFormatDB opts db
     s <- getFormatSwitch opts sw
-    dstr <- liftMonitor $ liftM3 (formatVolDStr $ volumeDynamicString opts) lo hi val
-    parseTemplate [p, b, v, d, s, dstr]
+    ipat <- liftMonitor $ liftM3 (formatVolDStr $ volumeIconPattern opts) lo hi val
+    parseTemplate [p, b, v, d, s, ipat]
 
   where
 
