@@ -18,6 +18,10 @@ _New features_
     Travis Staton.
   - Support for multiple Xft fonts, thanks to Phil Xiaojun Hu and
     Cedric staub (see [pull request #196]).
+  - Icon patterns for several monitors, that allow you to specify a
+    collection of icons to use for successive integer variable values,
+    thanks to Alexander Shabalin (see [pull request #192] and the
+    documentation for details).
 
 _Bug fixes_
 
@@ -29,6 +33,7 @@ _Bug fixes_
 
 [issue #181]: https://github.com/jaor/xmobar/issues/181
 [issue #189]: https://github.com/jaor/xmobar/issues/189
+[pull request #192]: https://github.com/jaor/xmobar/pull/192
 [pull request #195]: https://github.com/jaor/xmobar/pull/195
 [pull request #196]: https://github.com/jaor/xmobar/pull/196
 
