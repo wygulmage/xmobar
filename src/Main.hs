@@ -130,6 +130,7 @@ data Opts = Help
           | SepChar    String
           | Template   String
           | OnScr      String
+          | IconRoot   String
        deriving Show
 
 options :: [OptDescr Opts]
@@ -141,6 +142,8 @@ options =
       "The background color. Default black"
     , Option "F" ["fgcolor"] (ReqArg FgColor "fg color")
       "The foreground color. Default grey"
+    , Option "i" ["iconroot"] (ReqArg IconRoot "path")
+      "Root directory for icon pattern paths. Default '.'"
     , Option "o" ["top"] (NoArg T) "Place xmobar at the top of the screen"
     , Option "b" ["bottom"] (NoArg B)
       "Place xmobar at the bottom of the screen"
@@ -203,6 +206,7 @@ doOpts conf (o:oo) =
     AlignSep s -> doOpts' (conf {alignSep = s})
     SepChar s -> doOpts' (conf {sepChar = s})
     Template s -> doOpts' (conf {template = s})
+    IconRoot s -> doOpts' (conf {iconRoot = s})
     OnScr n -> doOpts' (conf {position = OnScreen (read n) $ position conf})
     Commands s -> case readCom 'c' s of
                     Right x -> doOpts' (conf {commands = x})

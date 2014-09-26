@@ -321,8 +321,9 @@ Other configuration options:
 
 `iconRoot`
 :     Root folder where icons are stored. For <icon=path/>
-      if path start with `"/"`, `"./"` or `"../"` it is interpreted as it is.
-      Otherwise it will have `iconRoot ++ "/"` prepended to it. Default is `"."`.
+      if path start with `"/"`, `"./"` or `"../"` it is interpreted as
+      it is.  Otherwise it will have `iconRoot ++ "/"` prepended to
+      it. Default is `"."`.
 
 `commands`
 :    For setting the options of the programs to run (optional).
@@ -377,6 +378,7 @@ xmobar --help):
       -s char       --sepchar=char         The character used to separate commands in
                                            the output template. Default '%'
       -t template   --template=template    The output template
+      -i path       --iconroot=path        Default directory for icon pattern files
       -c commands   --commands=commands    The list of commands to be executed
       -C command    --add-command=command  Add to the list of commands to be executed
       -x screen     --screen=screen        On which X screen number to start
