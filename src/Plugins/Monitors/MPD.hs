@@ -15,6 +15,7 @@
 module Plugins.Monitors.MPD ( mpdConfig, runMPD, mpdWait, mpdReady ) where
 
 import Data.List
+import Data.Maybe (fromMaybe)
 import Plugins.Monitors.Common
 import System.Console.GetOpt
 import qualified Network.MPD as M
@@ -96,12 +97,8 @@ parseMPD (Right st) song opts = do
   where s = M.stState st
         ss = show s
         si = stateGlyph s opts
-        vol = int2str $ case M.stVolume st of
-                         Just x -> x
-                         Nothing -> 0
-        (p, t) = case M.stTime st of
-                  Just x -> x
-                  Nothing -> (0, 0)
+        vol = int2str $ fromMaybe 0 (M.stVolume st)
+        (p, t) = fromMaybe (0, 0) (M.stTime st)
         [lap, len, remain] = map showTime [floor p, t, max 0 (t - floor p)]
         b = if t > 0 then realToFrac $ p / fromIntegral t else 0
         plen = int2str $ M.stPlaylistLength st
