@@ -75,7 +75,7 @@ mpdReady _ = do
     -- Only cases where MPD isn't responding is an issue; bogus information at
     -- least won't hold xmobar up.
     Left M.NoMPD    -> return False
-    Left M.TimedOut -> return False
+    Left (M.ConnectionError _) -> return False
     Left _          -> return True
 
 mopts :: [String] -> IO MOpts
@@ -96,8 +96,12 @@ parseMPD (Right st) song opts = do
   where s = M.stState st
         ss = show s
         si = stateGlyph s opts
-        vol = int2str $ M.stVolume st
-        (p, t) = M.stTime st
+        vol = int2str $ case M.stVolume st of
+                         Just x -> x
+                         Nothing -> 0
+        (p, t) = case M.stTime st of
+                  Just x -> x
+                  Nothing -> (0, 0)
         [lap, len, remain] = map showTime [floor p, t, max 0 (t - floor p)]
         b = if t > 0 then realToFrac $ p / fromIntegral t else 0
         plen = int2str $ M.stPlaylistLength st

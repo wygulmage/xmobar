@@ -22,6 +22,7 @@ _New features_
     collection of icons to use for successive integer variable values,
     thanks to Alexander Shabalin (see [pull request #192] and the
     documentation for details).
+  - Upgrade to libmpd 0.9.
 
 _Bug fixes_
 
