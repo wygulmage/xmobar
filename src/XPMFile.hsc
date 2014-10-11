@@ -13,7 +13,11 @@
 
 module XPMFile(readXPMFile) where
 
+#if MIN_VERSION_mtl(2, 2, 1)
 import Control.Monad.Except(MonadError(..))
+#else
+import Control.Monad.Error(MonadError(..))
+#endif
 import Control.Monad.Trans(MonadIO(..))
 import Graphics.X11.Xlib(Dimension, Display(..), Drawable, Pixmap)
 import Foreign.C.String(CString, withCString)

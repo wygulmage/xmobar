@@ -18,7 +18,6 @@ module Bitmap
 
 import Control.Applicative((<|>))
 import Control.Monad
-import Control.Monad.Except(MonadError(..), runExceptT)
 import Control.Monad.Trans(MonadIO(..))
 import Data.Map hiding (foldr, map, filter)
 import Graphics.X11.Xlib
@@ -31,6 +30,18 @@ import Actions (Action)
 
 #ifdef XPM
 import XPMFile(readXPMFile)
+#endif
+
+#if MIN_VERSION_mtl(2, 2, 1)
+import Control.Monad.Except(MonadError(..), runExceptT)
+
+#else
+import Control.Monad.Error(MonadError(..))
+import Control.Monad.Trans.Error(ErrorT, runErrorT)
+
+runExceptT :: ErrorT e m a -> m (Either e a)
+runExceptT = runErrorT
+
 #endif
 
 data BitmapType = Mono Pixel | Poly
