@@ -1,5 +1,12 @@
 % xmobar - Release notes
 
+## Version 0.22.1 (Oct 11, 2014)
+
+_Bug fixes_
+
+  - Fix compilation in systems that don't need mtl newer than the one
+    shipped with GHC.
+
 ## Version 0.22 (Oct 9, 2014)
 
 _New features_
