@@ -114,7 +114,7 @@ executable xmobar
       X11 >= 1.6.1,
       mtl >= 2.1 && < 2.3,
       parsec == 3.1.*,
-      HTTP >= 4000,
+      HTTP >= 4000.2.4,
       stm >= 2.3 && < 2.5
 
     if flag(with_threaded)
