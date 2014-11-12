@@ -768,10 +768,12 @@ something like:
 - Args: default monitor arguments, plus:
   - `--used-icon-pattern`: dynamic string for used memory ratio in `usedipat`.
   - `--free-icon-pattern`: dynamic string for free memory ratio in `freeipat`.
+  - `--available-icon-pattern`: dynamic string for available memory ratio in `availableipat`.
 - Variables that can be used with the `-t`/`--template` argument:
-             `total`, `free`, `buffer`, `cache`, `rest`, `used`,
+             `total`, `free`, `buffer`, `cache`, `available`, `used`,
              `usedratio`, `usedbar`, `usedvbar`, `usedipat`,
-             `freeratio`, `freebar`, `freevbar`, `freeipat`
+             `freeratio`, `freebar`, `freevbar`, `freeipat`,
+             `availableratio`, `availablebar`, `availablevbar`, `availableipat`
 - Default template: `Mem: <usedratio>% (<cache>M)`
 
 ### `Swap Args RefreshRate`

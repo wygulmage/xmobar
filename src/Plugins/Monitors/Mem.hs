@@ -21,12 +21,14 @@ import System.Console.GetOpt
 data MemOpts = MemOpts
   { usedIconPattern :: Maybe IconPattern
   , freeIconPattern :: Maybe IconPattern
+  , availableIconPattern :: Maybe IconPattern
   }
 
 defaultOpts :: MemOpts
 defaultOpts = MemOpts
   { usedIconPattern = Nothing
   , freeIconPattern = Nothing
+  , availableIconPattern = Nothing
   }
 
 options :: [OptDescr (MemOpts -> MemOpts)]
@@ -35,6 +37,8 @@ options =
      o { usedIconPattern = Just $ parseIconPattern x }) "") ""
   , Option "" ["free-icon-pattern"] (ReqArg (\x o ->
      o { freeIconPattern = Just $ parseIconPattern x }) "") ""
+  , Option "" ["available-icon-pattern"] (ReqArg (\x o ->
+     o { availableIconPattern = Just $ parseIconPattern x }) "") ""
   ]
 
 parseOpts :: [String] -> IO MemOpts
@@ -46,8 +50,10 @@ parseOpts argv =
 memConfig :: IO MConfig
 memConfig = mkMConfig
        "Mem: <usedratio>% (<cache>M)" -- template
-       ["usedbar", "usedvbar", "usedipat", "freebar", "freevbar", "freeipat", "usedratio", "freeratio",
-        "total", "free", "buffer", "cache", "rest", "used"] -- available replacements
+       ["usedbar", "usedvbar", "usedipat", "freebar", "freevbar", "freeipat",
+        "availablebar", "availablevbar", "availableipat",
+        "usedratio", "freeratio", "availableratio",
+        "total", "free", "buffer", "cache", "available", "used"] -- available replacements
 
 fileMEM :: IO String
 fileMEM = readFile "/proc/meminfo"
@@ -58,11 +64,12 @@ parseMEM =
        let content = map words $ take 8 $ lines file
            info = M.fromList $ map (\line -> (head line, (read $ line !! 1 :: Float) / 1024)) content
            [total, free, buffer, cache] = map (info M.!) ["MemTotal:", "MemFree:", "Buffers:", "Cached:"]
-           rest = free + buffer + cache
-           used = total - M.findWithDefault rest "MemAvailable:" info
+           available = M.findWithDefault (free + buffer + cache) "MemAvailable:" info
+           used = total - available
            usedratio = used / total
            freeratio = free / total
-       return [usedratio, freeratio, total, free, buffer, cache, rest, used, freeratio]
+           availableratio = available / total
+       return [usedratio, freeratio, availableratio, total, free, buffer, cache, available, used]
 
 totalMem :: IO Float
 totalMem = fmap ((*1024) . (!!1)) parseMEM
@@ -71,19 +78,14 @@ usedMem :: IO Float
 usedMem = fmap ((*1024) . (!!6)) parseMEM
 
 formatMem :: MemOpts -> [Float] -> Monitor [String]
-formatMem opts (r:fr:xs) =
+formatMem opts (r:fr:ar:xs) =
     do let f = showDigits 0
-           rr = 100 * r
-       ub <- showPercentBar rr r
-       uvb <- showVerticalBar rr r
-       uipat <- showIconPattern (usedIconPattern opts) r
-       fb <- showPercentBar (100 - rr) (1 - r)
-       fvb <- showVerticalBar (100 - rr) ( 1 - r)
-       fipat <- showIconPattern (freeIconPattern opts) (1 - r)
-       rs <- showPercentWithColors r
-       fs <- showPercentWithColors fr
-       s <- mapM (showWithColors f) xs
-       return (ub:uvb:uipat:fb:fvb:fipat:rs:fs:s)
+           mon i x = [showPercentBar (100 * x) x, showVerticalBar (100 * x) x, showIconPattern i x]
+       sequence $ mon (usedIconPattern opts) r
+           ++ mon (freeIconPattern opts) fr
+           ++ mon (availableIconPattern opts) ar
+           ++ map showPercentWithColors [r, fr, ar]
+           ++ map (showWithColors f) xs
 formatMem _ _ = replicate 10 `fmap` getConfigValue naString
 
 runMem :: [String] -> Monitor String
