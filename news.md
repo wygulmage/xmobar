@@ -1,5 +1,12 @@
 % xmobar - Release notes
 
+## Version 0.23
+
+_New features_
+
+  - New variables in `Mem` monitor for available memory as reported by
+    Linux 3.14 and newer, by Samuli Thomasson.
+
 ## Version 0.22.1 (Oct 11, 2014)
 
 _Bug fixes_
