@@ -52,6 +52,8 @@ data Config =
            , bgColor :: String      -- ^ Backgroud color
            , fgColor :: String      -- ^ Default font color
            , position :: XPosition  -- ^ Top Bottom or Static
+           , textOffset :: Int      -- ^ Offset from top of window for text
+           , iconOffset :: Int      -- ^ Offset from top of window for icons
            , border :: Border       -- ^ NoBorder TopB BottomB or FullB
            , borderColor :: String  -- ^ Border color
            , borderWidth :: Int     -- ^ Border width
@@ -113,6 +115,8 @@ defaultConfig =
            , border = NoBorder
            , borderColor = "#BFBFBF"
            , borderWidth = 1
+           , textOffset = -1
+           , iconOffset = -1
            , hideOnStart = False
            , lowerOnStart = True
            , persistent = False

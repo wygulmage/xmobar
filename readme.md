@@ -274,6 +274,15 @@ Other configuration options:
 
 :         position = Top
 
+`textOffset`
+:     The vertical offset, in pixels, for the text baseline.  If
+      negative or not given, xmobar will try to center text
+      vertically.
+
+`iconOffset`
+:     The vertical offset, in pixels, for icons bottom line.  If negative
+      or not given, xmobar will try to center icons vertically.
+
 `lowerOnStart`
 :     When True the window is sent the bottom of the window stack initially.
 

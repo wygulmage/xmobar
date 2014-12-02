@@ -305,29 +305,39 @@ drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
     -- resync
     io $ sync       d True
 
+verticalOffset ::  (Integral b, Integral a, MonadIO m) =>
+                   a -> Widget -> XFont -> Config -> m b
+verticalOffset ht (Text t) fontst conf
+  | textOffset conf > -1 = return $ fi (textOffset conf)
+  | otherwise = do
+     (as,ds) <- io $ textExtents fontst t
+     let bwidth = borderOffset (border conf) (borderWidth conf)
+         verticalMargin = (fi ht) - fi (as + ds) - 2 * fi (abs bwidth)
+     return $ (fi ht) - (fi ds) - (verticalMargin `div` 2) + bwidth + 1
+verticalOffset _ (Icon _) _ conf
+  | iconOffset conf > -1 = return $ fi (iconOffset conf)
+  | otherwise = do
+     let bwidth = borderOffset (border conf) (borderWidth conf)
+     return $ bwidth + 1
+
 -- | An easy way to print the stuff we need to print
 printStrings :: Drawable -> GC -> XFont -> Position
              -> Align -> [(Widget, String, Position)] -> X ()
 printStrings _ _ _ _ _ [] = return ()
 printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
   r <- ask
-  (as,ds) <- case s of
-               Text t -> io $ textExtents fontst t
-               Icon _ -> return (0, 0)
-  let (conf,d)             = (config &&& display) r
-      boffs                = borderOffset (border conf) (borderWidth conf)
+  let (conf,d) = (config &&& display) r
       Rectangle _ _ wid ht = rect r
-      totSLen              = foldr (\(_,_,len) -> (+) len) 0 sl
-      verticalMargin       = (fi ht) - fi (as + ds) + boffs
-      valign               = (fi ht) - (fi ds) - (verticalMargin `div` 2)
-      remWidth             = fi wid - fi totSLen
-      offset               = case a of
-                               C -> (remWidth + offs) `div` 2
-                               R -> remWidth
-                               L -> offs
-      (fc,bc)              = case break (==',') c of
-                               (f,',':b) -> (f, b           )
-                               (f,    _) -> (f, bgColor conf)
+      totSLen = foldr (\(_,_,len) -> (+) len) 0 sl
+      remWidth = fi wid - fi totSLen
+      offset = case a of
+                 C -> (remWidth + offs) `div` 2
+                 R -> remWidth
+                 L -> offs
+      (fc,bc) = case break (==',') c of
+                 (f,',':b) -> (f, b           )
+                 (f,    _) -> (f, bgColor conf)
+  valign <- verticalOffset ht s fontst conf
   case s of
     (Text t) -> io $ printString d dr fontst gc fc bc offset valign t
     (Icon p) -> io $ maybe (return ()) (drawBitmap d dr gc fc bc offset valign) (lookup p (iconS r))

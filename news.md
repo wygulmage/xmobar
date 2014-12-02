@@ -6,6 +6,11 @@ _New features_
 
   - New variables in `Mem` monitor for available memory as reported by
     Linux 3.14 and newer, by Samuli Thomasson.
+  - New configuration parameters `textOffset` and `iconOffset` (see
+    discussion in [issue #171] and [issue #201]).
+
+[issue #171]: https://github.com/jaor/xmobar/issues/171
+[issue #201]: https://github.com/jaor/xmobar/issues/201
 
 ## Version 0.22.1 (Oct 11, 2014)
 
