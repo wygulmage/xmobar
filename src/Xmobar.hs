@@ -318,7 +318,8 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
       boffs                = borderOffset (border conf) (borderWidth conf)
       Rectangle _ _ wid ht = rect r
       totSLen              = foldr (\(_,_,len) -> (+) len) 0 sl
-      valign               = boffs-1 + (fi ht + fi (as + ds)) `div` 2
+      verticalMargin       = (fi ht) - fi (as + ds) + boffs
+      valign               = (fi ht) - (fi ds) - (verticalMargin `div` 2)
       remWidth             = fi wid - fi totSLen
       offset               = case a of
                                C -> (remWidth + offs) `div` 2
