@@ -24,7 +24,7 @@ import Control.Concurrent (threadDelay)
 mpdConfig :: IO MConfig
 mpdConfig = mkMConfig "MPD: <state>"
               [ "bar", "vbar", "ipat", "state", "statei", "volume", "length"
-              , "lapsed", "remaining", "plength", "ppos", "file"
+              , "lapsed", "remaining", "plength", "ppos", "flags", "file"
               , "name", "artist", "composer", "performer"
               , "album", "title", "track", "genre"
               ]
@@ -93,7 +93,7 @@ parseMPD (Right st) song opts = do
   bar <- showPercentBar (100 * b) b
   vbar <- showVerticalBar (100 * b) b
   ipat <- showIconPattern (mLapsedIconPattern opts) b
-  return $ [bar, vbar, ipat, ss, si, vol, len, lap, remain, plen, ppos] ++ songData
+  return $ [bar, vbar, ipat, ss, si, vol, len, lap, remain, plen, ppos, flags] ++ songData
   where s = M.stState st
         ss = show s
         si = stateGlyph s opts
@@ -103,6 +103,7 @@ parseMPD (Right st) song opts = do
         b = if t > 0 then realToFrac $ p / fromIntegral t else 0
         plen = int2str $ M.stPlaylistLength st
         ppos = maybe "" (int2str . (+1)) $ M.stSongPos st
+        flags = playbackMode st
 
 stateGlyph :: M.State -> MOpts -> String
 stateGlyph s o =
@@ -110,6 +111,14 @@ stateGlyph s o =
     M.Playing -> mPlaying o
     M.Paused -> mPaused o
     M.Stopped -> mStopped o
+
+playbackMode :: M.Status -> String
+playbackMode s =
+  concat [if p s then f else "-" |
+          (p,f) <- [(M.stRepeat,"r"),
+                    (M.stRandom,"z"),
+                    (M.stSingle,"s"),
+                    (M.stConsume,"c")]]
 
 parseSong :: M.Response (Maybe M.Song) -> Monitor [String]
 parseSong (Left _) = return $ repeat ""

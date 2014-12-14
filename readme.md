@@ -1063,6 +1063,7 @@ more than one battery.
              `bar`, `vbar`, `ipat`, `state`, `statei`, `volume`, `length`,
              `lapsed`, `remaining`,
              `plength` (playlist length), `ppos` (playlist position),
+             `flags` (ncmpcpp-style playback mode),
              `name`, `artist`, `composer`, `performer`,
              `album`, `title`, `track`, `file`, `genre`
 - Default template: `MPD: <state>`
@@ -1070,7 +1071,7 @@ more than one battery.
   MPD's specific ones):
 
          Run MPD ["-t",
-                  "<composer> <title> (<album>) <track>/<plength> <statei> ",
+                  "<composer> <title> (<album>) <track>/<plength> <statei> [<flags>]",
                   "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
 
 ### `Mpris1 PlayerName Args RefreshRate`
