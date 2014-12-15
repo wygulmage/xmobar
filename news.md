@@ -8,6 +8,7 @@ _New features_
     Linux 3.14 and newer, by Samuli Thomasson.
   - New configuration parameters `textOffset` and `iconOffset` (see
     discussion in [issue #171] and [issue #201]).
+  - New template variable `flags` in `MPD` monitor, by Duncan Burke.
 
 [issue #171]: https://github.com/jaor/xmobar/issues/171
 [issue #201]: https://github.com/jaor/xmobar/issues/201

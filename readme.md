@@ -1496,17 +1496,17 @@ version 0.11.1. Since then, it is maintained and developed by [jao],
 with the help of the greater xmobar and Haskell communities.
 
 In particular, xmobar [incorporates patches] by Axel Angel, Ben
-Boeckel, Roman Cheplyaka, Patrick Chilton, Nathaniel Wesley Filardo,
-John Goerzen, Reto Hablützel, Juraj Hercek, Tomas Janousek, Spencer
-Janssen, Jochen Keil, Lennart Kolmodin, Krzysztof Kosciuszkiewicz,
-Dmitry Kurochkin, Todd Lunter, Robert J. Macomber, Dmitry Malikov,
-David McLean, Marcin Mikołajczyk, Tony Morris, Eric Mrak, Thiago
-Negri, Edward O'Callaghan, Svein Ove, Martin Perner, Jens Petersen,
-Alexander Polakov, Petr Rockai, Andrew Sackville-West, Alexander
-Shabalin, Peter Simons, Alexander Solovyov, John Soros, Travis Staton,
-Artem Tarasov, Samuli Thomasson, Sergei Trofimovich, Thomas Tuegel,
-Jan Vornberger, Anton Vorontsov, Daniel Wagner, Phil Xiaojun Hu and
-Norbert Zeh.
+Boeckel, Duncan Burke, Roman Cheplyaka, Patrick Chilton, Nathaniel
+Wesley Filardo, John Goerzen, Reto Hablützel, Juraj Hercek, Tomas
+Janousek, Spencer Janssen, Jochen Keil, Lennart Kolmodin, Krzysztof
+Kosciuszkiewicz, Dmitry Kurochkin, Todd Lunter, Robert J. Macomber,
+Dmitry Malikov, David McLean, Marcin Mikołajczyk, Tony Morris, Eric
+Mrak, Thiago Negri, Edward O'Callaghan, Svein Ove, Martin Perner, Jens
+Petersen, Alexander Polakov, Petr Rockai, Andrew Sackville-West,
+Alexander Shabalin, Peter Simons, Alexander Solovyov, John Soros,
+Travis Staton, Artem Tarasov, Samuli Thomasson, Sergei Trofimovich,
+Thomas Tuegel, Jan Vornberger, Anton Vorontsov, Daniel Wagner, Phil
+Xiaojun Hu and Norbert Zeh.
 
 [jao]: http://jao.io
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
