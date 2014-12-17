@@ -92,7 +92,7 @@ initFont d s =
 #endif
 
 miscFixedFont :: String
-miscFixedFont = "-misc-fixed-*-*-*-*-10-*-*-*-*-*-*-*"
+miscFixedFont = "-misc-fixed-*-*-*-*-*-*-*-*-*-*-*-*"
 
 -- | Given a fontname returns the font structure. If the font name is
 --  not valid the default font will be loaded and returned.
