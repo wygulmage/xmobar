@@ -1,7 +1,6 @@
 % xmobar - a minimalistic status bar
 
-About
-=====
+# About
 
 xmobar is a minimalistic, mostly text based, status bar. It was
 originally designed and implemented by Andrea Rossato to work with
@@ -23,8 +22,7 @@ instances of xmobar.
 [This screenshot]: http://projects.haskell.org/xmobar/xmobar-sawfish.png
 [this one]: http://projects.haskell.org/xmobar/xmobar-xmonad.png
 
-Bug Reports
-===========
+# Bug Reports
 
 To submit bug reports you can use the [bug tracker over at Github] or
 send mail to our [Mailing list].
@@ -34,8 +32,7 @@ Github's for new bugs.
 
 [bug tracker over at Github]: https://github.com/jaor/xmobar/issues
 
-Installation
-============
+# Installation
 
 ## Using cabal-install
 
@@ -163,8 +160,7 @@ Otherwise, you'll need to install them yourself.
 `all_extensions`
 :    Enables all the extensions above.
 
-Running xmobar
-==============
+# Running xmobar
 
 You can now run xmobar with:
 
@@ -186,8 +182,7 @@ Since 0.14 xmobar reacts to SIGUSR1 and SIGUSR2:
 
 - After receiving SIGUSR2 xmobar repositions it self on the current screen.
 
-Configuration
-=============
+# Configuration
 
 ## Quick Start
 
@@ -1371,8 +1366,7 @@ can be used in the output template as `%mydate%`
           logHook = dynamicLogString myPP >>= xmonadPropLog
         }
 
-Plugins
-=======
+# Plugins
 
 ## Writing a Plugin
 
@@ -1488,8 +1482,7 @@ To remove the system monitor plugin:
 
 3. rebuild xmobar.
 
-Authors and credits
-===================
+# Authors and credits
 
 Andrea Rossato originally designed and implemented xmobar up to
 version 0.11.1. Since then, it is maintained and developed by [jao],
@@ -1527,8 +1520,7 @@ __jao__:
 Thanks to Andrea for creating xmobar in the first place, and for
 giving me the chance to contribute.
 
-Useful links
-============
+# Useful links
 
 - [Github page].
 - [Mailing list].
@@ -1544,8 +1536,7 @@ Useful links
 [this tutorial]: http://www.haskell.org/haskellwiki/X_window_programming_in_Haskell
 [sawflibs]: http://github.com/jaor/sawflibs
 
-License
-=======
+# License
 
 This software is released under a BSD-style license. See [LICENSE] for
 more details.
