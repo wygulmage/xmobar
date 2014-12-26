@@ -13,6 +13,10 @@ _New features_
 [issue #171]: https://github.com/jaor/xmobar/issues/171
 [issue #201]: https://github.com/jaor/xmobar/issues/201
 
+_Bug fixes_
+
+  - We honour the `-S` (show suffix) monitor flag in `CpuFreq`.
+
 ## Version 0.22.1 (Oct 11, 2014)
 
 _Bug fixes_

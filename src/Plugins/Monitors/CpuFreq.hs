@@ -18,22 +18,24 @@ import Plugins.Monitors.Common
 import Plugins.Monitors.CoreCommon
 
 -- |
--- Cpu frequency default configuration. Default template contains only one
--- core frequency, user should specify custom template in order to get more
--- cpu frequencies.
+-- Cpu frequency default configuration. Default template contains only
+-- one core frequency, user should specify custom template in order to
+-- get more cpu frequencies.
 cpuFreqConfig :: IO MConfig
-cpuFreqConfig = mkMConfig
-       "Freq: <cpu0>" -- template
-       (map ((++) "cpu" . show) [0 :: Int ..]) -- available
-                                             -- replacements
+cpuFreqConfig =
+  mkMConfig "Freq: <cpu0>" (map ((++) "cpu" . show) [0 :: Int ..])
+
 
 -- |
--- Function retrieves monitor string holding the cpu frequency (or frequencies)
+-- Function retrieves monitor string holding the cpu frequency (or
+-- frequencies)
 runCpuFreq :: [String] -> Monitor String
 runCpuFreq _ = do
+  suffix <- getConfigValue useSuffix
   let path = ["/sys/devices/system/cpu/cpu", "/cpufreq/scaling_cur_freq"]
       divisor = 1e6 :: Double
-      fmt x | x < 1 = show (round (x * 1000) :: Integer) ++ "MHz"
-            | otherwise = show x ++ "GHz"
+      fmt x | x < 1 = show (round (x * 1000) :: Integer) ++
+                      if suffix then "MHz" else ""
+            | otherwise = show x ++ if suffix then "GHz" else ""
   failureMessage <- getConfigValue naString
   checkedDataRetrieval failureMessage [path] Nothing (/divisor) fmt
