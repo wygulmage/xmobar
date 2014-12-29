@@ -145,8 +145,8 @@ options =
       "The foreground color. Default grey"
     , Option "i" ["iconroot"] (ReqArg IconRoot "path")
       "Root directory for icon pattern paths. Default '.'"
-    , Option "a" ["alpha"] (ReqArg Alpha "alpha")
-      "The transparency: 0 is transparent, 255 is opaque"
+    , Option "A" ["alpha"] (ReqArg Alpha "alpha")
+      "The transparency: 0 is transparent, 255 is opaque. Default: 255"
     , Option "o" ["top"] (NoArg T) "Place xmobar at the top of the screen"
     , Option "b" ["bottom"] (NoArg B)
       "Place xmobar at the bottom of the screen"

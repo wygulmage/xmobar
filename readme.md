@@ -377,7 +377,7 @@ xmobar --help):
       -f font name  --font=font name       The font name
       -B bg color   --bgcolor=bg color     The background color. Default black
       -F fg color   --fgcolor=fg color     The foreground color. Default grey
-      -a alpha      --alpha=alpha          The transparency: 0 is transparent, 255 is opaque
+      -A alpha      --alpha=alpha          The transparency: 0 is transparent, 255 (the default) is opaque
       -o            --top                  Place xmobar at the top of the screen
       -b            --bottom               Place xmobar at the bottom of the screen
       -d            --dock                 Try to start xmobar as a dock
