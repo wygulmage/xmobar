@@ -205,10 +205,8 @@ printString d p (Utf8 fs) gc fc bc x y s =
       io $ wcDrawImageString d p fs gc x y s
 
 #ifdef XFT
-printString dpy drw fs@(Xft fonts) _ fc bc x y s = do
-  (a,d)  <- textExtents fs s
-  gi <- xftTxtExtents' dpy fonts s
-  withDrawingColors dpy drw fc bc $ \draw -> \fc' -> \bc' ->
+printString dpy drw (Xft fonts) _ fc bc x y s = do
+  withDrawingColors dpy drw fc bc $ \draw -> \fc' -> \_ ->
     (drawXftString' draw fc' fonts (toInteger x) (toInteger (y - 2)) s)
 #endif
 

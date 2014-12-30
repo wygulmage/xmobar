@@ -343,8 +343,8 @@ verticalOffset ht (Text t) fontst conf
   | otherwise = do
      (as,ds) <- io $ textExtents fontst t
      let bwidth = borderOffset (border conf) (borderWidth conf)
-         verticalMargin = (fi ht) - fi (as + ds) - 2 * fi (abs bwidth)
-     return $ (fi ht) - (fi ds) - (verticalMargin `div` 2) + bwidth + 1
+         verticalMargin = fi ht - fi (as + ds) - 2 * fi (abs bwidth)
+     return $ fi ht - fi ds - (verticalMargin `div` 2) + bwidth + 1
 verticalOffset _ (Icon _) _ conf
   | iconOffset conf > -1 = return $ fi (iconOffset conf)
   | otherwise = do
