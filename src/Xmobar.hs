@@ -277,7 +277,7 @@ updateActions conf (Rectangle _ _ wid _) ~[left,center,right] = do
 
 -- | Draws in and updates the window
 drawInWin :: Rectangle -> [[(Widget, String, Maybe [Action])]] -> X ()
-drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
+drawInWin (Rectangle x y wid ht) ~[left,center,right] = do
   r <- ask
   let (c,d ) = (config &&& display) r
       (w,fs) = (window &&& fontS  ) r
@@ -285,6 +285,9 @@ drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
       iconW i = maybe 0 Bitmap.width (lookup i $ iconS r)
       getWidth (Text s,cl,_) = textWidth d fs s >>= \tw -> return (Text s,cl,fi tw)
       getWidth (Icon s,cl,_) = return (Icon s,cl,fi $ iconW s)
+      render opt bg pic m =
+        xRenderComposite d opt bg m pic (fromIntegral x) (fromIntegral y)
+                         0 0 0 0 (fromIntegral wid) (fromIntegral ht)
 
   withColors d [borderColor c] $ \[bdcolor] -> do
     gc <- io $ createGC  d w
@@ -299,8 +302,9 @@ drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
             -- just bgcolor' (putting in the mask alpha directly has strange
             -- results.  I wish someone had better docs on how
             -- XRenderComposite worked...)
-            withRenderFill d (XRenderColor 0 0 0 (257 * alpha c)) $ \m ->
-                xRenderComposite d pictOpSrc bgfill m pic 0 0 0 0 0 0 (fromIntegral wid) (fromIntegral ht)
+            withRenderFill d
+                           (XRenderColor 0 0 0 (257 * alpha c))
+                           (render pictOpSrc bgfill pic)
         -- Handle transparency
         internAtom d "_XROOTPMAP_ID" False >>= \xid ->
             let xroot = defaultRootWindow d in
@@ -315,8 +319,9 @@ drawInWin (Rectangle _ _ wid ht) ~[left,center,right] = do
                     rootbg <- peek (castPtr prop) :: IO Pixmap
                     xFree prop
                     withRenderPicture d rootbg $ \bgpic ->
-                        withRenderFill d (XRenderColor 0 0 0 (0xFFFF - 257 * alpha c)) $ \m ->
-                            xRenderComposite d pictOpAdd bgpic m pic 0 0 0 0 0 0 (fromIntegral wid) (fromIntegral ht)
+                        withRenderFill d
+                                 (XRenderColor 0 0 0 (0xFFFF - 257 * alpha c))
+                                 (render pictOpAdd bgpic pic)
     -- write to the pixmap the new string
     printStrings p gc fs 1 L =<< strLn left
     printStrings p gc fs 1 R =<< strLn right
