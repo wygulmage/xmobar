@@ -1503,7 +1503,7 @@ Petersen, Alexander Polakov, Petr Rockai, Andrew Sackville-West,
 Alexander Shabalin, Peter Simons, Alexander Solovyov, John Soros,
 Travis Staton, Artem Tarasov, Samuli Thomasson, Sergei Trofimovich,
 Thomas Tuegel, Jan Vornberger, Anton Vorontsov, Daniel Wagner, Phil
-Xiaojun Hu and Norbert Zeh.
+Xiaojun Hu, Edward Z. Yang and Norbert Zeh.
 
 [jao]: http://jao.io
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
@@ -1545,7 +1545,7 @@ giving me the chance to contribute.
 This software is released under a BSD-style license. See [LICENSE] for
 more details.
 
-Copyright &copy; 2010-2013 Jose Antonio Ortega Ruiz
+Copyright &copy; 2010-2014 Jose Antonio Ortega Ruiz
 
 Copyright &copy; 2007-2010 Andrea Rossato
 
