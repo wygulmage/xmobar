@@ -10,10 +10,12 @@ _New features_
     discussion in [issue #171] and [issue #201]).
   - New template variable `flags` in `MPD` monitor, by Duncan Burke.
   - Xmobar can now use a (semi)transparent background: set it with the
-    new configuration option `alpha` (thanks to Edward Z. Yang).
+    new configuration option `alpha` (thanks to Edward Z. Yang, see
+    [issue #114]).
 
 [issue #171]: https://github.com/jaor/xmobar/issues/171
 [issue #201]: https://github.com/jaor/xmobar/issues/201
+[issue #114]: https://github.com/jaor/xmobar/issues/114
 
 _Bug fixes_
 
