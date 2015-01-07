@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  XUtil
--- Copyright   :  (C) 2011, 2012, 2013, 2014 Jose Antonio Ortega Ruiz
+-- Copyright   :  (C) 2011, 2012, 2013, 2014, 2015 Jose Antonio Ortega Ruiz
 --                (C) 2007 Andrea Rossato
 -- License     :  BSD3
 --
@@ -38,6 +38,7 @@ module XUtil
     , xRenderFreePicture
     , withRenderPicture
     , withRenderFill
+    , drawBackground
     , parseRenderColor
     , pictOpMinimum
     , pictOpClear
@@ -58,6 +59,7 @@ module XUtil
     ) where
 
 import Control.Concurrent
+import Control.Monad (when)
 import Control.Monad.Trans
 import Control.Exception (SomeException, handle)
 import Foreign
@@ -192,21 +194,28 @@ textExtents (Xft xftfonts) _ = do
 #endif
 
 printString :: Display -> Drawable -> XFont -> GC -> String -> String
-            -> Position -> Position -> String  -> IO ()
-printString d p (Core fs) gc fc bc x y s = do
+            -> Position -> Position -> String -> Int -> IO ()
+printString d p (Core fs) gc fc bc x y s a = do
     setFont d gc $ fontFromFontStruct fs
-    withColors d [fc, bc] $ \[fc', _] -> do
+    withColors d [fc, bc] $ \[fc', bc'] -> do
       setForeground d gc fc'
+      when (a == 255) (setBackground d gc bc')
       drawImageString d p gc x y s
 
-printString d p (Utf8 fs) gc fc bc x y s =
-    withColors d [fc, bc] $ \[fc', _] -> do
+printString d p (Utf8 fs) gc fc bc x y s a =
+    withColors d [fc, bc] $ \[fc', bc'] -> do
       setForeground d gc fc'
+      when (a == 255) (setBackground d gc bc')
       io $ wcDrawImageString d p fs gc x y s
 
 #ifdef XFT
-printString dpy drw (Xft fonts) _ fc bc x y s = do
-  withDrawingColors dpy drw fc bc $ \draw -> \fc' -> \_ ->
+printString dpy drw fs@(Xft fonts) _ fc bc x y s al = do
+  withDrawingColors dpy drw fc bc $ \draw -> \fc' -> \bc' -> do
+    when (al == 255) $ do
+      (a,d)  <- textExtents fs s
+      gi <- xftTxtExtents dpy (head fonts) s
+      drawXftRect draw bc' (x + 1 - fi (xglyphinfo_x gi))
+                  (y - (a + d) + 1) (xglyphinfo_xOff gi) (a + d)
     (drawXftString' draw fc' fonts (toInteger x) (toInteger (y - 2)) s)
 #endif
 
@@ -302,6 +311,38 @@ withRenderFill d c f = do
     f pic
     xRenderFreePicture d pic
 
+-- | Drawing the background to a pixmap and tacking into account
+-- transparency
+drawBackground ::  Display -> Drawable -> String -> Int -> Rectangle -> IO ()
+drawBackground d p bgc alpha (Rectangle x y wid ht) = do
+  let render opt bg pic m =
+        xRenderComposite d opt bg m pic
+                        (fromIntegral x) (fromIntegral y) 0 0
+                        0 0 (fromIntegral wid) (fromIntegral ht)
+  withRenderPicture d p $ \pic -> do
+    -- Handle background color
+    bgcolor <- parseRenderColor d bgc
+    withRenderFill d bgcolor $ \bgfill ->
+      withRenderFill d
+                     (XRenderColor 0 0 0 (257 * alpha))
+                     (render pictOpSrc bgfill pic)
+    -- Handle transparency
+    internAtom d "_XROOTPMAP_ID" False >>= \xid ->
+      let xroot = defaultRootWindow d in
+      alloca $ \x1 ->
+      alloca $ \x2 ->
+      alloca $ \x3 ->
+      alloca $ \x4 ->
+      alloca $ \pprop -> do
+        xGetWindowProperty d xroot xid 0 1 False 20 x1 x2 x3 x4 pprop
+        prop <- peek pprop
+        when (prop /= nullPtr) $ do
+          rootbg <- peek (castPtr prop) :: IO Pixmap
+          xFree prop
+          withRenderPicture d rootbg $ \bgpic ->
+            withRenderFill d (XRenderColor 0 0 0 (0xFFFF - 257 * alpha))
+                           (render pictOpAdd bgpic pic)
+
 -- | Parses color into XRender color (allocation not necessary!)
 parseRenderColor :: Display -> String -> IO XRenderColor
 parseRenderColor d c = do
@@ -309,9 +350,11 @@ parseRenderColor d c = do
     Color _ red green blue _ <- parseColor d colormap c
     return $ XRenderColor (fromIntegral red) (fromIntegral green) (fromIntegral blue) 0xFFFF
 
-pictOpMinimum, pictOpClear, pictOpSrc, pictOpDst, pictOpOver, pictOpOverReverse,
-    pictOpIn, pictOpInReverse, pictOpOut, pictOpOutReverse, pictOpAtop,
-    pictOpAtopReverse, pictOpXor, pictOpAdd, pictOpSaturate, pictOpMaximum :: PictOp
+pictOpMinimum, pictOpClear, pictOpSrc,
+  pictOpDst, pictOpOver, pictOpOverReverse,
+  pictOpIn, pictOpInReverse, pictOpOut, pictOpOutReverse, pictOpAtop,
+  pictOpAtopReverse, pictOpXor, pictOpAdd, pictOpSaturate,
+  pictOpMaximum :: PictOp
 pictOpMinimum = 0
 pictOpClear = 0
 pictOpSrc = 1

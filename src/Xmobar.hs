@@ -44,9 +44,6 @@ import Control.Exception (handle, SomeException(..))
 import Data.Bits
 import Data.Map hiding (foldr, map, filter)
 import Data.Maybe (fromJust, isJust)
-import Foreign.Marshal.Alloc
-import Foreign.Storable
-import Foreign.Ptr
 
 import Bitmap
 import Config
@@ -89,7 +86,8 @@ runX :: XConf -> X () -> IO ()
 runX xc f = runReaderT f xc
 
 -- | Starts the main event loop and threads
-startLoop :: XConf -> TMVar SignalType -> [[(Maybe ThreadId, TVar String)]] -> IO ()
+startLoop :: XConf -> TMVar SignalType -> [[(Maybe ThreadId, TVar String)]]
+             -> IO ()
 startLoop xcfg@(XConf _ _ w _ _ _) sig vs = do
 #ifdef XFT
     xftInitFtLibrary
@@ -112,8 +110,8 @@ startLoop xcfg@(XConf _ _ w _ _ _) sig vs = do
     eventer signal =
       allocaXEvent $ \e -> do
         dpy <- openDisplay ""
-        xrrSelectInput    dpy (defaultRootWindow dpy) rrScreenChangeNotifyMask
-        selectInput       dpy w (exposureMask .|. structureNotifyMask .|. buttonPressMask)
+        xrrSelectInput dpy (defaultRootWindow dpy) rrScreenChangeNotifyMask
+        selectInput dpy w (exposureMask .|. structureNotifyMask .|. buttonPressMask)
 
         forever $ do
 #ifdef THREADED_RUNTIME
@@ -277,51 +275,23 @@ updateActions conf (Rectangle _ _ wid _) ~[left,center,right] = do
 
 -- | Draws in and updates the window
 drawInWin :: Rectangle -> [[(Widget, String, Maybe [Action])]] -> X ()
-drawInWin (Rectangle x y wid ht) ~[left,center,right] = do
+drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
   r <- ask
-  let (c,d ) = (config &&& display) r
+  let (c,d)  = (config &&& display) r
       (w,fs) = (window &&& fontS  ) r
       strLn  = io . mapM getWidth
       iconW i = maybe 0 Bitmap.width (lookup i $ iconS r)
       getWidth (Text s,cl,_) = textWidth d fs s >>= \tw -> return (Text s,cl,fi tw)
       getWidth (Icon s,cl,_) = return (Icon s,cl,fi $ iconW s)
-      render opt bg pic m =
-        xRenderComposite d opt bg m pic (fromIntegral x) (fromIntegral y)
-                         0 0 0 0 (fromIntegral wid) (fromIntegral ht)
 
-  withColors d [borderColor c] $ \[bdcolor] -> do
+  p <- io $ createPixmap d w wid ht
+                         (defaultDepthOfScreen (defaultScreenOfDisplay d))
+  when (alpha c /= 255) (io $ drawBackground d p (bgColor c) (alpha c) wr)
+  withColors d [bgColor c, borderColor c] $ \[bgcolor, bdcolor] -> do
     gc <- io $ createGC  d w
-    -- create a pixmap to write to and fill it with a rectangle
-    p <- io $ createPixmap d w wid ht
-         (defaultDepthOfScreen (defaultScreenOfDisplay d))
-    io $ withRenderPicture d p $ \pic -> do
-        -- Handle background color
-        bgcolor <- parseRenderColor d (bgColor c)
-        withRenderFill d bgcolor $ \bgfill ->
-            -- I apparently don't know how to do this properly with
-            -- just bgcolor' (putting in the mask alpha directly has strange
-            -- results.  I wish someone had better docs on how
-            -- XRenderComposite worked...)
-            withRenderFill d
-                           (XRenderColor 0 0 0 (257 * alpha c))
-                           (render pictOpSrc bgfill pic)
-        -- Handle transparency
-        internAtom d "_XROOTPMAP_ID" False >>= \xid ->
-            let xroot = defaultRootWindow d in
-            alloca $ \x1 ->
-            alloca $ \x2 ->
-            alloca $ \x3 ->
-            alloca $ \x4 ->
-            alloca $ \pprop -> do
-                xGetWindowProperty d xroot xid 0 1 False 20 x1 x2 x3 x4 pprop
-                prop <- peek pprop
-                when (prop /= nullPtr) $ do
-                    rootbg <- peek (castPtr prop) :: IO Pixmap
-                    xFree prop
-                    withRenderPicture d rootbg $ \bgpic ->
-                        withRenderFill d
-                                 (XRenderColor 0 0 0 (0xFFFF - 257 * alpha c))
-                                 (render pictOpAdd bgpic pic)
+    when (alpha c == 255) $ do
+      io $ setForeground d gc bgcolor
+      io $ fillRectangle d p gc 0 0 wid ht
     -- write to the pixmap the new string
     printStrings p gc fs 1 L =<< strLn left
     printStrings p gc fs 1 R =<< strLn right
@@ -358,6 +328,7 @@ printStrings _ _ _ _ _ [] = return ()
 printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
   r <- ask
   let (conf,d) = (config &&& display) r
+      alph = alpha conf
       Rectangle _ _ wid ht = rect r
       totSLen = foldr (\(_,_,len) -> (+) len) 0 sl
       remWidth = fi wid - fi totSLen
@@ -370,6 +341,6 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
                  (f,    _) -> (f, bgColor conf)
   valign <- verticalOffset ht s fontst conf
   case s of
-    (Text t) -> io $ printString d dr fontst gc fc bc offset valign t
+    (Text t) -> io $ printString d dr fontst gc fc bc offset valign t alph
     (Icon p) -> io $ maybe (return ()) (drawBitmap d dr gc fc bc offset valign) (lookup p (iconS r))
   printStrings dr gc fontst (offs + l) a xs
