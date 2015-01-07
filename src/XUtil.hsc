@@ -1,4 +1,3 @@
-{-# LANGUAGE ForeignFunctionInterface #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  XUtil
@@ -12,6 +11,8 @@
 --
 -----------------------------------------------------------------------------
 
+{-# LANGUAGE ForeignFunctionInterface, EmptyDataDecls #-}
+
 module XUtil
     ( XFont
     , initFont
@@ -20,42 +21,13 @@ module XUtil
     , textExtents
     , textWidth
     , printString
+    , drawBackground
     , newWindow
     , nextEvent'
     , readFileSafe
     , hGetLineSafe
     , io
     , fi
-    , XRenderPictureAttributes(..)
-    , XRenderPictFormat(..)
-    , XRenderColor(..) -- reexport
-    , Picture
-    , xRenderFindStandardFormat
-    , xRenderCreatePicture
-    , xRenderFillRectangle
-    , xRenderComposite
-    , xRenderCreateSolidFill
-    , xRenderFreePicture
-    , withRenderPicture
-    , withRenderFill
-    , drawBackground
-    , parseRenderColor
-    , pictOpMinimum
-    , pictOpClear
-    , pictOpSrc
-    , pictOpDst
-    , pictOpOver
-    , pictOpOverReverse
-    , pictOpIn
-    , pictOpInReverse
-    , pictOpOut
-    , pictOpOutReverse
-    , pictOpAtop
-    , pictOpAtopReverse
-    , pictOpXor
-    , pictOpAdd
-    , pictOpSaturate
-    , pictOpMaximum
     ) where
 
 import Control.Concurrent
@@ -268,8 +240,11 @@ setupLocale = return ()
 type Picture = XID
 type PictOp = CInt
 
-foreign import ccall unsafe "X11/extensions/Xrender.h XRenderFillRectangle"
-  xRenderFillRectangle :: Display -> PictOp -> Picture -> Ptr XRenderColor -> CInt -> CInt -> CUInt -> CUInt -> IO ()
+data XRenderPictFormat
+data XRenderPictureAttributes = XRenderPictureAttributes
+
+-- foreign import ccall unsafe "X11/extensions/Xrender.h XRenderFillRectangle"
+  -- xRenderFillRectangle :: Display -> PictOp -> Picture -> Ptr XRenderColor -> CInt -> CInt -> CUInt -> CUInt -> IO ()
 foreign import ccall unsafe "X11/extensions/Xrender.h XRenderComposite"
   xRenderComposite :: Display -> PictOp -> Picture -> Picture -> Picture -> CInt -> CInt -> CInt -> CInt -> CInt -> CInt -> CUInt -> CUInt -> IO ()
 foreign import ccall unsafe "X11/extensions/Xrender.h XRenderCreateSolidFill"
@@ -282,8 +257,6 @@ foreign import ccall unsafe "X11/extensions/Xrender.h XRenderFindStandardFormat"
 foreign import ccall unsafe "X11/extensions/Xrender.h XRenderCreatePicture"
   xRenderCreatePicture :: Display -> Drawable -> Ptr XRenderPictFormat -> CULong -> Ptr XRenderPictureAttributes -> IO Picture
 
-data XRenderPictFormat = XRenderPictFormat
-data XRenderPictureAttributes = XRenderPictureAttributes
 
 -- Attributes not supported
 instance Storable XRenderPictureAttributes where
@@ -350,24 +323,21 @@ parseRenderColor d c = do
     Color _ red green blue _ <- parseColor d colormap c
     return $ XRenderColor (fromIntegral red) (fromIntegral green) (fromIntegral blue) 0xFFFF
 
-pictOpMinimum, pictOpClear, pictOpSrc,
-  pictOpDst, pictOpOver, pictOpOverReverse,
-  pictOpIn, pictOpInReverse, pictOpOut, pictOpOutReverse, pictOpAtop,
-  pictOpAtopReverse, pictOpXor, pictOpAdd, pictOpSaturate,
-  pictOpMaximum :: PictOp
-pictOpMinimum = 0
-pictOpClear = 0
+pictOpSrc, pictOpAdd :: PictOp
 pictOpSrc = 1
-pictOpDst = 2
-pictOpOver = 3
-pictOpOverReverse = 4
-pictOpIn = 5
-pictOpInReverse = 6
-pictOpOut = 7
-pictOpOutReverse = 8
-pictOpAtop = 9
-pictOpAtopReverse = 10
-pictOpXor = 11
 pictOpAdd = 12
-pictOpSaturate = 13
-pictOpMaximum = 13
+
+-- pictOpMinimum = 0
+-- pictOpClear = 0
+-- pictOpDst = 2
+-- pictOpOver = 3
+-- pictOpOverReverse = 4
+-- pictOpIn = 5
+-- pictOpInReverse = 6
+-- pictOpOut = 7
+-- pictOpOutReverse = 8
+-- pictOpAtop = 9
+-- pictOpAtopReverse = 10
+-- pictOpXor = 11
+-- pictOpSaturate = 13
+-- pictOpMaximum = 13
