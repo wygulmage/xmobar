@@ -2,7 +2,8 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Xmobar
--- Copyright   :  (c) Andrea Rossato
+-- Copyright   :  (c) 2011, 2012, 2013, 2014, 2015 Jose Antonio Ortega Ruiz
+--                (c) 2007 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
@@ -152,7 +153,8 @@ eventLoop tv xc@(XConf d r w fs is cfg) as signal = do
       case typ of
          Wakeup -> do
             str <- updateString cfg tv
-            xc' <- updateCache d w is (iconRoot cfg) str >>= \c -> return xc { iconS = c }
+            xc' <- updateCache d w is (iconRoot cfg) str >>=
+                     \c -> return xc { iconS = c }
             as' <- updateActions xc r str
             runX xc' $ drawInWin r str
             eventLoop tv xc' as' signal
@@ -211,8 +213,7 @@ eventLoop tv xc@(XConf d r w fs is cfg) as signal = do
                         (ocfg {position = OnScreen 1 o})
                        else
                         (ocfg {position = OnScreen (n+1) o}))
-            o ->
-              return (ocfg {position = OnScreen 1 o})
+            o -> return (ocfg {position = OnScreen 1 o})
 
         action button x = do
           mapM_ runAction $
@@ -232,23 +233,23 @@ startCommand sig (com,s,ss)
     | alias com == "" = do var <- atomically $ newTVar is
                            atomically $ writeTVar var (s ++ ss)
                            return (Nothing,var)
-    | otherwise       = do var <- atomically $ newTVar is
-                           let cb str = atomically $ writeTVar var (s ++ str ++ ss)
-                           h <- forkIO $ start com cb
-                           _ <- forkIO $ trigger com
-                                       $ maybe (return ()) (atomically . putTMVar sig)
-                           return (Just h,var)
+    | otherwise = do var <- atomically $ newTVar is
+                     let cb str = atomically $ writeTVar var (s ++ str ++ ss)
+                     h <- forkIO $ start com cb
+                     _ <- forkIO $ trigger com $ maybe (return ())
+                                                 (atomically . putTMVar sig)
+                     return (Just h,var)
     where is = s ++ "Updating..." ++ ss
 
-updateString :: Config -> TVar [String] ->
-                IO [[(Widget, String, Maybe [Action])]]
+updateString :: Config -> TVar [String]
+                -> IO [[(Widget, String, Maybe [Action])]]
 updateString conf v = do
   s <- atomically $ readTVar v
   let l:c:r:_ = s ++ repeat ""
   io $ mapM (parseString conf) [l, c, r]
 
-updateActions :: XConf -> Rectangle -> [[(Widget, String, Maybe [Action])]] ->
-                 IO [([Action], Position, Position)]
+updateActions :: XConf -> Rectangle -> [[(Widget, String, Maybe [Action])]]
+                 -> IO [([Action], Position, Position)]
 updateActions conf (Rectangle _ _ wid _) ~[left,center,right] = do
   let (d,fs) = (display &&& fontS) conf
       strLn :: [(Widget, String, Maybe [Action])] -> IO [(Maybe [Action], Position, Position)]
@@ -258,18 +259,19 @@ updateActions conf (Rectangle _ _ wid _) ~[left,center,right] = do
       getCoords (Icon s,_,a) = return (a, 0, fi $ iconW s)
       partCoord off xs = map (\(a, x, x') -> (fromJust a, x, x')) $
                          filter (\(a, _,_) -> isJust a) $
-                         scanl (\(_,_,x') (a,_,w') -> (a, x', x' + w')) (Nothing, 0, off) xs
-
-      totSLen              = foldr (\(_,_,len) -> (+) len) 0
-      remWidth xs          = fi wid - totSLen xs
-      offs                 = 1
-      offset a xs          = case a of
-                               C -> (remWidth xs + offs) `div` 2
-                               R -> remWidth xs
-                               L -> offs
-
-  fmap concat $ mapM (\(a,xs) -> (\xs' -> partCoord (offset a xs') xs') <$> strLn xs) $
-                zip [L,C,R] [left,center,right]
+                         scanl (\(_,_,x') (a,_,w') -> (a, x', x' + w'))
+                               (Nothing, 0, off)
+                               xs
+      totSLen = foldr (\(_,_,len) -> (+) len) 0
+      remWidth xs = fi wid - totSLen xs
+      offs = 1
+      offset a xs = case a of
+                     C -> (remWidth xs + offs) `div` 2
+                     R -> remWidth xs
+                     L -> offs
+  fmap concat $ mapM (\(a,xs) ->
+                       (\xs' -> partCoord (offset a xs') xs') <$> strLn xs) $
+                     zip [L,C,R] [left,center,right]
 
 -- $print
 
@@ -277,11 +279,12 @@ updateActions conf (Rectangle _ _ wid _) ~[left,center,right] = do
 drawInWin :: Rectangle -> [[(Widget, String, Maybe [Action])]] -> X ()
 drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
   r <- ask
-  let (c,d)  = (config &&& display) r
+  let (c,d) = (config &&& display) r
       (w,fs) = (window &&& fontS  ) r
-      strLn  = io . mapM getWidth
+      strLn = io . mapM getWidth
       iconW i = maybe 0 Bitmap.width (lookup i $ iconS r)
-      getWidth (Text s,cl,_) = textWidth d fs s >>= \tw -> return (Text s,cl,fi tw)
+      getWidth (Text s,cl,_) =
+        textWidth d fs s >>= \tw -> return (Text s,cl,fi tw)
       getWidth (Icon s,cl,_) = return (Icon s,cl,fi $ iconW s)
 
   p <- io $ createPixmap d w wid ht
@@ -299,12 +302,12 @@ drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
     -- draw 1 pixel border if requested
     io $ drawBorder (border c) (borderWidth c) d p gc bdcolor wid ht
     -- copy the pixmap with the new string to the window
-    io $ copyArea   d p w gc 0 0 wid ht 0 0
+    io $ copyArea d p w gc 0 0 wid ht 0 0
     -- free up everything (we do not want to leak memory!)
-    io $ freeGC     d gc
+    io $ freeGC d gc
     io $ freePixmap d p
     -- resync
-    io $ sync       d True
+    io $ sync d True
 
 verticalOffset ::  (Integral b, Integral a, MonadIO m) =>
                    a -> Widget -> XFont -> Config -> m b
@@ -342,5 +345,7 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
   valign <- verticalOffset ht s fontst conf
   case s of
     (Text t) -> io $ printString d dr fontst gc fc bc offset valign t alph
-    (Icon p) -> io $ maybe (return ()) (drawBitmap d dr gc fc bc offset valign) (lookup p (iconS r))
+    (Icon p) -> io $ maybe (return ())
+                           (drawBitmap d dr gc fc bc offset valign)
+                           (lookup p (iconS r))
   printStrings dr gc fontst (offs + l) a xs
