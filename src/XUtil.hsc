@@ -213,7 +213,7 @@ printString dpy drw fs@(Xft fonts) _ fc bc x y s al = do
   withDrawingColors dpy drw fc bc $ \draw -> \fc' -> \bc' -> do
     when (al == 255) $ do
       (a,d)  <- textExtents fs s
-      gi <- xftTxtExtents dpy (head fonts) s
+      gi <- xftTxtExtents' dpy fonts s
       drawXftRect draw bc' (x + 1 - fi (xglyphinfo_x gi))
                   (y - (a + d) + 1) (xglyphinfo_xOff gi) (a + d)
     (drawXftString' draw fc' fonts (toInteger x) (toInteger (y - 2)) s)
