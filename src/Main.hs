@@ -59,12 +59,13 @@ main = do
 
   conf  <- doOpts c o
   fs    <- initFont d (font conf)
+  fl    <- mapM (initFont d) (fontList conf)
   cls   <- mapM (parseTemplate conf) (splitTemplate conf)
   sig   <- setupSignalHandler
   vars  <- mapM (mapM $ startCommand sig) cls
   (r,w) <- createWin d fs conf
   let ic = Map.empty
-  startLoop (XConf d r w fs ic conf) sig vars
+  startLoop (XConf d r w (fs:fl) ic conf) sig vars
 
 -- | Splits the template in its parts
 splitTemplate :: Config -> [String]

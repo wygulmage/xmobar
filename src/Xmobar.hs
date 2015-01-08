@@ -74,12 +74,12 @@ type X = ReaderT XConf IO
 
 -- | The ReaderT inner component
 data XConf =
-    XConf { display :: Display
-          , rect    :: Rectangle
-          , window  :: Window
-          , fontS   :: XFont
-          , iconS   :: Map FilePath Bitmap
-          , config  :: Config
+    XConf { display   :: Display
+          , rect      :: Rectangle
+          , window    :: Window
+          , fontListS :: [XFont]
+          , iconS     :: Map FilePath Bitmap
+          , config    :: Config
           }
 
 -- | Runs the ReaderT
@@ -201,7 +201,7 @@ eventLoop tv xc@(XConf d r w fs is cfg) as signal = do
             eventLoop tv xc as signal
 
         reposWindow rcfg = do
-          r' <- repositionWin d w fs rcfg
+          r' <- repositionWin d w (fs!!0) rcfg
           eventLoop tv (XConf d r' w fs is rcfg) as signal
 
         updateConfigPosition ocfg =
@@ -242,21 +242,21 @@ startCommand sig (com,s,ss)
     where is = s ++ "Updating..." ++ ss
 
 updateString :: Config -> TVar [String]
-                -> IO [[(Widget, String, Maybe [Action])]]
+                -> IO [[(Widget, String, Int, Maybe [Action])]]
 updateString conf v = do
   s <- atomically $ readTVar v
   let l:c:r:_ = s ++ repeat ""
   io $ mapM (parseString conf) [l, c, r]
 
-updateActions :: XConf -> Rectangle -> [[(Widget, String, Maybe [Action])]]
+updateActions :: XConf -> Rectangle -> [[(Widget, String, Int, Maybe [Action])]]
                  -> IO [([Action], Position, Position)]
 updateActions conf (Rectangle _ _ wid _) ~[left,center,right] = do
-  let (d,fs) = (display &&& fontS) conf
-      strLn :: [(Widget, String, Maybe [Action])] -> IO [(Maybe [Action], Position, Position)]
+  let (d,fs) = (display &&& fontListS) conf
+      strLn :: [(Widget, String, Int, Maybe [Action])] -> IO [(Maybe [Action], Position, Position)]
       strLn  = io . mapM getCoords
       iconW i = maybe 0 Bitmap.width (lookup i $ iconS conf)
-      getCoords (Text s,_,a) = textWidth d fs s >>= \tw -> return (a, 0, fi tw)
-      getCoords (Icon s,_,a) = return (a, 0, fi $ iconW s)
+      getCoords (Text s,_,i,a) = textWidth d (fs!!i) s >>= \tw -> return (a, 0, fi tw)
+      getCoords (Icon s,_,_,a) = return (a, 0, fi $ iconW s)
       partCoord off xs = map (\(a, x, x') -> (fromJust a, x, x')) $
                          filter (\(a, _,_) -> isJust a) $
                          scanl (\(_,_,x') (a,_,w') -> (a, x', x' + w'))
@@ -276,16 +276,16 @@ updateActions conf (Rectangle _ _ wid _) ~[left,center,right] = do
 -- $print
 
 -- | Draws in and updates the window
-drawInWin :: Rectangle -> [[(Widget, String, Maybe [Action])]] -> X ()
+drawInWin :: Rectangle -> [[(Widget, String, Int, Maybe [Action])]] -> X ()
 drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
   r <- ask
   let (c,d) = (config &&& display) r
-      (w,fs) = (window &&& fontS  ) r
+      (w,fs) = (window &&& fontListS  ) r
       strLn = io . mapM getWidth
       iconW i = maybe 0 Bitmap.width (lookup i $ iconS r)
-      getWidth (Text s,cl,_) =
-        textWidth d fs s >>= \tw -> return (Text s,cl,fi tw)
-      getWidth (Icon s,cl,_) = return (Icon s,cl,fi $ iconW s)
+      getWidth (Text s,cl,i,_) =
+        textWidth d (fs!!i) s >>= \tw -> return (Text s,cl,i,fi tw)
+      getWidth (Icon s,cl,i,_) = return (Icon s,cl,i,fi $ iconW s)
 
   p <- io $ createPixmap d w wid ht
                          (defaultDepthOfScreen (defaultScreenOfDisplay d))
@@ -325,16 +325,17 @@ verticalOffset _ (Icon _) _ conf
      return $ bwidth + 1
 
 -- | An easy way to print the stuff we need to print
-printStrings :: Drawable -> GC -> XFont -> Position
-             -> Align -> [(Widget, String, Position)] -> X ()
+printStrings :: Drawable -> GC -> [XFont] -> Position
+             -> Align -> [(Widget, String, Int, Position)] -> X ()
 printStrings _ _ _ _ _ [] = return ()
-printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
+printStrings dr gc fontlist offs a sl@((s,c,i,l):xs) = do
   r <- ask
   let (conf,d) = (config &&& display) r
       alph = alpha conf
       Rectangle _ _ wid ht = rect r
-      totSLen = foldr (\(_,_,len) -> (+) len) 0 sl
+      totSLen = foldr (\(_,_,_,len) -> (+) len) 0 sl
       remWidth = fi wid - fi totSLen
+      fontst = fontlist !! i
       offset = case a of
                  C -> (remWidth + offs) `div` 2
                  R -> remWidth
@@ -348,4 +349,4 @@ printStrings dr gc fontst offs a sl@((s,c,l):xs) = do
     (Icon p) -> io $ maybe (return ())
                            (drawBitmap d dr gc fc bc offset valign)
                            (lookup p (iconS r))
-  printStrings dr gc fontst (offs + l) a xs
+  printStrings dr gc fontlist (offs + l) a xs

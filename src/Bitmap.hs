@@ -54,10 +54,10 @@ data Bitmap = Bitmap { width  :: Dimension
                      }
 
 updateCache :: Display -> Window -> Map FilePath Bitmap -> FilePath ->
-               [[(Widget, String, Maybe [Action])]] -> IO (Map FilePath Bitmap)
+               [[(Widget, String, Int, Maybe [Action])]] -> IO (Map FilePath Bitmap)
 updateCache dpy win cache iconRoot ps = do
-  let paths = map (\(Icon p, _, _) -> p) . concatMap (filter icons) $ ps
-      icons (Icon _, _, _) = True
+  let paths = map (\(Icon p, _, _, _) -> p) . concatMap (filter icons) $ ps
+      icons (Icon _, _, _, _) = True
       icons _ = False
       expandPath path@('/':_) = path
       expandPath path@('.':'/':_) = path
