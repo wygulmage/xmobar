@@ -220,7 +220,7 @@ parseConfig = runParser parseConf fields "Config" . stripComments
               <|?> pCommands <|?> pSepChar <|?> pAlignSep <|?> pTemplate
 
 
-      fields    = [ "font", "fontList","bgColor", "fgColor", "sepChar"
+      fields    = [ "font", "additionalFonts","bgColor", "fgColor", "sepChar"
                   , "alignSep" , "border", "borderColor" ,"template"
                   , "position" , "textOffset", "iconOffset"
                   , "allDesktops", "overrideRedirect", "pickBroadest"
@@ -229,7 +229,7 @@ parseConfig = runParser parseConf fields "Config" . stripComments
                   ]
 
       pFont = strField font "font"
-      pFontList = strListField fontList "fontList"
+      pFontList = strListField additionalFonts "additionalFonts"
       pBgColor = strField bgColor "bgColor"
       pFgColor = strField fgColor "fgColor"
       pBdColor = strField borderColor "borderColor"

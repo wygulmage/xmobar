@@ -59,7 +59,7 @@ main = do
 
   conf  <- doOpts c o
   fs    <- initFont d (font conf)
-  fl    <- mapM (initFont d) (fontList conf)
+  fl    <- mapM (initFont d) (additionalFonts conf)
   cls   <- mapM (parseTemplate conf) (splitTemplate conf)
   sig   <- setupSignalHandler
   vars  <- mapM (mapM $ startCommand sig) cls

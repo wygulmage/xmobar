@@ -198,7 +198,7 @@ For the output template:
 - `<fc=#FF0000>string</fc>` will print `string` with `#FF0000` color
   (red).
 
-- `<fn=1>string</fn>` will print `string` with the first font from `fontList`.
+- `<fn=1>string</fn>` will print `string` with the first font from `additionalFonts`.
   The index `0` corresponds to the standard font.
 
 - `<icon=/path/to/icon.xbm/>` will insert the given bitmap. XPM image
@@ -230,7 +230,7 @@ Other configuration options:
 `font`
 :    Name of the font to be used. Use the `xft:` prefix for XFT fonts.
 
-`fontList`
+`additionalFonts`
 :    Haskell-style list of fonts to be used with the `fn`-template.
      Use the `xft:` prefix for XFT fonts.
 

@@ -49,7 +49,7 @@ import Plugins.DateZone
 -- | The configuration data type
 data Config =
     Config { font :: String         -- ^ Font
-           , fontList :: [String]   -- ^ List of alternative fonts
+           , additionalFonts :: [String] -- ^ List of alternative fonts
            , bgColor :: String      -- ^ Backgroud color
            , fgColor :: String      -- ^ Default font color
            , position :: XPosition  -- ^ Top Bottom or Static
@@ -111,7 +111,7 @@ data Border = NoBorder
 defaultConfig :: Config
 defaultConfig =
     Config { font = "-misc-fixed-*-*-*-*-10-*-*-*-*-*-*-*"
-           , fontList = []
+           , additionalFonts = []
            , bgColor = "#000000"
            , fgColor = "#BFBFBF"
            , alpha   = 255
