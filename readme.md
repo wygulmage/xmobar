@@ -1507,10 +1507,10 @@ Kosciuszkiewicz, Dmitry Kurochkin, Todd Lunter, Robert J. Macomber,
 Dmitry Malikov, David McLean, Marcin Mikołajczyk, Tony Morris, Eric
 Mrak, Thiago Negri, Edward O'Callaghan, Svein Ove, Martin Perner, Jens
 Petersen, Alexander Polakov, Petr Rockai, Andrew Sackville-West,
-Alexander Shabalin, Peter Simons, Alexander Solovyov, John Soros,
-Travis Staton, Artem Tarasov, Samuli Thomasson, Sergei Trofimovich,
-Thomas Tuegel, Jan Vornberger, Anton Vorontsov, Daniel Wagner, Phil
-Xiaojun Hu, Edward Z. Yang and Norbert Zeh.
+Markus Scherer, Alexander Shabalin, Peter Simons, Alexander Solovyov,
+John Soros, Travis Staton, Artem Tarasov, Samuli Thomasson, Sergei
+Trofimovich, Thomas Tuegel, Jan Vornberger, Anton Vorontsov, Daniel
+Wagner, Phil Xiaojun Hu, Edward Z. Yang and Norbert Zeh.
 
 [jao]: http://jao.io
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors

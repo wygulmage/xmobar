@@ -12,6 +12,9 @@ _New features_
   - Xmobar can now use a (semi)transparent background: set it with the
     new configuration option `alpha` (thanks to Edward Z. Yang, see
     [issue #114]).
+  - Multiple fonts available by means of the new configuration
+    parameter `additionalFonts` and the template markers
+    `<fn=1>...</fn>`, by Markus Scherer.
 
 [issue #171]: https://github.com/jaor/xmobar/issues/171
 [issue #201]: https://github.com/jaor/xmobar/issues/201
