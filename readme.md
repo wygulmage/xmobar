@@ -727,6 +727,7 @@ something like:
 
 - Aliases to the Station ID: so `Weather "LIPB" []` can be used in
   template as `%LIPB%`
+- Thresholds refer to temperature in the selected units
 - Args: default monitor arguments
 - Variables that can be used with the `-t`/`--template` argument:
 	    `station`, `stationState`, `year`, `month`, `day`, `hour`,
@@ -740,6 +741,7 @@ something like:
 
 - Aliases to the interface name: so `Network "eth0" []` can be used as
   `%eth0%`
+- Thresholds refer to velocities expressed in Kb/s
 - Args: default monitor arguments, plus:
   - `--rx-icon-pattern`: dynamic string for reception rate in `rxipat`.
   - `--tx-icon-pattern`: dynamic string for transmission rate in `txipat`.
@@ -754,6 +756,7 @@ something like:
 
 - Active interface is detected automatically
 - Aliases to "dynnetwork"
+- Thresholds are expressed in Kb/s
 - Args: default monitor arguments, plus:
   - `--rx-icon-pattern`: dynamic string for reception rate in `rxipat`.
   - `--tx-icon-pattern`: dynamic string for transmission rate in `txipat`.
@@ -772,10 +775,11 @@ something like:
   - `--quality-icon-pattern`: dynamic string for connection quality in `qualityipat`.
 - Variables that can be used with the `-t`/`--template` argument:
             `essid`, `quality`, `qualitybar`, `qualityvbar`, `qualityipat`
+- Thresholds refer to link quality in a `[0, 100]` scale
 - Default template: `<essid> <quality>`
 - Requires the C library [iwlib] (part of the wireless tools suite)
   installed in your system. In addition, to activate this plugin you
-  must pass `--flags="with_iwlib"` during compilation.
+  must pass `--flags="with_iwlib"` during compilation
 
 ### `Memory Args RefreshRate`
 
@@ -784,6 +788,7 @@ something like:
   - `--used-icon-pattern`: dynamic string for used memory ratio in `usedipat`.
   - `--free-icon-pattern`: dynamic string for free memory ratio in `freeipat`.
   - `--available-icon-pattern`: dynamic string for available memory ratio in `availableipat`.
+- Thresholds refer to percentage of used memory
 - Variables that can be used with the `-t`/`--template` argument:
              `total`, `free`, `buffer`, `cache`, `available`, `used`,
              `usedratio`, `usedbar`, `usedvbar`, `usedipat`,
@@ -795,6 +800,7 @@ something like:
 
 - Aliases to `swap`
 - Args: default monitor arguments
+- Thresholds refer to percentage of used swap
 - Variables that can be used with the `-t`/`--template` argument:
 	    `total`, `used`, `free`, `usedratio`
 - Default template: `Swap: <usedratio>%`
@@ -803,7 +809,8 @@ something like:
 
 - Aliases to `cpu`
 - Args: default monitor arguments, plus:
-  - `--load-icon-pattern`: dynamic string for cpu load in `ipat`.
+  - `--load-icon-pattern`: dynamic string for cpu load in `ipat`
+- Thresholds refer to percentage of CPU load
 - Variables that can be used with the `-t`/`--template` argument:
 	    `total`, `bar`, `vbar`, `ipat`, `user`, `nice`, `system`, `idle`, `iowait`
 - Default template: `Cpu: <total>%`
@@ -816,6 +823,7 @@ something like:
   - `--load-icon-patterns`: dynamic string for each cpu load in `autoipat`, `ipat{i}`.
                               This option can be specified several times. nth option
                               corresponds to nth cpu.
+- Thresholds refer to percentage of CPU load
 - Variables that can be used with the `-t`/`--template` argument:
 	    `autototal`, `autobar`, `autovbar`, `autoipat`, `autouser`, `autonice`,
 	    `autosystem`, `autoidle`, `total`, `bar`, `vbar`, `ipat`, `user`, `nice`,
@@ -934,6 +942,7 @@ more than one battery.
   `<usedp>`, `<freebar>`, `<freevbar>`, `<freeipat>`, `<usedbar>`,
   `<usedvbar>` or `<usedipat>` for total, free, used, free percentage and
   used percentage of the given file system capacity.
+- Thresholds refer to usage percentage.
 - Args: default monitor arguments. `-t`/`--template` is ignored. Plus
   - `--free-icon-pattern`: dynamic string for free disk space in `freeipat`.
   - `--used-icon-pattern`: dynamic string for used disk space in `usedipat`.
@@ -953,6 +962,7 @@ more than one battery.
   `<totalbar>`, `<totalvbar>`, `<totalipat>`,
   `<readbar>`, `<readvbar>`, `<readipat>`,
   `<writebar>`, `<writevbar>`, and `<writeipat>`.
+- Thresholds refer to speed in b/s
 - Args: default monitor arguments. `-t`/`--template` is ignored. Plus
   - `--total-icon-pattern`: dynamic string for total disk I/O in `<totalipat>`.
   - `--write-icon-pattern`: dynamic string for write disk I/O in `<writeipat>`.
@@ -966,6 +976,7 @@ more than one battery.
 
 - Aliases to "thermaln": so `ThermalZone 0 []` can be used in template
   as `%thermal0%`
+- Thresholds refer to temperature in degrees
 - Args: default monitor arguments
 - Variables that can be used with the `-t`/`--template` argument:
 	    `temp`
@@ -985,6 +996,7 @@ more than one battery.
 - Aliases to the Zone: so `Thermal "THRM" []` can be used in template
   as `%THRM%`
 - Args: default monitor arguments
+- Thresholds refer to temperature in degrees
 - Variables that can be used with the `-t`/`--template` argument:
 	    `temp`
 - Default template: `Thm: <temp>C`
@@ -998,6 +1010,7 @@ more than one battery.
 
 - Aliases to `cpufreq`
 - Args: default monitor arguments
+- Thresholds refer to frequency in GHz
 - Variables that can be used with the `-t`/`--template` argument:
 	    `cpu0`, `cpu1`, ..,  `cpuN`
 - Default template: `Freq: <cpu0>GHz`
@@ -1011,6 +1024,7 @@ more than one battery.
 
 - Aliases to `coretemp`
 - Args: default monitor arguments
+- Thresholds refer to temperature in degrees
 - Variables that can be used with the `-t`/`--template` argument:
 	    `core0`, `core1`, ..,  `coreN`
 - Default template: `Temp: <core0>C`
@@ -1215,9 +1229,9 @@ more than one battery.
 
 	Run Locks
 
-### `CatInt n fn`
+### `CatInt n filename`
 
-- Reads and displays an integer from the file whose path is `fn`
+- Reads and displays an integer from the file whose path is `filename`
   (especially useful with files in `/sys`).
 - Aliases as `catn` (e.g. `Cat 0` as `cat0`, etc.) so you can
   have several.
