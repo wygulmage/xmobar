@@ -23,6 +23,10 @@ _New features_
 _Bug fixes_
 
   - We honour the `-S` (show suffix) monitor flag in `CpuFreq`.
+  - Better `Weather` parsing of wind direction, by Dino Morelli (see
+    [pull #212]).
+
+[pull #212]: https://github.com/jaor/xmobar/pull/212
 
 ## Version 0.22.1 (Oct 11, 2014)
 
