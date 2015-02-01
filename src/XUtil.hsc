@@ -38,6 +38,7 @@ import Foreign
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import qualified Graphics.X11.Xlib as Xlib (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
+import Graphics.X11.Xrender
 import System.Mem.Weak ( addFinalizer )
 import System.Posix.Types (Fd(..))
 import System.IO
@@ -53,7 +54,6 @@ import qualified System.IO as UTF8 (readFile,hGetLine)
 #if defined XFT
 import Data.List
 import MinXft
-import Graphics.X11.Xrender
 #endif
 
 import ColorCache
