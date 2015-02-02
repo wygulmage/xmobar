@@ -59,6 +59,7 @@ import ColorCache
 
 #ifdef XFT
 import Graphics.X11.Xft
+import MinXft (drawBackground)
 #endif
 
 #ifdef DBUS
@@ -289,10 +290,16 @@ drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
 
   p <- io $ createPixmap d w wid ht
                          (defaultDepthOfScreen (defaultScreenOfDisplay d))
+#if XFT
   when (alpha c /= 255) (io $ drawBackground d p (bgColor c) (alpha c) wr)
+#endif
   withColors d [bgColor c, borderColor c] $ \[bgcolor, bdcolor] -> do
     gc <- io $ createGC  d w
+#if XFT
     when (alpha c == 255) $ do
+#else
+    do
+#endif
       io $ setForeground d gc bgcolor
       io $ fillRectangle d p gc 0 0 wid ht
     -- write to the pixmap the new string
