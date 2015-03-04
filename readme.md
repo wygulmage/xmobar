@@ -427,13 +427,17 @@ An example using the `dbus-send` command line utility:
             --print-reply \
             '/org/Xmobar/Control' \
             org.Xmobar.Control.SendSignal \
-            "string:Toggle"
+            "string:Toggle 0"
 
 It is also possible to send multiple signals at once:
 
         # send to another screen, reveal and toggle the persistent flag
         dbus-send [..] \
-            "string:ChangeScreen" "string:Reveal 0" "string:TogglePersistent"
+            "string:ChangeScreen 0" "string:Reveal 0" "string:TogglePersistent"
+
+The `Toggle`, `Reveal`, and `Hide` signals take an additional integer
+argument that denotes an initial delay, in tenths of a second, before
+the command takes effect.
 
 ### Example for using the DBus IPC interface with XMonad
 
