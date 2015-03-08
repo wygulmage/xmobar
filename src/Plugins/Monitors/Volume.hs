@@ -154,18 +154,19 @@ runVolume mixerName controlName argv = do
     liftMonitor Nothing = unavailable
     liftMonitor (Just m) = m
 
+    channel v r = AE.catch (getChannel FrontLeft v) (const $ return $ Just r)
+
     getDB :: Maybe Volume -> IO (Maybe Integer)
     getDB Nothing = return Nothing
-    getDB (Just v) = AE.catch (getChannel FrontLeft $ dB v)
-                              (const $ return $ Just 0)
+    getDB (Just v) = channel (dB v) 0
 
     getVal :: Maybe Volume -> IO (Maybe Integer)
     getVal Nothing = return Nothing
-    getVal (Just v) = getChannel FrontLeft $ value v
+    getVal (Just v) = channel (value v) 0
 
     getSw :: Maybe Switch -> IO (Maybe Bool)
     getSw Nothing = return Nothing
-    getSw (Just s) = getChannel FrontLeft s
+    getSw (Just s) = channel s False
 
     getFormatDB :: VolumeOpts -> Maybe Integer -> Monitor String
     getFormatDB _ Nothing = unavailable
