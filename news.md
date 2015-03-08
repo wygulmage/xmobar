@@ -1,20 +1,20 @@
 % xmobar - Release notes
 
-## Version 0.23
+## Version 0.23 (Mar 8, 2015)
 
 _New features_
 
-  - New variables in `Mem` monitor for available memory as reported by
-    Linux 3.14 and newer, by Samuli Thomasson.
-  - New configuration parameters `textOffset` and `iconOffset` (see
-    discussion in [issue #171] and [issue #201]).
-  - New template variable `flags` in `MPD` monitor, by Duncan Burke.
   - Xmobar can now use a (semi)transparent background: set it with the
     new configuration option `alpha` (thanks to Edward Z. Yang, see
     [issue #114]).
   - Multiple fonts available by means of the new configuration
     parameter `additionalFonts` and the template markers
     `<fn=1>...</fn>`, by Markus Scherer.
+  - New variables in `Mem` monitor for available memory as reported by
+    Linux 3.14 and newer, by Samuli Thomasson.
+  - New configuration parameters `textOffset` and `iconOffset` (see
+    discussion in [issue #171] and [issue #201]).
+  - New template variable `flags` in `MPD` monitor, by Duncan Burke.
 
 [issue #171]: https://github.com/jaor/xmobar/issues/171
 [issue #201]: https://github.com/jaor/xmobar/issues/201
