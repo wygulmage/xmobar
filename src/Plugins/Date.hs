@@ -16,16 +16,11 @@
 --
 -----------------------------------------------------------------------------
 
-{-# LANGUAGE CPP #-}
-
 module Plugins.Date (Date(..)) where
 
 import Plugins
 
-#ifdef GHC783
 import System.Locale
-#endif
-
 import Control.Monad (liftM)
 import Data.Time
 
