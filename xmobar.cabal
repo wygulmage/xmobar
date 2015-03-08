@@ -127,6 +127,9 @@ executable xmobar
     if impl (ghc < 7)
        cpp-options: -DGHC6
 
+    if impl (ghc < 7.8.4)
+       cpp-options: -DGHC783
+
     if flag(with_xft) || flag(all_extensions)
        build-depends: utf8-string == 0.3.*, X11-xft >= 0.2 && < 0.4
        other-modules: MinXft
