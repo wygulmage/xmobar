@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Bitmap
--- Copyright   :  (C) 2013 Alexander Polakov
+-- Copyright   :  (C) 2013, 2015 Alexander Polakov
 -- License     :  BSD3
 --
 -- Maintainer  :  jao@gnu.org
@@ -16,7 +16,6 @@ module Bitmap
  , drawBitmap
  , Bitmap(..)) where
 
-import Control.Applicative((<|>))
 import Control.Monad
 import Control.Monad.Trans(MonadIO(..))
 import Data.Map hiding (foldr, map, filter)
@@ -30,6 +29,7 @@ import Actions (Action)
 
 #ifdef XPM
 import XPMFile(readXPMFile)
+import Control.Applicative((<|>))
 #endif
 
 #if MIN_VERSION_mtl(2, 2, 1)
