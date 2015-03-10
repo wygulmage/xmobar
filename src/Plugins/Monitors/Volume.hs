@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Volume
--- Copyright   :  (c) 2011, 2013 Thomas Tuegel
+-- Copyright   :  (c) 2011, 2013, 2015 Thomas Tuegel
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
@@ -122,13 +122,7 @@ formatDb opts dbi = do
 runVolume :: String -> String -> [String] -> Monitor String
 runVolume mixerName controlName argv = do
     opts <- io $ parseOpts argv
-    (lo, hi, val, db, sw) <- io $ withMixer mixerName $ \mixer -> do
-        control <- getControlByName mixer controlName
-        (lo, hi) <- liftMaybe $ getRange <$> volumeControl control
-        val <- getVal $ volumeControl control
-        db <- getDB $ volumeControl control
-        sw <- getSw $ switchControl control
-        return (lo, hi, val, db, sw)
+    (lo, hi, val, db, sw) <- io readMixer
     p <- liftMonitor $ liftM3 formatVol lo hi val
     b <- liftMonitor $ liftM3 formatVolBar lo hi val
     v <- liftMonitor $ liftM3 formatVolVBar lo hi val
@@ -138,6 +132,16 @@ runVolume mixerName controlName argv = do
     parseTemplate [p, b, v, d, s, ipat]
 
   where
+
+    readMixer =
+      AE.catch (withMixer mixerName $ \mixer -> do
+                   control <- getControlByName mixer controlName
+                   (lo, hi) <- liftMaybe $ getRange <$> volumeControl control
+                   val <- getVal $ volumeControl control
+                   db <- getDB $ volumeControl control
+                   sw <- getSw $ switchControl control
+                   return (lo, hi, val, db, sw))
+                (const $ return (Nothing, Nothing, Nothing, Nothing, Nothing))
 
     volumeControl :: Maybe Control -> Maybe Volume
     volumeControl c = join $
