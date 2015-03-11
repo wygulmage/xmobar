@@ -198,16 +198,17 @@ For the output template:
 - `<fc=#FF0000>string</fc>` will print `string` with `#FF0000` color
   (red).
 
-- `<fn=1>string</fn>` will print `string` with the first font from `additionalFonts`.
-  The index `0` corresponds to the standard font.
+- `<fn=1>string</fn>` will print `string` with the first font from
+  `additionalFonts`.  The index `0` corresponds to the standard font.
 
 - `<icon=/path/to/icon.xbm/>` will insert the given bitmap. XPM image
   format is also supported when compiled with `--flags="with_xpm"`.
 
-- ```<action=`command` button=12345>``` will execute given command when
-  clicked with specified buttons. If not specified, button is equal to 1
-  (left mouse button). Using old syntax (without backticks surrounding `command`)
-  will result in `button` attribute being ignored.
+- ```<action=`command` button=12345>``` will execute given command
+  when clicked with specified buttons. If not specified, button is
+  equal to 1 (left mouse button). Using old syntax (without backticks
+  surrounding `command`) will result in `button` attribute being
+  ignored.
 
 - `<raw=len:str/>` allows the encapsulation of arbitrary text `str` (which
   must be `len` `Char`s long, where `len` is encoded as a decimal sequence).
@@ -219,8 +220,7 @@ For the output template:
 
   and receives on standard input the line
 
-    ```<action=`echo test` button=1><raw=41:<action=`echo mooo`
-button=1>foo</action>/></action>```
+    ```<action=`echo test` button=1><raw=41:<action=`echo mooo` button=1>foo</action>/></action>```
 
   then it will display the text ```<action=`echo mooo` button=1>foo</action>```,
   which, when clicked, will cause `test` to be echoed.
