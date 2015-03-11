@@ -202,7 +202,7 @@ eventLoop tv xc@(XConf d r w fs is cfg) as signal = do
             eventLoop tv xc as signal
 
         reposWindow rcfg = do
-          r' <- repositionWin d w (fs!!0) rcfg
+          r' <- repositionWin d w (head fs) rcfg
           eventLoop tv (XConf d r' w fs is rcfg) as signal
 
         updateConfigPosition ocfg =
@@ -325,11 +325,9 @@ verticalOffset ht (Text t) fontst conf
      let bwidth = borderOffset (border conf) (borderWidth conf)
          verticalMargin = fi ht - fi (as + ds) - 2 * fi (abs bwidth)
      return $ fi ht - fi ds - (verticalMargin `div` 2) + bwidth + 1
-verticalOffset _ (Icon _) _ conf
+verticalOffset ht (Icon _) _ conf
   | iconOffset conf > -1 = return $ fi (iconOffset conf)
-  | otherwise = do
-     let bwidth = borderOffset (border conf) (borderWidth conf)
-     return $ bwidth + 1
+  | otherwise = return $ fi (ht `div` 2)
 
 -- | An easy way to print the stuff we need to print
 printStrings :: Drawable -> GC -> [XFont] -> Position
