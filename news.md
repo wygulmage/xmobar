@@ -1,5 +1,15 @@
 % xmobar - Release notes
 
+## Version 0.23.1
+
+_Bug fixes_
+
+  - Vertical alignment for icons, [issue #216]
+  - Better error handling in `Volume` monitor, [issue #215]
+
+[issue #216]: https://github.com/jaor/xmobar/issues/216
+[issue #215]: https://github.com/jaor/xmobar/issues/215
+
 ## Version 0.23 (Mar 8, 2015)
 
 _New features_

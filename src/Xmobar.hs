@@ -324,10 +324,10 @@ verticalOffset ht (Text t) fontst conf
      (as,ds) <- io $ textExtents fontst t
      let bwidth = borderOffset (border conf) (borderWidth conf)
          verticalMargin = fi ht - fi (as + ds) - 2 * fi (abs bwidth)
-     return $ fi ht - fi ds - (verticalMargin `div` 2) + bwidth + 1
+     return $ fi ht - fi ds - (verticalMargin `div` 2) + bwidth + 2
 verticalOffset ht (Icon _) _ conf
   | iconOffset conf > -1 = return $ fi (iconOffset conf)
-  | otherwise = return $ fi (ht `div` 2)
+  | otherwise = return $ fi (ht `div` 2) - 1
 
 -- | An easy way to print the stuff we need to print
 printStrings :: Drawable -> GC -> [XFont] -> Position
