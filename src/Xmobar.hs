@@ -316,15 +316,15 @@ drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
     -- resync
     io $ sync d True
 
-verticalOffset ::  (Integral b, Integral a, MonadIO m) =>
-                   a -> Widget -> XFont -> Config -> m b
+verticalOffset :: (Integral b, Integral a, MonadIO m) =>
+                  a -> Widget -> XFont -> Config -> m b
 verticalOffset ht (Text t) fontst conf
   | textOffset conf > -1 = return $ fi (textOffset conf)
   | otherwise = do
      (as,ds) <- io $ textExtents fontst t
      let bwidth = borderOffset (border conf) (borderWidth conf)
          verticalMargin = fi ht - fi (as + ds) - 2 * fi (abs bwidth)
-     return $ fi ht - fi ds - (verticalMargin `div` 2) + bwidth + 2
+     return $ fi ht - fi ds - (verticalMargin `div` 2) + bwidth
 verticalOffset ht (Icon _) _ conf
   | iconOffset conf > -1 = return $ fi (iconOffset conf)
   | otherwise = return $ fi (ht `div` 2) - 1
