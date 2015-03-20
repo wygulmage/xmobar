@@ -306,7 +306,7 @@ drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
     printStrings p gc fs 1 L =<< strLn left
     printStrings p gc fs 1 R =<< strLn right
     printStrings p gc fs 1 C =<< strLn center
-    -- draw 1 pixel border if requested
+    -- draw border if requested
     io $ drawBorder (border c) (borderWidth c) d p gc bdcolor wid ht
     -- copy the pixmap with the new string to the window
     io $ copyArea d p w gc 0 0 wid ht 0 0
@@ -322,9 +322,8 @@ verticalOffset ht (Text t) fontst conf
   | textOffset conf > -1 = return $ fi (textOffset conf)
   | otherwise = do
      (as,ds) <- io $ textExtents fontst t
-     let bwidth = borderOffset (border conf) (borderWidth conf)
-         verticalMargin = fi ht - fi (as + ds) - 2 * fi (abs bwidth)
-     return $ fi ht - fi ds - (verticalMargin `div` 2) + bwidth - 1
+     let margin = (fi ht - fi (as + ds)) `div` 2
+     return $ fi ht - margin - fi ds - 1
 verticalOffset ht (Icon _) _ conf
   | iconOffset conf > -1 = return $ fi (iconOffset conf)
   | otherwise = return $ fi (ht `div` 2) - 1

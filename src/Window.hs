@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Window
--- Copyright   :  (c) 2011-14 Jose A. Ortega Ruiz
+-- Copyright   :  (c) 2011-15 Jose A. Ortega Ruiz
 --             :  (c) 2012 Jochen Keil
 -- License     :  BSD-style (see LICENSE)
 --
@@ -171,15 +171,18 @@ drawBorder b lw d p gc c wi ht =  case b of
   TopB       -> drawBorder (TopBM 0) lw d p gc c wi ht
   BottomB    -> drawBorder (BottomBM 0) lw d p gc c wi ht
   FullB      -> drawBorder (FullBM 0) lw d p gc c wi ht
-  TopBM m    -> sf >> sla >> drawLine d p gc 0 (fi m + boff) (fi wi) (fi m + boff)
+  TopBM m    -> sf >> sla >>
+                 drawLine d p gc 0 (fi m + boff) (fi wi) (fi m + boff)
   BottomBM m -> let rw = fi ht - fi m + boff in
                  sf >> sla >> drawLine d p gc 0 rw (fi wi) rw
-  FullBM m   -> let pad = 2 * fi m + 2 * fi boff'; mp = fi m + fi boff' in
-                 sf >> sla >> drawRectangle d p gc mp mp (wi - pad) (ht - pad)
+  FullBM m   -> let mp = fi m
+                    pad = 2 * fi mp +  fi lw
+                in sf >> sla >>
+                     drawRectangle d p gc mp mp (wi - pad + 1) (ht - pad)
   where sf    = setForeground d gc c
         sla   = setLineAttributes d gc (fi lw) lineSolid capNotLast joinMiter
         boff  = borderOffset b lw
-        boff' = calcBorderOffset lw :: Int
+--        boff' = calcBorderOffset lw :: Int
 
 hideWindow :: Display -> Window -> IO ()
 hideWindow d w = do
@@ -209,4 +212,3 @@ borderOffset b lw =
 calcBorderOffset :: (Integral a) => Int -> a
 calcBorderOffset = ceiling . (/2) . toDouble
   where toDouble = fi :: (Integral a) => a -> Double
-
