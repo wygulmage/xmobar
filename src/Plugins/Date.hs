@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Date
@@ -20,7 +21,9 @@ module Plugins.Date (Date(..)) where
 
 import Plugins
 
+#if ! MIN_VERSION_time(1,5,0)
 import System.Locale
+#endif
 import Control.Monad (liftM)
 import Data.Time
 
