@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -w #-}
-{-# LANGUAGE CPP, NamedFieldPuns, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE CPP, NamedFieldPuns, GeneralizedNewtypeDeriving, FlexibleContexts #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -17,6 +17,7 @@
 
 module Plugins.EWMH (EWMH(..)) where
 
+import Control.Applicative (Applicative(..))
 import Control.Monad.State
 import Control.Monad.Reader
 import Graphics.X11 hiding (Modifier, Color)
@@ -176,7 +177,7 @@ clientHandlers = [ ("_NET_WM_NAME", updateName)
                  , ("_NET_WM_DESKTOP", updateDesktop) ]
 
 newtype M a = M (ReaderT EwmhConf (StateT EwmhState IO) a)
-    deriving (Monad, Functor, MonadIO, MonadReader EwmhConf, MonadState EwmhState)
+    deriving (Monad, Functor, Applicative, MonadIO, MonadReader EwmhConf, MonadState EwmhState)
 
 execM :: M a -> IO a
 execM (M m) = do
