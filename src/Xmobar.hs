@@ -322,8 +322,8 @@ verticalOffset ht (Text t) fontst conf
   | textOffset conf > -1 = return $ fi (textOffset conf)
   | otherwise = do
      (as,ds) <- io $ textExtents fontst t
-     let margin = (fi ht - fi (as + ds)) `div` 2
-     return $ fi ht - margin - fi ds - 1
+     let margin = (fi ht - fi ds - fi as) `div` 2
+     return $ fi as + margin - 1
 verticalOffset ht (Icon _) _ conf
   | iconOffset conf > -1 = return $ fi (iconOffset conf)
   | otherwise = return $ fi (ht `div` 2) - 1
