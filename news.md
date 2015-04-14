@@ -1,13 +1,18 @@
 % xmobar - Release notes
 
-## Version 0.24
+## Version 0.23.1 (Apr 14, 2015)
 
 _Bug fixes_
 
   - Vertical alignment for icons, [issue #216]
+  - Improvements to vertical text alignment, with many thanks to Jan
+    Palus (see ongoing discussion in [issue #221]).
   - Better error handling in `Volume` monitor, [issue #215]
-  - Compilation with ghc 7.8 and 7.10 (Edward Tjörnhammar)
+  - Compilation with ghc 7.8 and 7.10 (thanks to Edward Tjörnhammar,
+    see [issue #225]).
 
+[issue #225]: https://github.com/jaor/xmobar/issues/225
+[issue #221]: https://github.com/jaor/xmobar/issues/221
 [issue #216]: https://github.com/jaor/xmobar/issues/216
 [issue #215]: https://github.com/jaor/xmobar/issues/215
 
