@@ -184,7 +184,7 @@ printString dpy drw fs@(Xft fonts) _ fc bc x y s al = do
     when (al == 255) $ do
       (a,d)  <- textExtents fs s
       gi <- xftTxtExtents' dpy fonts s
-      drawXftRect draw bc' x (y - a + 1) (xglyphinfo_xOff gi) (a + d + 1)
+      drawXftRect draw bc' (x - 1) (y - a) (1 + xglyphinfo_xOff gi) (a + d + 2)
     drawXftString' draw fc' fonts (toInteger x) (toInteger y) s
 #endif
 
