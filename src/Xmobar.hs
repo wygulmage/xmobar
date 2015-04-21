@@ -347,7 +347,7 @@ printStrings dr gc fontlist offs a sl@((s,c,i,l):xs) = do
       (fc,bc) = case break (==',') c of
                  (f,',':b) -> (f, b           )
                  (f,    _) -> (f, bgColor conf)
-  valign <- verticalOffset ht s fontst conf
+  valign <- verticalOffset ht s (head fontlist) conf
   case s of
     (Text t) -> io $ printString d dr fontst gc fc bc offset valign t alph
     (Icon p) -> io $ maybe (return ())
