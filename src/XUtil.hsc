@@ -33,6 +33,7 @@ import Control.Concurrent
 import Control.Monad (when)
 import Control.Monad.Trans
 import Control.Exception (SomeException, handle)
+import Data.List
 import Foreign
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import qualified Graphics.X11.Xlib as Xlib (textExtents, textWidth)
@@ -49,7 +50,6 @@ import qualified System.IO as UTF8 (readFile,hGetLine)
 # endif
 #endif
 #if defined XFT
-import Data.List
 import MinXft
 import Graphics.X11.Xrender
 #endif
@@ -81,12 +81,18 @@ data XFont = Core FontStruct
 -- to the Xft backend Example: 'xft:Sans-10'
 initFont :: Display ->String -> IO XFont
 initFont d s =
-#ifdef XFT
        let xftPrefix = "xft:" in
        if  xftPrefix `isPrefixOf` s then
+#ifdef XFT
            fmap Xft $ initXftFont d s
-       else
+#else
+           do
+               hPutStrLn stderr $ "Warning: Xmobar must be built with "
+                   ++ "the with_xft flag to support font '" ++ s
+                   ++ ".' Falling back on default."
+               initFont d miscFixedFont
 #endif
+       else
 #if defined UTF8 ||  __GLASGOW_HASKELL__ >= 612
            fmap Utf8 $ initUtf8Font d s
 #else
