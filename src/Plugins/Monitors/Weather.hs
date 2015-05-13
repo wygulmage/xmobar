@@ -45,6 +45,14 @@ weatherConfig = mkMConfig
        , "pressure"
        ]
 
+data WindInfo =
+    WindInfo {
+         windCardinal :: String -- cardinal direction
+       , windAzimuth  :: String -- azimuth direction
+       , windMph      :: String -- speed (MPH)
+       , windKnots    :: String -- speed (knot)
+    } deriving (Show)
+
 data WeatherInfo =
     WI { stationPlace :: String
        , stationState :: String
@@ -52,10 +60,7 @@ data WeatherInfo =
        , month        :: String
        , day          :: String
        , hour         :: String
-       , windCardinal :: String
-       , windAzimuth  :: String
-       , windMph      :: String
-       , windKnots    :: String
+       , windInfo     :: WindInfo
        , visibility   :: String
        , skyCondition :: String
        , tempC        :: Int
@@ -77,34 +82,22 @@ pTime = do y <- getNumbersAsString
            char ' '
            return (y, m, d ,h:hh:":"++mi:mimi)
 
--- Occasionally there is no wind and a METAR report gives simply, "Wind: Calm:0"
-pWind0 ::
-  (
-    String -- cardinal direction
-  , String -- azimuth direction
-  , String -- speed (MPH)
-  , String -- speed (knot)
-  )       
-pWind0 =
-  ("μ", "μ", "0", "0")
+noWind :: WindInfo
+noWind = WindInfo "μ" "μ" "0" "0"
 
-pWind ::
-  Parser (
-    String -- cardinal direction
-  , String -- azimuth direction
-  , String -- speed (MPH)
-  , String -- speed (knot)
-  )       
+pWind :: Parser WindInfo
 pWind =
   let tospace = manyTill anyChar (char ' ')
+
+      -- Occasionally there is no wind and a METAR report gives simply, "Wind: Calm:0"
       wind0 = do manyTill skipRestOfLine (string "Wind: Calm:0")
-                 return pWind0
+                 return noWind
       windVar = do manyTill skipRestOfLine (string "Wind: Variable at ")
                    mph <- tospace
                    string "MPH ("
                    knot <- tospace
                    manyTill anyChar newline
-                   return ("μ", "μ", mph, knot)
+                   return $ WindInfo "μ" "μ" mph knot
       wind = do manyTill skipRestOfLine (string "Wind: from the ")
                 cardinal <- tospace
                 char '('
@@ -114,8 +107,8 @@ pWind =
                 string "MPH ("
                 knot <- tospace
                 manyTill anyChar newline
-                return (cardinal, azimuth, mph, knot)
-  in try wind0 <|> try windVar <|> wind
+                return $ WindInfo cardinal azimuth mph knot
+  in try wind0 <|> try windVar <|> try wind <|> return noWind
 
 pTemp :: Parser (Int, Int)
 pTemp = do let num = digit <|> char '-' <|> char '.'
@@ -159,7 +152,7 @@ parseData =
                    )
        skipRestOfLine >> getAllBut "/"
        (y,m,d,h) <- pTime
-       (wc, wa, wm, wk) <- pWind
+       w <- pWind
        v <- getAfterString "Visibility: "
        sk <- getAfterString "Sky conditions: "
        skipTillString "Temperature: "
@@ -171,7 +164,7 @@ parseData =
        skipTillString "Pressure (altimeter): "
        p <- pPressure
        manyTill skipRestOfLine eof
-       return [WI st ss y m d h wc wa wm wk v sk tC tF dC dF rh p]
+       return [WI st ss y m d h w v sk tC tF dC dF rh p]
 
 defUrl :: String
 defUrl = "http://weather.noaa.gov/pub/data/observations/metar/decoded/"
@@ -187,7 +180,7 @@ getData station = do
           errHandler _ = return "<Could not retrieve data>"
 
 formatWeather :: [WeatherInfo] -> Monitor String
-formatWeather [WI st ss y m d h wc wa wm wk v sk tC tF dC dF r p] =
+formatWeather [WI st ss y m d h (WindInfo wc wa wm wk) v sk tC tF dC dF r p] =
     do cel <- showWithColors show tC
        far <- showWithColors show tF
        parseTemplate [st, ss, y, m, d, h, wc, wa, wm, wk, v, sk, cel, far, show dC, show dF, show r , show p ]
