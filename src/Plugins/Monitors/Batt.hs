@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Batt
--- Copyright   :  (c) 2010, 2011, 2012, 2013 Jose A Ortega
+-- Copyright   :  (c) 2010, 2011, 2012, 2013, 2015 Jose A Ortega
 --                (c) 2010 Andrea Rossato, Petr Rockai
 -- License     :  BSD-style (see LICENSE)
 --
@@ -160,11 +160,10 @@ readBatteries opts bfs =
            ft = sum (map full bats)
            left = if ft > 0 then sum (map now bats) / ft else 0
            watts = sign * sum (map power bats)
-           idle = watts == 0
-           time = if idle then 0 else sum $ map time' bats
-           mwatts = if idle then 1 else sign * watts
+           time = if watts == 0 then 0 else max 0 (sum $ map time' bats)
+           mwatts = if watts == 0 then 1 else sign * watts
            time' b = (if ac then full b - now b else now b) / mwatts
-           acst | idle      = Idle
+           acst | time == 0 = Idle
                 | ac        = Charging
                 | otherwise = Discharging
        return $ if isNaN left then NA else Result left watts time acst
