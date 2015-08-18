@@ -18,7 +18,12 @@ import Plugins.Monitors.Common
 
 import qualified Control.Exception as CE
 
-import Network.HTTP
+import Network.HTTP.Conduit
+import Network.HTTP.Types.Status
+import Network.HTTP.Types.Method
+
+--import qualified Data.ByteString.Lazy as L
+import qualified Data.ByteString.Lazy.Char8 as B
 
 import Text.ParserCombinators.Parsec
 
@@ -172,11 +177,14 @@ defUrl = "http://weather.noaa.gov/pub/data/observations/metar/decoded/"
 stationUrl :: String -> String
 stationUrl station = defUrl ++ station ++ ".TXT"
 
-getData :: String -> IO String
-getData station = do
-    let request = getRequest (stationUrl station)
-    CE.catch (simpleHTTP request >>= getResponseBody) errHandler
-    where errHandler :: CE.IOException -> IO String
+getData:: String -> IO String
+getData station = CE.catch (do
+    manager <- newManager tlsManagerSettings 
+    request <- parseUrl $ stationUrl station
+    res <- httpLbs request manager
+    return $  B.unpack $ responseBody res
+    ) errHandler
+    where errHandler :: CE.SomeException -> IO String
           errHandler _ = return "<Could not retrieve data>"
 
 formatWeather :: [WeatherInfo] -> Monitor String
@@ -194,18 +202,15 @@ runWeather str =
 
 weatherReady :: [String] -> Monitor Bool
 weatherReady str = do
-    let station = head str
-        request = headRequest (stationUrl station)
-    io $ CE.catch (simpleHTTP request >>= checkResult) errHandler
-    where errHandler :: CE.IOException -> IO Bool
+    initRequest <- parseUrl $ stationUrl $ head str
+    let request = initRequest{method = methodHead}
+    io $ CE.catch ( do
+        manager <- newManager tlsManagerSettings
+        res     <- httpLbs request manager
+        return $ checkResult $responseStatus res ) errHandler
+    where errHandler :: CE.SomeException -> IO Bool
           errHandler _ = return False
-          checkResult result =
-            case result of
-                Left _ -> return False
-                Right response ->
-                    case rspCode response of
-                        -- Permission or network errors are failures; anything
-                        -- else is recoverable.
-                        (4, _, _) -> return False
-                        (5, _, _) -> return False
-                        (_, _, _) -> return True
+          checkResult status
+            | statusIsServerError status = False
+            | statusIsClientError status = False
+            | otherwise = True
