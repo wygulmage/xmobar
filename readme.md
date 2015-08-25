@@ -161,8 +161,8 @@ Otherwise, you'll need to install them yourself.
 :    Enables UVMeter plugin. The plugin shows UV data for Australia.
 
 `with_conduit`
-:    Use http-conduit for getting weather data enabling support for http proxyes
-     Requires [http-conduit] and [http-types]
+:    Use http-conduit for getting weather data enabling support for http proxyes.
+     Requires [http-conduit] and [http-types].
 
 `all_extensions`
 :    Enables all the extensions above.
@@ -1618,3 +1618,5 @@ Copyright &copy; 2007-2010 Andrea Rossato
 [timezone-olson]: http://hackage.haskell.org/package/timezone-olson
 [timezone-series]: http://hackage.haskell.org/package/timezone-series
 [libXpm]: http://cgit.freedesktop.org/xorg/lib/libXpm
+[http-conduit]: http://hackage.haskell.org/package/http-conduit
+[http-types]: http://hackage.haskell.org/package/http-types
