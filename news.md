@@ -1,5 +1,13 @@
 % xmobar - Release notes
 
+## Version 0.24
+
+_New features_
+
+   - Use the new compilation flag `with_conduit` to compile an
+     implemetation of the  `Weather` plugin that will work behind
+     proxies, by Dragos Boca.
+
 ## Version 0.23.1 (Apr 14, 2015)
 
 _Bug fixes_
