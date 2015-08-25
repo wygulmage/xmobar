@@ -78,6 +78,10 @@ flag with_uvmeter
   description: UVMeter only useful to australians.
   default: False
 
+flag with_conduit
+  description: Use http-conduits for getting weather data
+  default: False
+  
 executable xmobar
     hs-source-dirs:     src
     main-is:            Main.hs
@@ -105,24 +109,27 @@ executable xmobar
     extra-libraries: Xrandr Xrender
 
     build-depends:
-                  base == 4.*,
-                  containers,
-                  regex-compat,
-                  process,
-                  old-locale,
-                  bytestring,
-                  directory,
-                  unix,
-                  time,
-                  filepath,
-                  transformers,
-                  http-conduit,
-                  http-types,
-                  X11 >= 1.6.1,
-                  mtl >= 2.1 && < 2.3,
-                  parsec == 3.1.*,
-                  HTTP >= 4000.2.4,
-                  stm >= 2.3 && < 2.5
+      base == 4.*,
+      containers,
+      regex-compat,
+      process,
+      old-locale,
+      bytestring,
+      directory,
+      unix,
+      time,
+      filepath,
+      transformers,
+      X11 >= 1.6.1,
+      mtl >= 2.1 && < 2.3,
+      parsec == 3.1.*,
+      HTTP >= 4000.2.4,
+      stm >= 2.3 && < 2.5
+
+    if flag(with_conduit)
+       -- use http-conduit  instead of simple-http
+       build-depends: http-conduit, http-types
+       cpp-options: -DHTTP_CONDUIT
 
     if flag(with_threaded)
        -- -threaded is a workaround for 100% CPU busy loop
