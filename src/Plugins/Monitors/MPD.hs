@@ -63,7 +63,7 @@ runMPD args = do
 
 mpdWait :: IO ()
 mpdWait = do
-  status <- M.withMPD $ M.idle [M.PlayerS, M.MixerS]
+  status <- M.withMPD $ M.idle [M.PlayerS, M.MixerS, M.OptionsS]
   case status of
     Left _ -> threadDelay 10000000
     _ -> return ()
