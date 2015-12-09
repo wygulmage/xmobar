@@ -43,6 +43,8 @@ weatherConfig = mkMConfig
        , "windAzimuth"
        , "windMph"
        , "windKnots"
+       , "windKmh"
+       , "windMs"
        , "visibility"
        , "skyCondition"
        , "tempC"
@@ -59,6 +61,8 @@ data WindInfo =
        , windAzimuth  :: String -- azimuth direction
        , windMph      :: String -- speed (MPH)
        , windKnots    :: String -- speed (knot)
+       , windKmh      :: String -- speed (km/h)
+       , windMs       :: String -- speed (m/s)
     } deriving (Show)
 
 data WeatherInfo =
@@ -91,7 +95,7 @@ pTime = do y <- getNumbersAsString
            return (y, m, d ,h:hh:":"++mi:mimi)
 
 noWind :: WindInfo
-noWind = WindInfo "μ" "μ" "0" "0"
+noWind = WindInfo "μ" "μ" "0" "0" "0" "0"
 
 pWind :: Parser WindInfo
 pWind =
@@ -105,7 +109,7 @@ pWind =
                    string "MPH ("
                    knot <- tospace
                    manyTill anyChar newline
-                   return $ WindInfo "μ" "μ" mph knot
+                   return $ WindInfo "μ" "μ" mph knot (toKmh knot) (toMs knot)
       wind = do manyTill skipRestOfLine (string "Wind: from the ")
                 cardinal <- tospace
                 char '('
@@ -115,8 +119,13 @@ pWind =
                 string "MPH ("
                 knot <- tospace
                 manyTill anyChar newline
-                return $ WindInfo cardinal azimuth mph knot
+                return $ WindInfo cardinal azimuth mph knot (toKmh knot) (toMs knot)
   in try wind0 <|> try windVar <|> try wind <|> return noWind
+  where
+    toKmh knots = knots $* 1.852
+    toMs knots  = knots $* 0.514
+    ($*) :: String -> Double -> String
+    op1 $* op2 = show (round ((read op1::Double) * op2)::Integer)
 
 pTemp :: Parser (Int, Int)
 pTemp = do let num = digit <|> char '-' <|> char '.'
@@ -199,10 +208,10 @@ getData station = do
 #endif
 
 formatWeather :: [WeatherInfo] -> Monitor String
-formatWeather [WI st ss y m d h (WindInfo wc wa wm wk) v sk tC tF dC dF r p] =
+formatWeather [WI st ss y m d h (WindInfo wc wa wm wk wkh wms) v sk tC tF dC dF r p] =
     do cel <- showWithColors show tC
        far <- showWithColors show tF
-       parseTemplate [st, ss, y, m, d, h, wc, wa, wm, wk, v, sk, cel, far, show dC, show dF, show r , show p ]
+       parseTemplate [st, ss, y, m, d, h, wc, wa, wm, wk, wkh, wms, v, sk, cel, far, show dC, show dF, show r , show p ]
 formatWeather _ = getConfigValue naString
 
 runWeather :: [String] -> Monitor String
