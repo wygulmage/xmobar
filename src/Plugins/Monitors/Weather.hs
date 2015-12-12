@@ -100,6 +100,10 @@ noWind = WindInfo "μ" "μ" "0" "0" "0" "0"
 pWind :: Parser WindInfo
 pWind =
   let tospace = manyTill anyChar (char ' ')
+      toKmh knots = knots $* 1.852
+      toMs knots  = knots $* 0.514
+      ($*) :: String -> Double -> String
+      op1 $* op2 = show (round ((read op1::Double) * op2)::Integer)
 
       -- Occasionally there is no wind and a METAR report gives simply, "Wind: Calm:0"
       wind0 = do manyTill skipRestOfLine (string "Wind: Calm:0")
@@ -121,11 +125,6 @@ pWind =
                 manyTill anyChar newline
                 return $ WindInfo cardinal azimuth mph knot (toKmh knot) (toMs knot)
   in try wind0 <|> try windVar <|> try wind <|> return noWind
-  where
-    toKmh knots = knots $* 1.852
-    toMs knots  = knots $* 0.514
-    ($*) :: String -> Double -> String
-    op1 $* op2 = show (round ((read op1::Double) * op2)::Integer)
 
 pTemp :: Parser (Int, Int)
 pTemp = do let num = digit <|> char '-' <|> char '.'
