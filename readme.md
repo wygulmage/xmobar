@@ -57,7 +57,7 @@ source code in a variety of ways:
   - From [Github]. You can also obtain a tarball in [Github's
     downloads page]. You'll find there links to each tagged release.
   - From the bleeding edge repo. If you prefer to live dangerously,
-    just get the latest and greatest (and buggiest, i guess) using
+    just get the latest and greatest (and buggiest, I guess) using
     git:
 
         git clone git://github.com/jaor/xmobar
@@ -161,7 +161,7 @@ Otherwise, you'll need to install them yourself.
 :    Enables UVMeter plugin. The plugin shows UV data for Australia.
 
 `with_conduit`
-:    Use http-conduit for getting weather data enabling support for http proxyes.
+:    Use http-conduit for getting weather data enabling support for http proxies.
      Requires [http-conduit] and [http-types].
 
 `all_extensions`
@@ -187,7 +187,7 @@ Since 0.14 xmobar reacts to SIGUSR1 and SIGUSR2:
 
 - After receiving SIGUSR1 xmobar moves its position to the next screen.
 
-- After receiving SIGUSR2 xmobar repositions it self on the current screen.
+- After receiving SIGUSR2 xmobar repositions itself on the current screen.
 
 # Configuration
 
@@ -586,7 +586,7 @@ options (or *monitor arguments*) they all share.
 ### Icon patterns
 
 Some monitors allow usage of strings that depend on some integer value
-from 0 to 8 by replacing all occurences of `"%%"` with it
+from 0 to 8 by replacing all occurrences of `"%%"` with it
 (i.e. `"<icon=/path/to/icon_%%.xpm/>"` will be interpreted
 as `"<icon=/path/to/icon_3.xpm/>"` when the value is `3`, also `"%"` is interpreted
 as `"%"`, `"%%"` as `"3"`, `"%%%"` as `"3%"`, `"%%%%"` as `"33"` and so on). Essentially
