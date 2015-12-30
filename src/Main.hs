@@ -38,6 +38,7 @@ import System.Environment
 import System.FilePath ((</>))
 import System.Posix.Files
 import Control.Monad (unless, liftM)
+import Text.Read (readMaybe)
 
 import Signal (setupSignalHandler)
 
@@ -133,6 +134,7 @@ data Opts = Help
           | Template   String
           | OnScr      String
           | IconRoot   String
+          | Position   String
        deriving Show
 
 options :: [OptDescr Opts]
@@ -166,6 +168,8 @@ options =
       "Add to the list of commands to be executed"
     , Option "x" ["screen"] (ReqArg OnScr "screen")
       "On which X screen number to start"
+    , Option "p" ["position"] (ReqArg Position "position")
+      "Specify position of xmobar. Same syntax as in config file"
     ]
 
 getOpts :: [String] -> IO ([Opts], [String])
@@ -219,6 +223,7 @@ doOpts conf (o:oo) =
     AddCommand s -> case readCom 'C' s of
                       Right x -> doOpts' (conf {commands = commands conf ++ x})
                       Left e -> putStr (e ++ usage) >> exitWith (ExitFailure 1)
+    Position s -> readPosition s
   where readCom c str =
           case readStr str of
             [x] -> Right x
@@ -226,3 +231,9 @@ doOpts conf (o:oo) =
                         "specified with the -" ++ c:" option\n")
         readStr str = [x | (x,t) <- reads str, ("","") <- lex t]
         doOpts' opts = doOpts opts oo
+        readPosition string = 
+            case readMaybe string of
+                Just x  -> doOpts' (conf { position = x })
+                Nothing -> do
+                    putStrLn "Can't parse position option, ignoring"
+                    doOpts' conf
