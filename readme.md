@@ -1548,10 +1548,11 @@ Robert J. Macomber, Dmitry Malikov, David McLean, Marcin Mikołajczyk,
 Dino Morelli, Tony Morris, Eric Mrak, Thiago Negri, Edward
 O'Callaghan, Svein Ove, Martin Perner, Jens Petersen, Alexander
 Polakov, Petr Rockai, Andrew Sackville-West, Markus Scherer, Alexander
-Shabalin, Peter Simons, Alexander Solovyov, John Soros, Travis Staton,
-Artem Tarasov, Samuli Thomasson, Edward Tjörnhammar, Sergei
-Trofimovich, Thomas Tuegel, Jan Vornberger, Anton Vorontsov, Daniel
-Wagner, Phil Xiaojun Hu, Edward Z. Yang and Norbert Zeh.
+Shabalin, Valentin Shirokov, Peter Simons, Alexander Solovyov, John
+Soros, Travis Staton, Artem Tarasov, Samuli Thomasson, Edward
+Tjörnhammar, Sergei Trofimovich, Thomas Tuegel, Jan Vornberger, Anton
+Vorontsov, Daniel Wagner, Phil Xiaojun Hu, Edward Z. Yang and Norbert
+Zeh.
 
 [jao]: http://jao.io
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
