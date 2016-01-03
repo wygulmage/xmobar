@@ -15,7 +15,7 @@
 module Plugins.Monitors.Volume (runVolume, volumeConfig) where
 
 import Control.Applicative ((<$>))
-import Control.Monad ( join, liftM2, liftM3, mplus )
+import Control.Monad ( liftM2, liftM3, mplus )
 import Data.Traversable (sequenceA)
 import Plugins.Monitors.Common
 import Sound.ALSA.Mixer
@@ -144,12 +144,14 @@ runVolume mixerName controlName argv = do
                 (const $ return (Nothing, Nothing, Nothing, Nothing, Nothing))
 
     volumeControl :: Maybe Control -> Maybe Volume
-    volumeControl c = join $
-           (playback . volume <$> c) `mplus` (common . volume <$> c)
+    volumeControl c = (playback . volume =<< c)
+              `mplus` (capture . volume =<< c)
+              `mplus` (common . volume =<< c)
 
     switchControl :: Maybe Control -> Maybe Switch
-    switchControl c = join $
-           (playback . switch <$> c) `mplus` (common . switch <$> c)
+    switchControl c = (playback . switch =<< c)
+              `mplus` (capture . switch =<< c)
+              `mplus` (common . switch =<< c)
 
     liftMaybe :: Maybe (IO (a,b)) -> IO (Maybe a, Maybe b)
     liftMaybe = fmap (liftM2 (,) (fmap fst) (fmap snd)) . sequenceA
