@@ -7,6 +7,18 @@ _New features_
    - Use the new compilation flag `with_conduit` to compile an
      implemetation of the  `Weather` plugin that will work behind
      proxies, by Dragos Boca.
+   - New command line argument (`-p`) to specify xmobar's position, by
+     Valentin Shirokov.
+   - Wind speed in Km/h and m/s for the `Weather` plugin, by Michael
+     Knabe.
+   - `UVMeter`, a new optional plugin showing UV data for Australian
+     users, by Roman Joost.
+
+_Bug fixes_
+
+   - The `Volume` plugin now supports capture devices (Antoine Eiche).
+   - The `MPD` plugin will now automatically update on options changes
+     (Ben Boeckel).
 
 ## Version 0.23.1 (Apr 14, 2015)
 

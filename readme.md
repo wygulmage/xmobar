@@ -1541,12 +1541,12 @@ with the help of the greater xmobar and Haskell communities.
 
 In particular, xmobar [incorporates patches] by Axel Angel, Dragos
 Boca, Ben Boeckel, Duncan Burke, Roman Cheplyaka, Patrick Chilton,
-Nathaniel Wesley Filardo, John Goerzen, Reto Hablützel, Juraj Hercek,
-Tomas Janousek, Spencer Janssen, Roman Joost, Jochen Keil, Lennart
-Kolmodin, Krzysztof Kosciuszkiewicz, Dmitry Kurochkin, Todd Lunter,
-Robert J. Macomber, Dmitry Malikov, David McLean, Marcin Mikołajczyk,
-Dino Morelli, Tony Morris, Eric Mrak, Thiago Negri, Edward
-O'Callaghan, Svein Ove, Martin Perner, Jens Petersen, Alexander
+Antoine Eiche, Nathaniel Wesley Filardo, John Goerzen, Reto Hablützel,
+Juraj Hercek, Tomas Janousek, Spencer Janssen, Roman Joost, Jochen
+Keil, Lennart Kolmodin, Krzysztof Kosciuszkiewicz, Dmitry Kurochkin,
+Todd Lunter, Robert J. Macomber, Dmitry Malikov, David McLean, Marcin
+Mikołajczyk, Dino Morelli, Tony Morris, Eric Mrak, Thiago Negri,
+Edward O'Callaghan, Svein Ove, Martin Perner, Jens Petersen, Alexander
 Polakov, Petr Rockai, Andrew Sackville-West, Markus Scherer, Alexander
 Shabalin, Valentin Shirokov, Peter Simons, Alexander Solovyov, John
 Soros, Travis Staton, Artem Tarasov, Samuli Thomasson, Edward
