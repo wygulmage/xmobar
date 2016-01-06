@@ -101,15 +101,15 @@ getKbdLayout d = alloca $ \stRecPtr -> do
 --
 
 data XkbKeyNameRec = XkbKeyNameRec {
-	name :: Ptr CChar -- array
+    name :: Ptr CChar -- array
 }
 
 --
 -- the t_ before alias is just because of name collisions
 --
 data XkbKeyAliasRec = XkbKeyAliasRec {
-	real  :: Ptr CChar, -- array
-	t_alias :: Ptr CChar  -- array
+    real  :: Ptr CChar, -- array
+    t_alias :: Ptr CChar  -- array
 }
 
 --
@@ -146,7 +146,7 @@ data XkbDescRec = XkbDescRec {
     server :: Ptr CChar, -- XkbServerMapPtr ;  dont' care
     t_map :: Ptr CChar, --XkbClientMapPtr ;  dont' care
     t_indicators :: Ptr CChar, -- XkbIndicatorPtr ;  dont' care
-	names :: Ptr XkbNamesRec, -- array
+    names :: Ptr XkbNamesRec, -- array
     t_compat :: Ptr CChar, -- XkbCompatMap ;  dont' care
     geom :: Ptr CChar -- XkbGeometryPtr ;  dont' care
 
@@ -264,10 +264,10 @@ foreign import ccall unsafe "X11/XKBlib.h XkbFreeKeyboard"
     xkbFreeKeyboard :: (Ptr XkbDescRec) -> CUInt -> CInt -> IO ()
 
 foreign import ccall unsafe "X11/XKBlib.h XkbSelectEventDetails"
-	xkbSelectEventDetails :: Display -> CUInt -> CUInt -> CULong -> CULong -> IO CUInt
+    xkbSelectEventDetails :: Display -> CUInt -> CUInt -> CULong -> CULong -> IO CUInt
 
 foreign import ccall unsafe "X11/XKBlib.h XkbSelectEvents"
-	xkbSelectEvents :: Display -> CUInt -> CUInt -> CUInt -> IO CUInt
+    xkbSelectEvents :: Display -> CUInt -> CUInt -> CUInt -> IO CUInt
 
 
 xkbUseCoreKbd :: CUInt
@@ -371,11 +371,11 @@ getKbdLay dpy opts = do
 
 
 data Kbd = Kbd [(String, String)]
-	deriving (Read, Show)
+        deriving (Read, Show)
 
 instance Exec Kbd where
-	alias (Kbd _) = "kbd"
-	start (Kbd opts) cb = do
+        alias (Kbd _) = "kbd"
+        start (Kbd opts) cb = do
 
         dpy <- openDisplay ""
 
