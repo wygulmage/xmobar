@@ -42,4 +42,4 @@ checkPipe file =
     handle (\(SomeException _) -> waitForPipe) $ do
         status <- getFileStatus file
         unless (isNamedPipe status) waitForPipe
-    where waitForPipe = threadDelay 1000 >> checkPipe file
+    where waitForPipe = threadDelay 1000000 >> checkPipe file
