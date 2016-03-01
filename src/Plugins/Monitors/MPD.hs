@@ -26,7 +26,7 @@ mpdConfig = mkMConfig "MPD: <state>"
               [ "bar", "vbar", "ipat", "state", "statei", "volume", "length"
               , "lapsed", "remaining", "plength", "ppos", "flags", "file"
               , "name", "artist", "composer", "performer"
-              , "album", "title", "track", "genre"
+              , "album", "title", "track", "genre", "date"
               ]
 
 data MOpts = MOpts
@@ -126,7 +126,7 @@ parseSong (Right Nothing) = return $ repeat ""
 parseSong (Right (Just s)) =
   let str sel = maybe "" (intercalate ", " . map M.toString) (M.sgGetTag sel s)
       sels = [ M.Name, M.Artist, M.Composer, M.Performer
-             , M.Album, M.Title, M.Track, M.Genre ]
+             , M.Album, M.Title, M.Track, M.Genre, M.Date ]
       fields = M.toString (M.sgFilePath s) : map str sels
   in mapM showWithPadding fields
 

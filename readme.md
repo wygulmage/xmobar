@@ -1097,7 +1097,7 @@ more than one battery.
              `plength` (playlist length), `ppos` (playlist position),
              `flags` (ncmpcpp-style playback mode),
              `name`, `artist`, `composer`, `performer`,
-             `album`, `title`, `track`, `file`, `genre`
+             `album`, `title`, `track`, `file`, `genre`, `date`
 - Default template: `MPD: <state>`
 - Example (note that you need "--" to separate regular monitor options from
   MPD's specific ones):
