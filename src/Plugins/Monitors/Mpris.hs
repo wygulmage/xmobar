@@ -99,12 +99,15 @@ fromVar = fromJust . fromVariant
 
 unpackMetadata :: [Variant] -> [(String, Variant)]
 unpackMetadata [] = []
-unpackMetadata xs = (map (fromVar *** fromVar) . unpack . head) xs where
-                      unpack v = case variantType v of
-                            TypeDictionary _ _ -> dictionaryItems $ fromVar v
-                            TypeVariant -> unpack $ fromVar v
-                            TypeStructure _ -> unpack $ head $ structureItems $ fromVar v
-                            _ -> []
+unpackMetadata xs =
+  (map (fromVar *** fromVar) . unpack . head) xs where
+    unpack v = case variantType v of
+                 TypeDictionary _ _ -> dictionaryItems $ fromVar v
+                 TypeVariant -> unpack $ fromVar v
+                 TypeStructure _ ->
+                   let x = structureItems (fromVar v) in
+                     if x == [] then [] else unpack (head x)
+                 _ -> []
 
 getMetadata :: (MprisVersion a) => a -> DC.Client -> String -> IO [(String, Variant)]
 getMetadata version client player = do
@@ -136,5 +139,7 @@ makeList version md = map getStr (fieldsList version) where
                                           case str of
                                            "mpris:length" -> formatTime (num `div` 1000000)
                                            _ -> (show::Int64 -> String) num
-                            TypeArray TypeString -> fromVar $ head $ arrayItems $ fromVar v
+                            TypeArray TypeString ->
+                              let x = arrayItems (fromVar v) in
+                                if x == [] then "" else fromVar (head x)
                             _ -> ""
