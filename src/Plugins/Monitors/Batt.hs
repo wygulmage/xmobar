@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Batt
--- Copyright   :  (c) 2010, 2011, 2012, 2013, 2015 Jose A Ortega
+-- Copyright   :  (c) 2010, 2011, 2012, 2013, 2015, 2016 Jose A Ortega
 --                (c) 2010 Andrea Rossato, Petr Rockai
 -- License     :  BSD-style (see LICENSE)
 --
@@ -21,6 +21,7 @@ import System.FilePath ((</>))
 import System.IO (IOMode(ReadMode), hGetLine, withFile)
 import System.Posix.Files (fileExist)
 import System.Console.GetOpt
+import Data.List (sort, sortOn, group)
 
 data BattOpts = BattOpts
   { onString :: String
@@ -84,7 +85,7 @@ parseOpts argv =
     (o, _, []) -> return $ foldr id defaultOpts o
     (_, _, errs) -> ioError . userError $ concat errs
 
-data Status = Charging | Discharging | Idle
+data Status = Charging | Discharging | Full | Idle deriving (Read, Eq)
 
 data Result = Result Float Float Float Status | NA
 
@@ -101,6 +102,7 @@ data Files = Files
   , fNow :: String
   , fVoltage :: String
   , fCurrent :: String
+  , fStatus :: String
   , isCurrent :: Bool
   } | NoFiles
 
@@ -108,6 +110,7 @@ data Battery = Battery
   { full :: !Float
   , now :: !Float
   , power :: !Float
+  , status :: !String
   }
 
 safeFileExist :: String -> String -> IO Bool
@@ -132,6 +135,7 @@ batteryFiles bat =
                                   , fNow = prefix </> ch ++ "_now"
                                   , fCurrent = prefix </> cf
                                   , fVoltage = prefix </> "voltage_now"
+                                  , fStatus = prefix </> "status"
                                   , isCurrent = not ip}
 
 haveAc :: FilePath -> IO Bool
@@ -140,17 +144,22 @@ haveAc f =
   where onError = const (return False) :: SomeException -> IO Bool
 
 readBattery :: Float -> Files -> IO Battery
-readBattery _ NoFiles = return $ Battery 0 0 0
+readBattery _ NoFiles = return $ Battery 0 0 0 "Idle"
 readBattery sc files =
     do a <- grab $ fFull files
        b <- grab $ fNow files
        d <- grab $ fCurrent files
+       s <- grabs $ fStatus files
        let sc' = if isCurrent files then sc / 10 else sc
-       return $ Battery (3600 * a / sc') -- wattseconds
+           a' = max a b -- sometimes the reported max charge is lower than
+       return $ Battery (3600 * a' / sc') -- wattseconds
                         (3600 * b / sc') -- wattseconds
                         (d / sc') -- watts
+                        s -- string: Discharging/Charging/Full
     where grab f = handle onError $ withFile f ReadMode (fmap read . hGetLine)
           onError = const (return (-1)) :: SomeException -> IO Float
+          grabs f = handle onError' $ withFile f ReadMode hGetLine
+          onError' = const (return "Idle") :: SomeException -> IO String
 
 readBatteries :: BattOpts -> [Files] -> IO Result
 readBatteries opts bfs =
@@ -163,9 +172,9 @@ readBatteries opts bfs =
            time = if watts == 0 then 0 else max 0 (sum $ map time' bats)
            mwatts = if watts == 0 then 1 else sign * watts
            time' b = (if ac then full b - now b else now b) / mwatts
-           acst | time == 0 = Idle
-                | ac        = Charging
-                | otherwise = Discharging
+           statuses :: [Status]
+           statuses = map read (sort (map status bats))
+           acst = head $ last $ sortOn length (group statuses)
        return $ if isNaN left then NA else Result left watts time acst
 
 runBatt :: [String] -> Monitor String
@@ -200,6 +209,7 @@ runBatt' bfs args = do
           where hours = show (x `div` 3600)
                 minutes = show ((x `mod` 3600) `div` 60)
         fmtStatus opts Idle = idleString opts
+        fmtStatus opts Full = idleString opts
         fmtStatus opts Charging = onString opts
         fmtStatus opts Discharging = offString opts
         maybeColor Nothing str = str
@@ -208,9 +218,10 @@ runBatt' bfs args = do
                   | -x >= highThreshold o = maybeColor (highWColor o)
                   | -x >= lowThreshold o = maybeColor (mediumWColor o)
                   | otherwise = maybeColor (lowWColor o)
-        getIconPattern opts status x = do
+        getIconPattern opts st x = do
           let x' = minimum [1, x]
-          case status of
+          case st of
                Idle -> showIconPattern (idleIconPattern opts) x'
+               Full -> showIconPattern (idleIconPattern opts) x'
                Charging -> showIconPattern (onIconPattern opts) x'
                Discharging -> showIconPattern (offIconPattern opts) x'
