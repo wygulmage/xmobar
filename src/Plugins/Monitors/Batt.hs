@@ -22,6 +22,8 @@ import System.IO (IOMode(ReadMode), hGetLine, withFile)
 import System.Posix.Files (fileExist)
 import System.Console.GetOpt
 import Data.List (sort, sortOn, group)
+import Data.Maybe (fromMaybe)
+import Text.Read (readMaybe)
 
 data BattOpts = BattOpts
   { onString :: String
@@ -85,7 +87,7 @@ parseOpts argv =
     (o, _, []) -> return $ foldr id defaultOpts o
     (_, _, errs) -> ioError . userError $ concat errs
 
-data Status = Charging | Discharging | Full | Idle deriving (Read, Eq)
+data Status = Charging | Discharging | Full | Idle | Unknown deriving (Read, Eq)
 
 data Result = Result Float Float Float Status | NA
 
@@ -173,7 +175,8 @@ readBatteries opts bfs =
            mwatts = if watts == 0 then 1 else sign * watts
            time' b = (if ac then full b - now b else now b) / mwatts
            statuses :: [Status]
-           statuses = map read (sort (map status bats))
+           statuses = map (fromMaybe Unknown . readMaybe)
+                          (sort (map status bats))
            acst = head $ last $ sortOn length (group statuses)
        return $ if isNaN left then NA else Result left watts time acst
 
@@ -209,6 +212,7 @@ runBatt' bfs args = do
           where hours = show (x `div` 3600)
                 minutes = show ((x `mod` 3600) `div` 60)
         fmtStatus opts Idle = idleString opts
+        fmtStatus opts Unknown = idleString opts
         fmtStatus opts Full = idleString opts
         fmtStatus opts Charging = onString opts
         fmtStatus opts Discharging = offString opts
@@ -222,6 +226,7 @@ runBatt' bfs args = do
           let x' = minimum [1, x]
           case st of
                Idle -> showIconPattern (idleIconPattern opts) x'
+               Unknown -> showIconPattern (idleIconPattern opts) x'
                Full -> showIconPattern (idleIconPattern opts) x'
                Charging -> showIconPattern (onIconPattern opts) x'
                Discharging -> showIconPattern (offIconPattern opts) x'
