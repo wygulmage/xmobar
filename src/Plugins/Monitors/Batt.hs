@@ -189,12 +189,13 @@ runBatt' bfs args = do
   c <- io $ readBatteries opts =<< mapM batteryFiles bfs
   suffix <- getConfigValue useSuffix
   d <- getConfigValue decDigits
+  nas <- getConfigValue naString
   case c of
     Result x w t s ->
       do l <- fmtPercent x
          ws <- fmtWatts w opts suffix d
          si <- getIconPattern opts s x
-         parseTemplate (l ++ [fmtStatus opts s, fmtTime $ floor t, ws, si])
+         parseTemplate (l ++ [fmtStatus opts s nas, fmtTime $ floor t, ws, si])
     NA -> getConfigValue naString
   where fmtPercent :: Float -> Monitor [String]
         fmtPercent x = do
@@ -211,11 +212,11 @@ runBatt' bfs args = do
                                     then minutes else '0' : minutes
           where hours = show (x `div` 3600)
                 minutes = show ((x `mod` 3600) `div` 60)
-        fmtStatus opts Idle = idleString opts
-        fmtStatus opts Unknown = idleString opts
-        fmtStatus opts Full = idleString opts
-        fmtStatus opts Charging = onString opts
-        fmtStatus opts Discharging = offString opts
+        fmtStatus opts Idle _ = idleString opts
+        fmtStatus _ Unknown na = na
+        fmtStatus opts Full _ = idleString opts
+        fmtStatus opts Charging _ = onString opts
+        fmtStatus opts Discharging _ = offString opts
         maybeColor Nothing str = str
         maybeColor (Just c) str = "<fc=" ++ c ++ ">" ++ str ++ "</fc>"
         color x o | x >= 0 = maybeColor (posColor o)
@@ -225,8 +226,8 @@ runBatt' bfs args = do
         getIconPattern opts st x = do
           let x' = minimum [1, x]
           case st of
+               Unknown -> showIconPattern (offIconPattern opts) x'
                Idle -> showIconPattern (idleIconPattern opts) x'
-               Unknown -> showIconPattern (idleIconPattern opts) x'
                Full -> showIconPattern (idleIconPattern opts) x'
                Charging -> showIconPattern (onIconPattern opts) x'
                Discharging -> showIconPattern (offIconPattern opts) x'
