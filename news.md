@@ -18,7 +18,7 @@ _New features_
    - New monitor argument `-T` to specify the maximum total width of
      the monitor text.
    - New $VAR parameter syntax for using env vars in pipe monitors, by
-     [Will Song].
+     Will Song (see [issue #268]).
 
 _Bug fixes_
 
@@ -31,11 +31,11 @@ _Bug fixes_
    - The `MPris` monitor now honours field width and padding optons
      (-M, -w, etc.).
    - `Batt`: sensible thresholds for high/low power consumption (see
-     [issue #265].
+     [issue #265]).
 
 [issue #231]: https://github.com/jaor/xmobar/issues/225
 [issue #265]: https://github.com/jaor/xmobar/issues/225
-[Will Song]: https://github.com/jaor/xmobar/issues/268
+[issue #268]: https://github.com/jaor/xmobar/issues/268
 
 ## Version 0.23.1 (Apr 14, 2015)
 
