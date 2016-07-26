@@ -682,6 +682,10 @@ These are the options available for all monitors below:
       needed.
     - Long option: `--width`
     - Default: 0 (variable width)
+- `-T` _number_ Maximum total width
+    - Maximum total width of the text.
+    - Long option: `--maxtwidth`
+    - Default: 0 (no limit)
 - `-c` _string_
     - Characters used for padding. The characters of _string_ are used
       cyclically. E.g., with `-P +- -w 6`, a field with value "foo"

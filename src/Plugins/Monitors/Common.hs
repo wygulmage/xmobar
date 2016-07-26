@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Common
--- Copyright   :  (c) 2010, 2011, 2013 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2010, 2011, 2013, 2016 Jose Antonio Ortega Ruiz
 --                (c) 2007-2010 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -83,23 +83,24 @@ type Monitor a = ReaderT MConfig IO a
 
 data MConfig =
     MC { normalColor :: IORef (Maybe String)
-       , low         :: IORef Int
-       , lowColor    :: IORef (Maybe String)
-       , high        :: IORef Int
-       , highColor   :: IORef (Maybe String)
-       , template    :: IORef String
-       , export      :: IORef [String]
-       , ppad        :: IORef Int
-       , decDigits   :: IORef Int
-       , minWidth    :: IORef Int
-       , maxWidth    :: IORef Int
-       , padChars    :: IORef String
-       , padRight    :: IORef Bool
-       , barBack     :: IORef String
-       , barFore     :: IORef String
-       , barWidth    :: IORef Int
-       , useSuffix   :: IORef Bool
-       , naString    :: IORef String
+       , low :: IORef Int
+       , lowColor :: IORef (Maybe String)
+       , high :: IORef Int
+       , highColor :: IORef (Maybe String)
+       , template :: IORef String
+       , export :: IORef [String]
+       , ppad :: IORef Int
+       , decDigits :: IORef Int
+       , minWidth :: IORef Int
+       , maxWidth :: IORef Int
+       , padChars :: IORef String
+       , padRight :: IORef Bool
+       , barBack :: IORef String
+       , barFore :: IORef String
+       , barWidth :: IORef Int
+       , useSuffix :: IORef Bool
+       , naString :: IORef String
+       , maxTotalWidth :: IORef Int
        }
 
 -- | from 'http:\/\/www.haskell.org\/hawiki\/MonadState'
@@ -144,7 +145,8 @@ mkMConfig tmpl exprts =
        bw <- newIORef 10
        up <- newIORef False
        na <- newIORef "N/A"
-       return $ MC nc l lc h hc t e p d mn mx pc pr bb bf bw up na
+       mt <- newIORef 0
+       return $ MC nc l lc h hc t e p d mn mx pc pr bb bf bw up na mt
 
 data Opts = HighColor String
           | NormalColor String
@@ -164,6 +166,7 @@ data Opts = HighColor String
           | BarWidth String
           | UseSuffix String
           | NAString String
+          | MaxTotalWidth String
 
 options :: [OptDescr Opts]
 options =
@@ -186,6 +189,7 @@ options =
     , Option "f" ["bfore"] (ReqArg BarFore "bar foreground") "Characters used to draw bar foregrounds"
     , Option "W" ["bwidth"] (ReqArg BarWidth "bar width") "Bar width"
     , Option "x" ["nastring"] (ReqArg NAString "N/A string") "String used when the monitor is not available"
+    , Option "T" ["maxtwidth"] (ReqArg MaxTotalWidth "Maximum total width") "Maximum total width"
     ]
 
 doArgs :: [String] -> ([String] -> Monitor String) -> ([String] -> Monitor Bool) -> Monitor String
@@ -223,7 +227,8 @@ doConfigOptions (o:oo) =
           BarFore     s -> setConfigValue s barFore
           BarWidth    w -> setConfigValue (nz w) barWidth
           UseSuffix   u -> setConfigValue (bool u) useSuffix
-          NAString    s -> setConfigValue s naString) >> next
+          NAString    s -> setConfigValue s naString
+          MaxTotalWidth w -> setConfigValue (nz w) maxTotalWidth) >> next
 
 runM :: [String] -> IO MConfig -> ([String] -> Monitor String) -> Int
         -> (String -> IO ()) -> IO ()
@@ -324,13 +329,16 @@ templateParser = many templateStringParser --"%")
 -- | Takes a list of strings that represent the values of the exported
 -- keys. The strings are joined with the exported keys to form a map
 -- to be combined with 'combine' to the parsed template. Returns the
--- final output of the monitor.
+-- final output of the monitor, trimmed to MaxTotalWidth if that
+-- configuration value is positive.
 parseTemplate :: [String] -> Monitor String
 parseTemplate l =
     do t <- getConfigValue template
        e <- getConfigValue export
+       w <- getConfigValue maxTotalWidth
        let m = Map.fromList . zip e $ l
-       parseTemplate' t m
+       s <- parseTemplate' t m
+       return $ if w > 0 && length s > w then take w s else s
 
 -- | Parses the template given to it with a map of export values and combines
 -- them
@@ -488,7 +496,7 @@ showVerticalBar v x = colorizeString v [convert $ 100 * x]
           where t = 9600 + (round val `div` 12)
 
 showLogBar :: Float -> Float -> Monitor String
-showLogBar f v = 
+showLogBar f v =
   let intConfig c = fromIntegral `fmap` getConfigValue c
   in do
     h <- intConfig high

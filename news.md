@@ -15,6 +15,8 @@ _New features_
      users, by Roman Joost.
    - New template parameter `<date>` for the `MPD` plugin (by Bruno
      Heridet)
+   - New monitor argument `-T` to specify the maximum total width of
+     the monitor text.
 
 _Bug fixes_
 
