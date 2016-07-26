@@ -17,6 +17,8 @@ _New features_
      Heridet)
    - New monitor argument `-T` to specify the maximum total width of
      the monitor text.
+   - New $VAR parameter syntax for using env vars in pipe monitors, by
+     [Will Song].
 
 _Bug fixes_
 
@@ -32,6 +34,8 @@ _Bug fixes_
      [issue #265].
 
 [issue #231]: https://github.com/jaor/xmobar/issues/225
+[issue #265]: https://github.com/jaor/xmobar/issues/225
+[Will Song]: https://github.com/jaor/xmobar/issues/268
 
 ## Version 0.23.1 (Apr 14, 2015)
 
