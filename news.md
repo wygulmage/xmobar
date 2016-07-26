@@ -28,6 +28,8 @@ _Bug fixes_
    - `PipeReader` was polling too often (thanks to zlbruce).
    - The `MPris` monitor now honours field width and padding optons
      (-M, -w, etc.).
+   - `Batt`: sensible thresholds for high/low power consumption (see
+     [issue #265].
 
 [issue #231]: https://github.com/jaor/xmobar/issues/225
 

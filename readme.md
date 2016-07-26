@@ -866,8 +866,8 @@ something like:
   - `-O`: string for AC "on" status (default: "On")
   - `-i`: string for AC "idle" status (default: "On")
   - `-o`: string for AC "off" status (default: "Off")
-  - `-L`: low power (`watts`) threshold (default: -12)
-  - `-H`: high power threshold (default: -10)
+  - `-L`: low power (`watts`) threshold (default: 10)
+  - `-H`: high power threshold (default: 12)
   - `-l`: color to display power lower than the `-L` threshold
   - `-m`: color to display power lower than the `-H` threshold
   - `-h`: color to display power higher than the `-H` threshold
