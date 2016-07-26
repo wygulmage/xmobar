@@ -13,12 +13,19 @@ _New features_
      Knabe.
    - `UVMeter`, a new optional plugin showing UV data for Australian
      users, by Roman Joost.
+   - New template parameter `<date>` for the `MPD` plugin (by Bruno
+     Heridet)
 
 _Bug fixes_
 
    - The `Volume` plugin now supports capture devices (Antoine Eiche).
    - The `MPD` plugin will now automatically update on options changes
      (Ben Boeckel).
+   - The `Battery` plugin does now a better job at tracking AC status
+     and times (see [issue #231]).
+   - `PipeReader` was polling too often (thanks to zlbruce).
+
+[issue #231]: https://github.com/jaor/xmobar/issues/225
 
 ## Version 0.23.1 (Apr 14, 2015)
 

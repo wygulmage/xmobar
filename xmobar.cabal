@@ -1,5 +1,5 @@
 name:               xmobar
-version:            0.23.1
+version:            0.24
 homepage:           http://xmobar.org
 synopsis:           A Minimalistic Text Based Status Bar
 description: 	    Xmobar is a minimalistic text based status bar.
@@ -81,7 +81,7 @@ flag with_uvmeter
 flag with_conduit
   description: Use http-conduits for getting weather data
   default: False
-  
+
 executable xmobar
     hs-source-dirs:     src
     main-is:            Main.hs
