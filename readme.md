@@ -1602,7 +1602,7 @@ giving me the chance to contribute.
 This software is released under a BSD-style license. See [LICENSE] for
 more details.
 
-Copyright &copy; 2010-2014 Jose Antonio Ortega Ruiz
+Copyright &copy; 2010-2016 Jose Antonio Ortega Ruiz
 
 Copyright &copy; 2007-2010 Andrea Rossato
 
