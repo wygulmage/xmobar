@@ -26,6 +26,8 @@ _Bug fixes_
    - The `Battery` plugin does now a better job at tracking AC status
      and times (see [issue #231]).
    - `PipeReader` was polling too often (thanks to zlbruce).
+   - The `MPris` monitor now honours field width and padding optons
+     (-M, -w, etc.).
 
 [issue #231]: https://github.com/jaor/xmobar/issues/225
 
