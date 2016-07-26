@@ -25,8 +25,8 @@ expandEnv (c:s) = case c of
     return $ envVar ++ remainder
     where (e, s') = getVar s
           getVar "" = ("", "")
-          getVar ('{':s) = (takeUntil "}" s, drop 1 . dropUntil "}" $ s)
-          getVar s = (takeUntil filterstr s, dropUntil filterstr s)
+          getVar ('{':s'') = (takeUntil "}" s'', drop 1 . dropUntil "}" $ s'')
+          getVar s'' = (takeUntil filterstr s'', dropUntil filterstr s'')
           filterstr = ",./? \t;:\"'~`!@#$%^&*()<>-+=\\|"
           takeUntil f = takeWhile (not . flip elem f)
           dropUntil f = dropWhile (not . flip elem f)
@@ -36,7 +36,7 @@ expandEnv (c:s) = case c of
     False -> do
       remainder <- expandEnv $ drop 1 s
       return $ escString s ++ remainder
-      where escString s = let (cc:ss) = s in
+      where escString s' = let (cc:ss) = s' in
               case cc of
                 't' -> "\t"
                 'n' -> "\n"
