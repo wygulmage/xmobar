@@ -105,7 +105,7 @@ executable xmobar
       Plugins.Monitors.Bright, Plugins.Monitors.CatInt,
       Plugins.Monitors.UVMeter
 
-    ghc-prof-options:   -prof -auto-all
+    ghc-prof-options:   -prof
     ghc-options: -funbox-strict-fields -Wall -fno-warn-unused-do-bind
     extra-libraries: Xrandr Xrender
 
