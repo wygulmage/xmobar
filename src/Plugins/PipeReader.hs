@@ -21,6 +21,7 @@ import System.Posix.Files
 import Control.Concurrent(threadDelay)
 import Control.Exception
 import Control.Monad(forever, unless)
+import Control.Applicative ((<$>))
 
 data PipeReader = PipeReader String String
     deriving (Read, Show)

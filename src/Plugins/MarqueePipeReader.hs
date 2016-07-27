@@ -22,9 +22,10 @@ import Control.Concurrent(forkIO, threadDelay)
 import Control.Concurrent.STM (TChan, atomically, writeTChan, tryReadTChan, newTChan)
 import Control.Exception
 import Control.Monad(forever, unless)
+import Control.Applicative ((<$>))
 
 type Length = Int       -- length of the text to display
-type Rate = Int         -- delay in tenth seconds 
+type Rate = Int         -- delay in tenth seconds
 type Separator = String -- if text wraps around, use separator
 
 data MarqueePipeReader = MarqueePipeReader String (Length, Rate, Separator) String
@@ -48,16 +49,16 @@ instance Exec MarqueePipeReader where
 
 pipeToChan :: Handle -> TChan String -> IO ()
 pipeToChan h chan = do
-    line <- hGetLineSafe h 
+    line <- hGetLineSafe h
     atomically $ writeTChan chan line
 
 writer :: String -> Separator -> Length -> Rate -> TChan String -> (String -> IO ()) -> IO ()
-writer txt sep len rate chan cb = do 
+writer txt sep len rate chan cb = do
     cb (take len txt)
     mbnext <- atomically $ tryReadTChan chan
     case mbnext of
         Just new -> writer (toInfTxt new sep) sep len rate chan cb
-        Nothing -> tenthSeconds rate >> writer (drop 1 txt) sep len rate chan cb 
+        Nothing -> tenthSeconds rate >> writer (drop 1 txt) sep len rate chan cb
 
 toInfTxt :: String -> String -> String
 toInfTxt line sep = concat (repeat $ line ++ " " ++ sep ++ " ")

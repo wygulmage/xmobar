@@ -21,8 +21,9 @@ import System.FilePath ((</>))
 import System.IO (IOMode(ReadMode), hGetLine, withFile)
 import System.Posix.Files (fileExist)
 import System.Console.GetOpt
-import Data.List (sort, sortOn, group)
+import Data.List (sort, sortBy, group)
 import Data.Maybe (fromMaybe)
+import Data.Ord (comparing)
 import Text.Read (readMaybe)
 
 data BattOpts = BattOpts
@@ -162,6 +163,11 @@ readBattery sc files =
           onError = const (return (-1)) :: SomeException -> IO Float
           grabs f = handle onError' $ withFile f ReadMode hGetLine
           onError' = const (return "Idle") :: SomeException -> IO String
+
+-- sortOn is only available starting at ghc 7.10
+sortOn :: Ord b => (a -> b) -> [a] -> [a]
+sortOn f =
+  map snd . sortBy (comparing fst) . map (\x -> let y = f x in y `seq` (y, x))
 
 readBatteries :: BattOpts -> [Files] -> IO Result
 readBatteries opts bfs =
