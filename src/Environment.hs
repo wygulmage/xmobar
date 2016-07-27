@@ -37,7 +37,7 @@ expandEnv (c:s) = case c of
     False -> do
       remainder <- expandEnv $ drop 1 s
       return $ escString s ++ remainder
-      where escString s' = let (cc:ss) = s' in
+      where escString s' = let (cc:_) = s' in
               case cc of
                 't' -> "\t"
                 'n' -> "\n"
