@@ -1,5 +1,13 @@
 % xmobar - Release notes
 
+## Version 0.24.1 (Jul 28, 2016)
+
+_Bug fixes_
+
+   - Restoring compatibility with GHC 7.6, (see [issue #269]).
+
+[issue #268]: https://github.com/jaor/xmobar/issues/269
+
 ## Version 0.24 (Jul 26, 2016)
 
 _New features_
