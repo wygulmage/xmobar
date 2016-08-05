@@ -183,7 +183,8 @@ parseData =
        return [WI st ss y m d h w v sk tC tF dC dF rh p]
 
 defUrl :: String
-defUrl = "http://weather.noaa.gov/pub/data/observations/metar/decoded/"
+-- "http://weather.noaa.gov/pub/data/observations/metar/decoded/"
+defUrl = "http://tgftp.nws.noaa.gov/data/observations/metar/decoded/"
 
 stationUrl :: String -> String
 stationUrl station = defUrl ++ station ++ ".TXT"
@@ -191,7 +192,7 @@ stationUrl station = defUrl ++ station ++ ".TXT"
 getData :: String -> IO String
 #ifdef HTTP_CONDUIT
 getData station = CE.catch (do
-    manager <- newManager tlsManagerSettings 
+    manager <- newManager tlsManagerSettings
     request <- parseUrl $ stationUrl station
     res <- httpLbs request manager
     return $  B.unpack $ responseBody res
