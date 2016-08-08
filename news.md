@@ -1,5 +1,13 @@
 % xmobar - Release notes
 
+## Version 0.24.2 (Aug 8, 2016)
+
+_Bug fixes_
+
+   - New Weather plugin URL (see [issue #270]).
+
+[issue #270]: https://github.com/jaor/xmobar/issues/270
+
 ## Version 0.24.1 (Jul 28, 2016)
 
 _Bug fixes_
