@@ -147,7 +147,7 @@ haveAc f =
   where onError = const (return False) :: SomeException -> IO Bool
 
 readBattery :: Float -> Files -> IO Battery
-readBattery _ NoFiles = return $ Battery 0 0 0 "Idle"
+readBattery _ NoFiles = return $ Battery 0 0 0 "Unknown"
 readBattery sc files =
     do a <- grab $ fFull files
        b <- grab $ fNow files
@@ -162,12 +162,15 @@ readBattery sc files =
     where grab f = handle onError $ withFile f ReadMode (fmap read . hGetLine)
           onError = const (return (-1)) :: SomeException -> IO Float
           grabs f = handle onError' $ withFile f ReadMode hGetLine
-          onError' = const (return "Idle") :: SomeException -> IO String
+          onError' = const (return "Unknown") :: SomeException -> IO String
 
 -- sortOn is only available starting at ghc 7.10
 sortOn :: Ord b => (a -> b) -> [a] -> [a]
 sortOn f =
   map snd . sortBy (comparing fst) . map (\x -> let y = f x in y `seq` (y, x))
+
+mostCommonDef :: Eq a => a -> [a] -> a
+mostCommonDef x xs = head $ last $ [x] : sortOn length (group xs)
 
 readBatteries :: BattOpts -> [Files] -> IO Result
 readBatteries opts bfs =
@@ -183,7 +186,7 @@ readBatteries opts bfs =
            statuses :: [Status]
            statuses = map (fromMaybe Unknown . readMaybe)
                           (sort (map status bats))
-           acst = head $ last $ sortOn length (group statuses)
+           acst = mostCommonDef Unknown $ filter (Unknown/=) statuses
        return $ if isNaN left then NA else Result left watts time acst
 
 runBatt :: [String] -> Monitor String
