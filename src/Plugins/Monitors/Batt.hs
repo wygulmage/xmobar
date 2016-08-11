@@ -189,7 +189,7 @@ readBatteries opts bfs =
            acst = mostCommonDef Unknown $ filter (Unknown/=) statuses
            racst | acst /= Unknown = acst
                  | not ac = Discharging
-                 | left == 0 = Idle
+                 | left == 0 = Full
                  | otherwise = Charging
        return $ if isNaN left then NA else Result left watts time racst
 
