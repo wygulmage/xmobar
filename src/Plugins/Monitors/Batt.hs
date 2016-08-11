@@ -188,9 +188,9 @@ readBatteries opts bfs =
                           (sort (map status bats))
            acst = mostCommonDef Unknown $ filter (Unknown/=) statuses
            racst | acst /= Unknown = acst
-                 | not ac = Discharging
-                 | left == 0 = Full
-                 | otherwise = Charging
+                 | time == 0 = Idle
+                 | ac = Charging
+                 | otherwise = Discharging
        return $ if isNaN left then NA else Result left watts time racst
 
 runBatt :: [String] -> Monitor String
