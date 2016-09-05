@@ -1,5 +1,14 @@
 % xmobar - Release notes
 
+## Version 0.24.3 (Sep 5, 2016)
+
+_Bug fixes_
+
+  - Battery monitor: fixes for cases where status is not consistently
+    reported by the kernel (see [issue #271]).
+
+[issue #271]: https://github.com/jaor/xmobar/issues/271
+
 ## Version 0.24.2 (Aug 8, 2016)
 
 _Bug fixes_
