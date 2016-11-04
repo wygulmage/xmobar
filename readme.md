@@ -1559,8 +1559,8 @@ Polakov, Petr Rockai, Andrew Sackville-West, Markus Scherer, Alexander
 Shabalin, Valentin Shirokov, Peter Simons, Alexander Solovyov, Will
 Song, John Soros, Travis Staton, Artem Tarasov, Samuli Thomasson,
 Edward Tjörnhammar, Sergei Trofimovich, Thomas Tuegel, Jan Vornberger,
-Anton Vorontsov, Daniel Wagner, Phil Xiaojun Hu, Edward Z. Yang and
-Norbert Zeh.
+Anton Vorontsov, Daniel Wagner, Zev Weiss, Phil Xiaojun Hu, Edward
+Z. Yang and Norbert Zeh.
 
 [jao]: http://jao.io
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
