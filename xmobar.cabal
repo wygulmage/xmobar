@@ -74,6 +74,10 @@ flag with_threaded
   description: Use threaded runtime.
   default: False
 
+flag with_rtsopts
+  description: Use -with-rtsopts=-V0 to reduce wakeups
+  default: True
+
 flag with_uvmeter
   description: UVMeter only useful to australians.
   default: False
@@ -137,6 +141,9 @@ executable xmobar
        -- See also comments in https://github.com/jaor/xmobar/pull/36
        ghc-options: -threaded
        cpp-options: -DTHREADED_RUNTIME
+
+    if flag(with_rtsopts)
+       ghc-options: -with-rtsopts=-V0
 
     if impl (ghc < 7)
        cpp-options: -DGHC6
