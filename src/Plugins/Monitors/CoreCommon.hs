@@ -16,8 +16,7 @@
 
 module Plugins.Monitors.CoreCommon where
 
-#ifdef GHC8
-#else
+#if __GLASGOW_HASKELL__ < 800
 import Control.Applicative
 #endif
 

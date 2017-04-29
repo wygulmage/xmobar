@@ -145,12 +145,6 @@ executable xmobar
     if flag(with_rtsopts)
        ghc-options: -with-rtsopts=-V0
 
-    if impl (ghc < 7)
-       cpp-options: -DGHC6
-
-    if impl (ghc > 7)
-       cpp-options: -DGHC8
-
     if flag(with_xft) || flag(all_extensions)
        build-depends: utf8-string >= 0.3 && < 1.1, X11-xft >= 0.2 && < 0.4
        other-modules: MinXft
