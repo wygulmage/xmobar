@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE CPP, PatternGuards #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -15,6 +15,10 @@
 -----------------------------------------------------------------------------
 
 module Plugins.Monitors.CoreCommon where
+
+#ifndef GHC8
+import Control.Applicative
+#endif
 
 import Data.Char hiding (Space)
 import Data.Function
