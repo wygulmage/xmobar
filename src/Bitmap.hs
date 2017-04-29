@@ -86,9 +86,10 @@ loadBitmap d w p = do
     exist <- doesFileExist p
     if exist
        then do
-            res <- runExceptT $ tryXBM
 #ifdef XPM
-                <|> tryXPM
+            res <- runExceptT (tryXBM <|> tryXPM)
+#else
+            res <- runExceptT tryXBM
 #endif
             case res of
                  Right b -> return $ Just b
