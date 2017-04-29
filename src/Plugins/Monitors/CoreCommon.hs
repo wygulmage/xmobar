@@ -16,8 +16,6 @@
 
 module Plugins.Monitors.CoreCommon where
 
-import Control.Applicative
-import Control.Monad
 import Data.Char hiding (Space)
 import Data.Function
 import Data.List

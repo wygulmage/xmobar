@@ -23,7 +23,7 @@ import Plugins.Monitors.Common
 import Data.Word (Word64)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import Data.Time.Clock (UTCTime, getCurrentTime, diffUTCTime)
-import Control.Monad (forM, filterM, liftM)
+import Control.Monad (forM, filterM)
 import System.Directory (getDirectoryContents, doesFileExist)
 import System.FilePath ((</>))
 import System.Console.GetOpt
