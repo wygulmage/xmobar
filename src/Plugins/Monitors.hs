@@ -3,7 +3,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Xmobar.Plugins.Monitors
--- Copyright   :  (c) 2010, 2011, 2012, 2013 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2010, 2011, 2012, 2013, 2017 Jose Antonio Ortega Ruiz
 --                (c) 2007-10 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -114,15 +114,15 @@ instance Exec Monitors where
     alias (Cpu _ _) = "cpu"
     alias (MultiCpu _ _) = "multicpu"
     alias (Battery _ _) = "battery"
-    alias (BatteryP {})= "battery"
+    alias BatteryP {} = "battery"
     alias (BatteryN _ _ _ a)= a
     alias (Brightness _ _) = "bright"
     alias (CpuFreq _ _) = "cpufreq"
     alias (TopProc _ _) = "top"
     alias (TopMem _ _) = "topmem"
     alias (CoreTemp _ _) = "coretemp"
-    alias (DiskU {}) = "disku"
-    alias (DiskIO {}) = "diskio"
+    alias DiskU {} = "disku"
+    alias DiskIO {} = "diskio"
     alias (Uptime _ _) = "uptime"
     alias (CatInt n _ _ _) = "cat" ++ show n
 #ifdef UVMETER

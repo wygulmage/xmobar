@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Bitmap
--- Copyright   :  (C) 2013, 2015 Alexander Polakov
+-- Copyright   :  (C) 2013, 2015, 2017 Alexander Polakov
 -- License     :  BSD3
 --
 -- Maintainer  :  jao@gnu.org
@@ -86,8 +86,7 @@ loadBitmap d w p = do
     exist <- doesFileExist p
     if exist
        then do
-            res <- runExceptT $
-                    tryXBM
+            res <- runExceptT $ tryXBM
 #ifdef XPM
                 <|> tryXPM
 #endif
@@ -121,7 +120,7 @@ drawBitmap d p gc fc bc x y i =
         y' = 1 + y - fromIntegral h `div` 2
     setForeground d gc fc'
     setBackground d gc bc'
-    case (shapePixmap i) of
+    case shapePixmap i of
          Nothing -> return ()
          Just mask -> setClipOrigin d gc x y' >> setClipMask d gc mask
     case bitmapType i of

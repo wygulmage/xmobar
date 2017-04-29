@@ -29,7 +29,7 @@ checkedDataRetrieval :: (Ord a, Num a)
                      => String -> [[String]] -> Maybe (String, String -> Int)
                      -> (Double -> a) -> (a -> String) -> Monitor String
 checkedDataRetrieval msg paths lbl trans fmt =
-  liftM (fromMaybe msg . listToMaybe . catMaybes) $
+  fmap (fromMaybe msg . listToMaybe . catMaybes) $
     mapM (\p -> retrieveData p lbl trans fmt) paths
 
 retrieveData :: (Ord a, Num a)
@@ -127,7 +127,7 @@ findFilesAndLabel path lbl  =  catMaybes
 -- | Function to read the contents of the given file(s)
 readFiles :: (String, Either Int (String, String -> Int))
           -> Monitor (Int, String)
-readFiles (fval, flbl) = (,) <$> either return (\(f, ex) -> liftM ex
+readFiles (fval, flbl) = (,) <$> either return (\(f, ex) -> fmap ex
                                                             $ io $ readFile f) flbl
                              <*> io (readFile fval)
 

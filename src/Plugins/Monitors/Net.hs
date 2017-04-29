@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Net
--- Copyright   :  (c) 2011, 2012, 2013, 2014 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2011, 2012, 2013, 2014, 2017 Jose Antonio Ortega Ruiz
 --                (c) 2007-2010 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -82,8 +82,8 @@ instance Ord num => Ord (NetDev num) where
     compare NA _               = LT
     compare _  NA              = GT
     compare (NI _) (NI _)      = EQ
-    compare (NI _) (ND {})     = LT
-    compare (ND {}) (NI _)     = GT
+    compare (NI _) ND {}       = LT
+    compare ND {} (NI _)     = GT
     compare (ND _ x1 y1) (ND _ x2 y2) =
         if downcmp /= EQ
            then downcmp
@@ -189,7 +189,7 @@ runNets refs argv = do
   dev <- io $ parseActive refs
   opts <- io $ parseOpts argv
   printNet opts dev
-    where parseActive refs' = liftM selectActive (parseNets refs') 
+    where parseActive refs' = fmap selectActive (parseNets refs')
           selectActive = maximum
 
 startNet :: String -> [String] -> Int -> (String -> IO ()) -> IO ()

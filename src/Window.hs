@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Window
--- Copyright   :  (c) 2011-16 Jose A. Ortega Ruiz
+-- Copyright   :  (c) 2011-17 Jose A. Ortega Ruiz
 --             :  (c) 2012 Jochen Keil
 -- License     :  BSD-style (see LICENSE)
 --
@@ -197,7 +197,7 @@ showWindow r c d w = do
 
 isMapped :: Display -> Window -> IO Bool
 isMapped d w = ism <$> getWindowAttributes d w
-    where ism (WindowAttributes { wa_map_state = wms }) = wms /= waIsUnmapped
+    where ism WindowAttributes { wa_map_state = wms } = wms /= waIsUnmapped
 
 borderOffset :: (Integral a) => Border -> Int -> a
 borderOffset b lw =

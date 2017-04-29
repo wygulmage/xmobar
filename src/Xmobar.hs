@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Xmobar
--- Copyright   :  (c) 2011, 2012, 2013, 2014, 2015 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2011, 2012, 2013, 2014, 2015, 2017 Jose Antonio Ortega Ruiz
 --                (c) 2007 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -107,7 +107,7 @@ startLoop xcfg@(XConf _ _ w _ _ _) sig vs = do
     eventLoop tv xcfg [] sig
   where
     handler thing (SomeException e) =
-      void $ putStrLn ("Thread " ++ thing ++ " failed: " ++ (show e))
+      void $ putStrLn ("Thread " ++ thing ++ " failed: " ++ show e)
     -- Reacts on events from X
     eventer signal =
       allocaXEvent $ \e -> do

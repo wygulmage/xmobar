@@ -31,7 +31,7 @@ uvConfig = mkMConfig
        ["station"                               -- available replacements
        ]
 
-data UvInfo = UV { index :: String }
+newtype UvInfo = UV { index :: String }
     deriving (Show)
 
 uvURL :: String
@@ -86,7 +86,7 @@ runUVMeter (s:_) = do
 type AttrName  = String
 type AttrValue = String
 
-data Attribute = Attribute (AttrName, AttrValue)
+newtype Attribute = Attribute (AttrName, AttrValue)
     deriving (Show)
 
 data XML = Element String [Attribute] [XML]

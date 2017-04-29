@@ -96,10 +96,10 @@ formatCpu opts i xs
                       return (b:h:d:ps)
   where tryString
           | i == 0 = loadIconPattern opts
-          | i <= length (loadIconPatterns opts) = Just $ (loadIconPatterns opts) !! (i - 1)
+          | i <= length (loadIconPatterns opts) = Just $ loadIconPatterns opts !! (i - 1)
           | otherwise = Nothing
 
-splitEvery :: (Eq a) => Int -> [a] -> [[a]]
+splitEvery :: Int -> [a] -> [[a]]
 splitEvery n = unfoldr (\x -> if null x then Nothing else Just $ splitAt n x)
 
 groupData :: [String] -> [[String]]
