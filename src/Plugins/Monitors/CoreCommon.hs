@@ -16,7 +16,8 @@
 
 module Plugins.Monitors.CoreCommon where
 
-#ifndef GHC8
+#ifdef GHC8
+#else
 import Control.Applicative
 #endif
 
