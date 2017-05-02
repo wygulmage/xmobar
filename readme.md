@@ -1,5 +1,3 @@
-% xmobar - a minimalistic status bar
-
 [![Build Status](https://travis-ci.org/jaor/xmobar.svg?branch=master)](https://travis-ci.org/jaor/xmobar)
 
 # About
