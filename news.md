@@ -6,7 +6,7 @@ _Infrastructure_
 
   - Whe have now an active [Travis CI setup].
 
-[Travi CI setup]: https://travis-ci.org/jaor/xmobar
+[Travis CI setup]: https://travis-ci.org/jaor/xmobar
 
 _Bug fixes_
 
