@@ -751,7 +751,7 @@ something like:
         `visibility`, `skyCondition`, `tempC`, `tempF`,
 	    `dewPointC`, `dewPointF`, `rh`, `pressure`
 - Default template: `<station>: <tempC>C, rh <rh>% (<hour>)`
-- Retrieves weather information from http://weather.noaa.gov.
+- Retrieves weather information from http://tgftp.nws.noaa.gov.
 
 ### `Network Interface Args RefreshRate`
 
