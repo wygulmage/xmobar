@@ -510,7 +510,7 @@ showLogBar :: Float -> Float -> Monitor String
 showLogBar f v = logScaling f v >>= showPercentBar v
 
 showLogVBar :: Float -> Float -> Monitor String
-showLogVBar f v = logScaling f v >>= showPercentBar v
+showLogVBar f v = logScaling f v >>= showVerticalBar v
 
 showLogIconPattern :: Maybe IconPattern -> Float -> Float -> Monitor String
 showLogIconPattern str f v = logScaling f v >>= showIconPattern str
