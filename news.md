@@ -1,5 +1,13 @@
 % xmobar - Release notes
 
+## Version 0.24.5 (May, 2017)
+
+_Bug fixes_
+
+  - Fix for vertical bars ([issue #303])
+
+[issue #303]: https://github.com/jaor/xmobar/issues/303
+
 ## Version 0.24.4 (April, 2017)
 
 _Infrastructure_

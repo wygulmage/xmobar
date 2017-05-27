@@ -10,7 +10,7 @@ xmobar was inspired by the [Ion3] status bar, and supports similar
 features, like dynamic color management, icons, output templates, and
 extensibility through plugins.
 
-This page documents xmobar 0.24.4 (see [release notes]).
+This page documents xmobar 0.24.5 (see [release notes]).
 
 [This screenshot] shows xmobar running under [sawfish], with
 antialiased fonts. And [this one] is my desktop with [xmonad] and two
@@ -1602,7 +1602,7 @@ giving me the chance to contribute.
 This software is released under a BSD-style license. See [LICENSE] for
 more details.
 
-Copyright &copy; 2010-2016 Jose Antonio Ortega Ruiz
+Copyright &copy; 2010-2017 Jose Antonio Ortega Ruiz
 
 Copyright &copy; 2007-2010 Andrea Rossato
 

@@ -186,7 +186,7 @@ usage = usageInfo header options ++ footer
 info :: String
 info = "xmobar " ++ showVersion version
         ++ "\n (C) 2007 - 2010 Andrea Rossato "
-        ++ "\n (C) 2010 - 2014 Jose A Ortega Ruiz\n "
+        ++ "\n (C) 2010 - 2017 Jose A Ortega Ruiz\n "
         ++ mail ++ "\n" ++ license
 
 mail :: String
