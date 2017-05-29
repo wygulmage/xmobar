@@ -141,7 +141,7 @@ Otherwise, you'll need to install them yourself.
 :    Support for wireless cards. Enables the Wireless plugin. No Haskell
      library is required, but you will need the [iwlib] C library and
      headers in your system (e.g., install `libiw-dev` in Debian-based
-     systems).
+     systems or `wireless_tools` on Arch Linux).
 
 `with_alsa`
 :    Support for ALSA sound cards. Enables the Volume plugin. Requires the
