@@ -1115,7 +1115,9 @@ more than one battery.
 - Aliases to `mpris1`
 - Requires [dbus] and [text] packages.
   To activate, pass `--flags="with_mpris"` during compilation.
-- PlayerName: player supporting MPRIS v1 protocol.
+- PlayerName: player supporting MPRIS v1 protocol.  Some players need
+  this to be an all lowercase name (e.g. "spotify"), but some others
+  don't.
 - Args: default monitor arguments.
 - Variables that can be used with the `-t`/`--template` argument:
             `album`, `artist`, `arturl`, `length`, `title`, `tracknumber`
@@ -1129,7 +1131,9 @@ more than one battery.
 - Aliases to `mpris2`
 - Requires [dbus] and [text] packages.
   To activate, pass `--flags="with_mpris"` during compilation.
-- PlayerName: player supporting MPRIS v2 protocol.
+- PlayerName: player supporting MPRIS v2 protocol.  Some players need
+  this to be an all lowercase name (e.g. "spotify"), but some others
+  don't.
 - Args: default monitor arguments.
 - Variables that can be used with the `-t`/`--template` argument:
             `album`, `artist`, `arturl`, `length`, `title`,
