@@ -201,6 +201,7 @@ executable xmobar
           build-depends: http-conduit, http-types
           cpp-options: -DHTTP_CONDUIT
 
-    if flag(with_uvmeter)
+    if flag(with_uvmeter) && flag(with_conduit)
        other-modules: Plugins.Monitors.UVMeter
+       build-depends: http-conduit, http-types
        cpp-options: -DUVMETER

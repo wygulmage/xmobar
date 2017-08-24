@@ -158,7 +158,8 @@ Otherwise, you'll need to install them yourself.
      Requires the [libXpm] C library.
 
 `with_uvmeter`
-:    Enables UVMeter plugin. The plugin shows UV data for Australia.
+:    Enables UVMeter plugin. The plugin shows UV data for Australia. Requires
+     `with_conduit` to connect to HTTPS URLs.
 
 `with_weather`
 :    Support to display weather information. Enables Weather plugin.
