@@ -27,6 +27,7 @@ import Control.Monad (forM, filterM)
 import System.Directory (getDirectoryContents, doesFileExist)
 import System.FilePath ((</>))
 import System.Console.GetOpt
+import System.IO.Error (catchIOError)
 
 import qualified Data.ByteString.Lazy.Char8 as B
 
@@ -105,9 +106,9 @@ existingDevs = getDirectoryContents "/sys/class/net" >>= filterM isDev
         excludes = [".", "..", "lo"]
 
 isUp :: String -> IO Bool
-isUp d = do
+isUp d = flip catchIOError (const $ return False) $ do
   operstate <- B.readFile (operstateDir d)
-  return $ (B.unpack . head . B.lines) operstate `elem`  ["up", "unknown"]
+  return $! (B.unpack . head . B.lines) operstate `elem`  ["up", "unknown"]
 
 readNetDev :: [String] -> IO NetDevRawTotal
 readNetDev (d:x:y:_) = do
