@@ -212,7 +212,8 @@ parseConfig = runParser parseConf fields "Config" . stripComments
         return (x,s)
 
       perms = permute $ Config
-              <$?> pFont <|?> pFontList <|?> pBgColor <|?> pFgColor
+              <$?> pFont <|?> pFontList <|?> pWmClass <|?> pWmName
+              <|?> pBgColor <|?> pFgColor
               <|?> pPosition <|?> pTextOffset <|?> pIconOffset <|?> pBorder
               <|?> pBdColor <|?> pBdWidth <|?> pAlpha <|?> pHideOnStart
               <|?> pAllDesktops <|?> pOverrideRedirect <|?> pPickBroadest
@@ -220,7 +221,8 @@ parseConfig = runParser parseConf fields "Config" . stripComments
               <|?> pCommands <|?> pSepChar <|?> pAlignSep <|?> pTemplate
 
 
-      fields    = [ "font", "additionalFonts","bgColor", "fgColor", "sepChar"
+      fields    = [ "font", "additionalFonts","bgColor", "fgColor"
+                  , "wmClass", "wmName", "sepChar"
                   , "alignSep" , "border", "borderColor" ,"template"
                   , "position" , "textOffset", "iconOffset"
                   , "allDesktops", "overrideRedirect", "pickBroadest"
@@ -230,6 +232,8 @@ parseConfig = runParser parseConf fields "Config" . stripComments
 
       pFont = strField font "font"
       pFontList = strListField additionalFonts "additionalFonts"
+      pWmClass = strField wmClass "wmclass"
+      pWmName = strField wmName "windowName"
       pBgColor = strField bgColor "bgColor"
       pFgColor = strField fgColor "fgColor"
       pBdColor = strField borderColor "borderColor"

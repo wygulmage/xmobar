@@ -50,6 +50,8 @@ import Plugins.DateZone
 data Config =
     Config { font :: String         -- ^ Font
            , additionalFonts :: [String] -- ^ List of alternative fonts
+           , wmClass :: String      -- ^ X11 WM_CLASS property value
+           , wmName :: String       -- ^ X11 WM_NAME property value
            , bgColor :: String      -- ^ Backgroud color
            , fgColor :: String      -- ^ Default font color
            , position :: XPosition  -- ^ Top Bottom or Static
@@ -112,6 +114,8 @@ defaultConfig :: Config
 defaultConfig =
     Config { font = "-misc-fixed-*-*-*-*-10-*-*-*-*-*-*-*"
            , additionalFonts = []
+           , wmClass = "xmobar"
+           , wmName = "xmobar"
            , bgColor = "#000000"
            , fgColor = "#BFBFBF"
            , alpha   = 255

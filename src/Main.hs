@@ -135,6 +135,8 @@ data Opts = Help
           | OnScr      String
           | IconRoot   String
           | Position   String
+          | WmClass    String
+          | WmName     String
        deriving Show
 
 options :: [OptDescr Opts]
@@ -142,6 +144,8 @@ options =
     [ Option "h?" ["help"] (NoArg Help) "This help"
     , Option "V" ["version"] (NoArg Version) "Show version information"
     , Option "f" ["font"] (ReqArg Font "font name") "The font name"
+    , Option "w" ["wmclass"] (ReqArg WmClass "class") "X11 WM_CLASS property"
+    , Option "n" ["wmname"] (ReqArg WmName "name") "X11 WM_NAME property"
     , Option "B" ["bgcolor"] (ReqArg BgColor "bg color" )
       "The background color. Default black"
     , Option "F" ["fgcolor"] (ReqArg FgColor "fg color")
@@ -206,6 +210,8 @@ doOpts conf (o:oo) =
     Help -> putStr   usage >> exitSuccess
     Version -> putStrLn info  >> exitSuccess
     Font s -> doOpts' (conf {font = s})
+    WmClass s -> doOpts' (conf {wmClass = s})
+    WmName s -> doOpts' (conf {wmName = s})
     BgColor s -> doOpts' (conf {bgColor = s})
     FgColor s -> doOpts' (conf {fgColor = s})
     Alpha n -> doOpts' (conf {alpha = read n})

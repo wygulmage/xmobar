@@ -1,5 +1,16 @@
 % xmobar - Release notes
 
+## Version 0.25
+
+_New features_
+
+  - The X11 properties `WM_NAME` and `WM_CLASS` for xmobar windows can
+    be setup in either the configuration file (`wmName` and `wmClass`)
+    or using the new flags `-n` adn `-w` (see [issue #323]).
+
+[issue #303]: https://github.com/jaor/xmobar/issues/323
+
+
 ## Version 0.24.5 (May, 2017)
 
 _Bug fixes_

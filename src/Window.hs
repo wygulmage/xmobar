@@ -100,8 +100,8 @@ setProperties c d w = do
   card <- mkatom "CARDINAL"
   atom <- mkatom "ATOM"
 
-  setTextProperty d w "xmobar" wM_CLASS
-  setTextProperty d w "xmobar" wM_NAME
+  setTextProperty d w (wmClass c) wM_CLASS
+  setTextProperty d w (wmName c) wM_NAME
 
   wtype <- mkatom "_NET_WM_WINDOW_TYPE"
   dock <- mkatom "_NET_WM_WINDOW_TYPE_DOCK"
