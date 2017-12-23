@@ -8,8 +8,13 @@ _New features_
     be setup in either the configuration file (`wmName` and `wmClass`)
     or using the new flags `-n` adn `-w` (see [issue #323]).
 
-[issue #303]: https://github.com/jaor/xmobar/issues/323
+_Bug fixes_
 
+   - Honouring -x in MPris monitor ([issue #325])
+
+
+[issue #323]: https://github.com/jaor/xmobar/issues/323
+[issue #325]: https://github.com/jaor/xmobar/issues/325
 
 ## Version 0.24.5 (May, 2017)
 

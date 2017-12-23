@@ -85,7 +85,9 @@ dbusClient = unsafePerformIO DC.connectSession
 runMPRIS :: (MprisVersion a) => a -> String -> [String] -> Monitor String
 runMPRIS version playerName _ = do
     metadata <- io $ getMetadata version dbusClient playerName
-    mapM showWithPadding (makeList version metadata) >>= parseTemplate
+    if [] == metadata then
+      getConfigValue naString
+      else mapM showWithPadding (makeList version metadata) >>= parseTemplate
 
 runMPRIS1 :: String -> [String] -> Monitor String
 runMPRIS1 = runMPRIS MprisVersion1
