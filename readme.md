@@ -1179,6 +1179,7 @@ more than one battery.
   the mail count (use an empty string for the default).
 - Opts is a possibly empty list of options, as flags. Possible values:
    -a  --all (no arg)  Show all mailboxes, even if empty.
+   -u (no arg) Show only the mailboxes' names, sans counts.
    -d dir  --dir dir a string giving the base directory where mbox files with
                      a relative path live.
    -p prefix --prefix prefix  a string giving a prefix for the list
