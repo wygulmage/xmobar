@@ -17,7 +17,7 @@ module Plugins.Monitors.Wireless (wirelessConfig, runWireless)  where
 import System.Console.GetOpt
 
 import Plugins.Monitors.Common
-import IWlib
+import Network.IWlib
 
 newtype WirelessOpts = WirelessOpts
   { qualityIconPattern :: Maybe IconPattern

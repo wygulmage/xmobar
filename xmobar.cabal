@@ -158,7 +158,8 @@ executable xmobar
 
     if flag(with_iwlib) || flag(all_extensions)
        extra-libraries: iw
-       other-modules: IWlib, Plugins.Monitors.Wireless
+       build-depends: iwlib >= 0.1.0 && < 0.2
+       other-modules: Plugins.Monitors.Wireless
        cpp-options: -DIWLIB
 
     if flag(with_mpd) || flag(all_extensions)
