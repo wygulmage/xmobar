@@ -1,3 +1,4 @@
+[![Hackage](https://img.shields.io/hackage/v/xmobar.svg)](http://hackage.haskell.org/package/xmobar)
 [![Build Status](https://travis-ci.org/jaor/xmobar.svg?branch=master)](https://travis-ci.org/jaor/xmobar)
 
 # About
@@ -1566,20 +1567,20 @@ Andrea Rossato originally designed and implemented xmobar up to
 version 0.11.1. Since then, it is maintained and developed by [jao],
 with the help of the greater xmobar and Haskell communities.
 
-In particular, xmobar [incorporates patches] by Axel Angel, Dragos
-Boca, Ben Boeckel, Duncan Burke, Roman Cheplyaka, Patrick Chilton,
-Antoine Eiche, Nathaniel Wesley Filardo, John Goerzen, Reto Hablützel,
-Juraj Hercek, Tomáš Janoušek, Spencer Janssen, Roman Joost, Jochen
-Keil, Lennart Kolmodin, Krzysztof Kosciuszkiewicz, Dmitry Kurochkin,
-Todd Lunter, Robert J. Macomber, Dmitry Malikov, David McLean, Marcin
-Mikołajczyk, Dino Morelli, Tony Morris, Eric Mrak, Thiago Negri,
-Edward O'Callaghan, Svein Ove, Martin Perner, Jens Petersen, Alexander
-Polakov, Petr Rockai, Andrew Sackville-West, Markus Scherer, Alexander
-Shabalin, Valentin Shirokov, Peter Simons, Alexander Solovyov, Will
-Song, John Soros, Travis Staton, Artem Tarasov, Samuli Thomasson,
-Edward Tjörnhammar, Sergei Trofimovich, Thomas Tuegel, Jan Vornberger,
-Anton Vorontsov, Daniel Wagner, Zev Weiss, Phil Xiaojun Hu, Edward
-Z. Yang and Norbert Zeh.
+In particular, xmobar [incorporates patches] by Mohammed Alshiekh,
+Axel Angel, Dragos Boca, Ben Boeckel, Duncan Burke, Roman Cheplyaka,
+Patrick Chilton, Antoine Eiche, Nathaniel Wesley Filardo, John
+Goerzen, Reto Hablützel, Juraj Hercek, Tomáš Janoušek, Spencer
+Janssen, Roman Joost, Jochen Keil, Lennart Kolmodin, Krzysztof
+Kosciuszkiewicz, Dmitry Kurochkin, Todd Lunter, Robert J. Macomber,
+Dmitry Malikov, David McLean, Marcin Mikołajczyk, Dino Morelli, Tony
+Morris, Eric Mrak, Thiago Negri, Edward O'Callaghan, Svein Ove, Martin
+Perner, Jens Petersen, Alexander Polakov, Petr Rockai, Andrew
+Sackville-West, Markus Scherer, Alexander Shabalin, Valentin Shirokov,
+Peter Simons, Alexander Solovyov, Will Song, John Soros, Travis
+Staton, Artem Tarasov, Samuli Thomasson, Edward Tjörnhammar, Sergei
+Trofimovich, Thomas Tuegel, Jan Vornberger, Anton Vorontsov, Daniel
+Wagner, Zev Weiss, Phil Xiaojun Hu, Edward Z. Yang and Norbert Zeh.
 
 [jao]: http://jao.io
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
