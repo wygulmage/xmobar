@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Bitmap
--- Copyright   :  (C) 2013, 2015, 2017 Alexander Polakov
+-- Copyright   :  (C) 2013, 2015, 2017, 2018 Alexander Polakov
 -- License     :  BSD3
 --
 -- Maintainer  :  jao@gnu.org
@@ -18,7 +18,7 @@ module Bitmap
 
 import Control.Monad
 import Control.Monad.Trans(MonadIO(..))
-import Data.Map hiding (foldr, map, filter)
+import Data.Map hiding (map, filter)
 import Graphics.X11.Xlib
 import System.Directory (doesFileExist)
 import System.FilePath ((</>))

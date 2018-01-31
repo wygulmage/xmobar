@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Window
--- Copyright   :  (c) 2011-17 Jose A. Ortega Ruiz
+-- Copyright   :  (c) 2011-18 Jose A. Ortega Ruiz
 --             :  (c) 2012 Jochen Keil
 -- License     :  BSD-style (see LICENSE)
 --
@@ -18,7 +18,7 @@ module Window where
 import Prelude
 import Control.Applicative ((<$>))
 import Control.Monad (when, unless)
-import Graphics.X11.Xlib hiding (textExtents, textWidth)
+import Graphics.X11.Xlib hiding (textExtents)
 import Graphics.X11.Xlib.Extras
 import Graphics.X11.Xinerama
 import Foreign.C.Types (CLong)

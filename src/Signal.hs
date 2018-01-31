@@ -20,7 +20,7 @@ module Signal where
 
 import Data.Typeable (Typeable)
 import Control.Concurrent.STM
-import Control.Exception hiding (handle)
+import Control.Exception
 import System.Posix.Signals
 import Graphics.X11.Types (Button)
 import Graphics.X11.Xlib.Types (Position)
