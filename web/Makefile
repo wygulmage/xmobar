@@ -10,7 +10,7 @@ title = % xmobar - a minimalistic status bar
 default: index.html
 
 $(index): $(index.src)
-	@sed -E "s/^\\[!\\[Build .+/$(title)/1" $(index.src) > $(index)
+	@tail -n+3 $(index.src) | sed "1s/^/$(title)\n/" > $(index)
 
 index.html: releases.html $(index) $(css)
 	pandoc -f markdown -t html -c $(css) --toc -N -s \
@@ -24,7 +24,7 @@ upload-images:
 	rsync -zav $(images) $(remote)
 
 upload-pages: $(htmls)
-	rsync -zav $(htmls) $(css) $(remote)
+	scp $(htmls) $(css) $(remote)
 
 upload: upload-images upload-pages
 
