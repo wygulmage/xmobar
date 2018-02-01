@@ -1,5 +1,3 @@
-% xmobar - Release notes
-
 ## Version 0.25 (February, 2018)
 
 _New features_

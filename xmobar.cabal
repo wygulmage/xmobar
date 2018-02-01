@@ -16,7 +16,7 @@ bug-reports:        https://github.com/jaor/xmobar/issues
 cabal-version:      >= 1.6
 build-type:         Simple
 
-extra-source-files: readme.md, news.md,
+extra-source-files: readme.md, changelog.md,
                     samples/xmobar.config, samples/xmonadpropwrite.hs
                     samples/Plugins/helloworld.config,
                     samples/Plugins/HelloWorld.hs
