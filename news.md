@@ -1,12 +1,13 @@
 % xmobar - Release notes
 
-## Version 0.25
+## Version 0.25 (February, 2018)
 
 _New features_
 
   - The X11 properties `WM_NAME` and `WM_CLASS` for xmobar windows can
     be setup in either the configuration file (`wmName` and `wmClass`)
     or using the new flags `-n` adn `-w` (see [issue #323]).
+  - New flag `with_weather`, to build sans `Weather` monitor.
 
 _Bug fixes_
 
