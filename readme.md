@@ -102,76 +102,63 @@ Extensions need additional libraries (listed below) that will be
 automatically downloaded and installed if you're using cabal install.
 Otherwise, you'll need to install them yourself.
 
-`with_dbus`
-:    Enables support for DBUS by making xmobar to publish a service on
-     the session bus.  Requires the [dbus] package.
+- `with_dbus` Enables support for DBUS by making xmobar to publish a
+  service on the session bus.  Requires the [dbus] package.
 
-`with_threaded`
-:    Uses GHC's threaded runtime.  Use this option if xmobar enters a
-     high-CPU regime right after starting.
+- `with_threaded` Uses GHC's threaded runtime.  Use this option if
+  xmobar enters a high-CPU regime right after starting.
 
-`with_utf8`
-:    UTF-8 support. Requires the [utf8-string] package.
+- `with_utf8` UTF-8 support. Requires the [utf8-string] package.
 
-`with_xft`
-:    Antialiased fonts. Requires the [X11-xft] package. This option
-     automatically enables UTF-8.
-
-     To use XFT fonts you need to use the `xft:` prefix in the `font`
-     configuration option. For instance:
+- `with_xft` Antialiased fonts. Requires the [X11-xft] package. This
+  option automatically enables UTF-8.  To use XFT fonts you need to
+  use the `xft:` prefix in the `font` configuration option. For
+  instance:
 
         font = "xft:Times New Roman-10:italic"
 
-     Or to have fallback fonts, just separate them by commas:
+  Or to have fallback fonts, just separate them by commas:
 
         font = "xft:Open Sans:size=9,WenQuanYi Zen Hei:size=9"
 
-`with_mpd`
-:    Enables support for the [MPD] daemon. Requires the [libmpd] package.
+- `with_mpd` Enables support for the [MPD] daemon. Requires the
+  [libmpd] package.
 
-`with_mpris`
-:    Enables support for MPRIS v1/v2 protocol.
-     Requires the [dbus] and [text] packages.
+- `with_mpris` Enables support for MPRIS v1/v2 protocol.  Requires the
+  [dbus] and [text] packages.
 
-`with_inotify`
-:    Support for inotify in modern Linux kernels. This option is needed
-     for the MBox and Mail plugins to work. Requires the [hinotify]
-     package.
+- `with_inotify` Support for inotify in modern Linux kernels. This
+  option is needed for the MBox and Mail plugins to work. Requires the
+  [hinotify] package.
 
-`with_iwlib`
-:    Support for wireless cards. Enables the Wireless plugin. No Haskell
-     library is required, but you will need the [iwlib] C library and
-     headers in your system (e.g., install `libiw-dev` in Debian-based
-     systems or `wireless_tools` on Arch Linux).
+- `with_iwlib` Support for wireless cards. Enables the Wireless
+   plugin. No Haskell library is required, but you will need the
+   [iwlib] C library and headers in your system (e.g., install
+   `libiw-dev` in Debian-based systems or `wireless_tools` on Arch
+   Linux).
 
-`with_alsa`
-:    Support for ALSA sound cards. Enables the Volume plugin. Requires the
-     [alsa-mixer] package.  To install the latter, you'll need the
-     [libasound] C library and headers in your system (e.g., install
-     `libasound2-dev` in Debian-based systems).
+- `with_alsa` Support for ALSA sound cards. Enables the Volume
+   plugin. Requires the [alsa-mixer] package.  To install the latter,
+   you'll need the [libasound] C library and headers in your system
+   (e.g., install `libasound2-dev` in Debian-based systems).
 
-`with_datezone`
-:    Support for other timezones. Enables the DateZone plugin.
-     Requires [timezone-olson] and [timezone-series] package.
+- `with_datezone` Support for other timezones. Enables the DateZone
+   plugin.  Requires [timezone-olson] and [timezone-series] package.
 
-`with_xpm`
-:    Support for xpm image file format. This will allow loading .xpm files in `<icon>`.
-     Requires the [libXpm] C library.
+- `with_xpm` Support for xpm image file format. This will allow loading
+  .xpm files in `<icon>`.  Requires the [libXpm] C library.
 
-`with_uvmeter`
-:    Enables UVMeter plugin. The plugin shows UV data for Australia. Requires
-     `with_conduit` to connect to HTTPS URLs.
+- `with_uvmeter` Enables UVMeter plugin. The plugin shows UV data for
+   Australia. Requires `with_conduit` to connect to HTTPS URLs.
 
-`with_weather`
-:    Support to display weather information. Enables Weather plugin.
+- `with_weather` Support to display weather information. Enables
+   Weather plugin.
 
-`with_conduit`
-:    Use http-conduit for getting weather data enabling support for http proxies.
-     Requires [http-conduit] and [http-types].
-     Note that this flag has only an effect if `with_weather` is also set.
+- `with_conduit` Use http-conduit for getting weather data enabling
+  support for http proxies.  Requires [http-conduit] and [http-types].
+  Note that this flag has only an effect if `with_weather` is also set.
 
-`all_extensions`
-:    Enables all the extensions above.
+- `all_extensions` Enables all the extensions above.
 
 # Running xmobar
 
@@ -240,140 +227,119 @@ For the output template:
 
 Other configuration options:
 
-`font`
-:    Name of the font to be used. Use the `xft:` prefix for XFT fonts.
+- `font` Name of the font to be used. Use the `xft:` prefix for XFT
+  fonts.
 
-`additionalFonts`
-:    Haskell-style list of fonts to be used with the `fn`-template.
-     Use the `xft:` prefix for XFT fonts.
+- `additionalFonts` Haskell-style list of fonts to be used with the
+  `fn`-template.  Use the `xft:` prefix for XFT fonts.
 
-`bgColor`
-:    Background color.
+- `bgColor` Background color.
 
-`fgColor`
-:    Default font color.
+- `fgColor` Default font color.
 
-`alpha`
-:    The transparency.  0 is transparent, 255 is opaque.
+- `alpha` The transparency.  0 is transparent, 255 is opaque.
 
-`position`
-:     Top, TopP, TopW, TopSize, Bottom, BottomP, BottomW, BottomSize or Static
-      (with x, y, width and height).
+- `position` Top, TopP, TopW, TopSize, Bottom, BottomP, BottomW,
+  BottomSize or Static (with x, y, width and height).
 
-:     TopP and BottomP take 2 arguments: left padding and right padding.
+  TopP and BottomP take 2 arguments: left padding and right padding.
 
-:     TopW and BottomW take 2 arguments: an alignment parameter (L for
-      left, C for centered, R for Right) and an integer for the
-      percentage width xmobar window will have in respect to the
-      screen width.
+  TopW and BottomW take 2 arguments: an alignment parameter (L for
+  left, C for centered, R for Right) and an integer for the percentage
+  width xmobar window will have in respect to the screen width.
 
-:     TopSize and BottomSize take 3 arguments: an alignment parameter, an
-      integer for the percentage width, and an integer for the minimum pixel
-      height that the xmobar window will have.
+  TopSize and BottomSize take 3 arguments: an alignment parameter, an
+  integer for the percentage width, and an integer for the minimum
+  pixel height that the xmobar window will have.
 
-:     For example:
+  For example:
 
-:          position = BottomW C 75
+          position = BottomW C 75
 
-:     to place xmobar at the bottom, centered with the 75% of the screen width.
+  to place xmobar at the bottom, centered with the 75% of the screen
+  width.  Or
 
-:     Or:
+          position = BottomP 120 0
 
-:          position = BottomP 120 0
+  to place xmobar at the bottom, with 120 pixel indent of the left.
+  Or
 
-:    to place xmobar at the bottom, with 120 pixel indent of the left.
+          position = Static { xpos = 0 , ypos = 0, width = 1024, height = 15 }
 
+  or
 
-:     Or
+          position = Top
 
-:          position = Static { xpos = 0 , ypos = 0, width = 1024, height = 15 }
+- `textOffset` The vertical offset, in pixels, for the text baseline.
+   If negative or not given, xmobar will try to center text
+   vertically.
 
-:     or
+- `iconOffset` The vertical offset, in pixels, for icons bottom line.
+   If negative or not given, xmobar will try to center icons
+   vertically.
 
-:         position = Top
+- `lowerOnStart` When True the window is sent the bottom of the window
+  stack initially.
 
-`textOffset`
-:     The vertical offset, in pixels, for the text baseline.  If
-      negative or not given, xmobar will try to center text
-      vertically.
+- `hideOnStart` When set to True the window is initially not mapped,
+  i.e. hidden. It then can be toggled manually (for example using the
+  dbus interface) or automatically (by a plugin) to make it reappear.
 
-`iconOffset`
-:     The vertical offset, in pixels, for icons bottom line.  If negative
-      or not given, xmobar will try to center icons vertically.
+- `allDesktops` When set to True (the default), xmobar will tell the
+  window manager explicitly to be shown in all desktops, by setting
+  `_NET_WM_DESKTOP` to 0xffffffff.
 
-`lowerOnStart`
-:     When True the window is sent the bottom of the window stack initially.
+- `overrideRedirect` If you're running xmobar in a tiling window
+  manager, you might need to set this option to `False` so that it
+  behaves as a docked application.  Defaults to `True`.
 
-`hideOnStart`
-:     When set to True the window is initially not mapped, i.e. hidden. It then
-      can be toggled manually (for example using the dbus interface) or
-      automatically (by a plugin) to make it reappear.
+- `pickBroadest` When multiple displays are available, xmobar will
+  choose by default the first one to place itself.  With this flag set
+  to `True` (the default is `False`) it will choose the broadest one
+  instead.
 
-`allDesktops`
-:     When set to True (the default), xmobar will tell the window manager
-      explicitly to be shown in all desktops, by setting
-      `_NET_WM_DESKTOP` to 0xffffffff.
+- `persistent` When True the window status is fixed i.e. hiding or
+  revealing is not possible. This option can be toggled at
+  runtime. Defaults to False.
 
-`overrideRedirect`
-:     If you're running xmobar in a tiling window manager, you might need
-      to set this option to `False` so that it behaves as a docked
-      application.  Defaults to `True`.
+- `border` TopB, TopBM, BottomB, BottomBM, FullB, FullBM or NoBorder
+  (default).
 
-`pickBroadest`
-:     When multiple displays are available, xmobar will choose by default
-      the first one to place itself.  With this flag set to `True`
-      (the default is `False`) it will choose the broadest one
-      instead.
+  TopB, BottomB, FullB take no arguments, and request drawing a border
+  at the top, bottom or around xmobar's window, respectively.
 
-`persistent`
-:     When True the window status is fixed i.e. hiding or revealing is not
-      possible. This option can be toggled at runtime. Defaults to False.
+  TopBM, BottomBM, FullBM take an integer argument, which is the
+  margin, in pixels, between the border of the window and the drawn
+  border.
 
-`border`
-:     TopB, TopBM, BottomB, BottomBM, FullB, FullBM or NoBorder (default).
+- `borderColor` Border color.
 
-:     TopB, BottomB, FullB take no arguments, and request drawing a
-      border at the top, bottom or around xmobar's window,
-      respectively.
+- `borderWidth` Border width in pixels.
 
-:     TopBM, BottomBM, FullBM take an integer argument, which is the
-      margin, in pixels, between the border of the window and the
-      drawn border.
+- `iconRoot` Root folder where icons are stored. For <icon=path/> if
+  path start with `"/"`, `"./"` or `"../"` it is interpreted as it is.
+  Otherwise it will have `iconRoot ++ "/"` prepended to it. Default is
+  `"."`.
 
-`borderColor`
-:     Border color.
+- `commands` For setting the options of the programs to run
+  (optional).
 
-`borderWidth`
-:     Border width in pixels.
+- `sepChar` The character to be used for indicating commands in the
+  output template (default '%').
 
-`iconRoot`
-:     Root folder where icons are stored. For <icon=path/>
-      if path start with `"/"`, `"./"` or `"../"` it is interpreted as
-      it is.  Otherwise it will have `iconRoot ++ "/"` prepended to
-      it. Default is `"."`.
+- `alignSep` a 2 character string for aligning text in the output
+  template. The text before the first character will be align to left,
+  the text in between the 2 characters will be centered, and the text
+  after the second character will be align to the right.
 
-`commands`
-:    For setting the options of the programs to run (optional).
-
-`sepChar`
-:    The character to be used for indicating commands in the output
-     template (default '%').
-
-`alignSep`
-:    a 2 character string for aligning text in the output template. The
-     text before the first character will be align to left, the text in
-     between the 2 characters will be centered, and the text after the
-     second character will be align to the right.
-
-`template`
-:    The output template.
+- `template` The output template.
 
 
-`wmClass`
-:    The value for the window's X11 WM_CLASS property.  Defaults to "xmobar".
+- `wmClass` The value for the window's X11 WM_CLASS property.
+  Defaults to "xmobar".
 
-`wmName`
-:    The value for the window's X11 WM_NAME property.  Defaults to "xmobar".
+- `wmName` The value for the window's X11 WM_NAME property.  Defaults
+  to "xmobar".
 
 ### Running xmobar with i3status
 
