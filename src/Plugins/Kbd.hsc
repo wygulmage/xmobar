@@ -54,6 +54,7 @@ data XkbStateRec = XkbStateRec {
 instance Storable XkbStateRec where
     sizeOf _ = (#size XkbStateRec)
     alignment _ = alignment (undefined :: CUShort)
+    poke _ _ = undefined
     peek ptr = do
         r_group <- (#peek XkbStateRec, group) ptr
         r_locked_group <- (#peek XkbStateRec, locked_group) ptr
@@ -155,6 +156,7 @@ data XkbDescRec = XkbDescRec {
 instance Storable XkbKeyNameRec where
     sizeOf _ = (#size XkbKeyNameRec)
     alignment _ = alignment (undefined :: CUShort)
+    poke _ _ = undefined
     peek ptr = do
         r_name <- (#peek XkbKeyNameRec, name) ptr
 
@@ -165,6 +167,7 @@ instance Storable XkbKeyNameRec where
 instance Storable XkbKeyAliasRec where
     sizeOf _ = (#size XkbKeyAliasRec)
     alignment _ = alignment (undefined :: CUShort)
+    poke _ _ = undefined
     peek ptr = do
         r_real <- (#peek XkbKeyAliasRec, real) ptr
         r_alias <- (#peek XkbKeyAliasRec, alias) ptr
@@ -177,6 +180,7 @@ instance Storable XkbKeyAliasRec where
 instance Storable XkbNamesRec where
     sizeOf _ = (#size XkbNamesRec)
     alignment _ = alignment (undefined :: CUShort)
+    poke _ _ = undefined
     peek ptr = do
         r_keycodes <- (#peek XkbNamesRec, keycodes) ptr
         r_geometry <- (#peek XkbNamesRec, geometry) ptr
@@ -215,6 +219,7 @@ instance Storable XkbNamesRec where
 instance Storable XkbDescRec where
     sizeOf _ = (#size XkbDescRec)
     alignment _ = alignment (undefined :: CUShort)
+    poke _ _ = undefined
     peek ptr = do
         r_dpy <- (#peek XkbDescRec, dpy) ptr
         r_flags <- (#peek XkbDescRec, flags) ptr
