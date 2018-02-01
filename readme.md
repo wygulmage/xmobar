@@ -69,23 +69,10 @@ source tree:
         cabal install -fall_extensions
 
 
-Otherwise, run the configure script:
+There is also a barebones `stack.yaml` file that will allow you to
+build the xmobar executable with stances of the form:
 
-        runhaskell Setup.lhs configure
-
-        # To enable UTF-8 support run:
-        runhaskell Setup.lhs configure --flags="with_utf8"
-
-        # To enable both XFT and UTF-8 support run:
-        runhaskell Setup.lhs configure --flags="with_xft"
-
-        # To enable all extensions
-        runhaskell Setup.lhs configure --flags="all_extensions"
-
-Now you can build the source:
-
-        runhaskell Setup.lhs build
-        runhaskell Setup.lhs install # possibly to be run as root
+        stack build --flag xmobar:all_extensions
 
 
 ## Optional features
