@@ -39,6 +39,6 @@ runCpuFreq _ = do
                                 else ghzFmt x
             | otherwise = ghzFmt x ++ if suffix then "GHz" else ""
       mhzFmt x = show (round (x * 1000) :: Integer)
-      ghzFmt x = showDigits ddigits x
+      ghzFmt = showDigits ddigits
   failureMessage <- getConfigValue naString
   checkedDataRetrieval failureMessage [path] Nothing (/divisor) fmt
