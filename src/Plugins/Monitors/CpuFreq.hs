@@ -35,9 +35,10 @@ runCpuFreq _ = do
   ddigits <- getConfigValue decDigits
   let path = ["/sys/devices/system/cpu/cpu", "/cpufreq/scaling_cur_freq"]
       divisor = 1e6 :: Double
-      fmt x | x < 1 = mhzFmt x ++
-                      if suffix then "MHz" else ""
-            | otherwise = if suffix then showDigits ddigits x ++ "GHz" else mhzFmt x
+      fmt x | x < 1 = if suffix then mhzFmt x ++ "MHz"
+                                else ghzFmt x
+            | otherwise = ghzFmt x ++ if suffix then "GHz" else ""
       mhzFmt x = show (round (x * 1000) :: Integer)
+      ghzFmt x = showDigits ddigits x
   failureMessage <- getConfigValue naString
   checkedDataRetrieval failureMessage [path] Nothing (/divisor) fmt
