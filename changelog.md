@@ -1,3 +1,10 @@
+## Version 0.26
+
+_Bug fixes_
+
+  - `CpuFreq` monitors honours `-d` (number of digits) if no suffix is
+    given (cf. [issue #335].
+
 ## Version 0.25 (February, 2018)
 
 _New features_
