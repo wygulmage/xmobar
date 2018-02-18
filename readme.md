@@ -816,15 +816,17 @@ something like:
 
 ### `Battery Args RefreshRate`
 
-- Same as `BatteryP ["BAT0", "BAT1", "BAT2"] Args RefreshRate`.
+- Same as `BatteryP ["BAT", "BAT0", "BAT1", "BAT2"] Args RefreshRate`.
 
 ### `BatteryP Dirs Args RefreshRate`
 
 - Aliases to `battery`
+
 - Dirs: list of directories in `/sys/class/power_supply/` where to
   look for the ACPI files of each battery. Example:
-  `["BAT0","BAT1","BAT2"]`. Only the first 3 directories will be
+  `["BAT0","BAT1","BAT2"]`. Only up to 3 existing directories will be
   searched.
+
 - Args: default monitor arguments, plus the following specific ones
   (these options, being specific to the monitor, are to be specified
   after a `--` in the argument list):

@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Batt
--- Copyright   :  (c) 2010, 2011, 2012, 2013, 2015, 2016 Jose A Ortega
+-- Copyright   :  (c) 2010, 2011, 2012, 2013, 2015, 2016, 2018 Jose A Ortega
 --                (c) 2010 Andrea Rossato, Petr Rockai
 -- License     :  BSD-style (see LICENSE)
 --
@@ -107,7 +107,7 @@ data Files = Files
   , fCurrent :: String
   , fStatus :: String
   , isCurrent :: Bool
-  } | NoFiles
+  } | NoFiles deriving Eq
 
 data Battery = Battery
   { full :: !Float
@@ -174,7 +174,8 @@ mostCommonDef x xs = head $ last $ [x] : sortOn length (group xs)
 
 readBatteries :: BattOpts -> [Files] -> IO Result
 readBatteries opts bfs =
-    do bats <- mapM (readBattery (scale opts)) (take 3 bfs)
+    do let bfs' = filter (/= NoFiles) bfs
+       bats <- mapM (readBattery (scale opts)) (take 3 bfs')
        ac <- haveAc (onlineFile opts)
        let sign = if ac then 1 else -1
            ft = sum (map full bats)
@@ -194,7 +195,7 @@ readBatteries opts bfs =
        return $ if isNaN left then NA else Result left watts time racst
 
 runBatt :: [String] -> Monitor String
-runBatt = runBatt' ["BAT0","BAT1","BAT2"]
+runBatt = runBatt' ["BAT", "BAT0", "BAT1", "BAT2"]
 
 runBatt' :: [String] -> [String] -> Monitor String
 runBatt' bfs args = do
