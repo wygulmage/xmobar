@@ -17,4 +17,4 @@ install:
 
 script:
   - sh ./travis.sh src
-  - cabal configure --enable-tests && cabal build && cabal test
+  - cabal configure --enable-tests -fall_extensions && cabal build && cabal test
