@@ -642,6 +642,11 @@ These are the options available for all monitors below:
       than this value will be truncated.
     - Long option: `--maxwidth`
     - Default: 0 (no maximum width)
+- `-e` _string_ Maximum width ellipsis
+    - Ellipsis to be added to the field when it has reached its
+      max width.
+    - Long option: `--maxwidthellipsis`
+    - Default: "" (no ellipsis)
 - `-w` _number_ Fixed field width
     - All fields will be set to this width, padding or truncating as
       needed.
@@ -651,6 +656,11 @@ These are the options available for all monitors below:
     - Maximum total width of the text.
     - Long option: `--maxtwidth`
     - Default: 0 (no limit)
+- `-E` _string_ Maximum total width ellipsis
+    - Ellipsis to be added to the total text when it has reached
+      its max width.
+    - Long option: `--maxtwidthellipsis`
+    - Default: "" (no ellipsis)
 - `-c` _string_
     - Characters used for padding. The characters of _string_ are used
       cyclically. E.g., with `-P +- -w 6`, a field with value "foo"

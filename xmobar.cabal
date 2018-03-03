@@ -21,6 +21,48 @@ extra-source-files: readme.md, changelog.md,
                     samples/Plugins/helloworld.config,
                     samples/Plugins/HelloWorld.hs
 
+test-suite XmobarTest
+  type:           exitcode-stdio-1.0
+  hs-source-dirs:
+    src,
+    test
+  main-is:        Spec.hs
+  other-modules:
+        Xmobar, Actions, Bitmap, Config, Parsers, Commands, Localize,
+        XUtil, StatFS, Runnable, ColorCache, Window, Signal,
+        Environment,
+        Plugins, Plugins.BufferedPipeReader,
+        Plugins.CommandReader, Plugins.Date, Plugins.EWMH,
+        Plugins.PipeReader, Plugins.MarqueePipeReader,
+        Plugins.StdinReader, Plugins.XMonadLog,
+        Plugins.Utils, Plugins.Kbd, Plugins.Locks, Plugins.Monitors,
+        Plugins.Monitors.Batt, Plugins.Monitors.Common,
+        Plugins.Monitors.CoreCommon, Plugins.Monitors.CoreTemp,
+        Plugins.Monitors.CpuFreq, Plugins.Monitors.Cpu,
+        Plugins.Monitors.Disk, Plugins.Monitors.Mem,
+        Plugins.Monitors.MultiCpu, Plugins.Monitors.Net,
+        Plugins.Monitors.Swap, Plugins.Monitors.Thermal,
+        Plugins.Monitors.ThermalZone, Plugins.Monitors.Top,
+        Plugins.Monitors.Uptime,
+        Plugins.Monitors.Bright, Plugins.Monitors.CatInt
+  build-depends:
+    base == 4.*,
+    hspec == 2.*,
+    containers,
+    regex-compat,
+    process,
+    old-locale,
+    bytestring,
+    directory,
+    unix,
+    time,
+    filepath,
+    transformers,
+    X11 >= 1.6.1,
+    mtl >= 2.1 && < 2.3,
+    parsec == 3.1.*,
+    stm >= 2.3 && < 2.5
+
 source-repository head
   type:      git
   location:  git://github.com/jaor/xmobar.git

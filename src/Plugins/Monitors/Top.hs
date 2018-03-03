@@ -80,7 +80,7 @@ showInfo nm sms mms = do
   let lsms = length sms
       nmw = mnw - lsms - 1
       nmx = mxw - lsms - 1
-      rnm = if nmw > 0 then padString nmw nmx " " True nm else nm
+      rnm = if nmw > 0 then padString nmw nmx " " True "" nm else nm
   mstr <- showWithColors' sms mms
   both <- showWithColors' (rnm ++ " " ++ sms) mms
   return [nm, mstr, both]

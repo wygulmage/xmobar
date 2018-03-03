@@ -93,6 +93,7 @@ data MConfig =
        , decDigits :: IORef Int
        , minWidth :: IORef Int
        , maxWidth :: IORef Int
+       , maxWidthEllipsis :: IORef String
        , padChars :: IORef String
        , padRight :: IORef Bool
        , barBack :: IORef String
@@ -101,6 +102,7 @@ data MConfig =
        , useSuffix :: IORef Bool
        , naString :: IORef String
        , maxTotalWidth :: IORef Int
+       , maxTotalWidthEllipsis :: IORef String
        }
 
 -- | from 'http:\/\/www.haskell.org\/hawiki\/MonadState'
@@ -138,6 +140,7 @@ mkMConfig tmpl exprts =
        d  <- newIORef 0
        mn <- newIORef 0
        mx <- newIORef 0
+       mel <- newIORef ""
        pc <- newIORef " "
        pr <- newIORef False
        bb <- newIORef ":"
@@ -146,7 +149,8 @@ mkMConfig tmpl exprts =
        up <- newIORef False
        na <- newIORef "N/A"
        mt <- newIORef 0
-       return $ MC nc l lc h hc t e p d mn mx pc pr bb bf bw up na mt
+       mtel <- newIORef ""
+       return $ MC nc l lc h hc t e p d mn mx mel pc pr bb bf bw up na mt mtel
 
 data Opts = HighColor String
           | NormalColor String
@@ -159,6 +163,7 @@ data Opts = HighColor String
           | MinWidth String
           | MaxWidth String
           | Width String
+          | WidthEllipsis String
           | PadChars String
           | PadAlign String
           | BarBack String
@@ -167,6 +172,7 @@ data Opts = HighColor String
           | UseSuffix String
           | NAString String
           | MaxTotalWidth String
+          | MaxTotalWidthEllipsis String
 
 options :: [OptDescr Opts]
 options =
@@ -183,6 +189,7 @@ options =
     , Option "m" ["minwidth"] (ReqArg MinWidth "minimum width") "Minimum field width"
     , Option "M" ["maxwidth"] (ReqArg MaxWidth "maximum width") "Maximum field width"
     , Option "w" ["width"] (ReqArg Width "fixed width") "Fixed field width"
+    , Option "e" ["maxwidthellipsis"] (ReqArg WidthEllipsis "Maximum width ellipsis") "Ellipsis to be added to the field when it has reached its max width."
     , Option "c" ["padchars"] (ReqArg PadChars "padding chars") "Characters to use for padding"
     , Option "a" ["align"] (ReqArg PadAlign "padding alignment") "'l' for left padding, 'r' for right"
     , Option "b" ["bback"] (ReqArg BarBack "bar background") "Characters used to draw bar backgrounds"
@@ -190,6 +197,7 @@ options =
     , Option "W" ["bwidth"] (ReqArg BarWidth "bar width") "Bar width"
     , Option "x" ["nastring"] (ReqArg NAString "N/A string") "String used when the monitor is not available"
     , Option "T" ["maxtwidth"] (ReqArg MaxTotalWidth "Maximum total width") "Maximum total width"
+    , Option "E" ["maxtwidthellipsis"] (ReqArg MaxTotalWidthEllipsis "Maximum total width ellipsis") "Ellipsis to be added to the total text when it has reached its max width."
     ]
 
 doArgs :: [String] -> ([String] -> Monitor String) -> ([String] -> Monitor Bool) -> Monitor String
@@ -209,26 +217,28 @@ doConfigOptions (o:oo) =
            nz s = let x = read s in max 0 x
            bool = (`elem` ["True", "true", "Yes", "yes", "On", "on"])
        (case o of
-          High        h -> setConfigValue (read h) high
-          Low         l -> setConfigValue (read l) low
-          HighColor   c -> setConfigValue (Just c) highColor
-          NormalColor c -> setConfigValue (Just c) normalColor
-          LowColor    c -> setConfigValue (Just c) lowColor
-          Template    t -> setConfigValue t template
-          PercentPad  p -> setConfigValue (nz p) ppad
-          DecDigits   d -> setConfigValue (nz d) decDigits
-          MinWidth    w -> setConfigValue (nz w) minWidth
-          MaxWidth    w -> setConfigValue (nz w) maxWidth
-          Width       w -> setConfigValue (nz w) minWidth >>
-                           setConfigValue (nz w) maxWidth
-          PadChars    s -> setConfigValue s padChars
-          PadAlign    a -> setConfigValue ("r" `isPrefixOf` a) padRight
-          BarBack     s -> setConfigValue s barBack
-          BarFore     s -> setConfigValue s barFore
-          BarWidth    w -> setConfigValue (nz w) barWidth
-          UseSuffix   u -> setConfigValue (bool u) useSuffix
-          NAString    s -> setConfigValue s naString
-          MaxTotalWidth w -> setConfigValue (nz w) maxTotalWidth) >> next
+          High                  h -> setConfigValue (read h) high
+          Low                   l -> setConfigValue (read l) low
+          HighColor             c -> setConfigValue (Just c) highColor
+          NormalColor           c -> setConfigValue (Just c) normalColor
+          LowColor              c -> setConfigValue (Just c) lowColor
+          Template              t -> setConfigValue t template
+          PercentPad            p -> setConfigValue (nz p) ppad
+          DecDigits             d -> setConfigValue (nz d) decDigits
+          MinWidth              w -> setConfigValue (nz w) minWidth
+          MaxWidth              w -> setConfigValue (nz w) maxWidth
+          Width                 w -> setConfigValue (nz w) minWidth >>
+                                   setConfigValue (nz w) maxWidth
+          WidthEllipsis         e -> setConfigValue e maxWidthEllipsis
+          PadChars              s -> setConfigValue s padChars
+          PadAlign              a -> setConfigValue ("r" `isPrefixOf` a) padRight
+          BarBack               s -> setConfigValue s barBack
+          BarFore               s -> setConfigValue s barFore
+          BarWidth              w -> setConfigValue (nz w) barWidth
+          UseSuffix             u -> setConfigValue (bool u) useSuffix
+          NAString              s -> setConfigValue s naString
+          MaxTotalWidth         w -> setConfigValue (nz w) maxTotalWidth
+          MaxTotalWidthEllipsis e -> setConfigValue e maxTotalWidthEllipsis) >> next
 
 runM :: [String] -> IO MConfig -> ([String] -> Monitor String) -> Int
         -> (String -> IO ()) -> IO ()
@@ -336,9 +346,10 @@ parseTemplate l =
     do t <- getConfigValue template
        e <- getConfigValue export
        w <- getConfigValue maxTotalWidth
+       ellipsis <- getConfigValue maxTotalWidthEllipsis
        let m = Map.fromList . zip e $ l
        s <- parseTemplate' t m
-       return $ if w > 0 && length s > w then take w s else s
+       return $ if w > 0 && length s > w then take w s ++ ellipsis else s
 
 -- | Parses the template given to it with a map of export values and combines
 -- them
@@ -390,15 +401,15 @@ showWithUnits d n x
   | otherwise = showWithUnits d (n+1) (x/1024)
   where units = (!!) ["B", "K", "M", "G", "T"]
 
-padString :: Int -> Int -> String -> Bool -> String -> String
-padString mnw mxw pad pr s =
+padString :: Int -> Int -> String -> Bool -> String -> String -> String
+padString mnw mxw pad pr ellipsis s =
   let len = length s
       rmin = if mnw <= 0 then 1 else mnw
       rmax = if mxw <= 0 then max len rmin else mxw
       (rmn, rmx) = if rmin <= rmax then (rmin, rmax) else (rmax, rmin)
       rlen = min (max rmn len) rmx
   in if rlen < len then
-       take rlen s
+       take rlen s ++ ellipsis
      else let ps = take (rlen - len) (cycle pad)
           in if pr then s ++ ps else ps ++ s
 
@@ -420,7 +431,7 @@ floatToPercent n =
      up <- getConfigValue useSuffix
      let p = showDigits 0 (n * 100)
          ps = if up then "%" else ""
-     return $ padString pad pad pc pr p ++ ps
+     return $ padString pad pad pc pr "" p ++ ps
 
 stringParser :: Pos -> B.ByteString -> String
 stringParser (x,y) =
@@ -442,7 +453,8 @@ showWithPadding s =
        mx <- getConfigValue maxWidth
        p <- getConfigValue padChars
        pr <- getConfigValue padRight
-       return $ padString mn mx p pr s
+       ellipsis <- getConfigValue maxWidthEllipsis
+       return $ padString mn mx p pr ellipsis s
 
 colorizeString :: (Num a, Ord a) => a -> String -> Monitor String
 colorizeString x s = do

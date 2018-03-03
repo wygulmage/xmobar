@@ -13,3 +13,7 @@
 cabal.sandbox.config
 .stack-work
 /web/readme.md
+/.idea/
+/xmobar.iml
+/out/
+/cabal.config
