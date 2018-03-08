@@ -1,5 +1,10 @@
 ## Version 0.26
 
+_New features_
+
+  - New options to specify the ellipsis string for fields (`-e`) and
+    total width (`-E`), thanks to Olivier Schneider.
+
 _Bug fixes_
 
   - `CpuFreq` monitors honours `-d` (number of digits) if no suffix is
