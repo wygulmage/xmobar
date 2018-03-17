@@ -814,6 +814,8 @@ something like:
   - `--load-icon-patterns`: dynamic string for each cpu load in `autoipat`, `ipat{i}`.
                               This option can be specified several times. nth option
                               corresponds to nth cpu.
+  - `--fallback-icon-pattern`: dynamic string used by `autoipat` and `ipat{i}` when no
+                             `--load-icon-patterns` has been provided for `cpu{i}`
 - Thresholds refer to percentage of CPU load
 - Variables that can be used with the `-t`/`--template` argument:
 	    `autototal`, `autobar`, `autovbar`, `autoipat`, `autouser`, `autonice`,

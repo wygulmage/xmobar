@@ -24,12 +24,14 @@ import System.Console.GetOpt
 data MultiCpuOpts = MultiCpuOpts
   { loadIconPatterns :: [IconPattern]
   , loadIconPattern :: Maybe IconPattern
+  , fallbackIconPattern :: Maybe IconPattern
   }
 
 defaultOpts :: MultiCpuOpts
 defaultOpts = MultiCpuOpts
   { loadIconPatterns = []
   , loadIconPattern = Nothing
+  , fallbackIconPattern = Nothing
   }
 
 options :: [OptDescr (MultiCpuOpts -> MultiCpuOpts)]
@@ -38,6 +40,8 @@ options =
      o { loadIconPattern = Just $ parseIconPattern x }) "") ""
   , Option "" ["load-icon-patterns"] (ReqArg (\x o ->
      o { loadIconPatterns = parseIconPattern x : loadIconPatterns o }) "") ""
+  , Option "" ["fallback-icon-pattern"] (ReqArg (\x o ->
+     o { fallbackIconPattern = Just $ parseIconPattern x }) "") ""
   ]
 
 parseOpts :: [String] -> IO MultiCpuOpts
@@ -97,7 +101,7 @@ formatCpu opts i xs
   where tryString
           | i == 0 = loadIconPattern opts
           | i <= length (loadIconPatterns opts) = Just $ loadIconPatterns opts !! (i - 1)
-          | otherwise = Nothing
+          | otherwise = fallbackIconPattern opts
 
 splitEvery :: Int -> [a] -> [[a]]
 splitEvery n = unfoldr (\x -> if null x then Nothing else Just $ splitAt n x)
