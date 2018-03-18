@@ -4,6 +4,8 @@ _New features_
 
   - New options to specify the ellipsis string for fields (`-e`) and
     total width (`-E`), thanks to Olivier Schneider.
+  - `MultiCpu`: New option to specify fallback icon paths
+    (`--fallback-icon-pattern`), thanks to Reed Koser.
 
 _Bug fixes_
 
