@@ -10,7 +10,12 @@ _New features_
 _Bug fixes_
 
   - `CpuFreq` monitors honours `-d` (number of digits) if no suffix is
-    given (cf. [issue #335].
+    given (cf. [issue #335]).
+
+   - Race condition in network monitor fixed ([issue #347]).
+
+[issue #335]: https://github.com/jaor/xmobar/issues/335
+[issue #347]: https://github.com/jaor/xmobar/issues/347
 
 ## Version 0.25 (February, 2018)
 
