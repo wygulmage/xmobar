@@ -1,4 +1,4 @@
-## Version 0.26
+## Version 0.26 (April, 2018)
 
 _New features_
 
@@ -11,10 +11,11 @@ _Bug fixes_
 
   - `CpuFreq` monitors honours `-d` (number of digits) if no suffix is
     given (cf. [issue #335]).
-
-   - Race condition in network monitor fixed ([issue #347]).
+  - Race condition in network monitor fixed ([issue #347]).
+  - Limiting dbus supported version (see [issue #346]).
 
 [issue #335]: https://github.com/jaor/xmobar/issues/335
+[issue #346]: https://github.com/jaor/xmobar/issues/346
 [issue #347]: https://github.com/jaor/xmobar/issues/347
 
 ## Version 0.25 (February, 2018)

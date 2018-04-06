@@ -1,9 +1,9 @@
 name:               xmobar
-version:            0.25
+version:            0.26
 homepage:           http://xmobar.org
 synopsis:           A Minimalistic Text Based Status Bar
 description: 	    Xmobar is a minimalistic text based status bar.
-		    .
+                    .
                     Inspired by the Ion3 status bar, it supports similar
                     features, like dynamic color management, output templates,
                     and extensibility through plugins.
@@ -13,7 +13,7 @@ license-file:       license
 author:             Andrea Rossato and Jose A. Ortega Ruiz
 maintainer:         Jose A. Ortega Ruiz <jao@gnu.org>
 bug-reports:        https://github.com/jaor/xmobar/issues
-cabal-version:      >= 1.6
+cabal-version:      >= 1.8
 build-type:         Simple
 
 extra-source-files: readme.md, changelog.md,
