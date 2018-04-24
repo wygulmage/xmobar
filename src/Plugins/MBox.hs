@@ -31,6 +31,15 @@ import System.INotify (Event(..), EventVariety(..), initINotify, addWatch)
 
 import qualified Data.ByteString.Lazy.Char8 as B
 
+#if MIN_VERSION_hinotify(0,3,10)
+import qualified Data.ByteString.Char8 as BS (ByteString, pack)
+pack :: String -> BS.ByteString
+pack = BS.pack
+#else
+pack :: String -> String
+pack = id
+#endif
+
 data Options = Options
                { oAll :: Bool
                , oUniq :: Bool
@@ -93,7 +102,7 @@ instance Exec MBox where
                    n <- if exists then countMails f else return (-1)
                    v <- newTVarIO (f, n)
                    when exists $
-                     addWatch i events f (handleNotification v) >> return ()
+                     addWatch i events (pack f) (handleNotification v) >> return ()
                    return v)
                 boxes
 

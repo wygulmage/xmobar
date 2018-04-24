@@ -29,6 +29,19 @@ import System.INotify
 import Data.List (isPrefixOf)
 import Data.Set (Set)
 import qualified Data.Set as S
+
+#if MIN_VERSION_hinotify(0,3,10)
+import qualified Data.ByteString.Char8 as BS (ByteString, pack, unpack)
+unpack :: BS.ByteString -> String
+unpack = BS.unpack
+pack :: String -> BS.ByteString
+pack = BS.pack
+#else
+unpack :: String -> String
+unpack = id
+pack :: String -> String
+pack = id
+#endif
 #else
 import System.IO
 #endif
@@ -54,7 +67,7 @@ instance Exec Mail where
 
         ds <- mapM expandHome rs
         i <- initINotify
-        zipWithM_ (\d v -> addWatch i ev d (handle v)) ds vs
+        zipWithM_ (\d v -> addWatch i ev d (handle v)) (map pack ds) vs
 
         forM_ (zip ds vs) $ \(d, v) -> do
             s <- fmap (S.fromList . filter (not . isPrefixOf "."))
@@ -74,6 +87,6 @@ handle v e = atomically $ modifyTVar v $ case e of
     MovedOut {} -> delete
     _           -> id
  where
-    delete = S.delete (filePath e)
-    create = S.insert (filePath e)
+    delete = S.delete ((unpack . filePath) e)
+    create = S.insert ((unpack . filePath) e)
 #endif
