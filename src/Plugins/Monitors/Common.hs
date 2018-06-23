@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Common
--- Copyright   :  (c) 2010, 2011, 2013, 2016, 2017 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2010, 2011, 2013, 2016, 2017, 2018 Jose Antonio Ortega Ruiz
 --                (c) 2007-2010 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -336,6 +336,19 @@ templateCommandParser =
 templateParser :: Parser [(String,String,String)]
 templateParser = many templateStringParser --"%")
 
+trimTo :: Int -> String -> String -> (Int, String)
+trimTo n p "" = (n, p)
+trimTo n p ('<':cs) = trimTo n p' s
+  where p' = p ++ "<" ++ takeWhile (/= '>') cs ++ ">"
+        s = drop 1 (dropWhile (/= '>') cs)
+trimTo 0 p s = trimTo 0 p (dropWhile (/= '<') s)
+trimTo n p s = let p' = takeWhile (/= '<') s
+                   s' = dropWhile (/= '<') s
+               in
+                 if length p' <= n
+                 then trimTo (n - length p') (p ++ p') s'
+                 else trimTo 0 (p ++ take n p') s'
+
 -- | Takes a list of strings that represent the values of the exported
 -- keys. The strings are joined with the exported keys to form a map
 -- to be combined with 'combine' to the parsed template. Returns the
@@ -346,10 +359,13 @@ parseTemplate l =
     do t <- getConfigValue template
        e <- getConfigValue export
        w <- getConfigValue maxTotalWidth
-       ellipsis <- getConfigValue maxTotalWidthEllipsis
+       ell <- getConfigValue maxTotalWidthEllipsis
        let m = Map.fromList . zip e $ l
        s <- parseTemplate' t m
-       return $ if w > 0 && length s > w then take w s ++ ellipsis else s
+       let (n, s') = if w > 0 && length s > w
+                     then trimTo (w - length ell) "" s
+                     else (1, s)
+       return $ if n > 0 then s' else s' ++ ell
 
 -- | Parses the template given to it with a map of export values and combines
 -- them
