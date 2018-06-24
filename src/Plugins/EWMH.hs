@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -w #-}
-{-# LANGUAGE CPP, NamedFieldPuns, GeneralizedNewtypeDeriving, FlexibleContexts #-}
-
+{-# LANGUAGE CPP, NamedFieldPuns, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TupleSections, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.EWMH
@@ -224,7 +224,7 @@ updateClientList _ = do
     case mwp of
         Just xs -> do
                     cl <- gets clients
-                    let cl' = Map.fromList $ map (flip (,) initialClient . fromIntegral) xs
+                    let cl' = Map.fromList $ map ((, initialClient) . fromIntegral) xs
                         dels = Map.difference cl cl'
                         new = Map.difference cl' cl
                     modify (\s -> s { clients = Map.union (Map.intersection cl cl') cl'})

@@ -12,7 +12,7 @@
 - ignore: {name: "Use <$>"}
 - ignore: {name: "Use uncurry"}
 - ignore: {name: "Reduce duplication"}
-
+- ignore: {name: "Use sortOn"}
 
 # Specify additional command line arguments
 #

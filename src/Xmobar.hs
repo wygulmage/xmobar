@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Xmobar
--- Copyright   :  (c) 2011, 2012, 2013, 2014, 2015, 2017 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2011, 2012, 2013, 2014, 2015, 2017, 2018 Jose Antonio Ortega Ruiz
 --                (c) 2007 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -245,7 +245,7 @@ startCommand sig (com,s,ss)
 updateString :: Config -> TVar [String]
                 -> IO [[(Widget, String, Int, Maybe [Action])]]
 updateString conf v = do
-  s <- atomically $ readTVar v
+  s <- readTVarIO v
   let l:c:r:_ = s ++ repeat ""
   io $ mapM (parseString conf) [l, c, r]
 

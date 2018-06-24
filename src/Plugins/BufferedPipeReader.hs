@@ -84,4 +84,4 @@ instance Exec BufferedPipeReader where
             threadDelay ( to * 100 * 1000 )
             readTVarIO tb >>= \b -> when b $ do
                 when tg $ putMVar signal $ Hide 0
-                atomically (readTVar ts) >>= maybe (return ()) cb
+                readTVarIO ts >>= maybe (return ()) cb
