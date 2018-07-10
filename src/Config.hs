@@ -56,6 +56,7 @@ data Config =
            , fgColor :: String      -- ^ Default font color
            , position :: XPosition  -- ^ Top Bottom or Static
            , textOffset :: Int      -- ^ Offset from top of window for text
+           , textOffsets :: [Int]   -- ^ List of offsets for additionalFonts
            , iconOffset :: Int      -- ^ Offset from top of window for icons
            , border :: Border       -- ^ NoBorder TopB BottomB or FullB
            , borderColor :: String  -- ^ Border color
@@ -125,6 +126,7 @@ defaultConfig =
            , borderWidth = 1
            , textOffset = -1
            , iconOffset = -1
+           , textOffsets = []
            , hideOnStart = False
            , lowerOnStart = True
            , persistent = False
@@ -151,8 +153,8 @@ infixr :*:
 -- the 'Runnable.Runnable' Read instance. To install a plugin just add
 -- the plugin's type to the list of types (separated by ':*:') appearing in
 -- this function's type signature.
-runnableTypes :: Command :*: Monitors :*: Date :*: PipeReader :*: BufferedPipeReader :*: CommandReader :*: StdinReader :*: XMonadLog :*: EWMH :*: Kbd :*: Locks :*:
-                 Mail :*: MBox :*:
-                 DateZone :*: MarqueePipeReader :*:
-                 ()
+runnableTypes :: Command :*: Monitors :*: Date :*: PipeReader :*:
+                 BufferedPipeReader :*: CommandReader :*: StdinReader :*:
+                 XMonadLog :*: EWMH :*: Kbd :*: Locks :*: Mail :*: MBox :*:
+                 DateZone :*: MarqueePipeReader :*: ()
 runnableTypes = undefined

@@ -28,6 +28,7 @@ import Actions
 import Control.Monad (guard, mzero)
 import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
+import Text.ParserCombinators.Parsec.Number (int)
 import Text.ParserCombinators.Parsec.Perm
 import Graphics.X11.Types (Button)
 
@@ -214,7 +215,8 @@ parseConfig = runParser parseConf fields "Config" . stripComments
       perms = permute $ Config
               <$?> pFont <|?> pFontList <|?> pWmClass <|?> pWmName
               <|?> pBgColor <|?> pFgColor
-              <|?> pPosition <|?> pTextOffset <|?> pIconOffset <|?> pBorder
+              <|?> pPosition <|?> pTextOffset <|?> pTextOffsets
+              <|?> pIconOffset <|?> pBorder
               <|?> pBdColor <|?> pBdWidth <|?> pAlpha <|?> pHideOnStart
               <|?> pAllDesktops <|?> pOverrideRedirect <|?> pPickBroadest
               <|?> pLowerOnStart <|?> pPersistent <|?> pIconRoot
@@ -224,7 +226,7 @@ parseConfig = runParser parseConf fields "Config" . stripComments
       fields    = [ "font", "additionalFonts","bgColor", "fgColor"
                   , "wmClass", "wmName", "sepChar"
                   , "alignSep" , "border", "borderColor" ,"template"
-                  , "position" , "textOffset", "iconOffset"
+                  , "position" , "textOffset", "textOffsets", "iconOffset"
                   , "allDesktops", "overrideRedirect", "pickBroadest"
                   , "hideOnStart", "lowerOnStart", "persistent", "iconRoot"
                   , "alpha", "commands"
@@ -242,6 +244,7 @@ parseConfig = runParser parseConf fields "Config" . stripComments
       pTemplate = strField template "template"
 
       pTextOffset = readField textOffset "textOffset"
+      pTextOffsets = readIntList textOffsets "textOffsets"
       pIconOffset = readField iconOffset "iconOffset"
       pPosition = readField position "position"
       pHideOnStart = readField hideOnStart "hideOnStart"
@@ -300,6 +303,16 @@ parseConfig = runParser parseConf fields "Config" . stripComments
                      updateState (filter (/= n)) >> sepEndSpc [n,"="] >>
                      wrapSkip c >>= \r -> fieldEnd >> return r
       readField a n = field a n $ tillFieldEnd >>= read' n
+
+      readIntList d n = field d n intList
+      intList = do
+        spaces
+        char '['
+        list <- sepBy (spaces >> int >>= \x-> spaces >> return x) (char ',')
+        spaces
+        char ']'
+        return list
+
       read' d s = case reads s of
                     [(x, _)] -> return x
                     _ -> fail $ "error reading the " ++ d ++ " field: " ++ s

@@ -79,6 +79,7 @@ data XConf =
           , rect      :: Rectangle
           , window    :: Window
           , fontListS :: [XFont]
+          , verticalOffsets :: [Int]
           , iconS     :: Map FilePath Bitmap
           , config    :: Config
           }
@@ -90,7 +91,7 @@ runX xc f = runReaderT f xc
 -- | Starts the main event loop and threads
 startLoop :: XConf -> TMVar SignalType -> [[(Maybe ThreadId, TVar String)]]
              -> IO ()
-startLoop xcfg@(XConf _ _ w _ _ _) sig vs = do
+startLoop xcfg@(XConf _ _ w _ _ _ _) sig vs = do
 #ifdef XFT
     xftInitFtLibrary
 #endif
@@ -148,8 +149,12 @@ checker tvar ov vs signal = do
 
 
 -- | Continuously wait for a signal from a thread or a interrupt handler
-eventLoop :: TVar [String] -> XConf -> [([Action], Position, Position)] -> TMVar SignalType -> IO ()
-eventLoop tv xc@(XConf d r w fs is cfg) as signal = do
+eventLoop :: TVar [String]
+             -> XConf
+             -> [([Action], Position, Position)]
+             -> TMVar SignalType
+             -> IO ()
+eventLoop tv xc@(XConf d r w fs vos is cfg) as signal = do
       typ <- atomically $ takeTMVar signal
       case typ of
          Wakeup -> do
@@ -203,7 +208,7 @@ eventLoop tv xc@(XConf d r w fs is cfg) as signal = do
 
         reposWindow rcfg = do
           r' <- repositionWin d w (head fs) rcfg
-          eventLoop tv (XConf d r' w fs is rcfg) as signal
+          eventLoop tv (XConf d r' w fs vos is rcfg) as signal
 
         updateConfigPosition ocfg =
           case position ocfg of
@@ -281,7 +286,7 @@ drawInWin :: Rectangle -> [[(Widget, String, Int, Maybe [Action])]] -> X ()
 drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
   r <- ask
   let (c,d) = (config &&& display) r
-      (w,fs) = (window &&& fontListS  ) r
+      (w,(fs,vs)) = (window &&& fontListS &&& verticalOffsets) r
       strLn = io . mapM getWidth
       iconW i = maybe 0 Bitmap.width (lookup i $ iconS r)
       getWidth (Text s,cl,i,_) =
@@ -303,9 +308,9 @@ drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
       io $ setForeground d gc bgcolor
       io $ fillRectangle d p gc 0 0 wid ht
     -- write to the pixmap the new string
-    printStrings p gc fs 1 L =<< strLn left
-    printStrings p gc fs 1 R =<< strLn right
-    printStrings p gc fs 1 C =<< strLn center
+    printStrings p gc fs vs 1 L =<< strLn left
+    printStrings p gc fs vs 1 R =<< strLn right
+    printStrings p gc fs vs 1 C =<< strLn center
     -- draw border if requested
     io $ drawBorder (border c) (borderWidth c) d p gc bdcolor wid ht
     -- copy the pixmap with the new string to the window
@@ -317,22 +322,22 @@ drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
     io $ sync d True
 
 verticalOffset :: (Integral b, Integral a, MonadIO m) =>
-                  a -> Widget -> XFont -> Config -> m b
-verticalOffset ht (Text t) fontst conf
-  | textOffset conf > -1 = return $ fi (textOffset conf)
+                  a -> Widget -> XFont -> Int -> Config -> m b
+verticalOffset ht (Text t) fontst voffs _
+  | voffs > -1 = return $ fi voffs
   | otherwise = do
      (as,ds) <- io $ textExtents fontst t
      let margin = (fi ht - fi ds - fi as) `div` 2
      return $ fi as + margin - 1
-verticalOffset ht (Icon _) _ conf
+verticalOffset ht (Icon _) _ _ conf
   | iconOffset conf > -1 = return $ fi (iconOffset conf)
   | otherwise = return $ fi (ht `div` 2) - 1
 
 -- | An easy way to print the stuff we need to print
-printStrings :: Drawable -> GC -> [XFont] -> Position
+printStrings :: Drawable -> GC -> [XFont] -> [Int] -> Position
              -> Align -> [(Widget, String, Int, Position)] -> X ()
-printStrings _ _ _ _ _ [] = return ()
-printStrings dr gc fontlist offs a sl@((s,c,i,l):xs) = do
+printStrings _ _ _ _ _ _ [] = return ()
+printStrings dr gc fontlist voffs offs a sl@((s,c,i,l):xs) = do
   r <- ask
   let (conf,d) = (config &&& display) r
       alph = alpha conf
@@ -347,10 +352,10 @@ printStrings dr gc fontlist offs a sl@((s,c,i,l):xs) = do
       (fc,bc) = case break (==',') c of
                  (f,',':b) -> (f, b           )
                  (f,    _) -> (f, bgColor conf)
-  valign <- verticalOffset ht s (head fontlist) conf
+  valign <- verticalOffset ht s (head fontlist) (voffs !! i) conf
   case s of
     (Text t) -> io $ printString d dr fontst gc fc bc offset valign t alph
     (Icon p) -> io $ maybe (return ())
                            (drawBitmap d dr gc fc bc offset valign)
                            (lookup p (iconS r))
-  printStrings dr gc fontlist (offs + l) a xs
+  printStrings dr gc fontlist voffs (offs + l) a xs

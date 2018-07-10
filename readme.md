@@ -215,7 +215,8 @@ Other configuration options:
   fonts.
 
 - `additionalFonts` Haskell-style list of fonts to be used with the
-  `fn`-template.  Use the `xft:` prefix for XFT fonts.
+  `fn`-template.  Use the `xft:` prefix for XFT fonts.  See also
+  `textOffsets` below.
 
 - `bgColor` Background color.
 
@@ -257,6 +258,11 @@ Other configuration options:
 - `textOffset` The vertical offset, in pixels, for the text baseline.
    If negative or not given, xmobar will try to center text
    vertically.
+
+- `textOffsets` A list of vertical offsets, in pixels, for the text
+   baseline, to be used with the each of the fonts in
+   `additionalFonts` (if any).  If negative or not given, xmobar will
+   try to center text vertically for that font.
 
 - `iconOffset` The vertical offset, in pixels, for icons bottom line.
    If negative or not given, xmobar will try to center icons

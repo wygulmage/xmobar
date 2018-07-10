@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  XUtil
--- Copyright   :  (C) 2011, 2012, 2013, 2014, 2015, 2017 Jose Antonio Ortega Ruiz
+-- Copyright   :  (C) 2011, 2012, 2013, 2014, 2015, 2017, 2018 Jose Antonio Ortega Ruiz
 --                (C) 2007 Andrea Rossato
 -- License     :  BSD3
 --
@@ -77,7 +77,7 @@ data XFont = Core FontStruct
 
 -- | When initFont gets a font name that starts with 'xft:' it switchs
 -- to the Xft backend Example: 'xft:Sans-10'
-initFont :: Display ->String -> IO XFont
+initFont :: Display -> String -> IO XFont
 initFont d s =
        let xftPrefix = "xft:" in
        if  xftPrefix `isPrefixOf` s then

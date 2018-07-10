@@ -1,3 +1,14 @@
+## Version 0.27
+
+_New features_
+
+  - New configuration option, `textOffsets` to specify separate
+    vertical offsets for each of the fonts in `additionalFonts`.  See
+    [issue #311].
+
+
+[issue #311]: https://github.com/jaor/xmobar/issues/311
+
 ## Version 0.26 (April, 2018)
 
 _New features_

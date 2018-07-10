@@ -66,7 +66,9 @@ main = do
   vars  <- mapM (mapM $ startCommand sig) cls
   (r,w) <- createWin d fs conf
   let ic = Map.empty
-  startLoop (XConf d r w (fs:fl) ic conf) sig vars
+      to = textOffset conf
+      ts = textOffsets conf ++ replicate (length fl) (-1)
+  startLoop (XConf d r w (fs:fl) (to:ts) ic conf) sig vars
 
 -- | Splits the template in its parts
 splitTemplate :: Config -> [String]
@@ -190,7 +192,7 @@ usage = usageInfo header options ++ footer
 info :: String
 info = "xmobar " ++ showVersion version
         ++ "\n (C) 2007 - 2010 Andrea Rossato "
-        ++ "\n (C) 2010 - 2017 Jose A Ortega Ruiz\n "
+        ++ "\n (C) 2010 - 2018 Jose A Ortega Ruiz\n "
         ++ mail ++ "\n" ++ license
 
 mail :: String
