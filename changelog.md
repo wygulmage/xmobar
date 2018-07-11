@@ -2,12 +2,14 @@
 
 _New features_
 
+  - Dropped support for GHC 7.x.  See [issue #352].
   - New configuration option, `textOffsets` to specify separate
     vertical offsets for each of the fonts in `additionalFonts`.  See
     [issue #311].
 
 
 [issue #311]: https://github.com/jaor/xmobar/issues/311
+[issue #352]: https://github.com/jaor/xmobar/issues/352
 
 ## Version 0.26 (April, 2018)
 
