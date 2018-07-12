@@ -1572,11 +1572,7 @@ __jao__:
 Thanks to Andrea for creating xmobar in the first place, and for
 giving me the chance to contribute.
 
-# Useful links
-
-- [Github page].
-- [Mailing list].
-- [xmobar's Ohloh page].
+# Related
 
 - To understand the internal mysteries of xmobar you may try reading
   [this tutorial] on X Window Programming in Haskell.
@@ -1584,7 +1580,6 @@ giving me the chance to contribute.
 - My [sawflibs] project includes a module to automate running xmobar
   in [sawfish].
 
-[xmobar's Ohloh page]: https://www.ohloh.net/p/xmobar
 [this tutorial]: http://www.haskell.org/haskellwiki/X_window_programming_in_Haskell
 [sawflibs]: http://github.com/jaor/sawflibs
 
