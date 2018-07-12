@@ -15,7 +15,6 @@ extensibility through plugins.
 antialiased fonts. And [this one] is my desktop with [xmonad] and two
 instances of xmobar.
 
-[release notes]: http://projects.haskell.org/xmobar/releases.html
 [xmonad]: http://xmonad.org
 [Ion3]: http://tuomov.iki.fi/software/
 [This screenshot]: http://projects.haskell.org/xmobar/xmobar-sawfish.png

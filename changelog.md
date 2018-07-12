@@ -1,4 +1,4 @@
-## Version 0.27
+## Version 0.27 (July, 2018)
 
 _New features_
 
@@ -7,6 +7,10 @@ _New features_
     vertical offsets for each of the fonts in `additionalFonts`.  See
     [issue #311].
 
+_Bug fixes_
+
+   - Use the maximum width options `-T` and `-E` correctly when a
+     monitor subtemplate contains font and color tags.
 
 [issue #311]: https://github.com/jaor/xmobar/issues/311
 [issue #352]: https://github.com/jaor/xmobar/issues/352

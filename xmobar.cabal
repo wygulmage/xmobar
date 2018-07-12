@@ -46,7 +46,7 @@ test-suite XmobarTest
         Plugins.Monitors.Uptime,
         Plugins.Monitors.Bright, Plugins.Monitors.CatInt
   build-depends:
-    base >= 4.9.1.0,
+    base >= 4.9.1.0 && < 4.12,
     hspec == 2.*,
     containers,
     regex-compat,
@@ -159,7 +159,7 @@ executable xmobar
     extra-libraries: Xrandr Xrender
 
     build-depends:
-      base >= 4.9.1.0,
+      base >= 4.9.1.0 && < 4.12,
       containers,
       regex-compat,
       process,
