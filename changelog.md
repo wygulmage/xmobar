@@ -1,3 +1,9 @@
+## Version 0.28
+
+_New features_
+
+  - New `ComX`, which runs a command with custom exit error message.
+
 ## Version 0.27 (July, 2018)
 
 _New features_

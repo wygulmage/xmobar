@@ -1,14 +1,7 @@
-resolver: lts-10.3
-allow-newer: true
+resolver: lts-12.1
 packages:
 - .
-# Dependency packages to be pulled from upstream that are not in the resolver
-# (e.g., acme-missiles-0.3)
-extra-deps: [iwlib-0.1.0]
-
-# Override default flag values for local packages and extra-deps
-# flags: {}
-
-# Control whether we use the GHC we find on the path
-# system-ghc: true
-
+extra-deps:
+- iwlib-0.1.0
+- parsec-numbers-0.1.0
+- alsa-mixer-0.2.0.3

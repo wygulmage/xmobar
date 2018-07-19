@@ -1284,7 +1284,20 @@ _uname_ only once), while
 
         Run Com "date" ["+\"%a %b %_d %H:%M\""] "mydate" 600
 
-can be used in the output template as `%mydate%`
+can be used in the output template as `%mydate%`.
+
+Sometimes, you don't mind if the command executed exits with an error,
+or you might want to display a custom message in that case.  To that
+end, you can use the `ComX` variant:
+
+`ComX ProgramName Args ExitMessage Alias RefreshRate`
+
+Works like `Com`, but displaying `ExitMessage` (a string) if the
+execution fails.  For instance:
+
+        Run ComX "date" ["+\"%a %b %_d %H:%M\""] "N/A" "mydate" 600
+
+will display "N/A" if for some reason the `date` invocation fails.
 
 ## Other Plugins
 

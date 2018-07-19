@@ -48,6 +48,7 @@ class Show e => Exec e where
     trigger _ sh  = sh Nothing
 
 data Command = Com Program Args Alias Rate
+             | ComX Program Args String Alias Rate
                deriving (Show,Read,Eq)
 
 type Args    = [String]
@@ -56,10 +57,12 @@ type Alias   = String
 type Rate    = Int
 
 instance Exec Command where
-    alias (Com p    _    a _)
-        | p /= ""             = if a == "" then p else a
-        | otherwise           = ""
-    start (Com prog args _ r) cb = if r > 0 then go else exec
+    alias (ComX p _ _ a _) =
+      if p /= "" then (if a == "" then p else a) else ""
+    alias (Com p a al r) = alias (ComX p a "" al r)
+    start (Com p as al r) cb =
+      start (ComX p as ("Could not execute command " ++ p) al r) cb
+    start (ComX prog args msg _ r) cb = if r > 0 then go else exec
         where go = exec >> tenthSeconds r >> go
               exec = do
                 (i,o,e,p) <- runInteractiveProcess prog args Nothing Nothing
@@ -71,8 +74,7 @@ instance Exec Command where
                   ExitSuccess -> do str <- getL
                                     closeHandles
                                     cb str
-                  _ -> do closeHandles
-                          cb $ "Could not execute command " ++ prog
+                  _ -> closeHandles >> cb msg
 
 
 -- | Work around to the Int max bound: since threadDelay takes an Int, it
