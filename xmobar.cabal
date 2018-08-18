@@ -203,7 +203,7 @@ executable xmobar
        cpp-options: -DUTF8
 
     if flag(with_inotify) || flag(all_extensions)
-       build-depends: hinotify == 0.3.*
+       build-depends: hinotify >= 0.3 && < 0.5
        other-modules: Plugins.Mail, Plugins.MBox
        cpp-options: -DINOTIFY
 
