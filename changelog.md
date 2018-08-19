@@ -4,6 +4,12 @@ _New features_
 
   - New `ComX`, which runs a command with custom exit error message.
 
+_Bug fixes_
+
+  - hinotify version upgraded ([issue #356])
+
+[issue #356]: https://github.com/jaor/xmobar/issues/356
+
 ## Version 0.27 (July, 2018)
 
 _New features_
