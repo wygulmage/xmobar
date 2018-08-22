@@ -38,6 +38,8 @@ Xmobar is available from [Hackage], and you can install it using
 
         cabal install xmobar
 
+Xmobar versions >= 0.27 require GHC version >= 8.0.2.
+
 See below for a list of optional compilation flags that will enable
 some optional plugins. For instance, to install xmobar with all the
 bells and whistles, use:
