@@ -183,7 +183,7 @@ instance Exec Monitors where
     start (AutoMPD a) = runMBD a mpdConfig runMPD mpdWait mpdReady
 #endif
 #ifdef ALSA
-    start (Volume m c a r) = runM a volumeConfig (runVolume m c) r
+    start (Volume m c a r) = startVolume m c a r
 #endif
 #ifdef MPRIS
     start (Mpris1 s a r) = runM a mprisConfig (runMPRIS1 s) r

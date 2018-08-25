@@ -1063,6 +1063,14 @@ more than one battery.
     - `--highd` _number_ High threshold for dB. Defaults to -5.0.
     - `--lowd` _number_ Low threshold for dB. Defaults to -30.0.
     - `--volume-icon-pattern` _string_ dynamic string for current volume in `volumeipat`.
+    - `--monitor[=/path/to/alsactl]`
+        - Use event-based refreshing via `alsactl monitor` instead of polling
+          (`RefreshRate` will be ignored).
+        - If no `/path/to/alsactl` is given, `alsactl` will be sought in your `PATH`
+          first, and failing that, at `/usr/sbin/alsactl` (this is its location on
+          Debian systems. `alsactl monitor` works as a non-root user despite living
+          in `/usr/sbin`.).
+        - `stdbuf` (from coreutils) must be (and most probably already is) in your `PATH`.
 - Variables that can be used with the `-t`/`--template` argument:
             `volume`, `volumebar`, `volumevbar`, `volumeipat`, `dB`, `status`
 - Note that `dB` might only return 0 on your system. This is known

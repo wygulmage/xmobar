@@ -44,7 +44,8 @@ test-suite XmobarTest
         Plugins.Monitors.Swap, Plugins.Monitors.Thermal,
         Plugins.Monitors.ThermalZone, Plugins.Monitors.Top,
         Plugins.Monitors.Uptime,
-        Plugins.Monitors.Bright, Plugins.Monitors.CatInt
+        Plugins.Monitors.Bright, Plugins.Monitors.CatInt,
+        Plugins.Monitors.VolumeSpec
   build-depends:
     base >= 4.9.1.0 && < 4.13,
     hspec == 2.*,
@@ -62,7 +63,15 @@ test-suite XmobarTest
     mtl >= 2.1 && < 2.3,
     parsec == 3.1.*,
     parsec-numbers == 0.1.0,
-    stm >= 2.3 && < 2.6
+    stm >= 2.3 && < 2.6,
+    temporary,
+    async
+
+  if flag(with_alsa) || flag(all_extensions)
+      build-depends: alsa-mixer > 0.2.0.2
+      build-depends: alsa-core == 0.5.*
+      other-modules: Plugins.Monitors.Volume
+      cpp-options: -DALSA
 
 source-repository head
   type:      git

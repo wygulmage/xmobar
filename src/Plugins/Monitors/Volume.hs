@@ -12,15 +12,30 @@
 --
 -----------------------------------------------------------------------------
 
-module Plugins.Monitors.Volume (runVolume, volumeConfig) where
+module Plugins.Monitors.Volume
+  ( startVolume
+  , runVolume
+  , volumeConfig
+  , getMonitorWaiter
+  , parseOptsIncludingMonitorArgs
+  , VolumeOpts(refreshMode)
+  , RefreshMode(..)
+  ) where
 
+import Commands (tenthSeconds)
 import Control.Applicative ((<$>))
-import Control.Monad ( liftM2, liftM3, mplus )
+import Control.Concurrent
+import Control.Exception
+import Control.Monad ( forever, liftM2, liftM3, mplus, void, when, unless )
 import Data.Traversable (sequenceA)
 import Plugins.Monitors.Common
 import Sound.ALSA.Mixer
 import qualified Sound.ALSA.Exception as AE
 import System.Console.GetOpt
+import System.Directory
+import System.Exit
+import System.IO
+import System.Process
 
 volumeConfig :: IO MConfig
 volumeConfig = mkMConfig "Vol: <volume>% <status>"
@@ -35,7 +50,12 @@ data VolumeOpts = VolumeOpts
     , highDbThresh :: Float
     , lowDbThresh :: Float
     , volumeIconPattern :: Maybe IconPattern
+    , refreshMode :: RefreshMode
     }
+
+data RefreshMode = RefreshModePoll
+                 | RefreshModeMonitor (Maybe FilePath) -- alsactl path
+                 deriving(Eq,Show)
 
 defaultOpts :: VolumeOpts
 defaultOpts = VolumeOpts
@@ -46,7 +66,11 @@ defaultOpts = VolumeOpts
     , highDbThresh = -5.0
     , lowDbThresh = -30.0
     , volumeIconPattern = Nothing
+    , refreshMode = RefreshModePoll
     }
+
+monitorOptionName :: String
+monitorOptionName = "monitor"
 
 options :: [OptDescr (VolumeOpts -> VolumeOpts)]
 options =
@@ -58,6 +82,8 @@ options =
     , Option "c" ["offc"] (ReqArg (\x o -> o { offColor = Just x }) "") ""
     , Option "" ["volume-icon-pattern"] (ReqArg (\x o ->
        o { volumeIconPattern = Just $ parseIconPattern x }) "") ""
+    , Option "" [monitorOptionName] (OptArg (\x o ->
+       o { refreshMode = RefreshModeMonitor x }) "") ""
     ]
 
 parseOpts :: [String] -> IO VolumeOpts
@@ -183,3 +209,89 @@ runVolume mixerName controlName argv = do
     getFormatSwitch opts (Just sw) = formatSwitch opts sw
 
     unavailable = getConfigValue naString
+
+parseOptsIncludingMonitorArgs :: [String] -> IO VolumeOpts
+parseOptsIncludingMonitorArgs args =
+    -- Drop generic Monitor args first
+    case getOpt Permute [] args of
+      (_, args', _) -> parseOpts args'
+
+startVolume :: String -> String -> [String] -> Int -> (String -> IO ()) -> IO ()
+startVolume mixerName controlName args rate cb = do
+  opts <- parseOptsIncludingMonitorArgs args
+
+  waitFunction <-
+    case refreshMode opts of
+      RefreshModePoll -> pure $ tenthSeconds rate
+      RefreshModeMonitor alsaCtlPath -> getMonitorWaiter mixerName alsaCtlPath
+
+  runMB args volumeConfig (runVolume mixerName controlName) waitFunction cb
+
+
+getMonitorWaiter :: String -> Maybe FilePath -> IO (IO ())
+getMonitorWaiter mixerName alsaCtlPath = do
+  mvar <- newMVar Nothing :: IO (MVar (Maybe SomeException))
+
+  forkFinally (readerThread mvar) (putMVar mvar . either Just (const Nothing))
+
+  pure $ do
+    ei <- takeMVar mvar
+    case ei of
+      -- Propagate exceptions from reader thread
+      Just (SomeException ex) -> throwIO ex
+      Nothing -> pure ()
+
+  where
+
+    readerThread mvar = do
+          path <- determineAlsaCtlPath
+          withCreateProcess
+            (proc "stdbuf" ["-oL", path, "monitor", mixerName]) {std_out = CreatePipe}
+            run
+
+      where
+
+        defaultPath = "/usr/sbin/alsactl"
+
+        determineAlsaCtlPath =
+          case alsaCtlPath of
+            Just path -> do
+              found <- doesFileExist path
+              if found
+                then pure path
+                else throwIO . ErrorCall $
+                     "Specified alsactl file " ++ path ++ " does not exist"
+
+            Nothing -> do
+              (ec, path, err) <- readProcessWithExitCode "which" ["alsactl"] ""
+              unless (null err) $ hPutStrLn stderr err
+              case ec of
+                ExitSuccess -> pure $ trimTrailingNewline path
+                ExitFailure _ -> do
+                  found <- doesFileExist defaultPath
+                  if found
+                    then pure defaultPath
+                    else throwIO . ErrorCall $
+                         "alsactl not found in PATH or at " ++
+                         show defaultPath ++
+                         "; please specify with --" ++
+                         monitorOptionName ++ "=/path/to/alsactl"
+
+
+        run _ ~(Just out) _ _ = do
+          hSetBuffering out LineBuffering
+          forever $ do
+            c <- hGetChar out
+            when (c == '\n') $
+              -- This uses 'tryPutMVar' because 'putMVar' would make 'runVolume' run
+              -- once for each event. But we want it to run only once after a burst
+              -- of events.
+              void $ tryPutMVar mvar Nothing
+
+-- This is necessarily very inefficient on 'String's
+trimTrailingNewline :: String -> String
+trimTrailingNewline x =
+  case reverse x of
+    '\n' : '\r' : y -> reverse y
+    '\n' : y -> reverse y
+    _ -> x
