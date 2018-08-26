@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall #-}
-module Plugins.Monitors.VolumeSpec
+module Plugins.Monitors.AlsaSpec
   ( main
   , spec
   ) where
@@ -7,7 +7,7 @@ module Plugins.Monitors.VolumeSpec
 import Control.Concurrent
 import Control.Concurrent.Async
 import Control.Monad
-import Plugins.Monitors.Volume
+import Plugins.Monitors.Alsa
 import System.FilePath
 import System.IO
 import System.IO.Temp
@@ -20,22 +20,18 @@ main = hspec spec
 
 spec :: Spec
 spec = do
-  describe "Volume.getWaitMonitor" $
-    it "produces the expected timeline (using a fake alsactl)" $
-      runFakeAlsactlTest
+  describe "Alsa.getWaitMonitor" $
+    it "produces the expected timeline (using a fake alsactl)"
+       runFakeAlsactlTest
 
-  describe "Volume.parseOptsIncludingMonitorArgs" $ do
+  describe "Alsa.parseOptsIncludingMonitorArgs" $ do
     it "works with empty args" $ do
       opts <- parseOptsIncludingMonitorArgs []
-      refreshMode opts `shouldBe` RefreshModePoll
+      aoAlsaCtlPath opts `shouldBe` Nothing
 
-    it "parses --monitor" $ do
-      opts <- parseOptsIncludingMonitorArgs ["--", "--monitor"]
-      refreshMode opts `shouldBe` RefreshModeMonitor Nothing
-
-    it "parses --monitor=foo" $ do
-      opts <- parseOptsIncludingMonitorArgs ["--", "--monitor=foo"]
-      refreshMode opts `shouldBe` RefreshModeMonitor (Just "foo")
+    it "parses --alsactl=foo" $ do
+      opts <- parseOptsIncludingMonitorArgs ["--", "--alsactl=foo"]
+      aoAlsaCtlPath opts `shouldBe` Just "foo"
 
 
 runFakeAlsactlTest :: Expectation

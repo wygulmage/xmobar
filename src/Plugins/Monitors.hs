@@ -50,6 +50,7 @@ import Plugins.Monitors.Common (runMBD)
 #endif
 #ifdef ALSA
 import Plugins.Monitors.Volume
+import Plugins.Monitors.Alsa
 #endif
 #ifdef MPRIS
 import Plugins.Monitors.Mpris
@@ -90,6 +91,7 @@ data Monitors = Network      Interface   Args Rate
 #endif
 #ifdef ALSA
               | Volume   String     String Args Rate
+              | Alsa     String     String Args
 #endif
 #ifdef MPRIS
               | Mpris1   String     Args Rate
@@ -143,6 +145,7 @@ instance Exec Monitors where
 #endif
 #ifdef ALSA
     alias (Volume m c _ _) = m ++ ":" ++ c
+    alias (Alsa m c _) = "alsa:" ++ m ++ ":" ++ c
 #endif
 #ifdef MPRIS
     alias (Mpris1 _ _ _) = "mpris1"
@@ -183,7 +186,8 @@ instance Exec Monitors where
     start (AutoMPD a) = runMBD a mpdConfig runMPD mpdWait mpdReady
 #endif
 #ifdef ALSA
-    start (Volume m c a r) = startVolume m c a r
+    start (Volume m c a r) = runM a volumeConfig (runVolume m c) r
+    start (Alsa m c a) = startAlsaPlugin m c a
 #endif
 #ifdef MPRIS
     start (Mpris1 s a r) = runM a mprisConfig (runMPRIS1 s) r

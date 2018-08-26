@@ -1063,14 +1063,6 @@ more than one battery.
     - `--highd` _number_ High threshold for dB. Defaults to -5.0.
     - `--lowd` _number_ Low threshold for dB. Defaults to -30.0.
     - `--volume-icon-pattern` _string_ dynamic string for current volume in `volumeipat`.
-    - `--monitor[=/path/to/alsactl]`
-        - Use event-based refreshing via `alsactl monitor` instead of polling
-          (`RefreshRate` will be ignored).
-        - If no `/path/to/alsactl` is given, `alsactl` will be sought in your `PATH`
-          first, and failing that, at `/usr/sbin/alsactl` (this is its location on
-          Debian systems. `alsactl monitor` works as a non-root user despite living
-          in `/usr/sbin`.).
-        - `stdbuf` (from coreutils) must be (and most probably already is) in your `PATH`.
 - Variables that can be used with the `-t`/`--template` argument:
             `volume`, `volumebar`, `volumevbar`, `volumeipat`, `dB`, `status`
 - Note that `dB` might only return 0 on your system. This is known
@@ -1079,6 +1071,21 @@ more than one battery.
 - Requires the package [alsa-core] and [alsa-mixer] installed in your
   system. In addition, to activate this plugin you must pass
   `--flags="with_alsa"` during compilation.
+
+### `Alsa Mixer Element Args`
+
+Like [Volume](#volume-mixer-element-args-refreshrate), but with the following differences:
+- Uses event-based refreshing via `alsactl monitor` instead of polling, so it will refresh
+  instantly when there's a volume change, and won't use CPU until a change happens.
+- Aliases to `alsa:` followed by the mixer name and element name separated by a colon. Thus,
+  `Alsa "default" "Master" []` can be used as `%alsa:default:Master%`.
+- Additional options (after the `--`):
+    - `--alsactl=/path/to/alsactl`
+        - If this option is not specified, `alsactl` will be sought in your `PATH`
+          first, and failing that, at `/usr/sbin/alsactl` (this is its location on
+          Debian systems. `alsactl monitor` works as a non-root user despite living
+          in `/usr/sbin`.).
+- `stdbuf` (from coreutils) must be (and most probably already is) in your `PATH`.
 
 ### `MPD Args RefreshRate`
 
