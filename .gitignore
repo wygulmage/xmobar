@@ -1,4 +1,5 @@
 /dist/
+/dist-newstyle/
 /TAGS
 /IWlib.hs
 /StatFS.hs
@@ -17,3 +18,5 @@ cabal.sandbox.config
 /xmobar.iml
 /out/
 /cabal.config
+codex.tags
+cabal.project.local
