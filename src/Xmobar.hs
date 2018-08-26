@@ -40,6 +40,7 @@ import Control.Arrow ((&&&))
 import Control.Applicative ((<$>))
 import Control.Monad.Reader
 import Control.Concurrent
+import Control.Concurrent.Async (Async, async)
 import Control.Concurrent.STM
 import Control.Exception (handle, SomeException(..))
 import Data.Bits
@@ -89,7 +90,7 @@ runX :: XConf -> X () -> IO ()
 runX xc f = runReaderT f xc
 
 -- | Starts the main event loop and threads
-startLoop :: XConf -> TMVar SignalType -> [[(Maybe ThreadId, TVar String)]]
+startLoop :: XConf -> TMVar SignalType -> [[([Async ()], TVar String)]]
              -> IO ()
 startLoop xcfg@(XConf _ _ w _ _ _ _) sig vs = do
 #ifdef XFT
@@ -133,7 +134,7 @@ startLoop xcfg@(XConf _ _ w _ _ _ _) sig vs = do
 -- | Send signal to eventLoop every time a var is updated
 checker :: TVar [String]
            -> [String]
-           -> [[(Maybe ThreadId, TVar String)]]
+           -> [[([Async ()], TVar String)]]
            -> TMVar SignalType
            -> IO ()
 checker tvar ov vs signal = do
@@ -230,21 +231,21 @@ eventLoop tv xc@(XConf d r w fs vos is cfg) as signal = do
 
 -- $command
 
--- | Runs a command as an independent thread and returns its thread id
+-- | Runs a command as an independent thread and returns its Async handles
 -- and the TVar the command will be writing to.
 startCommand :: TMVar SignalType
              -> (Runnable,String,String)
-             -> IO (Maybe ThreadId, TVar String)
+             -> IO ([Async ()], TVar String)
 startCommand sig (com,s,ss)
     | alias com == "" = do var <- atomically $ newTVar is
                            atomically $ writeTVar var (s ++ ss)
-                           return (Nothing,var)
+                           return ([], var)
     | otherwise = do var <- atomically $ newTVar is
                      let cb str = atomically $ writeTVar var (s ++ str ++ ss)
-                     h <- forkIO $ start com cb
-                     _ <- forkIO $ trigger com $ maybe (return ())
+                     a1 <- async $ start com cb
+                     a2 <- async $ trigger com $ maybe (return ())
                                                  (atomically . putTMVar sig)
-                     return (Just h,var)
+                     return ([a1, a2], var)
     where is = s ++ "Updating..." ++ ss
 
 updateString :: Config -> TVar [String]

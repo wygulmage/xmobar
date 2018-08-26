@@ -25,6 +25,7 @@ import Parsers
 import Config
 import XUtil
 
+import Data.Foldable (for_)
 import Data.List (intercalate)
 import qualified Data.Map as Map
 
@@ -37,6 +38,8 @@ import System.Exit
 import System.Environment
 import System.FilePath ((</>))
 import System.Posix.Files
+import Control.Exception
+import Control.Concurrent.Async (Async, cancel)
 import Control.Monad (unless)
 import Text.Read (readMaybe)
 
@@ -63,12 +66,19 @@ main = do
   fl    <- mapM (initFont d) (additionalFonts conf)
   cls   <- mapM (parseTemplate conf) (splitTemplate conf)
   sig   <- setupSignalHandler
-  vars  <- mapM (mapM $ startCommand sig) cls
-  (r,w) <- createWin d fs conf
-  let ic = Map.empty
-      to = textOffset conf
-      ts = textOffsets conf ++ replicate (length fl) (-1)
-  startLoop (XConf d r w (fs:fl) (to:ts) ic conf) sig vars
+  bracket (mapM (mapM $ startCommand sig) cls)
+          cleanupThreads
+          $ \vars -> do
+    (r,w) <- createWin d fs conf
+    let ic = Map.empty
+        to = textOffset conf
+        ts = textOffsets conf ++ replicate (length fl) (-1)
+    startLoop (XConf d r w (fs:fl) (to:ts) ic conf) sig vars
+
+cleanupThreads :: [[([Async ()], a)]] -> IO ()
+cleanupThreads vars =
+  for_ (concat vars) $ \(asyncs, _) ->
+    for_ asyncs cancel
 
 -- | Splits the template in its parts
 splitTemplate :: Config -> [String]
