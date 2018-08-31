@@ -57,83 +57,83 @@ runFakeAlsactlTest =
             waiterTaskIsRunning <- newEmptyMVar :: IO (MVar ())
             waiterTaskIsWaiting <- newEmptyMVar :: IO (MVar ())
 
-            waitFunc <- getMonitorWaiter fifoPath (Just fakeAlsactlPath)
+            withMonitorWaiter fifoPath (Just fakeAlsactlPath) $ \waitFunc -> do
 
-            let addToTimeline e =  modifyMVar_ timeline (pure . (e :))
+              let addToTimeline e =  modifyMVar_ timeline (pure . (e :))
 
-                emitEvent = do
-                  addToTimeline EventEmitted
-                  hPutStrLn fifo "#17 (2,0,0,Master Playback Volume,0) VALUE"
-                  hFlush fifo
+                  emitEvent = do
+                    addToTimeline EventEmitted
+                    hPutStrLn fifo "#17 (2,0,0,Master Playback Volume,0) VALUE"
+                    hFlush fifo
 
-                putNow mv val = do
-                  ok <- tryPutMVar mv val
-                  unless ok $ expectationFailure "Expected the MVar to be empty"
+                  putNow mv val = do
+                    ok <- tryPutMVar mv val
+                    unless ok $ expectationFailure "Expected the MVar to be empty"
 
-                simulateRunVolumeCompleted = putNow runVolumeCompleted False
+                  simulateRunVolumeCompleted = putNow runVolumeCompleted False
 
-                quitWaiter = putNow runVolumeCompleted True
+                  quitWaiter = putNow runVolumeCompleted True
 
-                waiterTaskMain = do
-                  addToTimeline RunVolume
-                  putNow waiterTaskIsRunning ()
-                  q <- takeMVar runVolumeCompleted
-                  unless q $ do
-                    addToTimeline Waiting
-                    putNow waiterTaskIsWaiting ()
-                    waitFunc
+                  waiterTaskMain = do
+                    addToTimeline RunVolume
+                    putNow waiterTaskIsRunning ()
+                    q <- takeMVar runVolumeCompleted
+                    unless q $ do
+                      addToTimeline Waiting
+                      putNow waiterTaskIsWaiting ()
+                      waitFunc
 
-                    waiterTaskMain
+                      waiterTaskMain
 
-                delay_ms = threadDelay . (* 1000)
+                  delay_ms = threadDelay . (* 1000)
 
-            withAsync waiterTaskMain $ \waiterTask -> do
+              withAsync waiterTaskMain $ \waiterTask -> do
 
-              takeMVar waiterTaskIsRunning
-              simulateRunVolumeCompleted
-              takeMVar waiterTaskIsWaiting
-              takeMVar waiterTaskIsRunning -- Waiter returns instantly once
-              simulateRunVolumeCompleted
-              takeMVar waiterTaskIsWaiting
+                takeMVar waiterTaskIsRunning
+                simulateRunVolumeCompleted
+                takeMVar waiterTaskIsWaiting
+                takeMVar waiterTaskIsRunning -- Waiter returns instantly once
+                simulateRunVolumeCompleted
+                takeMVar waiterTaskIsWaiting
 
-              emitEvent
-              takeMVar waiterTaskIsRunning
-              simulateRunVolumeCompleted
-              takeMVar waiterTaskIsWaiting
-
-              let iters = 3
-                  burstSize = 5
-
-              replicateM_ iters $ do
                 emitEvent
                 takeMVar waiterTaskIsRunning
-                -- Now more events start to accumulate during runVolume
-                replicateM_ burstSize emitEvent
-                delay_ms 250 -- Give the events time to go through the pipe
                 simulateRunVolumeCompleted
-                -- runVolume completed and should run once more due to
-                -- accumulated events
                 takeMVar waiterTaskIsWaiting
+
+                let iters = 3
+                    burstSize = 5
+
+                replicateM_ iters $ do
+                  emitEvent
+                  takeMVar waiterTaskIsRunning
+                  -- Now more events start to accumulate during runVolume
+                  replicateM_ burstSize emitEvent
+                  delay_ms 250 -- Give the events time to go through the pipe
+                  simulateRunVolumeCompleted
+                  -- runVolume completed and should run once more due to
+                  -- accumulated events
+                  takeMVar waiterTaskIsWaiting
+                  takeMVar waiterTaskIsRunning
+                  simulateRunVolumeCompleted
+                  takeMVar waiterTaskIsWaiting
+
+                emitEvent
                 takeMVar waiterTaskIsRunning
-                simulateRunVolumeCompleted
-                takeMVar waiterTaskIsWaiting
+                quitWaiter
 
-              emitEvent
-              takeMVar waiterTaskIsRunning
-              quitWaiter
+                wait waiterTask
 
-              wait waiterTask
+                timelineValue <- reverse <$> readMVar timeline
 
-              timelineValue <- reverse <$> readMVar timeline
-
-              timelineValue `shouldBe`
-                [RunVolume, Waiting, RunVolume, Waiting, EventEmitted, RunVolume, Waiting]
-                ++ concat
-                    (replicate iters $
-                      [EventEmitted, RunVolume]
-                      ++ replicate burstSize EventEmitted
-                      ++ [Waiting, RunVolume, Waiting])
-                ++ [EventEmitted, RunVolume]
+                timelineValue `shouldBe`
+                  [RunVolume, Waiting, RunVolume, Waiting, EventEmitted, RunVolume, Waiting]
+                  ++ concat
+                      (replicate iters $
+                        [EventEmitted, RunVolume]
+                        ++ replicate burstSize EventEmitted
+                        ++ [Waiting, RunVolume, Waiting])
+                  ++ [EventEmitted, RunVolume]
 
 data TimelineEntry = EventEmitted | Waiting | RunVolume
               deriving(Eq)

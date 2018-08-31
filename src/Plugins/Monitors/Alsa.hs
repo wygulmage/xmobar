@@ -14,12 +14,13 @@
 
 module Plugins.Monitors.Alsa
   ( startAlsaPlugin
-  , getMonitorWaiter
+  , withMonitorWaiter
   , parseOptsIncludingMonitorArgs
   , AlsaOpts(aoAlsaCtlPath)
   ) where
 
 import Control.Concurrent
+import Control.Concurrent.Async
 import Control.Exception
 import Control.Monad
 import Plugins.Monitors.Common
@@ -66,8 +67,6 @@ startAlsaPlugin :: String -> String -> [String] -> (String -> IO ()) -> IO ()
 startAlsaPlugin mixerName controlName args cb = do
   opts <- parseOptsIncludingMonitorArgs args
 
-  waitFunction <- getMonitorWaiter mixerName (aoAlsaCtlPath opts)
-
   let run args2 = do
         -- Replicating the reparsing logic used by other plugins for now,
         -- but it seems the option parsing could be floated out (actually,
@@ -78,67 +77,66 @@ startAlsaPlugin mixerName controlName args cb = do
         opts2 <- io $ parseOpts args2
         runVolumeWith (aoVolumeOpts opts2) mixerName controlName
 
-  runMB args volumeConfig run waitFunction cb
+  withMonitorWaiter mixerName (aoAlsaCtlPath opts) $ \wait_ ->
+    runMB args volumeConfig run wait_ cb
 
-getMonitorWaiter :: String -> Maybe FilePath -> IO (IO ())
-getMonitorWaiter mixerName alsaCtlPath = do
-  mvar <- newMVar Nothing :: IO (MVar (Maybe SomeException))
+withMonitorWaiter :: String -> Maybe FilePath -> (IO () -> IO a) -> IO a
+withMonitorWaiter mixerName alsaCtlPath cont = do
+  mvar <- newMVar ()
 
-  forkFinally (readerThread mvar) (putMVar mvar . either Just (const Nothing))
+  path <- determineAlsaCtlPath
 
-  pure $ do
-    ei <- takeMVar mvar
-    case ei of
-      -- Propagate exceptions from reader thread
-      Just (SomeException ex) -> throwIO ex
-      Nothing -> pure ()
+  bracket (async $ readerThread mvar path) cancel $ \a -> do
+
+    -- Throw on this thread if there's an exception
+    -- on the reader thread.
+    link a
+
+    cont $ takeMVar mvar
 
   where
 
-    readerThread mvar = do
-          path <- determineAlsaCtlPath
-          withCreateProcess
-            (proc "stdbuf" ["-oL", path, "monitor", mixerName]) {std_out = CreatePipe}
-            run
+    readerThread mvar path =
+      let createProc = (proc "stdbuf" ["-oL", path, "monitor", mixerName])
+                          {std_out = CreatePipe}
+      in
+        withCreateProcess createProc $ \_ (Just alsaOut) _ _ -> do
+          hSetBuffering alsaOut LineBuffering
 
-      where
-
-        defaultPath = "/usr/sbin/alsactl"
-
-        determineAlsaCtlPath =
-          case alsaCtlPath of
-            Just path -> do
-              found <- doesFileExist path
-              if found
-                then pure path
-                else throwIO . ErrorCall $
-                     "Specified alsactl file " ++ path ++ " does not exist"
-
-            Nothing -> do
-              (ec, path, err) <- readProcessWithExitCode "which" ["alsactl"] ""
-              unless (null err) $ hPutStrLn stderr err
-              case ec of
-                ExitSuccess -> pure $ trimTrailingNewline path
-                ExitFailure _ -> do
-                  found <- doesFileExist defaultPath
-                  if found
-                    then pure defaultPath
-                    else throwIO . ErrorCall $
-                         "alsactl not found in PATH or at " ++
-                         show defaultPath ++
-                         "; please specify with --" ++
-                         alsaCtlOptionName ++ "=/path/to/alsactl"
-
-
-        run _ ~(Just out) _ _ = do
-          hSetBuffering out LineBuffering
           forever $ do
-            c <- hGetChar out
+            c <- hGetChar alsaOut
             when (c == '\n') $
               -- This uses 'tryPutMVar' because 'putMVar' would make 'runVolume' run
               -- once for each event. But we want it to run only once after a burst
               -- of events.
-              void $ tryPutMVar mvar Nothing
+              void $ tryPutMVar mvar ()
+
+    defaultPath = "/usr/sbin/alsactl"
+
+    determineAlsaCtlPath =
+      case alsaCtlPath of
+        Just path -> do
+          found <- doesFileExist path
+          if found
+            then pure path
+            else throwIO . ErrorCall $
+                  "Specified alsactl file " ++ path ++ " does not exist"
+
+        Nothing -> do
+          (ec, path, err) <- readProcessWithExitCode "which" ["alsactl"] ""
+          unless (null err) $ hPutStrLn stderr err
+          case ec of
+            ExitSuccess -> pure $ trimTrailingNewline path
+            ExitFailure _ -> do
+              found <- doesFileExist defaultPath
+              if found
+                then pure defaultPath
+                else throwIO . ErrorCall $
+                      "alsactl not found in PATH or at " ++
+                      show defaultPath ++
+                      "; please specify with --" ++
+                      alsaCtlOptionName ++ "=/path/to/alsactl"
+
 
 -- This is necessarily very inefficient on 'String's
 trimTrailingNewline :: String -> String
