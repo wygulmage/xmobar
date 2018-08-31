@@ -38,18 +38,18 @@ import System.Exit
 import System.Environment
 import System.FilePath ((</>))
 import System.Posix.Files
-import Control.Exception
 import Control.Concurrent.Async (Async, cancel)
+import Control.Exception (bracket)
 import Control.Monad (unless)
 import Text.Read (readMaybe)
 
-import Signal (setupSignalHandler)
+import Signal (setupSignalHandler, withDeferSignals)
 
 -- $main
 
 -- | The main entry point
 main :: IO ()
-main = do
+main = withDeferSignals $ do
   initThreads
   d <- openDisplay ""
   args <- getArgs
@@ -77,6 +77,7 @@ main = do
 
 cleanupThreads :: [[([Async ()], a)]] -> IO ()
 cleanupThreads vars =
+  -- putStrLn "In cleanupThreads"
   for_ (concat vars) $ \(asyncs, _) ->
     for_ asyncs cancel
 

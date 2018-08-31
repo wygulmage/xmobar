@@ -18,12 +18,15 @@
 
 module Signal where
 
+import Data.Foldable (for_)
 import Data.Typeable (Typeable)
+import Control.Concurrent
 import Control.Concurrent.STM
 import Control.Exception
 import System.Posix.Signals
 import Graphics.X11.Types (Button)
 import Graphics.X11.Xlib.Types (Position)
+import System.IO
 
 #ifdef DBUS
 import DBus (IsVariant(..))
@@ -71,3 +74,57 @@ changeScreenHandler :: TMVar SignalType -> IO ()
 changeScreenHandler sig = do
    atomically $ putTMVar sig ChangeScreen
    return ()
+
+
+-- | Ensures that the given IO action runs its cleanup actions ('bracket' etc.),
+-- even if a signal is caught.
+--
+-- An exception will be thrown on the thread that called this function when a
+-- signal is caught.
+withDeferSignals :: IO a -> IO a
+withDeferSignals thing = do
+  threadId <- myThreadId
+  caughtSignal <- newEmptyMVar
+
+  let signals =
+        filter (not . flip inSignalSet reservedSignals)
+          [ sigHUP
+          -- , sigINT -- Handler already installed by GHC
+          , sigQUIT
+          , sigILL
+          , sigABRT
+          , sigFPE
+          , sigSEGV
+          --, sigPIPE -- Handler already installed by GHC
+          , sigALRM
+          , sigTERM
+          , sigBUS
+          , sigPOLL
+          , sigPROF
+          , sigSYS
+          , sigTRAP
+          , sigVTALRM
+          , sigXCPU
+          , sigXFSZ
+          -- , sigUSR1 -- Handled by setupSignalHandler
+          -- , sigUSR2 -- Handled by setupSignalHandler
+          ]
+
+  for_ signals $ \s ->
+
+      installHandler s
+        (Catch $ do
+          tryPutMVar caughtSignal s
+          hPutStrLn stderr ("xmobar: Caught signal "++show s++"; exiting...")
+          throwTo threadId ThreadKilled)
+        Nothing
+
+  thing `finally` do
+        s0 <- tryReadMVar caughtSignal
+        case s0 of
+          Nothing -> pure ()
+          Just s -> do
+            -- Run the default handler for the signal
+            -- hPutStrLn stderr ("xmobar: Running default handler for signal "++show s)
+            installHandler s Default Nothing
+            raiseSignal s
