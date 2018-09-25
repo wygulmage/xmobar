@@ -46,7 +46,7 @@ test-suite XmobarTest
         Plugins.Monitors.Uptime,
         Plugins.Monitors.Bright, Plugins.Monitors.CatInt
   build-depends:
-    base >= 4.9.1.0 && < 4.12,
+    base >= 4.9.1.0 && < 4.13,
     hspec == 2.*,
     containers,
     regex-compat,
@@ -62,7 +62,7 @@ test-suite XmobarTest
     mtl >= 2.1 && < 2.3,
     parsec == 3.1.*,
     parsec-numbers == 0.1.0,
-    stm >= 2.3 && < 2.5
+    stm >= 2.3 && < 2.6
 
 source-repository head
   type:      git
@@ -159,7 +159,7 @@ executable xmobar
     extra-libraries: Xrandr Xrender
 
     build-depends:
-      base >= 4.9.1.0 && < 4.12,
+      base >= 4.9.1.0 && < 4.13,
       containers,
       regex-compat,
       process,
@@ -174,7 +174,7 @@ executable xmobar
       mtl >= 2.1 && < 2.3,
       parsec == 3.1.*,
       parsec-numbers >= 0.1.0,
-      stm >= 2.3 && < 2.5
+      stm >= 2.3 && < 2.6
 
     if impl(ghc < 8.0.2)
        -- Disable building with GHC before 8.0.2.
