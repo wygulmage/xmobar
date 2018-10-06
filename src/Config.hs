@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeOperators, CPP #-}
 
 -----------------------------------------------------------------------------
 -- |
@@ -38,10 +38,14 @@ import Plugins.EWMH
 import Plugins.Kbd
 import Plugins.Locks
 
+#ifdef INOTIFY
 import Plugins.Mail
 import Plugins.MBox
+#endif
 
+#ifdef DATEZONE
 import Plugins.DateZone
+#endif
 
 -- $config
 -- Configuration data type and default configuration
@@ -155,6 +159,12 @@ infixr :*:
 -- this function's type signature.
 runnableTypes :: Command :*: Monitors :*: Date :*: PipeReader :*:
                  BufferedPipeReader :*: CommandReader :*: StdinReader :*:
-                 XMonadLog :*: EWMH :*: Kbd :*: Locks :*: Mail :*: MBox :*:
-                 DateZone :*: MarqueePipeReader :*: ()
+                 XMonadLog :*: EWMH :*: Kbd :*: Locks :*:
+#ifdef INOTIFY
+                 Mail :*: MBox :*:
+#endif
+#ifdef DATEZONE
+                 DateZone :*:
+#endif
+                 MarqueePipeReader :*: ()
 runnableTypes = undefined
