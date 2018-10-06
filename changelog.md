@@ -1,4 +1,10 @@
-## Version 0.28
+## Version 0.28.1 (October, 2018)
+
+Dependencies updated to work with GHC 8.6, avoiding [issue #354].
+
+[issue #354]: https://github.com/jaor/xmobar/issues/356
+
+## Version 0.28 (August, 2018)
 
 _New features_
 
