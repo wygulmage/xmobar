@@ -380,7 +380,7 @@ xmobar --help):
       -C command    --add-command=command  Add to the list of commands to be executed
       -x screen     --screen=screen        On which X screen number to start
 
-    Mail bug reports and suggestions to <xmobar@projects.haskell.org>
+    Mail bug reports and suggestions to <mail@jao.io>
 
 ## The DBus Interface
 

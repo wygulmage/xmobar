@@ -207,7 +207,7 @@ info = "xmobar " ++ showVersion version
         ++ mail ++ "\n" ++ license
 
 mail :: String
-mail = "<xmobar@projects.haskell.org>"
+mail = "<mail@jao.io>"
 
 license :: String
 license = "\nThis program is distributed in the hope that it will be useful," ++
