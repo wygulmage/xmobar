@@ -187,10 +187,10 @@ runVolumeWith opts mixerName controlName = do
 
     getFormatDB :: VolumeOpts -> Maybe Integer -> Monitor String
     getFormatDB _ Nothing = unavailable
-    getFormatDB opts (Just d) = formatDb opts d
+    getFormatDB opts' (Just d) = formatDb opts' d
 
     getFormatSwitch :: VolumeOpts -> Maybe Bool -> Monitor String
     getFormatSwitch _ Nothing = unavailable
-    getFormatSwitch opts (Just sw) = formatSwitch opts sw
+    getFormatSwitch opts' (Just sw) = formatSwitch opts' sw
 
     unavailable = getConfigValue naString
