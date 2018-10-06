@@ -1,3 +1,10 @@
+## Version 0.29
+
+_New features_
+
+  - New `Alsa` monitor for volume display that doesn't use polling, by
+    Daniel Schüssler.
+
 ## Version 0.28.1 (October, 2018)
 
 Dependencies updated to work with GHC 8.6, avoiding [issue #354].
