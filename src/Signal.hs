@@ -88,26 +88,28 @@ withDeferSignals thing = do
 
   let signals =
         filter (not . flip inSignalSet reservedSignals)
-          [ sigHUP
-          -- , sigINT -- Handler already installed by GHC
-          , sigQUIT
-          , sigILL
-          , sigABRT
-          , sigFPE
-          , sigSEGV
-          --, sigPIPE -- Handler already installed by GHC
-          , sigALRM
+          [ sigQUIT
           , sigTERM
-          , sigBUS
-          , sigPOLL
-          , sigPROF
-          , sigSYS
-          , sigTRAP
-          , sigVTALRM
-          , sigXCPU
-          , sigXFSZ
-          -- , sigUSR1 -- Handled by setupSignalHandler
-          -- , sigUSR2 -- Handled by setupSignalHandler
+          --, sigINT -- Handler already installed by GHC
+          --, sigPIPE -- Handler already installed by GHC
+          --, sigUSR1 -- Handled by setupSignalHandler
+          --, sigUSR2 -- Handled by setupSignalHandler
+
+          -- One of the following appears to cause instability, see #360
+          --, sigHUP
+          --, sigILL
+          --, sigABRT
+          --, sigFPE
+          --, sigSEGV
+          --, sigALRM
+          --, sigBUS
+          --, sigPOLL
+          --, sigPROF
+          --, sigSYS
+          --, sigTRAP
+          --, sigVTALRM
+          --, sigXCPU
+          --, sigXFSZ
           ]
 
   for_ signals $ \s ->
