@@ -17,7 +17,7 @@ module IPC.DBus (runIPC) where
 import DBus
 import DBus.Client hiding (interfaceName)
 import qualified DBus.Client as DC
-import Control.Monad (when)
+import Data.Maybe (isNothing)
 import Control.Concurrent.STM
 import Control.Exception (handle)
 import System.IO (stderr, hPutStrLn)
@@ -57,10 +57,17 @@ sendSignalMethod mvst = makeMethod sendSignalName
     sendSignalName = memberName_ "SendSignal"
 
     sendSignalMethodCall :: MethodCall -> DBusR Reply
-    sendSignalMethodCall mc = liftIO $ do
-        when ( methodCallMember mc == sendSignalName )
-             $ mapM_ (sendSignal . fromVariant) (methodCallBody mc)
-        return ( ReplyReturn [] )
+    sendSignalMethodCall mc = liftIO $
+        if methodCallMember mc == sendSignalName
+          then do
+            let signals :: [Maybe SignalType]
+                signals = map fromVariant (methodCallBody mc)
+            mapM_ sendSignal signals
+            if any isNothing signals
+              then return ( ReplyError errorInvalidParameters [] )
+              else return ( ReplyReturn [] )
+          else
+            return ( ReplyError errorUnknownMethod [] )
 
     sendSignal :: Maybe SignalType -> IO ()
     sendSignal = maybe (return ()) (atomically . putTMVar mvst)
