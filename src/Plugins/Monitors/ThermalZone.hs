@@ -34,12 +34,16 @@ runThermalZone :: [String] -> Monitor String
 runThermalZone args = do
     let zone = head args
         file = "/sys/class/thermal/thermal_zone" ++ zone ++ "/temp"
-        handleIOError :: IOException -> IO B.ByteString
-        handleIOError _ = return (B.pack "-1")
+        handleIOError :: IOException -> IO (Maybe B.ByteString)
+        handleIOError _ = return Nothing
         parse = return . (read :: String -> Int) . B.unpack
     exists <- io $ fileExist file
     if exists
-      then do mdegrees <- io $ catch ( B.readFile file) handleIOError >>= parse
-              temp <- showWithColors show (mdegrees `quot` 1000)
-              parseTemplate [ temp ]
+      then do contents <- io $ catch (fmap Just $ B.readFile file) handleIOError
+              case contents of
+                Just d -> do
+                  mdegrees <- parse d
+                  temp <- showWithColors show (mdegrees `quot` 1000)
+                  parseTemplate [ temp ]
+                Nothing -> getConfigValue naString
       else getConfigValue naString
