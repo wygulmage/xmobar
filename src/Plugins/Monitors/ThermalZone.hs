@@ -20,6 +20,7 @@ module Plugins.Monitors.ThermalZone (thermalZoneConfig, runThermalZone) where
 import Plugins.Monitors.Common
 
 import System.Posix.Files (fileExist)
+import Control.Exception (IOException, catch)
 import qualified Data.ByteString.Char8 as B
 
 -- | Default thermal configuration.
@@ -33,10 +34,12 @@ runThermalZone :: [String] -> Monitor String
 runThermalZone args = do
     let zone = head args
         file = "/sys/class/thermal/thermal_zone" ++ zone ++ "/temp"
+        handleIOError :: IOException -> IO B.ByteString
+        handleIOError _ = return (B.pack "-1")
         parse = return . (read :: String -> Int) . B.unpack
     exists <- io $ fileExist file
     if exists
-      then do mdegrees <- io $ B.readFile file >>= parse
+      then do mdegrees <- io $ catch ( B.readFile file) handleIOError >>= parse
               temp <- showWithColors show (mdegrees `quot` 1000)
               parseTemplate [ temp ]
       else getConfigValue naString
