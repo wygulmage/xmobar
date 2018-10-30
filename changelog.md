@@ -4,6 +4,7 @@ _New features_
 
   - New `Alsa` monitor for volume display that doesn't use polling, by
     Daniel Schüssler.
+  - `ThermalZone` retries reading missing files, thanks to Reed Koser
 
 ## Version 0.28.1 (October, 2018)
 
