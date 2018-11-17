@@ -5,6 +5,13 @@ _New features_
   - New `Alsa` monitor for volume display that doesn't use polling, by
     Daniel Schüssler.
   - `ThermalZone` retries reading missing files, thanks to Reed Koser
+  - `TopProc` ignores kernel threads (see also [issue #369])
+
+_Bug fixes_
+
+  - Correctly parsing configuration option `mwClass`
+
+[issue #369]: https://github.com/jaor/xmobar/issues/369
 
 ## Version 0.28.1 (October, 2018)
 
