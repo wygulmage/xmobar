@@ -4,8 +4,8 @@ _New features_
 
   - New `Alsa` monitor for volume display that doesn't use polling, by
     Daniel Schüssler.
-  - `ThermalZone` retries reading missing files, thanks to Reed Koser
-  - `TopProc` ignores kernel threads (see also [issue #369])
+  - `ThermalZone` retries reading missing files, thanks to Reed Koser.
+  - `TopProc` ignores kernel threads (see also [issue #369]).
 
 _Bug fixes_
 
@@ -17,7 +17,7 @@ _Bug fixes_
 
 Dependencies updated to work with GHC 8.6, avoiding [issue #354].
 
-[issue #354]: https://github.com/jaor/xmobar/issues/356
+[issue #354]: https://github.com/jaor/xmobar/issues/354
 
 ## Version 0.28 (August, 2018)
 
