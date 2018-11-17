@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Top
--- Copyright   :  (c) 2010, 2011, 2012, 2013, 2014 Jose A Ortega Ruiz
+-- Copyright   :  (c) 2010, 2011, 2012, 2013, 2014, 2018 Jose A Ortega Ruiz
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A Ortega Ruiz <jao@gnu.org>
@@ -68,9 +68,18 @@ getProcessData pidf =
   where readWords = fmap (statWords . words) . hGetLine
         ign = const (return []) :: SomeException -> IO [String]
 
+memPages :: [String] -> String
+memPages fs = fs!!23
+
+ppid :: [String] -> String
+ppid fs = fs!!3
+
+skip :: [String] -> Bool
+skip fs = length fs < 24 || memPages fs == "0" || ppid fs == "0"
+
 handleProcesses :: ([String] -> a) -> IO [a]
 handleProcesses f =
-  fmap (foldl' (\a p -> if length p < 15 then a else f p : a) [])
+  fmap (foldl' (\a p -> if skip p then a else f p : a) [])
        (processes >>= mapM getProcessData)
 
 showInfo :: String -> String -> Float -> Monitor [String]
