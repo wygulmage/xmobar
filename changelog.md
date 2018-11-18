@@ -9,7 +9,7 @@ _New features_
 
 _Bug fixes_
 
-  - Correctly parsing configuration option `mwClass`
+  - Correctly parsing configuration options `mwClass` and `wmName`.
 
 [issue #369]: https://github.com/jaor/xmobar/issues/369
 
