@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Plugins.Monitors.Alsa
+module Xmobar.Plugins.Monitors.Alsa
   ( startAlsaPlugin
   , withMonitorWaiter
   , parseOptsIncludingMonitorArgs
@@ -23,8 +23,8 @@ import Control.Concurrent
 import Control.Concurrent.Async
 import Control.Exception
 import Control.Monad
-import Plugins.Monitors.Common
-import Plugins.Monitors.Volume(volumeConfig, VolumeOpts, runVolumeWith)
+import Xmobar.Plugins.Monitors.Common
+import Xmobar.Plugins.Monitors.Volume(volumeConfig, VolumeOpts, runVolumeWith)
 import qualified Plugins.Monitors.Volume as Volume;
 import System.Console.GetOpt
 import System.Directory
