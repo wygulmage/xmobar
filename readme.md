@@ -342,6 +342,16 @@ formats suitable for being displayed by the dzen2 status bar, wmii's
 status bar or xmobar's `StdinReader`.  See [i3status manual] for
 further details.
 
+### Dynamically sizing xmobar
+
+See [this idea] by Jonas Camillus Jeppensen for a way of adapting
+dynamically xmobar's size and run it alongside a system tray widget
+such as trayer or stalonetray (although the idea is not limited to
+trays, really).  For your convenience, there is a version of Jonas'
+script in [samples/padding-icon.sh](./samples/padding-icon.sh).
+
+[this idea]: https://github.com/jaor/xmobar/issues/239#issuecomment-233206552
+
 ## Command Line Options
 
 xmobar can be either configured with a configuration file or with
