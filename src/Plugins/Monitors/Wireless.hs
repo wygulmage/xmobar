@@ -42,12 +42,14 @@ parseOpts argv =
 
 wirelessConfig :: IO MConfig
 wirelessConfig =
-  mkMConfig "<essid> <quality>" ["essid", "quality", "qualitybar", "qualityvbar", "qualityipat"]
+  mkMConfig "<essid> <quality>"
+            ["essid", "quality", "qualitybar", "qualityvbar", "qualityipat"]
 
 runWireless :: String -> [String] -> Monitor String
 runWireless iface args = do
   opts <- io $ parseOpts args
-  wi <- io $ getWirelessInfo iface
+  iface' <- if "" == iface then io findInterface else return iface
+  wi <- io $ getWirelessInfo iface'
   na <- getConfigValue naString
   let essid = wiEssid wi
       qlty = fromIntegral $ wiQuality wi
@@ -60,3 +62,9 @@ runWireless iface args = do
   qvb <- showVerticalBar qlty (qlty / 100)
   qipat <- showIconPattern (qualityIconPattern opts) (qlty / 100)
   parseTemplate [ep, q, qb, qvb, qipat]
+
+findInterface :: IO String
+findInterface = do
+  c <- readFile "/proc/net/wireless"
+  let nds = lines c
+  return $ if length nds > 2 then takeWhile (/= 'c') (nds!!2) else []

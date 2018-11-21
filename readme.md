@@ -769,8 +769,9 @@ something like:
 
 ### `Wireless Interface Args RefreshRate`
 
+- If set to "", the interface is looked up in /proc/net/wireless.
 - Aliases to the interface name with the suffix "wi": thus, `Wireless
-  "wlan0" []` can be used as `%wlan0wi%`
+  "wlan0" []` can be used as `%wlan0wi%`, and `Wireless "" []` as `%wi%`.
 - Args: default monitor arguments, plus:
   - `--quality-icon-pattern`: dynamic string for connection quality in `qualityipat`.
 - Variables that can be used with the `-t`/`--template` argument:

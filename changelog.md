@@ -6,6 +6,8 @@ _New features_
     Daniel Schüssler.
   - `ThermalZone` retries reading missing files, thanks to Reed Koser.
   - `TopProc` ignores kernel threads (see also [issue #369]).
+  - `Wireless` simple autodetection of wirless interface name (if set
+    to "").
 
 _Bug fixes_
 
