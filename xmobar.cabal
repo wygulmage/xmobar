@@ -92,7 +92,7 @@ flag with_conduit
   default: False
 
 library
-    hs-source-dirs:  src
+    hs-source-dirs:  src/lib
 
     exposed-modules: Xmobar,
                      Xmobar.Actions,
@@ -243,7 +243,7 @@ library
        cpp-options: -DUVMETER
 
 executable xmobar
-    hs-source-dirs:     app
+    hs-source-dirs:     src/app
     main-is:            Main.hs
     other-modules:      Paths_xmobar, Configuration
     build-depends:      base,
@@ -271,7 +271,7 @@ executable xmobar
 
 test-suite XmobarTest
   type:           exitcode-stdio-1.0
-  hs-source-dirs: src, test
+  hs-source-dirs: src/lib, test
   main-is:        Spec.hs
   build-depends: base,
                  containers,
