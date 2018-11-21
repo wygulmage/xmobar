@@ -7,7 +7,7 @@ module Plugins.Monitors.AlsaSpec
 import Control.Concurrent
 import Control.Concurrent.Async
 import Control.Monad
-import Plugins.Monitors.Alsa
+import Xmobar.Plugins.Monitors.Alsa
 import System.FilePath
 import System.IO
 import System.IO.Temp

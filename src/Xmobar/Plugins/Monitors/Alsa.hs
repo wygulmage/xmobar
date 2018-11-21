@@ -24,8 +24,7 @@ import Control.Concurrent.Async
 import Control.Exception
 import Control.Monad
 import Xmobar.Plugins.Monitors.Common
-import Xmobar.Plugins.Monitors.Volume(volumeConfig, VolumeOpts, runVolumeWith)
-import qualified Plugins.Monitors.Volume as Volume;
+import qualified Xmobar.Plugins.Monitors.Volume as Volume;
 import System.Console.GetOpt
 import System.Directory
 import System.Exit
@@ -33,7 +32,7 @@ import System.IO
 import System.Process
 
 data AlsaOpts = AlsaOpts
-    { aoVolumeOpts :: VolumeOpts
+    { aoVolumeOpts :: Volume.VolumeOpts
     , aoAlsaCtlPath :: Maybe FilePath
     }
 
@@ -75,10 +74,10 @@ startAlsaPlugin mixerName controlName args cb = do
         -- it, which probably isn't going to happen with the default
         -- optimization settings).
         opts2 <- io $ parseOpts args2
-        runVolumeWith (aoVolumeOpts opts2) mixerName controlName
+        Volume.runVolumeWith (aoVolumeOpts opts2) mixerName controlName
 
   withMonitorWaiter mixerName (aoAlsaCtlPath opts) $ \wait_ ->
-    runMB args volumeConfig run wait_ cb
+    runMB args Volume.volumeConfig run wait_ cb
 
 withMonitorWaiter :: String -> Maybe FilePath -> (IO () -> IO a) -> IO a
 withMonitorWaiter mixerName alsaCtlPath cont = do
