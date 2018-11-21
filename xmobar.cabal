@@ -158,7 +158,6 @@ library
       X11 >= 1.6.1,
       mtl >= 2.1 && < 2.3,
       parsec == 3.1.*,
-      parsec-numbers >= 0.1.0,
       stm >= 2.3 && < 2.6,
       async
 
@@ -246,7 +245,7 @@ library
 executable xmobar
     hs-source-dirs:     app
     main-is:            Main.hs
-    other-modules:      Paths_xmobar
+    other-modules:      Paths_xmobar, Configuration
     build-depends:      base,
                         containers,
                         async,
@@ -254,6 +253,8 @@ executable xmobar
                         directory,
                         filepath,
                         unix,
+                        parsec,
+                        parsec-numbers >= 0.1.0,
                         xmobar
 
     ghc-options: -funbox-strict-fields -Wall -fno-warn-unused-do-bind

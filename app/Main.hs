@@ -29,7 +29,6 @@ import Data.Foldable (for_)
 import Data.List (intercalate)
 import qualified Data.Map as Map
 
-import Paths_xmobar (version)
 import Data.Version (showVersion)
 import Graphics.X11.Xlib
 import System.Console.GetOpt
@@ -44,6 +43,9 @@ import Control.Monad (unless)
 import Text.Read (readMaybe)
 
 import Xmobar.Signal (setupSignalHandler, withDeferSignals)
+
+import Paths_xmobar (version)
+import Configuration
 
 -- $main
 
