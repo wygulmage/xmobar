@@ -33,6 +33,18 @@ import Xmobar.XUtil
 
 -- $window
 
+-- | Creates a window with the attribute override_redirect set to True.
+-- Windows Managers should not touch this kind of windows.
+newWindow :: Display -> Screen -> Window -> Rectangle -> Bool -> IO Window
+newWindow dpy scr rw (Rectangle x y w h) o = do
+  let visual = defaultVisualOfScreen scr
+      attrmask = if o then cWOverrideRedirect else 0
+  allocaSetWindowAttributes $
+         \attributes -> do
+           set_override_redirect attributes o
+           createWindow dpy rw x y w h 0 (defaultDepthOfScreen scr)
+                        inputOutput visual attrmask attributes
+
 -- | The function to create the initial window
 createWin :: Display -> XFont -> Config -> IO (Rectangle,Window)
 createWin d fs c = do
@@ -41,7 +53,7 @@ createWin d fs c = do
   rootw <- rootWindow d dflt
   (as,ds) <- textExtents fs "0"
   let ht = as + ds + 4
-      r = setPosition c (position c) srs (fi ht)
+      r = setPosition c (position c) srs (fromIntegral ht)
   win <- newWindow  d (defaultScreenOfDisplay d) rootw r (overrideRedirect c)
   setProperties c d win
   setStruts r c d win srs
@@ -55,10 +67,13 @@ repositionWin d win fs c = do
   srs <- getScreenInfo d
   (as,ds) <- textExtents fs "0"
   let ht = as + ds + 4
-      r = setPosition c (position c) srs (fi ht)
+      r = setPosition c (position c) srs (fromIntegral ht)
   moveResizeWindow d win (rect_x r) (rect_y r) (rect_width r) (rect_height r)
   setStruts r c d win srs
   return r
+
+fi :: (Integral a, Num b) => a -> b
+fi = fromIntegral
 
 setPosition :: Config -> XPosition -> [Rectangle] -> Dimension -> Rectangle
 setPosition c p rs ht =

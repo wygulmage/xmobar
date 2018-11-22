@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  XUtil
@@ -19,12 +21,9 @@ module Xmobar.XUtil
     , textExtents
     , textWidth
     , printString
-    , newWindow
     , nextEvent'
     , readFileSafe
     , hGetLineSafe
-    , io
-    , fi
     ) where
 
 import Control.Concurrent
@@ -41,12 +40,9 @@ import System.Posix.Types (Fd(..))
 import System.IO
 
 #if defined XFT || defined UTF8
-# if __GLASGOW_HASKELL__ < 612
-import qualified System.IO.UTF8 as UTF8 (readFile,hGetLine)
-# else
-import qualified System.IO as UTF8 (readFile,hGetLine)
-# endif
+import qualified System.IO as S (readFile,hGetLine)
 #endif
+
 #if defined XFT
 import Xmobar.MinXft
 import Graphics.X11.Xrender
@@ -56,14 +52,14 @@ import Xmobar.ColorCache
 
 readFileSafe :: FilePath -> IO String
 #if defined XFT || defined UTF8
-readFileSafe = UTF8.readFile
+readFileSafe = S.readFile
 #else
 readFileSafe = readFile
 #endif
 
 hGetLineSafe :: Handle -> IO String
 #if defined XFT || defined UTF8
-hGetLineSafe = UTF8.hGetLine
+hGetLineSafe = S.hGetLine
 #else
 hGetLineSafe = hGetLine
 #endif
@@ -91,11 +87,7 @@ initFont d s =
                initFont d miscFixedFont
 #endif
        else
-#if defined UTF8 ||  __GLASGOW_HASKELL__ >= 612
            fmap Utf8 $ initUtf8Font d s
-#else
-           fmap Core $ initCoreFont d s
-#endif
 
 miscFixedFont :: String
 miscFixedFont = "-misc-fixed-*-*-*-*-*-*-*-*-*-*-*-*"
@@ -115,7 +107,6 @@ initCoreFont d s = do
 --  not valid the default font will be loaded and returned.
 initUtf8Font :: Display -> String -> IO FontSet
 initUtf8Font d s = do
-  setupLocale
   (_,_,f) <- handle fallBack getIt
   addFinalizer f (freeFontSet d f)
   return f
@@ -126,7 +117,6 @@ initUtf8Font d s = do
 #ifdef XFT
 initXftFont :: Display -> String -> IO [AXftFont]
 initXftFont d s = do
-  setupLocale
   let fontNames = wordsBy (== ',') (drop 4 s)
   mapM openFont fontNames
   where
@@ -142,8 +132,8 @@ initXftFont d s = do
 #endif
 
 textWidth :: Display -> XFont -> String -> IO Int
-textWidth _   (Utf8 fs) s = return $ fi $ wcTextEscapement fs s
-textWidth _   (Core fs) s = return $ fi $ Xlib.textWidth fs s
+textWidth _   (Utf8 fs) s = return $ fromIntegral $ wcTextEscapement fs s
+textWidth _   (Core fs) s = return $ fromIntegral $ Xlib.textWidth fs s
 #ifdef XFT
 textWidth dpy (Xft xftdraw) s = do
     gi <- xftTxtExtents' dpy xftdraw s
@@ -156,13 +146,13 @@ textExtents (Core fs) s = do
   return (a,d)
 textExtents (Utf8 fs) s = do
   let (_,rl)  = wcTextExtents fs s
-      ascent  = fi $ - (rect_y rl)
-      descent = fi $ rect_height rl + fi (rect_y rl)
+      ascent  = fromIntegral $ - (rect_y rl)
+      descent = fromIntegral $ rect_height rl + fromIntegral (rect_y rl)
   return (ascent, descent)
 #ifdef XFT
 textExtents (Xft xftfonts) _ = do
-  ascent  <- fi `fmap` xft_ascent'  xftfonts
-  descent <- fi `fmap` xft_descent' xftfonts
+  ascent  <- fromIntegral `fmap` xft_ascent'  xftfonts
+  descent <- fromIntegral `fmap` xft_descent' xftfonts
   return (ascent, descent)
 #endif
 
@@ -179,7 +169,7 @@ printString d p (Utf8 fs) gc fc bc x y s a =
     withColors d [fc, bc] $ \[fc', bc'] -> do
       setForeground d gc fc'
       when (a == 255) (setBackground d gc bc')
-      io $ wcDrawImageString d p fs gc x y s
+      liftIO $ wcDrawImageString d p fs gc x y s
 
 #ifdef XFT
 printString dpy drw fs@(Xft fonts) _ fc bc x y s al =
@@ -191,18 +181,6 @@ printString dpy drw fs@(Xft fonts) _ fc bc x y s al =
     drawXftString' draw fc' fonts (toInteger x) (toInteger y) s
 #endif
 
-
--- | Creates a window with the attribute override_redirect set to True.
--- Windows Managers should not touch this kind of windows.
-newWindow :: Display -> Screen -> Window -> Rectangle -> Bool -> IO Window
-newWindow dpy scr rw (Rectangle x y w h) o = do
-  let visual = defaultVisualOfScreen scr
-      attrmask = if o then cWOverrideRedirect else 0
-  allocaSetWindowAttributes $
-         \attributes -> do
-           set_override_redirect attributes o
-           createWindow dpy rw x y w h 0 (defaultDepthOfScreen scr)
-                        inputOutput visual attrmask attributes
 -- | A version of nextEvent that does not block in foreign calls.
 nextEvent' :: Display -> XEventPtr -> IO ()
 nextEvent' d p = do
@@ -214,22 +192,3 @@ nextEvent' d p = do
             nextEvent' d p
  where
     fd = connectionNumber d
-
-io :: MonadIO m => IO a -> m a
-io = liftIO
-
--- | Short-hand for 'fromIntegral'
-fi :: (Integral a, Num b) => a -> b
-fi = fromIntegral
-
-#if __GLASGOW_HASKELL__ < 612 && (defined XFT || defined UTF8)
-#include <locale.h>
-foreign import ccall unsafe "locale.h setlocale"
-    setlocale :: CInt -> CString -> IO CString
-
-setupLocale :: IO ()
-setupLocale = withCString "" (setlocale $ #const LC_ALL) >> return ()
-# else
-setupLocale :: IO ()
-setupLocale = return ()
-#endif

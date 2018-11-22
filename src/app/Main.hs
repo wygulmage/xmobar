@@ -40,6 +40,7 @@ import System.Posix.Files
 import Control.Concurrent.Async (Async, cancel)
 import Control.Exception (bracket)
 import Control.Monad (unless)
+import Control.Monad.IO.Class (liftIO)
 import Text.Read (readMaybe)
 
 import Xmobar.Signal (setupSignalHandler, withDeferSignals)
@@ -100,9 +101,9 @@ splitTemplate conf =
 -- | Reads the configuration files or quits with an error
 readConfig :: FilePath -> IO (Config,[String])
 readConfig f = do
-  file <- io $ fileExist f
-  s <- io $ if file then readFileSafe f else error $
-               f ++ ": file not found!\n" ++ usage
+  file <- liftIO $ fileExist f
+  s <- liftIO $ if file then readFileSafe f else error $
+                  f ++ ": file not found!\n" ++ usage
   either (\err -> error $ f ++
                     ": configuration file contains errors at:\n" ++ show err)
          return $ parseConfig s
@@ -123,10 +124,10 @@ getXdgConfigFile = fmap (</> "xmobarrc") xmobarConfigDir
 readDefaultConfig :: IO (Config,[String])
 readDefaultConfig = do
   xdgConfigFile <- getXdgConfigFile
-  xdgConfigFileExists <- io $ fileExist xdgConfigFile
-  home <- io $ getEnv "HOME"
+  xdgConfigFileExists <- liftIO $ fileExist xdgConfigFile
+  home <- liftIO $ getEnv "HOME"
   let defaultConfigFile = home ++ "/.xmobarrc"
-  defaultConfigFileExists <- io $ fileExist defaultConfigFile
+  defaultConfigFileExists <- liftIO $ fileExist defaultConfigFile
   if xdgConfigFileExists
     then readConfig xdgConfigFile
     else if defaultConfigFileExists

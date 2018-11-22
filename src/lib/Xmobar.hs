@@ -253,14 +253,14 @@ updateString :: Config -> TVar [String]
 updateString conf v = do
   s <- readTVarIO v
   let l:c:r:_ = s ++ repeat ""
-  io $ mapM (parseString conf) [l, c, r]
+  liftIO $ mapM (parseString conf) [l, c, r]
 
 updateActions :: XConf -> Rectangle -> [[(Widget, String, Int, Maybe [Action])]]
                  -> IO [([Action], Position, Position)]
 updateActions conf (Rectangle _ _ wid _) ~[left,center,right] = do
   let (d,fs) = (display &&& fontListS) conf
       strLn :: [(Widget, String, Int, Maybe [Action])] -> IO [(Maybe [Action], Position, Position)]
-      strLn  = io . mapM getCoords
+      strLn  = liftIO . mapM getCoords
       iconW i = maybe 0 Bitmap.width (lookup i $ iconS conf)
       getCoords (Text s,_,i,a) = textWidth d (fs!!i) s >>= \tw -> return (a, 0, fi tw)
       getCoords (Icon s,_,_,a) = return (a, 0, fi $ iconW s)
@@ -288,46 +288,46 @@ drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
   r <- ask
   let (c,d) = (config &&& display) r
       (w,(fs,vs)) = (window &&& fontListS &&& verticalOffsets) r
-      strLn = io . mapM getWidth
+      strLn = liftIO . mapM getWidth
       iconW i = maybe 0 Bitmap.width (lookup i $ iconS r)
       getWidth (Text s,cl,i,_) =
         textWidth d (fs!!i) s >>= \tw -> return (Text s,cl,i,fi tw)
       getWidth (Icon s,cl,i,_) = return (Icon s,cl,i,fi $ iconW s)
 
-  p <- io $ createPixmap d w wid ht
+  p <- liftIO $ createPixmap d w wid ht
                          (defaultDepthOfScreen (defaultScreenOfDisplay d))
 #if XFT
-  when (alpha c /= 255) (io $ drawBackground d p (bgColor c) (alpha c) wr)
+  when (alpha c /= 255) (liftIO $ drawBackground d p (bgColor c) (alpha c) wr)
 #endif
   withColors d [bgColor c, borderColor c] $ \[bgcolor, bdcolor] -> do
-    gc <- io $ createGC  d w
+    gc <- liftIO $ createGC  d w
 #if XFT
     when (alpha c == 255) $ do
 #else
     do
 #endif
-      io $ setForeground d gc bgcolor
-      io $ fillRectangle d p gc 0 0 wid ht
+      liftIO $ setForeground d gc bgcolor
+      liftIO $ fillRectangle d p gc 0 0 wid ht
     -- write to the pixmap the new string
     printStrings p gc fs vs 1 L =<< strLn left
     printStrings p gc fs vs 1 R =<< strLn right
     printStrings p gc fs vs 1 C =<< strLn center
     -- draw border if requested
-    io $ drawBorder (border c) (borderWidth c) d p gc bdcolor wid ht
+    liftIO $ drawBorder (border c) (borderWidth c) d p gc bdcolor wid ht
     -- copy the pixmap with the new string to the window
-    io $ copyArea d p w gc 0 0 wid ht 0 0
+    liftIO $ copyArea d p w gc 0 0 wid ht 0 0
     -- free up everything (we do not want to leak memory!)
-    io $ freeGC d gc
-    io $ freePixmap d p
+    liftIO $ freeGC d gc
+    liftIO $ freePixmap d p
     -- resync
-    io $ sync d True
+    liftIO $ sync d True
 
 verticalOffset :: (Integral b, Integral a, MonadIO m) =>
                   a -> Widget -> XFont -> Int -> Config -> m b
 verticalOffset ht (Text t) fontst voffs _
   | voffs > -1 = return $ fi voffs
   | otherwise = do
-     (as,ds) <- io $ textExtents fontst t
+     (as,ds) <- liftIO $ textExtents fontst t
      let margin = (fi ht - fi ds - fi as) `div` 2
      return $ fi as + margin - 1
 verticalOffset ht (Icon _) _ _ conf
@@ -355,8 +355,8 @@ printStrings dr gc fontlist voffs offs a sl@((s,c,i,l):xs) = do
                  (f,    _) -> (f, bgColor conf)
   valign <- verticalOffset ht s (head fontlist) (voffs !! i) conf
   case s of
-    (Text t) -> io $ printString d dr fontst gc fc bc offset valign t alph
-    (Icon p) -> io $ maybe (return ())
+    (Text t) -> liftIO $ printString d dr fontst gc fc bc offset valign t alph
+    (Icon p) -> liftIO $ maybe (return ())
                            (drawBitmap d dr gc fc bc offset valign)
                            (lookup p (iconS r))
   printStrings dr gc fontlist voffs (offs + l) a xs
