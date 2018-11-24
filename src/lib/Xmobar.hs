@@ -15,10 +15,11 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar (xmobar) where
+module Xmobar (xmobar, Runnable (..)) where
 
 import Xmobar.EventLoop (startLoop, startCommand)
 import Xmobar.Config
+import Xmobar.Runnable
 
 import Data.Foldable (for_)
 import qualified Data.Map as Map

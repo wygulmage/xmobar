@@ -12,9 +12,9 @@
 --
 -----------------------------------------------------------------------------
 
-module Plugins.HelloWorld where
+module Xmobar.Plugins.HelloWorld where
 
-import Plugins
+import Xmobar.Plugins
 
 data HelloWorld = HelloWorld
     deriving (Read, Show)
