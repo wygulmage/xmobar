@@ -95,19 +95,12 @@ library
     hs-source-dirs:  src/lib
 
     exposed-modules: Xmobar,
+                     Xmobar.Types,
+                     Xmobar.Config,
                      Xmobar.Actions,
                      Xmobar.Bitmap,
-                     Xmobar.Config,
-                     Xmobar.Parsers,
                      Xmobar.Commands,
-                     Xmobar.Localize,
-                     Xmobar.XUtil,
-                     Xmobar.StatFS,
                      Xmobar.Runnable,
-                     Xmobar.ColorCache,
-                     Xmobar.Window,
-                     Xmobar.Signal,
-                     Xmobar.Environment,
                      Xmobar.Plugins,
                      Xmobar.Plugins.BufferedPipeReader,
                      Xmobar.Plugins.CommandReader,
@@ -138,6 +131,17 @@ library
                      Xmobar.Plugins.Monitors.Uptime,
                      Xmobar.Plugins.Monitors.Bright,
                      Xmobar.Plugins.Monitors.CatInt
+
+    other-modules: Xmobar.Localize,
+                   Xmobar.Parsers,
+                   Xmobar.XUtil,
+                   Xmobar.StatFS,
+                   Xmobar.ColorCache,
+                   Xmobar.Window,
+                   Xmobar.Draw,
+                   Xmobar.Signal,
+                   Xmobar.Environment,
+                   Xmobar.EventLoop
 
     extra-libraries: Xrandr Xrender
 
@@ -297,6 +301,8 @@ test-suite XmobarTest
   other-modules: Plugins.Monitors.CommonSpec,
                  Xmobar.Commands,
                  Xmobar.Signal,
+                 Xmobar.XUtil,
+                 Xmobar.ColorCache,
                  Xmobar.Plugins,
                  Xmobar.Plugins.Utils,
                  Xmobar.Plugins.Monitors.Common

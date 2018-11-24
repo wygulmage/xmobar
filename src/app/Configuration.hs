@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts, CPP #-}
 
 ------------------------------------------------------------------------------
 -- |
@@ -17,13 +17,32 @@
 ------------------------------------------------------------------------------
 
 
-module Configuration (parseConfig) where
+module Configuration (readConfig, readDefaultConfig) where
 
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Number (int)
 import Text.ParserCombinators.Parsec.Perm ((<|?>), (<$?>), permute)
+import Control.Monad.IO.Class (liftIO)
+
+import System.Posix.Files
+import System.FilePath ((</>))
+import System.Environment
+import System.Directory (getHomeDirectory)
+
+import Xmobar.Config
 
 import qualified Xmobar.Config as C
+
+#if defined XFT || defined UTF8
+import qualified System.IO as S (readFile,hGetLine)
+#endif
+
+readFileSafe :: FilePath -> IO String
+#if defined XFT || defined UTF8
+readFileSafe = S.readFile
+#else
+readFileSafe = readFile
+#endif
 
 stripComments :: String -> String
 stripComments =
@@ -156,3 +175,39 @@ commandsErr = "commands: this usually means that a command could not" ++
               "\nbe parsed." ++
               "\nThe error could be located at the begining of the command" ++
               "\nwhich follows the offending one."
+
+-- | Reads the configuration files or quits with an error
+readConfig :: FilePath -> String -> IO (Config,[String])
+readConfig f usage = do
+  file <- liftIO $ fileExist f
+  s <- liftIO $ if file then readFileSafe f else error $
+                  f ++ ": file not found!\n" ++ usage
+  either (\err -> error $ f ++
+                    ": configuration file contains errors at:\n" ++ show err)
+         return $ parseConfig s
+
+xdgConfigDir :: IO String
+xdgConfigDir = do env <- getEnvironment
+                  case lookup "XDG_CONFIG_HOME" env of
+                       Just val -> return val
+                       Nothing  -> fmap (</> ".config") getHomeDirectory
+
+xmobarConfigDir :: IO FilePath
+xmobarConfigDir = fmap (</> "xmobar") xdgConfigDir
+
+getXdgConfigFile :: IO FilePath
+getXdgConfigFile = fmap (</> "xmobarrc") xmobarConfigDir
+
+-- | Read default configuration file or load the default config
+readDefaultConfig :: String -> IO (Config,[String])
+readDefaultConfig usage = do
+  xdgConfigFile <- getXdgConfigFile
+  xdgConfigFileExists <- liftIO $ fileExist xdgConfigFile
+  home <- liftIO $ getEnv "HOME"
+  let defaultConfigFile = home ++ "/.xmobarrc"
+  defaultConfigFileExists <- liftIO $ fileExist defaultConfigFile
+  if xdgConfigFileExists
+    then readConfig xdgConfigFile usage
+    else if defaultConfigFileExists
+         then readConfig defaultConfigFile usage
+         else return (defaultConfig,[])

@@ -17,7 +17,6 @@
 module Xmobar.Plugins
     ( Exec (..)
     , tenthSeconds
-    , readFileSafe
     , hGetLineSafe
     ) where
 

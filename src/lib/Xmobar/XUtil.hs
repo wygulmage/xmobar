@@ -22,7 +22,6 @@ module Xmobar.XUtil
     , textWidth
     , printString
     , nextEvent'
-    , readFileSafe
     , hGetLineSafe
     ) where
 
@@ -40,7 +39,7 @@ import System.Posix.Types (Fd(..))
 import System.IO
 
 #if defined XFT || defined UTF8
-import qualified System.IO as S (readFile,hGetLine)
+import qualified System.IO as S (hGetLine)
 #endif
 
 #if defined XFT
@@ -49,13 +48,6 @@ import Graphics.X11.Xrender
 #endif
 
 import Xmobar.ColorCache
-
-readFileSafe :: FilePath -> IO String
-#if defined XFT || defined UTF8
-readFileSafe = S.readFile
-#else
-readFileSafe = readFile
-#endif
 
 hGetLineSafe :: Handle -> IO String
 #if defined XFT || defined UTF8

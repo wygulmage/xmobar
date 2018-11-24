@@ -13,126 +13,35 @@
 --
 -----------------------------------------------------------------------------
 
-module Main ( -- * Main Stuff
-              -- $main
-              main
-            , readConfig
-            , readDefaultConfig
-            ) where
+module Main (main) where
 
-import Xmobar
-import Xmobar.Parsers
-import Xmobar.Config
-import Xmobar.XUtil
-
-import Data.Foldable (for_)
 import Data.List (intercalate)
-import qualified Data.Map as Map
 
 import Data.Version (showVersion)
-import Graphics.X11.Xlib
 import System.Console.GetOpt
-import System.Directory (getHomeDirectory)
 import System.Exit
-import System.Environment
-import System.FilePath ((</>))
-import System.Posix.Files
-import Control.Concurrent.Async (Async, cancel)
-import Control.Exception (bracket)
+import System.Environment (getArgs)
 import Control.Monad (unless)
-import Control.Monad.IO.Class (liftIO)
 import Text.Read (readMaybe)
 
-import Xmobar.Signal (setupSignalHandler, withDeferSignals)
+import Xmobar (xmobar)
+import Xmobar.Config
 
 import Paths_xmobar (version)
-import Configuration
+import Configuration (readConfig, readDefaultConfig)
 
 -- $main
 
 -- | The main entry point
 main :: IO ()
-main = withDeferSignals $ do
-  initThreads
-  d <- openDisplay ""
-  args <- getArgs
-  (o,file) <- getOpts args
+main = do
+  (o,file) <- getArgs >>= getOpts
   (c,defaultings) <- case file of
-                       [cfgfile] -> readConfig cfgfile
-                       _ -> readDefaultConfig
-
+                       [cfgfile] -> readConfig cfgfile usage
+                       _ -> readDefaultConfig usage
   unless (null defaultings) $ putStrLn $
     "Fields missing from config defaulted: " ++ intercalate "," defaultings
-
-  conf  <- doOpts c o
-  fs    <- initFont d (font conf)
-  fl    <- mapM (initFont d) (additionalFonts conf)
-  cls   <- mapM (parseTemplate conf) (splitTemplate conf)
-  sig   <- setupSignalHandler
-  bracket (mapM (mapM $ startCommand sig) cls)
-          cleanupThreads
-          $ \vars -> do
-    (r,w) <- createWin d fs conf
-    let ic = Map.empty
-        to = textOffset conf
-        ts = textOffsets conf ++ replicate (length fl) (-1)
-    startLoop (XConf d r w (fs:fl) (to:ts) ic conf) sig vars
-
-cleanupThreads :: [[([Async ()], a)]] -> IO ()
-cleanupThreads vars =
-  -- putStrLn "In cleanupThreads"
-  for_ (concat vars) $ \(asyncs, _) ->
-    for_ asyncs cancel
-
--- | Splits the template in its parts
-splitTemplate :: Config -> [String]
-splitTemplate conf =
-  case break (==l) t of
-    (le,_:re) -> case break (==r) re of
-                   (ce,_:ri) -> [le, ce, ri]
-                   _         -> def
-    _         -> def
-  where [l, r] = alignSep
-                   (if length (alignSep conf) == 2 then conf else defaultConfig)
-        t = template conf
-        def = [t, "", ""]
-
-
--- | Reads the configuration files or quits with an error
-readConfig :: FilePath -> IO (Config,[String])
-readConfig f = do
-  file <- liftIO $ fileExist f
-  s <- liftIO $ if file then readFileSafe f else error $
-                  f ++ ": file not found!\n" ++ usage
-  either (\err -> error $ f ++
-                    ": configuration file contains errors at:\n" ++ show err)
-         return $ parseConfig s
-
-xdgConfigDir :: IO String
-xdgConfigDir = do env <- getEnvironment
-                  case lookup "XDG_CONFIG_HOME" env of
-                       Just val -> return val
-                       Nothing  -> fmap (</> ".config") getHomeDirectory
-
-xmobarConfigDir :: IO FilePath
-xmobarConfigDir = fmap (</> "xmobar") xdgConfigDir
-
-getXdgConfigFile :: IO FilePath
-getXdgConfigFile = fmap (</> "xmobarrc") xmobarConfigDir
-
--- | Read default configuration file or load the default config
-readDefaultConfig :: IO (Config,[String])
-readDefaultConfig = do
-  xdgConfigFile <- getXdgConfigFile
-  xdgConfigFileExists <- liftIO $ fileExist xdgConfigFile
-  home <- liftIO $ getEnv "HOME"
-  let defaultConfigFile = home ++ "/.xmobarrc"
-  defaultConfigFileExists <- liftIO $ fileExist defaultConfigFile
-  if xdgConfigFileExists
-    then readConfig xdgConfigFile
-    else if defaultConfigFileExists
-         then readConfig defaultConfigFile
-         else return (defaultConfig,[])
+  doOpts c o >>= xmobar
 
 data Opts = Help
           | Version
