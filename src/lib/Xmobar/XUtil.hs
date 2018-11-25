@@ -22,7 +22,6 @@ module Xmobar.XUtil
     , textWidth
     , printString
     , nextEvent'
-    , hGetLineSafe
     ) where
 
 import Control.Concurrent
@@ -36,25 +35,15 @@ import qualified Graphics.X11.Xlib as Xlib (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
 import System.Mem.Weak ( addFinalizer )
 import System.Posix.Types (Fd(..))
-import System.IO
-
-#if defined XFT || defined UTF8
-import qualified System.IO as S (hGetLine)
-#endif
 
 #if defined XFT
 import Xmobar.MinXft
 import Graphics.X11.Xrender
+#else
+import System.IO(hPutStrLn, stderr)
 #endif
 
 import Xmobar.ColorCache
-
-hGetLineSafe :: Handle -> IO String
-#if defined XFT || defined UTF8
-hGetLineSafe = S.hGetLine
-#else
-hGetLineSafe = hGetLine
-#endif
 
 -- Hide the Core Font/Xft switching here
 data XFont = Core FontStruct

@@ -25,6 +25,7 @@ import System.IO
 import Control.Exception (SomeException(..), handle)
 import Xmobar.Plugins
 import Xmobar.Actions (stripActions)
+import Xmobar.Utils (hGetLineSafe)
 
 data StdinReader = StdinReader | UnsafeStdinReader
   deriving (Read, Show)

@@ -32,7 +32,7 @@ import System.Exit
 import System.IO (hClose)
 
 import Xmobar.Signal
-import Xmobar.XUtil
+import Xmobar.Utils (hGetLineSafe)
 
 class Show e => Exec e where
     alias   :: e -> String

@@ -133,6 +133,7 @@ library
 
     other-modules: Xmobar.Localize,
                    Xmobar.Parsers,
+                   Xmobar.Utils,
                    Xmobar.XUtil,
                    Xmobar.StatFS,
                    Xmobar.ColorCache,
@@ -140,8 +141,7 @@ library
                    Xmobar.Draw,
                    Xmobar.Signal,
                    Xmobar.Environment,
-                   Xmobar.EventLoop,
-                   Xmobar.Plugins.Utils
+                   Xmobar.EventLoop
 
     extra-libraries: Xrandr Xrender
 
@@ -302,9 +302,9 @@ test-suite XmobarTest
                  Xmobar.Commands,
                  Xmobar.Signal,
                  Xmobar.XUtil,
+                 Xmobar.Utils,
                  Xmobar.ColorCache,
                  Xmobar.Plugins,
-                 Xmobar.Plugins.Utils,
                  Xmobar.Plugins.Monitors.Common
 
   if flag(with_alsa) || flag(all_extensions)

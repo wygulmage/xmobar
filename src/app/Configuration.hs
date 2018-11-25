@@ -24,12 +24,8 @@ import Text.ParserCombinators.Parsec.Number (int)
 import Text.ParserCombinators.Parsec.Perm ((<|?>), (<$?>), permute)
 import Control.Monad.IO.Class (liftIO)
 
-import System.Posix.Files
-import System.FilePath ((</>))
 import System.Environment
-import System.Directory (getHomeDirectory)
-
-import Xmobar.Config
+import System.Posix.Files (fileExist)
 
 import qualified Xmobar.Config as C
 
@@ -177,7 +173,7 @@ commandsErr = "commands: this usually means that a command could not" ++
               "\nwhich follows the offending one."
 
 -- | Reads the configuration files or quits with an error
-readConfig :: FilePath -> String -> IO (Config,[String])
+readConfig :: FilePath -> String -> IO (C.Config,[String])
 readConfig f usage = do
   file <- liftIO $ fileExist f
   s <- liftIO $ if file then readFileSafe f else error $
@@ -186,22 +182,10 @@ readConfig f usage = do
                     ": configuration file contains errors at:\n" ++ show err)
          return $ parseConfig s
 
-xdgConfigDir :: IO String
-xdgConfigDir = do env <- getEnvironment
-                  case lookup "XDG_CONFIG_HOME" env of
-                       Just val -> return val
-                       Nothing  -> fmap (</> ".config") getHomeDirectory
-
-xmobarConfigDir :: IO FilePath
-xmobarConfigDir = fmap (</> "xmobar") xdgConfigDir
-
-getXdgConfigFile :: IO FilePath
-getXdgConfigFile = fmap (</> "xmobarrc") xmobarConfigDir
-
 -- | Read default configuration file or load the default config
-readDefaultConfig :: String -> IO (Config,[String])
+readDefaultConfig :: String -> IO (C.Config,[String])
 readDefaultConfig usage = do
-  xdgConfigFile <- getXdgConfigFile
+  xdgConfigFile <- C.getXdgConfigFile
   xdgConfigFileExists <- liftIO $ fileExist xdgConfigFile
   home <- liftIO $ getEnv "HOME"
   let defaultConfigFile = home ++ "/.xmobarrc"
@@ -210,4 +194,4 @@ readDefaultConfig usage = do
     then readConfig xdgConfigFile usage
     else if defaultConfigFileExists
          then readConfig defaultConfigFile usage
-         else return (defaultConfig,[])
+         else return (C.defaultConfig,[])

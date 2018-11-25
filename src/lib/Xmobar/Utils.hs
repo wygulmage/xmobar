@@ -1,7 +1,9 @@
+{-# LANGUAGE CPP #-}
+
 ------------------------------------------------------------------------------
 -- |
--- Module: Plugins.Utils
--- Copyright: (c) 2010 Jose Antonio Ortega Ruiz
+-- Module: Utils
+-- Copyright: (c) 2010, 2018 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: Jose A Ortega Ruiz <jao@gnu.org>
@@ -15,18 +17,30 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.Plugins.Utils (expandHome, changeLoop, safeHead) where
+module Xmobar.Utils (expandHome, changeLoop, safeHead, hGetLineSafe) where
 
 import Control.Monad
 import Control.Concurrent.STM
 
 import System.Environment
 import System.FilePath
+import System.IO
+
+#if defined XFT || defined UTF8
+import qualified System.IO as S (hGetLine)
+#endif
+
+hGetLineSafe :: Handle -> IO String
+#if defined XFT || defined UTF8
+hGetLineSafe = S.hGetLine
+#else
+hGetLineSafe = hGetLine
+#endif
 
 
 expandHome :: FilePath -> IO FilePath
 expandHome ('~':'/':path) = fmap (</> path) (getEnv "HOME")
-expandHome p              = return p
+expandHome p = return p
 
 changeLoop :: Eq a => STM a -> (a -> IO ()) -> IO ()
 changeLoop s f = atomically s >>= go

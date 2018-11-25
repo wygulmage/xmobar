@@ -15,7 +15,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar (xmobar, Runnable (..)) where
+module Xmobar (xmobar, Runnable (..), module Xmobar.Config) where
 
 import Xmobar.EventLoop (startLoop, startCommand)
 import Xmobar.Config
@@ -30,7 +30,6 @@ import Control.Exception (bracket)
 
 import Xmobar.Parsers
 import Xmobar.XUtil
-import Xmobar.Config()
 import Xmobar.Signal (setupSignalHandler, withDeferSignals)
 import Xmobar.Window
 import Xmobar.Types

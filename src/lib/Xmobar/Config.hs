@@ -21,8 +21,12 @@ module Xmobar.Config
     , XPosition (..), Align (..), Border(..)
     , defaultConfig
     , runnableTypes
+    , getXdgConfigFile
     ) where
 
+import System.Environment
+import System.Directory (getHomeDirectory)
+import System.FilePath ((</>))
 
 import Xmobar.Commands
 import {-# SOURCE #-} Xmobar.Runnable
@@ -168,3 +172,15 @@ runnableTypes :: Command :*: Monitors :*: Date :*: PipeReader :*:
 #endif
                  MarqueePipeReader :*: ()
 runnableTypes = undefined
+
+xdgConfigDir :: IO String
+xdgConfigDir = do env <- getEnvironment
+                  case lookup "XDG_CONFIG_HOME" env of
+                       Just val -> return val
+                       Nothing  -> fmap (</> ".config") getHomeDirectory
+
+xmobarConfigDir :: IO FilePath
+xmobarConfigDir = fmap (</> "xmobar") xdgConfigDir
+
+getXdgConfigFile :: IO FilePath
+getXdgConfigFile = fmap (</> "xmobarrc") xmobarConfigDir

@@ -17,8 +17,6 @@
 module Xmobar.Plugins
     ( Exec (..)
     , tenthSeconds
-    , hGetLineSafe
     ) where
 
 import Xmobar.Commands
-import Xmobar.XUtil

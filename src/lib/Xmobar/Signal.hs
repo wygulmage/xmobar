@@ -33,7 +33,7 @@ import DBus (IsVariant(..))
 import Control.Monad ((>=>))
 #endif
 
-import Xmobar.Plugins.Utils (safeHead)
+import Xmobar.Utils (safeHead)
 
 data WakeUp = WakeUp deriving (Show,Typeable)
 instance Exception WakeUp

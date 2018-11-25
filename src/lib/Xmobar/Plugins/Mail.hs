@@ -17,7 +17,7 @@ module Xmobar.Plugins.Mail where
 
 import Xmobar.Plugins
 #ifdef INOTIFY
-import Xmobar.Plugins.Utils (expandHome, changeLoop)
+import Xmobar.Utils (expandHome, changeLoop)
 
 import Control.Monad
 import Control.Concurrent.STM
