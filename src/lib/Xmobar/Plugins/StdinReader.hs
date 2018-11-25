@@ -23,7 +23,7 @@ import System.Posix.Process
 import System.Exit
 import System.IO
 import Control.Exception (SomeException(..), handle)
-import Xmobar.Plugins
+import Xmobar.Commands
 import Xmobar.Actions (stripActions)
 import Xmobar.Utils (hGetLineSafe)
 

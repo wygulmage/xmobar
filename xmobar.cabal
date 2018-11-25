@@ -99,7 +99,6 @@ library
                      Xmobar.Actions,
                      Xmobar.Commands,
                      Xmobar.Runnable,
-                     Xmobar.Plugins,
                      Xmobar.Plugins.BufferedPipeReader,
                      Xmobar.Plugins.CommandReader,
                      Xmobar.Plugins.Date,
@@ -308,7 +307,6 @@ test-suite XmobarTest
                      Xmobar.Plugins.Monitors.Alsa
                      Plugins.Monitors.AlsaSpec
                      Xmobar.Commands
-                     Xmobar.Plugins
                      Xmobar.Plugins.Monitors.Common
                      Xmobar.System.Signal
                      Xmobar.Utils

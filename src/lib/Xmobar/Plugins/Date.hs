@@ -19,7 +19,7 @@
 
 module Xmobar.Plugins.Date (Date(..)) where
 
-import Xmobar.Plugins
+import Xmobar.Commands
 
 #if ! MIN_VERSION_time(1,5,0)
 import System.Locale

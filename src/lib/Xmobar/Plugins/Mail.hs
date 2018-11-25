@@ -15,7 +15,7 @@
 
 module Xmobar.Plugins.Mail where
 
-import Xmobar.Plugins
+import Xmobar.Commands
 #ifdef INOTIFY
 import Xmobar.Utils (expandHome, changeLoop)
 

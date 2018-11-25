@@ -14,9 +14,6 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins
-    ( Exec (..)
-    , tenthSeconds
-    ) where
+module Xmobar.Plugins (Exec (..)) where
 
 import Xmobar.Commands

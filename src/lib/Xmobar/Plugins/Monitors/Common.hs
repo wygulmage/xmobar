@@ -76,7 +76,8 @@ import Text.ParserCombinators.Parsec
 import System.Console.GetOpt
 import Control.Exception (SomeException,handle)
 
-import Xmobar.Plugins
+import Xmobar.Commands
+
 -- $monitor
 
 type Monitor a = ReaderT MConfig IO a

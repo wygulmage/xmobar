@@ -16,7 +16,7 @@
 module Xmobar.Plugins.MBox (MBox(..)) where
 
 import Prelude
-import Xmobar.Plugins
+import Xmobar.Commands
 #ifdef INOTIFY
 import Xmobar.Utils (changeLoop, expandHome)
 
