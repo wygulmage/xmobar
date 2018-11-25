@@ -15,7 +15,7 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.X11.Types (X , XConf (..)) where
+module Xmobar.X11.Types (X, XConf (..)) where
 
 import Graphics.X11.Xlib
 import Control.Monad.Reader

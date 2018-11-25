@@ -24,7 +24,7 @@ import System.Directory (doesFileExist)
 import System.FilePath ((</>))
 import System.Mem.Weak ( addFinalizer )
 import Xmobar.X11.ColorCache
-import Xmobar.Parsers (Widget(..))
+import Xmobar.X11.Parsers (Widget(..))
 import Xmobar.Actions (Action)
 
 #ifdef XPM

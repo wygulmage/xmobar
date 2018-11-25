@@ -10,23 +10,16 @@
 -- Stability   :  unstable
 -- Portability :  unportable
 --
--- Parsers needed for Xmobar, a text based status bar
+-- Parsing for template substrings
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Parsers
-    ( parseString
-    , parseTemplate
-    , Widget(..)
-    ) where
+module Xmobar.X11.Parsers (parseString, Widget(..)) where
 
 import Xmobar.Config
-import Xmobar.Runnable
-import Xmobar.Commands
 import Xmobar.Actions
 
 import Control.Monad (guard, mzero)
-import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
 import Graphics.X11.Types (Button)
 
@@ -151,43 +144,3 @@ fontParser c a = do
 -- | Parses a color specification (hex or named)
 colors :: Parser String
 colors = many1 (alphaNum <|> char ',' <|> char '#')
-
--- | Parses the output template string
-templateStringParser :: Config -> Parser (String,String,String)
-templateStringParser c = do
-  s   <- allTillSep c
-  com <- templateCommandParser c
-  ss  <- allTillSep c
-  return (com, s, ss)
-
--- | Parses the command part of the template string
-templateCommandParser :: Config -> Parser String
-templateCommandParser c =
-  let chr = char . head . sepChar
-  in  between (chr c) (chr c) (allTillSep c)
-
--- | Combines the template parsers
-templateParser :: Config -> Parser [(String,String,String)]
-templateParser = many . templateStringParser
-
--- | Actually runs the template parsers
-parseTemplate :: Config -> String -> IO [(Runnable,String,String)]
-parseTemplate c s =
-    do str <- case parse (templateParser c) "" s of
-                Left _  -> return [("", s, "")]
-                Right x -> return x
-       let cl = map alias (commands c)
-           m  = Map.fromList $ zip cl (commands c)
-       return $ combine c m str
-
--- | Given a finite "Map" and a parsed template produce the resulting
--- output string.
-combine :: Config -> Map.Map String Runnable
-           -> [(String, String, String)] -> [(Runnable,String,String)]
-combine _ _ [] = []
-combine c m ((ts,s,ss):xs) = (com, s, ss) : combine c m xs
-    where com  = Map.findWithDefault dflt ts m
-          dflt = Run $ Com ts [] [] 10
-
-allTillSep :: Config -> Parser String
-allTillSep = many . noneOf . sepChar

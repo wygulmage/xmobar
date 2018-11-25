@@ -100,13 +100,14 @@ library
                      Xmobar.Commands,
                      Xmobar.Runnable
 
-    other-modules: Xmobar.Parsers,
+    other-modules: Xmobar.Template,
                    Xmobar.Utils,
                    Xmobar.System.StatFS,
                    Xmobar.System.Environment,
                    Xmobar.System.Localize,
                    Xmobar.System.Signal,
                    Xmobar.System.Kbd,
+                   Xmobar.X11.Parsers,
                    Xmobar.X11.Types,
                    Xmobar.X11.XUtil,
                    Xmobar.X11.Bitmap,
