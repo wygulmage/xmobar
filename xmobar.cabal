@@ -103,7 +103,7 @@ library
     other-modules: Xmobar.Utils,
                    Xmobar.Run.Types,
                    Xmobar.Run.Template,
-                   Xmobar.Run.EventLoop,
+                   Xmobar.App.EventLoop,
                    Xmobar.System.StatFS,
                    Xmobar.System.Environment,
                    Xmobar.System.Localize,

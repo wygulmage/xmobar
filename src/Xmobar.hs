@@ -47,7 +47,6 @@ import Control.Exception (bracket)
 import Xmobar.Config
 import Xmobar.Run.Runnable
 import Xmobar.Run.Template
-import Xmobar.Run.EventLoop (startLoop, startCommand)
 import Xmobar.System.Signal (setupSignalHandler, withDeferSignals)
 import Xmobar.X11.Types
 import Xmobar.X11.XUtil
@@ -69,19 +68,7 @@ import Xmobar.Plugins.Monitors
 import Xmobar.Plugins.PipeReader
 import Xmobar.Plugins.StdinReader
 import Xmobar.Plugins.XMonadLog
-
-
-splitTemplate :: Config -> [String]
-splitTemplate conf =
-  case break (==l) t of
-    (le,_:re) -> case break (==r) re of
-                   (ce,_:ri) -> [le, ce, ri]
-                   _         -> def
-    _         -> def
-  where [l, r] = alignSep
-                   (if length (alignSep conf) == 2 then conf else defaultConfig)
-        t = template conf
-        def = [t, "", ""]
+import Xmobar.App.EventLoop (startLoop, startCommand)
 
 xmobar :: Config -> IO ()
 xmobar conf = withDeferSignals $ do
@@ -89,7 +76,8 @@ xmobar conf = withDeferSignals $ do
   d <- openDisplay ""
   fs    <- initFont d (font conf)
   fl    <- mapM (initFont d) (additionalFonts conf)
-  cls   <- mapM (parseCommands conf) (splitTemplate conf)
+  cls   <- mapM (parseTemplate (commands conf) (sepChar conf))
+                (splitTemplate (alignSep conf) (template conf))
   sig   <- setupSignalHandler
   bracket (mapM (mapM $ startCommand sig) cls)
           cleanupThreads

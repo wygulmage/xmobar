@@ -15,51 +15,64 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.Run.Template(parseCommands) where
+module Xmobar.Run.Template(parseTemplate, splitTemplate) where
 
 import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
 
 import Xmobar.Run.Commands
 import Xmobar.Run.Runnable
-import Xmobar.Config
+
+defaultAlign :: String
+defaultAlign = "}{"
+
+allTillSep :: String -> Parser String
+allTillSep = many . noneOf
 
 -- | Parses the output template string
-templateStringParser :: Config -> Parser (String,String,String)
-templateStringParser c = do
-  s   <- allTillSep c
-  com <- templateCommandParser c
-  ss  <- allTillSep c
+templateStringParser :: String -> Parser (String,String,String)
+templateStringParser sepChar = do
+  s   <- allTillSep sepChar
+  com <- templateCommandParser sepChar
+  ss  <- allTillSep sepChar
   return (com, s, ss)
 
 -- | Parses the command part of the template string
-templateCommandParser :: Config -> Parser String
-templateCommandParser c =
-  let chr = char . head . sepChar
-  in  between (chr c) (chr c) (allTillSep c)
+templateCommandParser :: String -> Parser String
+templateCommandParser sepChar =
+  let chr = char (head sepChar) in between chr chr (allTillSep sepChar)
 
 -- | Combines the template parsers
-templateParser :: Config -> Parser [(String,String,String)]
-templateParser = many . templateStringParser
+templateParser :: String -> Parser [(String,String,String)]
+templateParser s = many $ templateStringParser s
 
 -- | Actually runs the template parsers
-parseCommands :: Config -> String -> IO [(Runnable,String,String)]
-parseCommands c s =
-    do str <- case parse (templateParser c) "" s of
+parseTemplate :: [Runnable] -> String -> String -> IO [(Runnable,String,String)]
+parseTemplate c sepChar s =
+    do str <- case parse (templateParser sepChar) "" s of
                 Left _  -> return [("", s, "")]
                 Right x -> return x
-       let cl = map alias (commands c)
-           m  = Map.fromList $ zip cl (commands c)
+       let cl = map alias c
+           m  = Map.fromList $ zip cl c
        return $ combine c m str
 
 -- | Given a finite "Map" and a parsed template produce the resulting
 -- output string.
-combine :: Config -> Map.Map String Runnable
-           -> [(String, String, String)] -> [(Runnable,String,String)]
+combine :: [Runnable] -> Map.Map String Runnable -> [(String, String, String)]
+           -> [(Runnable,String,String)]
 combine _ _ [] = []
 combine c m ((ts,s,ss):xs) = (com, s, ss) : combine c m xs
     where com  = Map.findWithDefault dflt ts m
           dflt = Run $ Com ts [] [] 10
 
-allTillSep :: Config -> Parser String
-allTillSep = many . noneOf . sepChar
+-- | Given an two-char alignment separator and a template string,
+-- splits it into its segments, that can then be parsed via parseCommands
+splitTemplate :: String -> String -> [String]
+splitTemplate alignSep template =
+  case break (==l) template of
+    (le,_:re) -> case break (==r) re of
+                   (ce,_:ri) -> [le, ce, ri]
+                   _         -> def
+    _         -> def
+  where [l, r] = if (length alignSep == 2) then alignSep else defaultAlign
+        def = [template, "", ""]
