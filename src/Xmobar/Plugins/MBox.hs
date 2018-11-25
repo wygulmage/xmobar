@@ -18,7 +18,8 @@ module Xmobar.Plugins.MBox (MBox(..)) where
 import Prelude
 import Xmobar.Run.Commands
 #ifdef INOTIFY
-import Xmobar.Utils (changeLoop, expandHome)
+
+import Xmobar.System.Utils (changeLoop, expandHome)
 
 import Control.Monad (when)
 import Control.Concurrent.STM

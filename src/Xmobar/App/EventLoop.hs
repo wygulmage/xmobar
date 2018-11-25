@@ -36,18 +36,18 @@ import Data.Bits
 import Data.Map hiding (foldr, map, filter)
 import Data.Maybe (fromJust, isJust)
 
-import Xmobar.Utils
 import Xmobar.System.Signal
 import Xmobar.Config.Types
-import Xmobar.X11.Actions
 import Xmobar.Run.Commands
 import Xmobar.Run.Runnable
+import Xmobar.X11.Actions
 import Xmobar.X11.Parsers
 import Xmobar.X11.Window
 import Xmobar.X11.Text
 import Xmobar.X11.Draw
 import Xmobar.X11.Bitmap as Bitmap
 import Xmobar.X11.Types
+import Xmobar.X11.Events(nextEvent')
 
 #ifdef XFT
 import Graphics.X11.Xft

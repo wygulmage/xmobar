@@ -21,7 +21,7 @@ import Control.Monad
 import Graphics.X11.Xlib.Extras
 import Xmobar.Run.Commands
 import Xmobar.System.Kbd
-import Xmobar.Utils (nextEvent')
+import Xmobar.X11.Events (nextEvent')
 
 data Locks = Locks
     deriving (Read, Show)

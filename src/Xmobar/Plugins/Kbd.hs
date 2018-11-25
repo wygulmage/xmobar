@@ -21,7 +21,7 @@ import Graphics.X11.Xlib
 import Graphics.X11.Xlib.Extras
 
 import Xmobar.Run.Commands
-import Xmobar.Utils (nextEvent')
+import Xmobar.X11.Events (nextEvent')
 import Xmobar.System.Kbd
 
 

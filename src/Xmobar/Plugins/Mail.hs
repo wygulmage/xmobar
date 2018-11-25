@@ -17,7 +17,8 @@ module Xmobar.Plugins.Mail(Mail(..)) where
 
 import Xmobar.Run.Commands
 #ifdef INOTIFY
-import Xmobar.Utils (expandHome, changeLoop)
+
+import Xmobar.System.Utils (expandHome, changeLoop)
 
 import Control.Monad
 import Control.Concurrent.STM

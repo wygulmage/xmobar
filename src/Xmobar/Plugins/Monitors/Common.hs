@@ -76,7 +76,7 @@ import Text.ParserCombinators.Parsec
 import System.Console.GetOpt
 import Control.Exception (SomeException,handle)
 
-import Xmobar.Utils
+import Xmobar.Run.Commands
 
 -- $monitor
 
