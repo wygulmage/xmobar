@@ -17,7 +17,7 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.X11.EventLoop (startLoop, startCommand) where
+module Xmobar.Run.EventLoop (startLoop, startCommand) where
 
 import Prelude hiding (lookup)
 import Graphics.X11.Xlib hiding (textExtents, textWidth)

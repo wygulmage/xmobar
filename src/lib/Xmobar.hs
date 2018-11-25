@@ -47,9 +47,9 @@ import Control.Exception (bracket)
 import Xmobar.Config
 import Xmobar.Run.Runnable
 import Xmobar.Run.Template
+import Xmobar.Run.EventLoop (startLoop, startCommand)
 import Xmobar.System.Signal (setupSignalHandler, withDeferSignals)
 import Xmobar.X11.Types
-import Xmobar.X11.EventLoop (startLoop, startCommand)
 import Xmobar.X11.XUtil
 import Xmobar.X11.Window
 import Xmobar.Plugins.BufferedPipeReader
