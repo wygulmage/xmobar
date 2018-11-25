@@ -28,7 +28,7 @@ import Xmobar.Parsers (Widget(..))
 import Xmobar.Actions (Action)
 
 #ifdef XPM
-import Xmobar.XPMFile(readXPMFile)
+import Xmobar.X11.XPMFile(readXPMFile)
 import Control.Applicative((<|>))
 #endif
 

@@ -1587,11 +1587,11 @@ Spencer Janssen, Roman Joost, Jochen Keil, Lennart Kolmodin, Krzysztof
 Kosciuszkiewicz, Dmitry Kurochkin, Todd Lunter, Vanessa McHale, Robert
 J. Macomber, Dmitry Malikov, David McLean, Marcin Mikołajczyk, Dino
 Morelli, Tony Morris, Eric Mrak, Thiago Negri, Edward O'Callaghan,
-Svein Ove, Martin Perner, Jens Petersen, Alexander Polakov, Petr
-Rockai, Andrew Sackville-West, Markus Scherer, Daniel Schüssler,
-Olivier Schneider, Alexander Shabalin, Valentin Shirokov, Peter
-Simons, Alexander Solovyov, Will Song, John Soros, Travis Staton,
-Artem Tarasov, Samuli Thomasson, Edward Tjörnhammar, Sergei
+Svein Ove, Martin Perner, Jens Petersen, Alexander Polakov, Pavan
+Rikhi, Petr Rockai, Andrew Sackville-West, Markus Scherer, Daniel
+Schüssler, Olivier Schneider, Alexander Shabalin, Valentin Shirokov,
+Peter Simons, Alexander Solovyov, Will Song, John Soros, Travis
+Staton, Artem Tarasov, Samuli Thomasson, Edward Tjörnhammar, Sergei
 Trofimovich, Thomas Tuegel, Jan Vornberger, Anton Vorontsov, Daniel
 Wagner, Zev Weiss, Phil Xiaojun Hu, Edward Z. Yang and Norbert Zeh.
 

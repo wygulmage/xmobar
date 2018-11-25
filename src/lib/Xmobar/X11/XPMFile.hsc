@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  XPMFile
--- Copyright   :  (C) 2014 Alexander Shabalin
+-- Copyright   :  (C) 2014, 2018 Alexander Shabalin
 -- License     :  BSD3
 --
 -- Maintainer  :  jao@gnu.org
@@ -11,7 +11,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.XPMFile(readXPMFile) where
+module Xmobar.X11.XPMFile(readXPMFile) where
 
 #if MIN_VERSION_mtl(2, 2, 1)
 import Control.Monad.Except(MonadError(..))

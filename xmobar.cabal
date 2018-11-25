@@ -229,7 +229,7 @@ library
 
     if flag(with_xpm) || flag(all_extensions)
        extra-libraries: Xpm
-       other-modules: Xmobar.XPMFile
+       other-modules: Xmobar.X11.XPMFile
        cpp-options: -DXPM
 
     if flag(with_weather) || flag(all_extensions)
