@@ -20,10 +20,10 @@ import Control.Concurrent.STM
 import System.IO
 import System.IO.Unsafe(unsafePerformIO)
 
-import Xmobar.Environment
 import Xmobar.Plugins
 import Xmobar.Utils(hGetLineSafe)
 import Xmobar.System.Signal
+import Xmobar.System.Environment
 
 data BufferedPipeReader = BufferedPipeReader String [(Int, Bool, String)]
     deriving (Read, Show)
@@ -45,7 +45,7 @@ instance Exec BufferedPipeReader where
         writer chan str rst
 
         where
-        initV :: IO ( TChan (Int, Bool, String), TVar (Maybe String), TVar Bool )
+        initV :: IO (TChan (Int, Bool, String), TVar (Maybe String), TVar Bool)
         initV = atomically $ do
             tc <- newTChan
             ts <- newTVar Nothing

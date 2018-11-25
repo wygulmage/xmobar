@@ -15,7 +15,7 @@
 module Xmobar.Plugins.MarqueePipeReader where
 
 import System.IO (openFile, IOMode(ReadWriteMode), Handle)
-import Xmobar.Environment
+import Xmobar.System.Environment
 import Xmobar.Plugins (tenthSeconds, Exec(alias, start))
 import Xmobar.Utils(hGetLineSafe)
 import System.Posix.Files (getFileStatus, isNamedPipe)

@@ -11,10 +11,10 @@
 -- A function to expand environment variables in strings
 --
 -----------------------------------------------------------------------------
-module Xmobar.Environment(expandEnv) where
+module Xmobar.System.Environment(expandEnv) where
 
 import Control.Applicative  ((<$>))
-import Data.Maybe           (fromMaybe)
+import Data.Maybe (fromMaybe)
 import System.Environment   (lookupEnv)
 
 expandEnv :: String -> IO String

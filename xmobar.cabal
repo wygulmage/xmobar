@@ -132,6 +132,7 @@ library
     other-modules: Xmobar.Parsers,
                    Xmobar.Utils,
                    Xmobar.System.StatFS,
+                   Xmobar.System.Environment,
                    Xmobar.System.Localize,
                    Xmobar.System.Signal,
                    Xmobar.X11.Types,
@@ -140,8 +141,7 @@ library
                    Xmobar.X11.EventLoop,
                    Xmobar.X11.ColorCache,
                    Xmobar.X11.Window,
-                   Xmobar.X11.Draw,
-                   Xmobar.Environment
+                   Xmobar.X11.Draw
 
     extra-libraries: Xrandr Xrender
 
@@ -310,6 +310,6 @@ test-suite XmobarTest
                      Xmobar.Commands
                      Xmobar.Plugins
                      Xmobar.Plugins.Monitors.Common
-                     Xmobar.Signal
+                     Xmobar.System.Signal
                      Xmobar.Utils
       cpp-options: -DALSA
