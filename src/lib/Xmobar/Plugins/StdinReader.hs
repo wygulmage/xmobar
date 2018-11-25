@@ -23,9 +23,9 @@ import System.Posix.Process
 import System.Exit
 import System.IO
 import Control.Exception (SomeException(..), handle)
-import Xmobar.Commands
 import Xmobar.Actions (stripActions)
 import Xmobar.Utils (hGetLineSafe)
+import Xmobar.Run.Commands
 
 data StdinReader = StdinReader | UnsafeStdinReader
   deriving (Read, Show)

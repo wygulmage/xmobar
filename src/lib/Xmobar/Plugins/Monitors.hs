@@ -17,7 +17,7 @@
 
 module Xmobar.Plugins.Monitors where
 
-import Xmobar.Commands
+import Xmobar.Run.Commands
 
 import Xmobar.Plugins.Monitors.Common (runM, runMD)
 #ifdef WEATHER

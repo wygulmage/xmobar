@@ -22,7 +22,7 @@
 
 module Xmobar.Plugins.DateZone (DateZone(..)) where
 
-import Xmobar.Commands
+import Xmobar.Run.Commands
 import Xmobar.Utils(tenthSeconds)
 
 #ifdef DATEZONE

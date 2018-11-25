@@ -97,11 +97,12 @@ library
     exposed-modules: Xmobar,
                      Xmobar.Config,
                      Xmobar.Actions,
-                     Xmobar.Commands,
-                     Xmobar.Runnable
+                     Xmobar.Run.Commands,
+                     Xmobar.Run.Runnable
 
-    other-modules: Xmobar.Template,
-                   Xmobar.Utils,
+    other-modules: Xmobar.Utils,
+                   Xmobar.Run.Types,
+                   Xmobar.Run.Template,
                    Xmobar.System.StatFS,
                    Xmobar.System.Environment,
                    Xmobar.System.Localize,
@@ -308,7 +309,7 @@ test-suite XmobarTest
       other-modules: Xmobar.Plugins.Monitors.Volume
                      Xmobar.Plugins.Monitors.Alsa
                      Plugins.Monitors.AlsaSpec
-                     Xmobar.Commands
+                     Xmobar.Run.Commands
                      Xmobar.Plugins.Monitors.Common
                      Xmobar.System.Signal
                      Xmobar.Utils

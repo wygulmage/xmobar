@@ -1,6 +1,6 @@
 {-# LANGUAGE ExistentialQuantification  #-}
-module Xmobar.Runnable where
-import Xmobar.Commands
+module Xmobar.Run.Runnable where
+import Xmobar.Run.Commands
 
 data Runnable = forall r . (Exec r,Read r,Show r) => Run r
 

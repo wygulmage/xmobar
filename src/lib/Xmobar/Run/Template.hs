@@ -15,14 +15,14 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.Template(parseCommands) where
+module Xmobar.Run.Template(parseCommands) where
 
 import qualified Data.Map as Map
 import Text.ParserCombinators.Parsec
 
-import Xmobar.Commands
+import Xmobar.Run.Commands
+import Xmobar.Run.Runnable
 import Xmobar.Config
-import Xmobar.Runnable
 
 -- | Parses the output template string
 templateStringParser :: Config -> Parser (String,String,String)

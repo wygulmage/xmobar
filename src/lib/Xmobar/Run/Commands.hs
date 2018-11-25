@@ -17,7 +17,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Commands (Command (..), Exec (..)) where
+module Xmobar.Run.Commands (Command (..), Exec (..)) where
 
 import Prelude
 import Control.Exception (handle, SomeException(..))

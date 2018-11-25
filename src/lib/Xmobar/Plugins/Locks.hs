@@ -19,7 +19,7 @@ import Data.List
 import Data.Bits
 import Control.Monad
 import Graphics.X11.Xlib.Extras
-import Xmobar.Commands
+import Xmobar.Run.Commands
 import Xmobar.System.Kbd
 import Xmobar.Utils (nextEvent')
 

@@ -16,7 +16,7 @@
 module Xmobar.Plugins.CommandReader(CommandReader(..)) where
 
 import System.IO
-import Xmobar.Commands
+import Xmobar.Run.Commands
 import Xmobar.Utils (hGetLineSafe)
 import System.Process(runInteractiveCommand, getProcessExitCode)
 

@@ -20,7 +20,7 @@ import Control.Monad (forever)
 import Graphics.X11.Xlib
 import Graphics.X11.Xlib.Extras
 
-import Xmobar.Commands
+import Xmobar.Run.Commands
 import Xmobar.Utils (nextEvent')
 import Xmobar.System.Kbd
 

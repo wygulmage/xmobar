@@ -45,8 +45,8 @@ import Control.Concurrent.Async (Async, cancel)
 import Control.Exception (bracket)
 
 import Xmobar.Config
-import Xmobar.Runnable
-import Xmobar.Template
+import Xmobar.Run.Runnable
+import Xmobar.Run.Template
 import Xmobar.System.Signal (setupSignalHandler, withDeferSignals)
 import Xmobar.X11.Types
 import Xmobar.X11.EventLoop (startLoop, startCommand)

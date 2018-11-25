@@ -1,5 +1,3 @@
-{-# LANGUAGE TypeOperators, CPP #-}
-
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Xmobar.Config
@@ -20,36 +18,17 @@ module Xmobar.Config
       Config (..)
     , XPosition (..), Align (..), Border(..)
     , defaultConfig
-    , runnableTypes
     , getXdgConfigFile
     ) where
+
+import Xmobar.Plugins.Date
+import Xmobar.Plugins.StdinReader
 
 import System.Environment
 import System.Directory (getHomeDirectory)
 import System.FilePath ((</>))
 
-import Xmobar.Commands
-import {-# SOURCE #-} Xmobar.Runnable
-import Xmobar.Plugins.Monitors
-import Xmobar.Plugins.Date
-import Xmobar.Plugins.PipeReader
-import Xmobar.Plugins.BufferedPipeReader
-import Xmobar.Plugins.MarqueePipeReader
-import Xmobar.Plugins.CommandReader
-import Xmobar.Plugins.StdinReader
-import Xmobar.Plugins.XMonadLog
-import Xmobar.Plugins.EWMH
-import Xmobar.Plugins.Kbd
-import Xmobar.Plugins.Locks
-
-#ifdef INOTIFY
-import Xmobar.Plugins.Mail
-import Xmobar.Plugins.MBox
-#endif
-
-#ifdef DATEZONE
-import Xmobar.Plugins.DateZone
-#endif
+import Xmobar.Run.Runnable (Runnable(..))
 
 -- $config
 -- Configuration data type and default configuration
@@ -149,29 +128,6 @@ defaultConfig =
            , template = "%StdinReader% }{ " ++
                         "<fc=#00FF00>%uname%</fc> * <fc=#FF0000>%theDate%</fc>"
            }
-
-
--- | An alias for tuple types that is more convenient for long lists.
-type a :*: b = (a, b)
-infixr :*:
-
--- | This is the list of types that can be hidden inside
--- 'Runnable.Runnable', the existential type that stores all commands
--- to be executed by Xmobar. It is used by 'Runnable.readRunnable' in
--- the 'Runnable.Runnable' Read instance. To install a plugin just add
--- the plugin's type to the list of types (separated by ':*:') appearing in
--- this function's type signature.
-runnableTypes :: Command :*: Monitors :*: Date :*: PipeReader :*:
-                 BufferedPipeReader :*: CommandReader :*: StdinReader :*:
-                 XMonadLog :*: EWMH :*: Kbd :*: Locks :*:
-#ifdef INOTIFY
-                 Mail :*: MBox :*:
-#endif
-#ifdef DATEZONE
-                 DateZone :*:
-#endif
-                 MarqueePipeReader :*: ()
-runnableTypes = undefined
 
 xdgConfigDir :: IO String
 xdgConfigDir = do env <- getEnvironment
