@@ -50,13 +50,12 @@ allParsers :: ColorString
            -> FontIndex
            -> Maybe [Action]
            -> Parser [(Widget, ColorString, FontIndex, Maybe [Action])]
-allParsers c f a =
-        textParser c f a
-  <|> try (iconParser c f a)
-  <|> try (rawParser c f a)
-  <|> try (actionParser c f a)
-  <|> try (fontParser c a)
-  <|> colorParser f a
+allParsers c f a =  textParser c f a
+                <|> try (iconParser c f a)
+                <|> try (rawParser c f a)
+                <|> try (actionParser c f a)
+                <|> try (fontParser c a)
+                <|> colorParser f a
 
 -- | Gets the string and combines the needed parsers
 stringParser :: String -> FontIndex -> Maybe [Action]

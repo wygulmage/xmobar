@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.PipeReader where
+module Xmobar.Plugins.PipeReader(PipeReader(..)) where
 
 import System.IO
 import Xmobar.Commands(Exec(..))

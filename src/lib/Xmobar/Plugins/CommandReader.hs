@@ -13,7 +13,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.CommandReader where
+module Xmobar.Plugins.CommandReader(CommandReader(..)) where
 
 import System.IO
 import Xmobar.Commands

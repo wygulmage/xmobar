@@ -13,7 +13,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.Mail where
+module Xmobar.Plugins.Mail(Mail(..)) where
 
 import Xmobar.Commands
 #ifdef INOTIFY

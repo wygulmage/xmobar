@@ -23,7 +23,6 @@
 module Xmobar.Plugins.DateZone (DateZone(..)) where
 
 import Xmobar.Commands
-import Xmobar.Commands(tenthSeconds)
 
 #ifdef DATEZONE
 import Control.Concurrent.STM

@@ -15,7 +15,27 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar (xmobar, Runnable (..), module Xmobar.Config) where
+module Xmobar (xmobar
+              , Runnable (..)
+              , module Xmobar.Config
+              , module Xmobar.Plugins.BufferedPipeReader
+              , module Xmobar.Plugins.CommandReader
+              , module Xmobar.Plugins.Date
+#ifdef DATEZONE
+              , module Xmobar.Plugins.DateZone
+#endif
+              , module Xmobar.Plugins.EWMH
+              , module Xmobar.Plugins.Kbd
+              , module Xmobar.Plugins.Locks
+#ifdef INOTIFY
+              , module Xmobar.Plugins.Mail
+              , module Xmobar.Plugins.MBox
+#endif
+              , module Xmobar.Plugins.Monitors
+              , module Xmobar.Plugins.PipeReader
+              , module Xmobar.Plugins.StdinReader
+              , module Xmobar.Plugins.XMonadLog
+              ) where
 
 import Data.Foldable (for_)
 import qualified Data.Map as Map
@@ -32,6 +52,24 @@ import Xmobar.X11.Types
 import Xmobar.X11.EventLoop (startLoop, startCommand)
 import Xmobar.X11.XUtil
 import Xmobar.X11.Window
+import Xmobar.Plugins.BufferedPipeReader
+import Xmobar.Plugins.CommandReader
+import Xmobar.Plugins.Date
+#ifdef DATEZONE
+import Xmobar.Plugins.DateZone
+#endif
+import Xmobar.Plugins.EWMH
+import Xmobar.Plugins.Kbd
+import Xmobar.Plugins.Locks
+#ifdef INOTIFY
+import Xmobar.Plugins.Mail
+import Xmobar.Plugins.MBox
+#endif
+import Xmobar.Plugins.Monitors
+import Xmobar.Plugins.PipeReader
+import Xmobar.Plugins.StdinReader
+import Xmobar.Plugins.XMonadLog
+
 
 splitTemplate :: Config -> [String]
 splitTemplate conf =

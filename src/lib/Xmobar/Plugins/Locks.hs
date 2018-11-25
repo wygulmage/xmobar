@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.Locks where
+module Xmobar.Plugins.Locks(Locks(..)) where
 
 import Graphics.X11
 import Data.List
@@ -20,7 +20,7 @@ import Data.Bits
 import Control.Monad
 import Graphics.X11.Xlib.Extras
 import Xmobar.Commands
-import Xmobar.Plugins.Kbd
+import Xmobar.System.Kbd
 import Xmobar.Utils (nextEvent')
 
 data Locks = Locks

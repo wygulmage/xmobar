@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.BufferedPipeReader where
+module Xmobar.Plugins.BufferedPipeReader(BufferedPipeReader(..)) where
 
 import Control.Monad(forM_, when, void)
 import Control.Concurrent

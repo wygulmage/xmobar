@@ -13,18 +13,13 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.Kbd where
+module Xmobar.System.Kbd where
 
-import Graphics.X11.Xlib
-import Graphics.X11.Xlib.Extras
 import Foreign
 import Foreign.C.Types
 import Foreign.C.String
-import Control.Monad (forever)
-import Xmobar.Commands
-import Xmobar.Utils (nextEvent')
-import Data.List (isPrefixOf, findIndex)
-import Data.Maybe (fromJust)
+
+import Graphics.X11.Xlib
 
 #include <X11/XKBlib.h>
 #include <X11/extensions/XKB.h>
@@ -96,10 +91,6 @@ getKbdLayout d = alloca $ \stRecPtr -> do
     xkbGetState d 0x100 stRecPtr
     st <- peek stRecPtr
     return $ fromIntegral (group st)
-
---
---
---
 
 data XkbKeyNameRec = XkbKeyNameRec {
     name :: Ptr CChar -- array
@@ -307,7 +298,6 @@ xkbGroupNamesMask = #const XkbGroupNamesMask
 
 type KbdOpts = [(String, String)]
 
--- gets the layout string
 getLayoutStr :: Display -> IO String
 getLayoutStr dpy =  do
         kbdDescPtr <- xkbAllocKeyboard
@@ -329,76 +319,3 @@ getLayoutStr' st dpy kbdDescPtr =
         else -- Behaviour on error
             do
                 return "Error while requesting layout!"
-
-
--- 'Bad' prefixes of layouts
-noLaySymbols :: [String]
-noLaySymbols = ["group", "inet", "ctr", "pc", "ctrl"]
-
-
--- splits the layout string into the actual layouts
-splitLayout :: String -> [String]
-splitLayout s = splitLayout' noLaySymbols $ split s '+'
-
-splitLayout' :: [String] ->  [String] -> [String]
---                  end of recursion, remove empty strings
-splitLayout' [] s = map (takeWhile (\x -> x /= ':')) $ filter (\x -> length x > 0) s
---                    remove current string if it has a 'bad' prefix
-splitLayout' bad s  = splitLayout' (tail bad) [x | x <- s, not $ isPrefixOf (head bad) x]
-
--- split String at each Char
-split :: String -> Char -> [String]
-split [] _ = [""]
-split (c:cs) delim
-    | c == delim = "" : rest
-    | otherwise = (c : head rest) : tail rest
-        where
-            rest = split cs delim
-
--- replaces input string if on search list (exact match) with corresponding
--- element on replacement list.
---
--- if not found, return string unchanged
-searchReplaceLayout :: KbdOpts -> String -> String
-searchReplaceLayout opts s = let c = findIndex (\x -> fst x == s) opts in
-    case c of
-        Nothing -> s
-        x -> let i = (fromJust x) in
-            snd $ opts!!i
-
--- returns the active layout
-getKbdLay :: Display -> KbdOpts -> IO String
-getKbdLay dpy opts = do
-        lay <- getLayoutStr dpy
-        curLay <- getKbdLayout dpy
-        return $ searchReplaceLayout opts $ (splitLayout lay)!!(curLay)
-
-
-
-data Kbd = Kbd [(String, String)]
-        deriving (Read, Show)
-
-instance Exec Kbd where
-        alias (Kbd _) = "kbd"
-        start (Kbd opts) cb = do
-
-            dpy <- openDisplay ""
-
-            -- initial set of layout
-            cb =<< getKbdLay dpy opts
-
-            -- enable listing for
-            -- group changes
-            _ <- xkbSelectEventDetails dpy xkbUseCoreKbd xkbStateNotify xkbAllStateComponentsMask xkbGroupStateMask
-            -- layout/geometry changes
-            _ <- xkbSelectEvents dpy  xkbUseCoreKbd xkbNewKeyboardNotifyMask xkbNewKeyboardNotifyMask
-
-            allocaXEvent $ \e -> forever $ do
-                nextEvent' dpy e
-                _ <- getEvent e
-                cb =<< getKbdLay dpy opts
-
-            closeDisplay dpy
-            return ()
-
--- vim:ft=haskell:ts=4:shiftwidth=4:softtabstop=4:expandtab:foldlevel=20:
