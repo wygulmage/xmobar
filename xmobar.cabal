@@ -300,7 +300,9 @@ test-suite XmobarTest
                  hspec == 2.*,
                  xmobar
 
-  other-modules: Plugins.Monitors.CommonSpec
+  other-modules: Xmobar.Plugins.Monitors.CommonSpec
+                 Xmobar.Plugins.Monitors.Common
+                 Xmobar.Utils
 
   if flag(with_alsa) || flag(all_extensions)
       build-depends: alsa-mixer > 0.2.0.2,
@@ -308,9 +310,6 @@ test-suite XmobarTest
                      process >= 1.4.3.0
       other-modules: Xmobar.Plugins.Monitors.Volume
                      Xmobar.Plugins.Monitors.Alsa
-                     Plugins.Monitors.AlsaSpec
-                     Xmobar.Run.Commands
-                     Xmobar.Plugins.Monitors.Common
-                     Xmobar.System.Signal
-                     Xmobar.Utils
+                     Xmobar.Plugins.Monitors.AlsaSpec
+
       cpp-options: -DALSA

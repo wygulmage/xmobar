@@ -1,4 +1,4 @@
-module Plugins.Monitors.CommonSpec
+module Xmobar.Plugins.Monitors.CommonSpec
   ( main
   , spec
   ) where

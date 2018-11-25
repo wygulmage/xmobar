@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall #-}
-module Plugins.Monitors.AlsaSpec
+module Xmobar.Plugins.Monitors.AlsaSpec
   ( main
   , spec
   ) where
@@ -7,13 +7,14 @@ module Plugins.Monitors.AlsaSpec
 import Control.Concurrent
 import Control.Concurrent.Async
 import Control.Monad
-import Xmobar.Plugins.Monitors.Alsa
 import System.FilePath
 import System.IO
 import System.IO.Temp
 import System.Posix.Files
 import System.Process
 import Test.Hspec
+
+import Xmobar.Plugins.Monitors.Alsa
 
 main :: IO ()
 main = hspec spec
