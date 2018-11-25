@@ -16,9 +16,11 @@
 -----------------------------------------------------------------------------
 
 module Xmobar (xmobar
+              , defaultConfig
+              , getXdgConfigFile
               , Runnable (..)
               , Exec (..)
-              , module Xmobar.Config
+              , module Xmobar.Config.Types
               , module Xmobar.Plugins.BufferedPipeReader
               , module Xmobar.Plugins.CommandReader
               , module Xmobar.Plugins.Date
@@ -40,7 +42,7 @@ module Xmobar (xmobar
 
 import Xmobar.Run.Runnable
 import Xmobar.Run.Commands
-import Xmobar.Config
+import Xmobar.Config.Types
 import Xmobar.Plugins.BufferedPipeReader
 import Xmobar.Plugins.CommandReader
 import Xmobar.Plugins.Date
@@ -59,4 +61,5 @@ import Xmobar.Plugins.PipeReader
 import Xmobar.Plugins.StdinReader
 import Xmobar.Plugins.XMonadLog
 
-import Xmobar.App.Main (xmobar)
+import Xmobar.App.Main(xmobar)
+import Xmobar.App.Defaults(defaultConfig, getXdgConfigFile)

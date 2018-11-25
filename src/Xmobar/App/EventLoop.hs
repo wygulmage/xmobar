@@ -36,9 +36,9 @@ import Data.Bits
 import Data.Map hiding (foldr, map, filter)
 import Data.Maybe (fromJust, isJust)
 
-import Xmobar.Config
 import Xmobar.Utils
 import Xmobar.System.Signal
+import Xmobar.Config.Types
 import Xmobar.X11.Actions
 import Xmobar.Run.Commands
 import Xmobar.Run.Runnable

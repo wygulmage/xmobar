@@ -29,11 +29,11 @@ import Data.Map hiding (foldr, map, filter)
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
 
+import Xmobar.Config.Types
 import qualified Xmobar.X11.Bitmap as B
 import Xmobar.X11.Actions (Action(..))
 import Xmobar.X11.Types
 import Xmobar.X11.XUtil
-import Xmobar.Config
 import Xmobar.X11.ColorCache
 import Xmobar.X11.Window (drawBorder)
 import Xmobar.X11.Parsers (Widget(..))

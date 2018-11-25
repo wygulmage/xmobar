@@ -94,16 +94,17 @@ flag with_conduit
 library
     hs-source-dirs:  src
 
-    exposed-modules: Xmobar,
-                     Xmobar.Config
+    exposed-modules: Xmobar
 
     other-modules: Xmobar.Utils,
+                   Xmobar.Config.Types,
                    Xmobar.Run.Types,
                    Xmobar.Run.Template,
                    Xmobar.Run.Commands,
                    Xmobar.Run.Runnable
                    Xmobar.App.EventLoop,
                    Xmobar.App.Main,
+                   Xmobar.App.Defaults,
                    Xmobar.System.StatFS,
                    Xmobar.System.Environment,
                    Xmobar.System.Localize,

@@ -23,7 +23,7 @@ import Data.Map
 
 import Xmobar.X11.Bitmap
 import Xmobar.X11.XUtil
-import Xmobar.Config
+import Xmobar.Config.Types
 
 -- | The X type is a ReaderT
 type X = ReaderT XConf IO

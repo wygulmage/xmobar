@@ -27,7 +27,7 @@ import Control.Monad.IO.Class (liftIO)
 import System.Environment
 import System.Posix.Files (fileExist)
 
-import qualified Xmobar.Config as C
+import qualified Xmobar as X
 
 #if defined XFT || defined UTF8
 import qualified System.IO as S (readFile,hGetLine)
@@ -50,7 +50,7 @@ stripComments =
 
 -- | Parse the config, logging a list of fields that were missing and replaced
 -- by the default definition.
-parseConfig :: String -> Either ParseError (C.Config,[String])
+parseConfig :: String -> Either ParseError (X.Config,[String])
 parseConfig = runParser parseConf fields "Config" . stripComments
     where
       parseConf = do
@@ -61,7 +61,7 @@ parseConfig = runParser parseConf fields "Config" . stripComments
         s <- getState
         return (x,s)
 
-      perms = permute $ C.Config
+      perms = permute $ X.Config
               <$?> pFont <|?> pFontList <|?> pWmClass <|?> pWmName
               <|?> pBgColor <|?> pFgColor
               <|?> pPosition <|?> pTextOffset <|?> pTextOffsets
@@ -81,33 +81,33 @@ parseConfig = runParser parseConf fields "Config" . stripComments
                   , "alpha", "commands"
                   ]
 
-      pFont = strField C.font "font"
-      pFontList = strListField C.additionalFonts "additionalFonts"
-      pWmClass = strField C.wmClass "wmClass"
-      pWmName = strField C.wmName "wmName"
-      pBgColor = strField C.bgColor "bgColor"
-      pFgColor = strField C.fgColor "fgColor"
-      pBdColor = strField C.borderColor "borderColor"
-      pSepChar = strField C.sepChar "sepChar"
-      pAlignSep = strField C.alignSep "alignSep"
-      pTemplate = strField C.template "template"
+      pFont = strField X.font "font"
+      pFontList = strListField X.additionalFonts "additionalFonts"
+      pWmClass = strField X.wmClass "wmClass"
+      pWmName = strField X.wmName "wmName"
+      pBgColor = strField X.bgColor "bgColor"
+      pFgColor = strField X.fgColor "fgColor"
+      pBdColor = strField X.borderColor "borderColor"
+      pSepChar = strField X.sepChar "sepChar"
+      pAlignSep = strField X.alignSep "alignSep"
+      pTemplate = strField X.template "template"
 
-      pTextOffset = readField C.textOffset "textOffset"
-      pTextOffsets = readIntList C.textOffsets "textOffsets"
-      pIconOffset = readField C.iconOffset "iconOffset"
-      pPosition = readField C.position "position"
-      pHideOnStart = readField C.hideOnStart "hideOnStart"
-      pLowerOnStart = readField C.lowerOnStart "lowerOnStart"
-      pPersistent = readField C.persistent "persistent"
-      pBorder = readField C.border "border"
-      pBdWidth = readField C.borderWidth "borderWidth"
-      pAllDesktops = readField C.allDesktops "allDesktops"
-      pOverrideRedirect = readField C.overrideRedirect "overrideRedirect"
-      pPickBroadest = readField C.pickBroadest "pickBroadest"
-      pIconRoot = readField C.iconRoot "iconRoot"
-      pAlpha = readField C.alpha "alpha"
+      pTextOffset = readField X.textOffset "textOffset"
+      pTextOffsets = readIntList X.textOffsets "textOffsets"
+      pIconOffset = readField X.iconOffset "iconOffset"
+      pPosition = readField X.position "position"
+      pHideOnStart = readField X.hideOnStart "hideOnStart"
+      pLowerOnStart = readField X.lowerOnStart "lowerOnStart"
+      pPersistent = readField X.persistent "persistent"
+      pBorder = readField X.border "border"
+      pBdWidth = readField X.borderWidth "borderWidth"
+      pAllDesktops = readField X.allDesktops "allDesktops"
+      pOverrideRedirect = readField X.overrideRedirect "overrideRedirect"
+      pPickBroadest = readField X.pickBroadest "pickBroadest"
+      pIconRoot = readField X.iconRoot "iconRoot"
+      pAlpha = readField X.alpha "alpha"
 
-      pCommands = field C.commands "commands" readCommands
+      pCommands = field X.commands "commands" readCommands
 
       staticPos = do string "Static"
                      wrapSkip (string "{")
@@ -148,7 +148,7 @@ parseConfig = runParser parseConf fields "Config" . stripComments
       wrapSkip   x = many space >> x >>= \r -> many space >> return r
       sepEndSpc    = mapM_ (wrapSkip . try . string)
       fieldEnd     = many $ space <|> oneOf ",}"
-      field  e n c = (,) (e C.defaultConfig) $
+      field  e n c = (,) (e X.defaultConfig) $
                      updateState (filter (/= n)) >> sepEndSpc [n,"="] >>
                      wrapSkip c >>= \r -> fieldEnd >> return r
       readField a n = field a n $ tillFieldEnd >>= read' n
@@ -173,7 +173,7 @@ commandsErr = "commands: this usually means that a command could not" ++
               "\nwhich follows the offending one."
 
 -- | Reads the configuration files or quits with an error
-readConfig :: FilePath -> String -> IO (C.Config,[String])
+readConfig :: FilePath -> String -> IO (X.Config,[String])
 readConfig f usage = do
   file <- liftIO $ fileExist f
   s <- liftIO $ if file then readFileSafe f else error $
@@ -183,9 +183,9 @@ readConfig f usage = do
          return $ parseConfig s
 
 -- | Read default configuration file or load the default config
-readDefaultConfig :: String -> IO (C.Config,[String])
+readDefaultConfig :: String -> IO (X.Config,[String])
 readDefaultConfig usage = do
-  xdgConfigFile <- C.getXdgConfigFile
+  xdgConfigFile <- X.getXdgConfigFile
   xdgConfigFileExists <- liftIO $ fileExist xdgConfigFile
   home <- liftIO $ getEnv "HOME"
   let defaultConfigFile = home ++ "/.xmobarrc"
@@ -194,4 +194,4 @@ readDefaultConfig usage = do
     then readConfig xdgConfigFile usage
     else if defaultConfigFileExists
          then readConfig defaultConfigFile usage
-         else return (C.defaultConfig,[])
+         else return (X.defaultConfig,[])

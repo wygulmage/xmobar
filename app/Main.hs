@@ -24,8 +24,7 @@ import System.Environment (getArgs)
 import Control.Monad (unless)
 import Text.Read (readMaybe)
 
-import Xmobar (xmobar)
-import Xmobar.Config
+import Xmobar
 
 import Paths_xmobar (version)
 import Configuration (readConfig, readDefaultConfig)

@@ -16,7 +16,7 @@
 
 module Xmobar.X11.Parsers (parseString, Widget(..)) where
 
-import Xmobar.Config
+import Xmobar.Config.Types
 import Xmobar.X11.Actions
 
 import Control.Monad (guard, mzero)

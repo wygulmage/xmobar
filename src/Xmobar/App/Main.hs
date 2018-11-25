@@ -24,7 +24,7 @@ import Graphics.X11.Xlib
 import Control.Concurrent.Async (Async, cancel)
 import Control.Exception (bracket)
 
-import Xmobar.Config
+import Xmobar.Config.Types
 import Xmobar.System.Signal (setupSignalHandler, withDeferSignals)
 import Xmobar.Run.Template
 import Xmobar.X11.Types
