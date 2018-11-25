@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Disk
--- Copyright   :  (c) 2010, 2011, 2012, 2014 Jose A Ortega Ruiz
+-- Copyright   :  (c) 2010, 2011, 2012, 2014, 2018 Jose A Ortega Ruiz
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A Ortega Ruiz <jao@gnu.org>
@@ -15,7 +15,7 @@
 module Xmobar.Plugins.Monitors.Disk (diskUConfig, runDiskU, startDiskIO) where
 
 import Xmobar.Plugins.Monitors.Common
-import Xmobar.StatFS
+import Xmobar.System.StatFS
 
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 

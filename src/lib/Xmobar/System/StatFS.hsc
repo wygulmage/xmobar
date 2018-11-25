@@ -15,7 +15,7 @@
 {-# LANGUAGE CPP, ForeignFunctionInterface, EmptyDataDecls #-}
 
 
-module Xmobar.StatFS ( FileSystemStats(..), getFileSystemStats ) where
+module Xmobar.System.StatFS ( FileSystemStats(..), getFileSystemStats ) where
 
 import Foreign
 import Foreign.C.Types

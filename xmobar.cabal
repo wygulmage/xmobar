@@ -129,10 +129,11 @@ library
                      Xmobar.Plugins.Monitors.Bright,
                      Xmobar.Plugins.Monitors.CatInt
 
-    other-modules: Xmobar.Localize,
-                   Xmobar.Parsers,
+    other-modules: Xmobar.Parsers,
                    Xmobar.Utils,
-                   Xmobar.StatFS,
+                   Xmobar.System.StatFS,
+                   Xmobar.System.Localize,
+                   Xmobar.System.Signal,
                    Xmobar.X11.Types,
                    Xmobar.X11.XUtil,
                    Xmobar.X11.Bitmap,
@@ -140,7 +141,6 @@ library
                    Xmobar.X11.ColorCache,
                    Xmobar.X11.Window,
                    Xmobar.X11.Draw,
-                   Xmobar.Signal,
                    Xmobar.Environment
 
     extra-libraries: Xrandr Xrender
@@ -224,7 +224,7 @@ library
 
     if flag(with_dbus) || flag(all_extensions)
        build-depends: dbus >= 1
-       other-modules: Xmobar.IPC.DBus
+       other-modules: Xmobar.System.DBus
        cpp-options: -DDBUS
 
     if flag(with_xpm) || flag(all_extensions)

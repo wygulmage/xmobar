@@ -31,7 +31,7 @@ import System.Process
 import System.Exit
 import System.IO (hClose)
 
-import Xmobar.Signal
+import Xmobar.System.Signal
 import Xmobar.Utils (hGetLineSafe)
 
 class Show e => Exec e where

@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.IPC.DBus (runIPC) where
+module Xmobar.System.DBus (runIPC) where
 
 import DBus
 import DBus.Client hiding (interfaceName)
@@ -23,7 +23,7 @@ import Control.Exception (handle)
 import System.IO (stderr, hPutStrLn)
 import Control.Monad.IO.Class (liftIO)
 
-import Xmobar.Signal
+import Xmobar.System.Signal
 
 busName :: BusName
 busName = busName_ "org.Xmobar.Control"

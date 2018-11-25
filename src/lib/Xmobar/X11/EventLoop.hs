@@ -36,25 +36,25 @@ import Data.Bits
 import Data.Map hiding (foldr, map, filter)
 import Data.Maybe (fromJust, isJust)
 
-import Xmobar.X11.Bitmap as Bitmap
-import Xmobar.X11.Types
 import Xmobar.Config
 import Xmobar.Parsers
 import Xmobar.Commands
 import Xmobar.Actions
 import Xmobar.Runnable
-import Xmobar.Signal
+import Xmobar.System.Signal
 import Xmobar.X11.Window
 import Xmobar.X11.XUtil
 import Xmobar.Utils
 import Xmobar.X11.Draw
+import Xmobar.X11.Bitmap as Bitmap
+import Xmobar.X11.Types
 
 #ifdef XFT
 import Graphics.X11.Xft
 #endif
 
 #ifdef DBUS
-import Xmobar.IPC.DBus
+import Xmobar.System.DBus
 #endif
 
 runX :: XConf -> X () -> IO ()

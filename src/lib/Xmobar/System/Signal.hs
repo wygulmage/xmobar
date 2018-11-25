@@ -16,7 +16,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Signal where
+module Xmobar.System.Signal where
 
 import Data.Foldable (for_)
 import Data.Typeable (Typeable)
@@ -33,7 +33,9 @@ import DBus (IsVariant(..))
 import Control.Monad ((>=>))
 #endif
 
-import Xmobar.Utils (safeHead)
+safeHead :: [a] -> Maybe a
+safeHead    [] = Nothing
+safeHead (x:_) = Just x
 
 data WakeUp = WakeUp deriving (Show,Typeable)
 instance Exception WakeUp

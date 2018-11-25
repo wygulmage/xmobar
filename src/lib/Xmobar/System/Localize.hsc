@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Localize
--- Copyright   :  (C) 2011 Martin Perner
+-- Copyright   :  (C) 2011, 2018 Martin Perner
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Martin Perner <martin@perner.cc>
@@ -13,7 +13,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Localize
+module Xmobar.System.Localize
     ( setupTimeLocale,
       getTimeLocale
     ) where

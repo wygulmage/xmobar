@@ -30,11 +30,12 @@ import Control.Concurrent.STM
 
 import System.IO.Unsafe
 
-import Xmobar.Localize
 import Data.Time.Format
 import Data.Time.LocalTime
 import Data.Time.LocalTime.TimeZone.Olson
 import Data.Time.LocalTime.TimeZone.Series
+
+import Xmobar.System.Localize
 
 #if ! MIN_VERSION_time(1,5,0)
 import System.Locale (TimeLocale)

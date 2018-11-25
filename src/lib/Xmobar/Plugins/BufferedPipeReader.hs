@@ -22,8 +22,8 @@ import System.IO.Unsafe(unsafePerformIO)
 
 import Xmobar.Environment
 import Xmobar.Plugins
-import Xmobar.Signal
 import Xmobar.Utils(hGetLineSafe)
+import Xmobar.System.Signal
 
 data BufferedPipeReader = BufferedPipeReader String [(Int, Bool, String)]
     deriving (Read, Show)

@@ -27,7 +27,7 @@ import Control.Exception (bracket)
 import Xmobar.Config
 import Xmobar.Runnable
 import Xmobar.Parsers
-import Xmobar.Signal (setupSignalHandler, withDeferSignals)
+import Xmobar.System.Signal (setupSignalHandler, withDeferSignals)
 import Xmobar.X11.Types
 import Xmobar.X11.EventLoop (startLoop, startCommand)
 import Xmobar.X11.XUtil
