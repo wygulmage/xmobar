@@ -17,14 +17,9 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Commands
-    ( Command (..)
-    , Exec    (..)
-    , tenthSeconds
-    ) where
+module Xmobar.Commands (Command (..), Exec (..)) where
 
 import Prelude
-import Control.Concurrent
 import Control.Exception (handle, SomeException(..))
 import Data.Char
 import System.Process
@@ -32,7 +27,7 @@ import System.Exit
 import System.IO (hClose)
 
 import Xmobar.System.Signal
-import Xmobar.Utils (hGetLineSafe)
+import Xmobar.Utils (hGetLineSafe, tenthSeconds)
 
 class Show e => Exec e where
     alias   :: e -> String
@@ -75,13 +70,3 @@ instance Exec Command where
                                     closeHandles
                                     cb str
                   _ -> closeHandles >> cb msg
-
-
--- | Work around to the Int max bound: since threadDelay takes an Int, it
--- is not possible to set a thread delay grater than about 45 minutes.
--- With a little recursion we solve the problem.
-tenthSeconds :: Int -> IO ()
-tenthSeconds s | s >= x = do threadDelay (x * 100000)
-                             tenthSeconds (s - x)
-               | otherwise = threadDelay (s * 100000)
-               where x = (maxBound :: Int) `div` 100000

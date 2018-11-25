@@ -17,7 +17,8 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.Utils (expandHome, changeLoop, hGetLineSafe, nextEvent')
+module Xmobar.Utils
+  (expandHome, changeLoop, hGetLineSafe, nextEvent', tenthSeconds)
 where
 
 import Control.Monad
@@ -69,3 +70,13 @@ nextEvent' d p = do
             nextEvent' d p
  where
     fd = connectionNumber d
+
+
+-- | Work around to the Int max bound: since threadDelay takes an Int, it
+-- is not possible to set a thread delay grater than about 45 minutes.
+-- With a little recursion we solve the problem.
+tenthSeconds :: Int -> IO ()
+tenthSeconds s | s >= x = do threadDelay (x * 100000)
+                             tenthSeconds (s - x)
+               | otherwise = threadDelay (s * 100000)
+               where x = (maxBound :: Int) `div` 100000
