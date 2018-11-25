@@ -17,10 +17,6 @@
 
 module Xmobar (xmobar, Runnable (..), module Xmobar.Config) where
 
-import Xmobar.EventLoop (startLoop, startCommand)
-import Xmobar.Config
-import Xmobar.Runnable
-
 import Data.Foldable (for_)
 import qualified Data.Map as Map
 
@@ -28,11 +24,14 @@ import Graphics.X11.Xlib
 import Control.Concurrent.Async (Async, cancel)
 import Control.Exception (bracket)
 
+import Xmobar.Config
+import Xmobar.Runnable
 import Xmobar.Parsers
-import Xmobar.XUtil
 import Xmobar.Signal (setupSignalHandler, withDeferSignals)
-import Xmobar.Window
-import Xmobar.Types
+import Xmobar.X11.Types
+import Xmobar.X11.EventLoop (startLoop, startCommand)
+import Xmobar.X11.XUtil
+import Xmobar.X11.Window
 
 splitTemplate :: Config -> [String]
 splitTemplate conf =

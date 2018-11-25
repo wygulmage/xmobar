@@ -15,18 +15,15 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.Types (X , XConf (..), runX) where
+module Xmobar.X11.Types (X , XConf (..)) where
 
 import Graphics.X11.Xlib
 import Control.Monad.Reader
 import Data.Map
 
+import Xmobar.X11.Bitmap
+import Xmobar.X11.XUtil
 import Xmobar.Config
-import Xmobar.Bitmap
-import Xmobar.XUtil
-
-
--- The Xmobar data type and basic loops and functions.
 
 -- | The X type is a ReaderT
 type X = ReaderT XConf IO
@@ -41,7 +38,3 @@ data XConf =
           , iconS     :: Map FilePath Bitmap
           , config    :: Config
           }
-
--- | Runs the ReaderT
-runX :: XConf -> X () -> IO ()
-runX xc f = runReaderT f xc

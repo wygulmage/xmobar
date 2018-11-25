@@ -2,7 +2,7 @@
 
 ------------------------------------------------------------------------------
 -- |
--- Module: Xmobar.Draw
+-- Module: Xmobar.X11.Draw
 -- Copyright: (c) 2018 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
@@ -17,27 +17,30 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.Draw (drawInWin) where
+module Xmobar.X11.Draw (drawInWin) where
 
 import Prelude hiding (lookup)
 import Control.Monad.IO.Class
 import Control.Monad.Reader
+import Control.Monad (when)
 import Control.Arrow ((&&&))
 import Data.Map hiding (foldr, map, filter)
 
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
+import Graphics.X11.Xlib.Extras
 
 import Xmobar.Parsers (Widget(..))
 import Xmobar.Actions (Action(..))
-import qualified Xmobar.Bitmap as B
-import Xmobar.Types
-import Xmobar.XUtil
+import qualified Xmobar.X11.Bitmap as B
+import Xmobar.X11.Types
+import Xmobar.X11.XUtil
 import Xmobar.Config
-import Xmobar.ColorCache
-import Xmobar.Window (drawBorder)
+import Xmobar.X11.ColorCache
+import Xmobar.X11.Window (drawBorder)
 
 #ifdef XFT
-import Xmobar.MinXft (drawBackground)
+import Xmobar.X11.MinXft
+import Graphics.X11.Xrender
 #endif
 
 fi :: (Integral a, Num b) => a -> b
@@ -94,6 +97,31 @@ verticalOffset ht (Text t) fontst voffs _
 verticalOffset ht (Icon _) _ _ conf
   | iconOffset conf > -1 = return $ fi (iconOffset conf)
   | otherwise = return $ fi (ht `div` 2) - 1
+
+printString :: Display -> Drawable -> XFont -> GC -> String -> String
+            -> Position -> Position -> String -> Int -> IO ()
+printString d p (Core fs) gc fc bc x y s a = do
+    setFont d gc $ fontFromFontStruct fs
+    withColors d [fc, bc] $ \[fc', bc'] -> do
+      setForeground d gc fc'
+      when (a == 255) (setBackground d gc bc')
+      drawImageString d p gc x y s
+
+printString d p (Utf8 fs) gc fc bc x y s a =
+    withColors d [fc, bc] $ \[fc', bc'] -> do
+      setForeground d gc fc'
+      when (a == 255) (setBackground d gc bc')
+      liftIO $ wcDrawImageString d p fs gc x y s
+
+#ifdef XFT
+printString dpy drw fs@(Xft fonts) _ fc bc x y s al =
+  withDrawingColors dpy drw fc bc $ \draw fc' bc' -> do
+    when (al == 255) $ do
+      (a,d)  <- textExtents fs s
+      gi <- xftTxtExtents' dpy fonts s
+      drawXftRect draw bc' x (y - a) (1 + xglyphinfo_xOff gi) (a + d + 2)
+    drawXftString' draw fc' fonts (toInteger x) (toInteger y) s
+#endif
 
 -- | An easy way to print the stuff we need to print
 printStrings :: Drawable -> GC -> [XFont] -> [Int] -> Position

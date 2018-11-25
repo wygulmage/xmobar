@@ -13,18 +13,15 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.XUtil
-    ( XFont
+module Xmobar.X11.XUtil
+    ( XFont(..)
     , initFont
     , initCoreFont
     , initUtf8Font
     , textExtents
     , textWidth
-    , printString
     ) where
 
-import Control.Monad (when)
-import Control.Monad.Trans
 import Control.Exception (SomeException, handle)
 import Data.List
 import Foreign
@@ -34,15 +31,12 @@ import Graphics.X11.Xlib.Extras
 import System.Mem.Weak ( addFinalizer )
 
 #if defined XFT
-import Xmobar.MinXft
+import Xmobar.X11.MinXft
 import Graphics.X11.Xrender
 #else
 import System.IO(hPutStrLn, stderr)
 #endif
 
-import Xmobar.ColorCache
-
--- Hide the Core Font/Xft switching here
 data XFont = Core FontStruct
            | Utf8 FontSet
 #ifdef XFT
@@ -132,29 +126,4 @@ textExtents (Xft xftfonts) _ = do
   ascent  <- fromIntegral `fmap` xft_ascent'  xftfonts
   descent <- fromIntegral `fmap` xft_descent' xftfonts
   return (ascent, descent)
-#endif
-
-printString :: Display -> Drawable -> XFont -> GC -> String -> String
-            -> Position -> Position -> String -> Int -> IO ()
-printString d p (Core fs) gc fc bc x y s a = do
-    setFont d gc $ fontFromFontStruct fs
-    withColors d [fc, bc] $ \[fc', bc'] -> do
-      setForeground d gc fc'
-      when (a == 255) (setBackground d gc bc')
-      drawImageString d p gc x y s
-
-printString d p (Utf8 fs) gc fc bc x y s a =
-    withColors d [fc, bc] $ \[fc', bc'] -> do
-      setForeground d gc fc'
-      when (a == 255) (setBackground d gc bc')
-      liftIO $ wcDrawImageString d p fs gc x y s
-
-#ifdef XFT
-printString dpy drw fs@(Xft fonts) _ fc bc x y s al =
-  withDrawingColors dpy drw fc bc $ \draw fc' bc' -> do
-    when (al == 255) $ do
-      (a,d)  <- textExtents fs s
-      gi <- xftTxtExtents' dpy fonts s
-      drawXftRect draw bc' x (y - a) (1 + xglyphinfo_xOff gi) (a + d + 2)
-    drawXftString' draw fc' fonts (toInteger x) (toInteger y) s
 #endif

@@ -17,12 +17,12 @@
 
 #if defined XFT
 
-module Xmobar.ColorCache(withColors, withDrawingColors) where
+module Xmobar.X11.ColorCache(withColors, withDrawingColors) where
 
-import Xmobar.MinXft
+import Xmobar.X11.MinXft
 
 #else
-module Xmobar.ColorCache(withColors) where
+module Xmobar.X11., 2018ColorCache(withColors) where
 
 #endif
 

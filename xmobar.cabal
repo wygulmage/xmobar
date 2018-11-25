@@ -95,10 +95,8 @@ library
     hs-source-dirs:  src/lib
 
     exposed-modules: Xmobar,
-                     Xmobar.Types,
                      Xmobar.Config,
                      Xmobar.Actions,
-                     Xmobar.Bitmap,
                      Xmobar.Commands,
                      Xmobar.Runnable,
                      Xmobar.Plugins,
@@ -134,14 +132,16 @@ library
     other-modules: Xmobar.Localize,
                    Xmobar.Parsers,
                    Xmobar.Utils,
-                   Xmobar.XUtil,
                    Xmobar.StatFS,
-                   Xmobar.ColorCache,
-                   Xmobar.Window,
-                   Xmobar.Draw,
+                   Xmobar.X11.Types,
+                   Xmobar.X11.XUtil,
+                   Xmobar.X11.Bitmap,
+                   Xmobar.X11.EventLoop,
+                   Xmobar.X11.ColorCache,
+                   Xmobar.X11.Window,
+                   Xmobar.X11.Draw,
                    Xmobar.Signal,
-                   Xmobar.Environment,
-                   Xmobar.EventLoop
+                   Xmobar.Environment
 
     extra-libraries: Xrandr Xrender
 
@@ -181,7 +181,7 @@ library
 
     if flag(with_xft) || flag(all_extensions)
        build-depends: utf8-string >= 0.3 && < 1.1, X11-xft >= 0.2 && < 0.4
-       other-modules: Xmobar.MinXft
+       other-modules: Xmobar.X11.MinXft
        cpp-options: -DXFT
 
     if flag(with_utf8) || flag(all_extensions)
@@ -298,20 +298,18 @@ test-suite XmobarTest
                  hspec == 2.*,
                  xmobar
 
-  other-modules: Plugins.Monitors.CommonSpec,
-                 Xmobar.Commands,
-                 Xmobar.Signal,
-                 Xmobar.XUtil,
-                 Xmobar.Utils,
-                 Xmobar.ColorCache,
-                 Xmobar.Plugins,
-                 Xmobar.Plugins.Monitors.Common
+  other-modules: Plugins.Monitors.CommonSpec
 
   if flag(with_alsa) || flag(all_extensions)
-      build-depends: alsa-mixer > 0.2.0.2
-      build-depends: alsa-core == 0.5.*,
+      build-depends: alsa-mixer > 0.2.0.2,
+                     alsa-core == 0.5.*,
                      process >= 1.4.3.0
-      other-modules: Xmobar.Plugins.Monitors.Volume,
-                     Xmobar.Plugins.Monitors.Alsa,
+      other-modules: Xmobar.Plugins.Monitors.Volume
+                     Xmobar.Plugins.Monitors.Alsa
                      Plugins.Monitors.AlsaSpec
+                     Xmobar.Commands
+                     Xmobar.Plugins
+                     Xmobar.Plugins.Monitors.Common
+                     Xmobar.Signal
+                     Xmobar.Utils
       cpp-options: -DALSA

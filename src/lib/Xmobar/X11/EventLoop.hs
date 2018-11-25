@@ -2,7 +2,7 @@
 
 ------------------------------------------------------------------------------
 -- |
--- Module: Xmobar.EventLoop
+-- Module: Xmobar.X11.EventLoop
 -- Copyright: (c) 2018 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
@@ -17,7 +17,7 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.EventLoop (startLoop, startCommand) where
+module Xmobar.X11.EventLoop (startLoop, startCommand) where
 
 import Prelude hiding (lookup)
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
@@ -36,18 +36,18 @@ import Data.Bits
 import Data.Map hiding (foldr, map, filter)
 import Data.Maybe (fromJust, isJust)
 
-import Xmobar.Bitmap as Bitmap
+import Xmobar.X11.Bitmap as Bitmap
+import Xmobar.X11.Types
 import Xmobar.Config
 import Xmobar.Parsers
 import Xmobar.Commands
 import Xmobar.Actions
 import Xmobar.Runnable
 import Xmobar.Signal
-import Xmobar.Window
-import Xmobar.XUtil
+import Xmobar.X11.Window
+import Xmobar.X11.XUtil
 import Xmobar.Utils
-import Xmobar.Draw
-import Xmobar.Types
+import Xmobar.X11.Draw
 
 #ifdef XFT
 import Graphics.X11.Xft
@@ -56,6 +56,9 @@ import Graphics.X11.Xft
 #ifdef DBUS
 import Xmobar.IPC.DBus
 #endif
+
+runX :: XConf -> X () -> IO ()
+runX xc f = runReaderT f xc
 
 -- | Starts the main event loop and threads
 startLoop :: XConf -> TMVar SignalType -> [[([Async ()], TVar String)]]

@@ -1,7 +1,7 @@
 {-# LANGUAGE CPP, FlexibleContexts #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Bitmap
+-- Module      :  X11.Bitmap
 -- Copyright   :  (C) 2013, 2015, 2017, 2018 Alexander Polakov
 -- License     :  BSD3
 --
@@ -11,7 +11,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Bitmap
+module Xmobar.X11.Bitmap
  ( updateCache
  , drawBitmap
  , Bitmap(..)) where
@@ -23,7 +23,7 @@ import Graphics.X11.Xlib
 import System.Directory (doesFileExist)
 import System.FilePath ((</>))
 import System.Mem.Weak ( addFinalizer )
-import Xmobar.ColorCache
+import Xmobar.X11.ColorCache
 import Xmobar.Parsers (Widget(..))
 import Xmobar.Actions (Action)
 

@@ -13,7 +13,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Window where
+module Xmobar.X11.Window where
 
 import Prelude
 import Control.Applicative ((<$>))
@@ -29,7 +29,7 @@ import Data.Maybe (fromMaybe)
 import System.Posix.Process (getProcessID)
 
 import Xmobar.Config
-import Xmobar.XUtil
+import Xmobar.X11.XUtil
 
 -- $window
 

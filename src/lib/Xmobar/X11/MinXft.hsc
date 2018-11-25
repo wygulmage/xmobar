@@ -20,7 +20,7 @@
 
 {-# LANGUAGE ForeignFunctionInterface, EmptyDataDecls #-}
 
-module Xmobar.MinXft ( AXftColor
+module Xmobar.X11.MinXft ( AXftColor
               , AXftDraw (..)
               , AXftFont
               , mallocAXftColor
