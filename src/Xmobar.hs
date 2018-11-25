@@ -17,6 +17,7 @@
 
 module Xmobar (xmobar
               , Runnable (..)
+              , Exec (..)
               , module Xmobar.Config
               , module Xmobar.Plugins.BufferedPipeReader
               , module Xmobar.Plugins.CommandReader
@@ -37,20 +38,9 @@ module Xmobar (xmobar
               , module Xmobar.Plugins.XMonadLog
               ) where
 
-import Data.Foldable (for_)
-import qualified Data.Map as Map
-
-import Graphics.X11.Xlib
-import Control.Concurrent.Async (Async, cancel)
-import Control.Exception (bracket)
-
-import Xmobar.Config
 import Xmobar.Run.Runnable
-import Xmobar.Run.Template
-import Xmobar.System.Signal (setupSignalHandler, withDeferSignals)
-import Xmobar.X11.Types
-import Xmobar.X11.XUtil
-import Xmobar.X11.Window
+import Xmobar.Run.Commands
+import Xmobar.Config
 import Xmobar.Plugins.BufferedPipeReader
 import Xmobar.Plugins.CommandReader
 import Xmobar.Plugins.Date
@@ -68,27 +58,5 @@ import Xmobar.Plugins.Monitors
 import Xmobar.Plugins.PipeReader
 import Xmobar.Plugins.StdinReader
 import Xmobar.Plugins.XMonadLog
-import Xmobar.App.EventLoop (startLoop, startCommand)
 
-xmobar :: Config -> IO ()
-xmobar conf = withDeferSignals $ do
-  initThreads
-  d <- openDisplay ""
-  fs    <- initFont d (font conf)
-  fl    <- mapM (initFont d) (additionalFonts conf)
-  cls   <- mapM (parseTemplate (commands conf) (sepChar conf))
-                (splitTemplate (alignSep conf) (template conf))
-  sig   <- setupSignalHandler
-  bracket (mapM (mapM $ startCommand sig) cls)
-          cleanupThreads
-          $ \vars -> do
-    (r,w) <- createWin d fs conf
-    let ic = Map.empty
-        to = textOffset conf
-        ts = textOffsets conf ++ replicate (length fl) (-1)
-    startLoop (XConf d r w (fs:fl) (to:ts) ic conf) sig vars
-
-cleanupThreads :: [[([Async ()], a)]] -> IO ()
-cleanupThreads vars =
-  for_ (concat vars) $ \(asyncs, _) ->
-    for_ asyncs cancel
+import Xmobar.App.Main (xmobar)

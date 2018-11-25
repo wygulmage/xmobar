@@ -95,20 +95,21 @@ library
     hs-source-dirs:  src
 
     exposed-modules: Xmobar,
-                     Xmobar.Config,
-                     Xmobar.Actions,
-                     Xmobar.Run.Commands,
-                     Xmobar.Run.Runnable
+                     Xmobar.Config
 
     other-modules: Xmobar.Utils,
                    Xmobar.Run.Types,
                    Xmobar.Run.Template,
+                   Xmobar.Run.Commands,
+                   Xmobar.Run.Runnable
                    Xmobar.App.EventLoop,
+                   Xmobar.App.Main,
                    Xmobar.System.StatFS,
                    Xmobar.System.Environment,
                    Xmobar.System.Localize,
                    Xmobar.System.Signal,
                    Xmobar.System.Kbd,
+                   Xmobar.X11.Actions,
                    Xmobar.X11.Parsers,
                    Xmobar.X11.Types,
                    Xmobar.X11.XUtil,

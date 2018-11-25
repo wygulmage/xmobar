@@ -46,7 +46,8 @@ templateCommandParser sepChar =
 templateParser :: String -> Parser [(String,String,String)]
 templateParser s = many $ templateStringParser s
 
--- | Actually runs the template parsers
+-- | Actually runs the template parsers over a (segment of) a template
+-- string, returning a list of runnables with their prefix and suffix.
 parseTemplate :: [Runnable] -> String -> String -> IO [(Runnable,String,String)]
 parseTemplate c sepChar s =
     do str <- case parse (templateParser sepChar) "" s of
