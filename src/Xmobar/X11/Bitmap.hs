@@ -25,7 +25,7 @@ import System.FilePath ((</>))
 import System.Mem.Weak ( addFinalizer )
 import Xmobar.X11.ColorCache
 import Xmobar.X11.Parsers (Widget(..))
-import Xmobar.Actions (Action)
+import Xmobar.X11.Actions (Action)
 
 #ifdef XPM
 import Xmobar.X11.XPMFile(readXPMFile)

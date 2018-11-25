@@ -17,7 +17,7 @@
 module Xmobar.X11.Parsers (parseString, Widget(..)) where
 
 import Xmobar.Config
-import Xmobar.Actions
+import Xmobar.X11.Actions
 
 import Control.Monad (guard, mzero)
 import Text.ParserCombinators.Parsec
