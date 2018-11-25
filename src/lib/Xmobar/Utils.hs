@@ -17,14 +17,20 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.Utils (expandHome, changeLoop, safeHead, hGetLineSafe) where
+module Xmobar.Utils (expandHome, changeLoop, safeHead, hGetLineSafe, nextEvent')
+where
 
 import Control.Monad
+import Control.Concurrent
 import Control.Concurrent.STM
+import System.Posix.Types (Fd(..))
 
 import System.Environment
 import System.FilePath
 import System.IO
+
+import Graphics.X11.Xlib (
+  Display(..), XEventPtr, nextEvent, pending, connectionNumber)
 
 #if defined XFT || defined UTF8
 import qualified System.IO as S (hGetLine)
@@ -55,3 +61,15 @@ changeLoop s f = atomically s >>= go
 safeHead :: [a] -> Maybe a
 safeHead    [] = Nothing
 safeHead (x:_) = Just x
+
+-- | A version of nextEvent that does not block in foreign calls.
+nextEvent' :: Display -> XEventPtr -> IO ()
+nextEvent' d p = do
+    pend <- pending d
+    if pend /= 0
+        then nextEvent d p
+        else do
+            threadWaitRead (Fd fd)
+            nextEvent' d p
+ where
+    fd = connectionNumber d

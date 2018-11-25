@@ -45,6 +45,7 @@ import Xmobar.Runnable
 import Xmobar.Signal
 import Xmobar.Window
 import Xmobar.XUtil
+import Xmobar.Utils
 import Xmobar.Draw
 import Xmobar.Types
 
@@ -55,8 +56,6 @@ import Graphics.X11.Xft
 #ifdef DBUS
 import Xmobar.IPC.DBus
 #endif
-
--- $main
 
 -- | Starts the main event loop and threads
 startLoop :: XConf -> TMVar SignalType -> [[([Async ()], TVar String)]]

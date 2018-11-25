@@ -21,10 +21,8 @@ module Xmobar.XUtil
     , textExtents
     , textWidth
     , printString
-    , nextEvent'
     ) where
 
-import Control.Concurrent
 import Control.Monad (when)
 import Control.Monad.Trans
 import Control.Exception (SomeException, handle)
@@ -34,7 +32,6 @@ import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import qualified Graphics.X11.Xlib as Xlib (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
 import System.Mem.Weak ( addFinalizer )
-import System.Posix.Types (Fd(..))
 
 #if defined XFT
 import Xmobar.MinXft
@@ -161,15 +158,3 @@ printString dpy drw fs@(Xft fonts) _ fc bc x y s al =
       drawXftRect draw bc' x (y - a) (1 + xglyphinfo_xOff gi) (a + d + 2)
     drawXftString' draw fc' fonts (toInteger x) (toInteger y) s
 #endif
-
--- | A version of nextEvent that does not block in foreign calls.
-nextEvent' :: Display -> XEventPtr -> IO ()
-nextEvent' d p = do
-    pend <- pending d
-    if pend /= 0
-        then nextEvent d p
-        else do
-            threadWaitRead (Fd fd)
-            nextEvent' d p
- where
-    fd = connectionNumber d
