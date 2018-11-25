@@ -15,7 +15,7 @@
 module Xmobar.Plugins.PipeReader where
 
 import System.IO
-import Xmobar.Plugins(Exec(..))
+import Xmobar.Commands(Exec(..))
 import Xmobar.Utils(hGetLineSafe)
 import Xmobar.System.Environment(expandEnv)
 import System.Posix.Files

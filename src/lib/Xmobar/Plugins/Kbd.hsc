@@ -20,8 +20,8 @@ import Graphics.X11.Xlib.Extras
 import Foreign
 import Foreign.C.Types
 import Foreign.C.String
-import Xmobar.Plugins
 import Control.Monad (forever)
+import Xmobar.Commands
 import Xmobar.Utils (nextEvent')
 import Data.List (isPrefixOf, findIndex)
 import Data.Maybe (fromJust)

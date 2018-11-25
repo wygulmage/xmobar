@@ -17,7 +17,7 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.Utils (expandHome, changeLoop, safeHead, hGetLineSafe, nextEvent')
+module Xmobar.Utils (expandHome, changeLoop, hGetLineSafe, nextEvent')
 where
 
 import Control.Monad
@@ -57,10 +57,6 @@ changeLoop s f = atomically s >>= go
             new <- s
             guard (new /= old)
             return new)
-
-safeHead :: [a] -> Maybe a
-safeHead    [] = Nothing
-safeHead (x:_) = Just x
 
 -- | A version of nextEvent that does not block in foreign calls.
 nextEvent' :: Display -> XEventPtr -> IO ()
