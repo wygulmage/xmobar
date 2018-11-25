@@ -2,7 +2,7 @@
 
 -----------------------------------------------------------------------------
 -- |
--- Module      :  XUtil
+-- Module      :  Xmobar.X11.Text
 -- Copyright   :  (C) 2011, 2012, 2013, 2014, 2015, 2017, 2018 Jose Antonio Ortega Ruiz
 --                (C) 2007 Andrea Rossato
 -- License     :  BSD3
@@ -13,7 +13,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.X11.XUtil
+module Xmobar.X11.Text
     ( XFont(..)
     , initFont
     , initCoreFont

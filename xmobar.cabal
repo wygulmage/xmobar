@@ -113,7 +113,7 @@ library
                    Xmobar.X11.Actions,
                    Xmobar.X11.Parsers,
                    Xmobar.X11.Types,
-                   Xmobar.X11.XUtil,
+                   Xmobar.X11.Text,
                    Xmobar.X11.Bitmap,
                    Xmobar.X11.ColorCache,
                    Xmobar.X11.Window,

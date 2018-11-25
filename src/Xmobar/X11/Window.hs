@@ -29,7 +29,7 @@ import Data.Maybe (fromMaybe)
 import System.Posix.Process (getProcessID)
 
 import Xmobar.Config.Types
-import Xmobar.X11.XUtil
+import Xmobar.X11.Text
 
 -- $window
 

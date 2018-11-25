@@ -28,7 +28,7 @@ import Xmobar.Config.Types
 import Xmobar.System.Signal (setupSignalHandler, withDeferSignals)
 import Xmobar.Run.Template
 import Xmobar.X11.Types
-import Xmobar.X11.XUtil
+import Xmobar.X11.Text
 import Xmobar.X11.Window
 import Xmobar.App.EventLoop (startLoop, startCommand)
 

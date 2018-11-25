@@ -44,7 +44,7 @@ import Xmobar.Run.Commands
 import Xmobar.Run.Runnable
 import Xmobar.X11.Parsers
 import Xmobar.X11.Window
-import Xmobar.X11.XUtil
+import Xmobar.X11.Text
 import Xmobar.X11.Draw
 import Xmobar.X11.Bitmap as Bitmap
 import Xmobar.X11.Types

@@ -22,7 +22,7 @@ import Control.Monad.Reader
 import Data.Map
 
 import Xmobar.X11.Bitmap
-import Xmobar.X11.XUtil
+import Xmobar.X11.Text
 import Xmobar.Config.Types
 
 -- | The X type is a ReaderT
