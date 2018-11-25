@@ -36,9 +36,10 @@ splitLayout s = splitLayout' noLaySymbols $ split s '+'
 
 splitLayout' :: [String] ->  [String] -> [String]
 --                  end of recursion, remove empty strings
-splitLayout' [] s = map (takeWhile (\x -> x /= ':')) $ filter (\x -> length x > 0) s
+splitLayout' [] s = map (takeWhile (/= ':')) $ filter (not . null) s
 --                    remove current string if it has a 'bad' prefix
-splitLayout' bad s  = splitLayout' (tail bad) [x | x <- s, not $ isPrefixOf (head bad) x]
+splitLayout' bad s  =
+  splitLayout' (tail bad) [x | x <- s, not $ isPrefixOf (head bad) x]
 
 -- split String at each Char
 split :: String -> Char -> [String]
@@ -57,20 +58,19 @@ searchReplaceLayout :: KbdOpts -> String -> String
 searchReplaceLayout opts s = let c = findIndex (\x -> fst x == s) opts in
     case c of
         Nothing -> s
-        x -> let i = (fromJust x) in
-            snd $ opts!!i
+        x -> let i = fromJust x in snd $ opts!!i
 
 -- returns the active layout
 getKbdLay :: Display -> KbdOpts -> IO String
 getKbdLay dpy opts = do
         lay <- getLayoutStr dpy
         curLay <- getKbdLayout dpy
-        return $ searchReplaceLayout opts $ (splitLayout lay)!!(curLay)
+        return $ searchReplaceLayout opts $ splitLayout lay!!curLay
 
 
 
-data Kbd = Kbd [(String, String)]
-        deriving (Read, Show)
+newtype Kbd = Kbd [(String, String)]
+  deriving (Read, Show)
 
 instance Exec Kbd where
         alias (Kbd _) = "kbd"
