@@ -36,7 +36,8 @@ type ColorString = String
 type FontIndex   = Int
 
 -- | Runs the string parser
-parseString :: Config -> String -> IO [(Widget, ColorString, FontIndex, Maybe [Action])]
+parseString :: Config -> String
+               -> IO [(Widget, ColorString, FontIndex, Maybe [Action])]
 parseString c s =
     case parse (stringParser (fgColor c) 0 Nothing) "" s of
       Left  _ -> return [(Text $ "Could not parse string: " ++ s
@@ -114,7 +115,8 @@ iconParser c f a = do
   i <- manyTill (noneOf ">") (try (string "/>"))
   return [(Icon i, c, f, a)]
 
-actionParser :: String -> FontIndex -> Maybe [Action] -> Parser [(Widget, ColorString, FontIndex, Maybe [Action])]
+actionParser :: String -> FontIndex -> Maybe [Action]
+                -> Parser [(Widget, ColorString, FontIndex, Maybe [Action])]
 actionParser c f act = do
   string "<action="
   command <- choice [between (char '`') (char '`') (many1 (noneOf "`")),
@@ -132,14 +134,16 @@ toButtons :: String -> [Button]
 toButtons = map (\x -> read [x])
 
 -- | Parsers a string wrapped in a color specification.
-colorParser :: FontIndex -> Maybe [Action] -> Parser [(Widget, ColorString, FontIndex, Maybe [Action])]
+colorParser :: FontIndex -> Maybe [Action]
+               -> Parser [(Widget, ColorString, FontIndex, Maybe [Action])]
 colorParser f a = do
   c <- between (string "<fc=") (string ">") colors
   s <- manyTill (allParsers c f a) (try $ string "</fc>")
   return (concat s)
 
 -- | Parsers a string wrapped in a font specification.
-fontParser :: ColorString -> Maybe [Action] -> Parser [(Widget, ColorString, FontIndex, Maybe [Action])]
+fontParser :: ColorString -> Maybe [Action]
+              -> Parser [(Widget, ColorString, FontIndex, Maybe [Action])]
 fontParser c a = do
   f <- between (string "<fn=") (string ">") colors
   s <- manyTill (allParsers c (read f) a) (try $ string "</fn>")

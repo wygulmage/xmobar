@@ -22,7 +22,8 @@ module Xmobar.X11.ColorCache(withColors, withDrawingColors) where
 import Xmobar.X11.MinXft
 
 #else
-module Xmobar.X11., 2018ColorCache(withColors) where
+
+module Xmobar.X11.ColorCache(withColors) where
 
 #endif
 
