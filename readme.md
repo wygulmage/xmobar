@@ -173,9 +173,9 @@ Since 0.14 xmobar reacts to SIGUSR1 and SIGUSR2:
 
 ## Quick Start
 
-See [samples/xmobar.config] for an example.
+See [examples/xmobar.config] for an example.
 
-[samples/xmobar.config]: http://github.com/jaor/xmobar/raw/master/samples/xmobar.config
+[examples/xmobar.config]: http://github.com/jaor/xmobar/raw/master/examples/xmobar.config
 
 For the output template:
 
@@ -348,7 +348,7 @@ See [this idea] by Jonas Camillus Jeppensen for a way of adapting
 dynamically xmobar's size and run it alongside a system tray widget
 such as trayer or stalonetray (although the idea is not limited to
 trays, really).  For your convenience, there is a version of Jonas'
-script in [samples/padding-icon.sh](./samples/padding-icon.sh).
+script in [examples/padding-icon.sh](./examples/padding-icon.sh).
 
 [this idea]: https://github.com/jaor/xmobar/issues/239#issuecomment-233206552
 
@@ -1202,11 +1202,11 @@ Like [Volume](#volume-mixer-element-args-refreshrate), but with the following di
 
 - Aliases to `PropName`
 - Reads the X property named by `PropName` (a string) and displays its
-  value. The [samples/xmonadpropwrite.hs script] in xmobar's
+  value. The [examples/xmonadpropwrite.hs script] in xmobar's
   distribution can be used to set the given property from the output
   of any other program or script.
 
-[samples/xmonadpropwrite.hs script]: https://github.com/jaor/xmobar/raw/master/samples/xmonadpropwrite.hs
+[examples/xmonadpropwrite.hs script]: https://github.com/jaor/xmobar/raw/master/examples/xmonadpropwrite.hs
 
 ### `UnsafeXPropertyLog PropName`
 
@@ -1420,10 +1420,10 @@ will display "N/A" if for some reason the `date` invocation fails.
   your xmobar.  Sending some status information to
   `"/tmp/xmobar_status"` will reveal xmonad for 1.5 seconds and
   temporarily overwrite the window titles.
-- Take a look at [samples/status.sh]
+- Take a look at [examples/status.sh]
 - Expands environment variables for the pipe path
 
-[samples/status.sh]: http://github.com/jaor/xmobar/raw/master/samples/status.sh
+[examples/status.sh]: http://github.com/jaor/xmobar/raw/master/examples/status.sh
 
 
 <font size="+1">**`XMonadLog`**</font>
@@ -1517,7 +1517,7 @@ configuration options.
 This requires importing your plugin into `Config.hs` and adding your
 type to the type list in the type signature of `Config.runnableTypes`.
 
-For a very basic example see `samples/Plugins/HelloWorld.hs` or the
+For a very basic example see `examples/Plugins/HelloWorld.hs` or the
 other plugins that are distributed with xmobar.
 
 ## Installing/Removing a Plugin

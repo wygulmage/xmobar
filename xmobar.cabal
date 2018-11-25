@@ -17,10 +17,10 @@ cabal-version:      >= 1.8
 build-type:         Simple
 
 extra-source-files: readme.md, changelog.md,
-                    samples/padding-icon.sh,
-                    samples/xmobar.config, samples/xmonadpropwrite.hs
-                    samples/Plugins/helloworld.config,
-                    samples/Plugins/HelloWorld.hs
+                    examples/padding-icon.sh,
+                    examples/xmobar.config, examples/xmonadpropwrite.hs
+                    examples/Plugins/helloworld.config,
+                    examples/Plugins/HelloWorld.hs
 
 source-repository head
   type:      git
