@@ -17,7 +17,7 @@
 
 module Xmobar (xmobar
               , defaultConfig
-              , getXdgConfigFile
+              , xmobarConfigFile
               , Runnable (..)
               , Exec (..)
               , module Xmobar.Config.Types
@@ -64,4 +64,4 @@ import Xmobar.Plugins.StdinReader
 import Xmobar.Plugins.XMonadLog
 
 import Xmobar.App.Main(xmobar)
-import Xmobar.App.Config(defaultConfig, getXdgConfigFile)
+import Xmobar.App.Config(defaultConfig, xmobarConfigFile)

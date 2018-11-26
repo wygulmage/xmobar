@@ -256,7 +256,7 @@ library
 executable xmobar
     hs-source-dirs:     app
     main-is:            Main.hs
-    other-modules:      Paths_xmobar, Configuration
+    other-modules:      Paths_xmobar
     build-depends:      base,
                         containers,
                         async,

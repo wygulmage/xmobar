@@ -23,11 +23,10 @@ import System.Exit
 import System.Environment (getArgs)
 import Control.Monad (unless)
 import Text.Read (readMaybe)
+import System.Posix.Files (fileExist)
 
 import Xmobar
-
 import Paths_xmobar (version)
-import Configuration as C (readConfig, readDefaultConfig)
 
 -- $main
 
@@ -36,11 +35,31 @@ main :: IO ()
 main = do
   (o,file) <- getArgs >>= getOpts
   (c,defaultings) <- case file of
-                       [cfgfile] -> C.readConfig cfgfile usage
-                       _ -> C.readDefaultConfig usage
+                       [cfgfile] -> config cfgfile usage
+                       _ -> defConfig usage
   unless (null defaultings || (not $ any (== Debug) o)) $ putStrLn $
     "Fields missing from config defaulted: " ++ intercalate "," defaultings
   doOpts c o >>= xmobar
+
+config :: FilePath -> String -> IO (Config,[String])
+config f msg = do
+  let err m = error $ f ++ ": " ++ m
+  file <- fileExist f
+  r <- if file
+       then readConfig defaultConfig f
+       else err $ "file not found" ++ "\n" ++ msg
+  case r of
+    Left e -> err (show e)
+    Right res -> return res
+
+-- | Read default configuration file or load the default config
+defConfig :: String -> IO (Config,[String])
+defConfig msg = do
+  xdgConfigFile <- xmobarConfigFile
+  xdgConfigFileExists <- fileExist xdgConfigFile
+  if xdgConfigFileExists
+    then config xdgConfigFile msg
+    else return (defaultConfig,[])
 
 data Opts = Help
           | Debug
