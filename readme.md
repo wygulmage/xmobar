@@ -3,22 +3,21 @@
 
 # About
 
-xmobar is a minimalistic, mostly text based, status bar. It was
-originally designed and implemented by Andrea Rossato to work with
-[xmonad], but it's actually usable with any window-manager.
+xmobar is a minimalistic status bar. It was originally designed and
+implemented by Andrea Rossato to work with [xmonad], but it is
+actually usable with any window manager.
 
 xmobar was inspired by the [Ion3] status bar, and supports similar
 features, like dynamic color management, icons, output templates, and
 extensibility through plugins.
 
-[This screenshot] shows xmobar running under [sawfish], with
-antialiased fonts. And [this one] is my desktop with [xmonad] and two
+[This screenshot](doc/xmobar-sawfish.png) shows xmobar running under
+[sawfish], with antialiased fonts. And [this
+one](doc/xmobar-xmonad.png) is my desktop with [xmonad] and two
 instances of xmobar.
 
 [xmonad]: http://xmonad.org
 [Ion3]: http://tuomov.iki.fi/software/
-[This screenshot]: http://projects.haskell.org/xmobar/xmobar-sawfish.png
-[this one]: http://projects.haskell.org/xmobar/xmobar-xmonad.png
 
 # Bug Reports
 
