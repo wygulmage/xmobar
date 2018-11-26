@@ -3,30 +3,25 @@
 
 # About
 
-xmobar is a minimalistic status bar. It was originally designed and
+Xmobar is a minimalistic status bar. It was originally designed and
 implemented by Andrea Rossato to work with [xmonad], but it is
 actually usable with any window manager.
 
-xmobar was inspired by the [Ion3] status bar, and supports similar
+Xmobar was inspired by the [Ion3] status bar, and supports similar
 features, like dynamic color management, icons, output templates, and
 extensibility through plugins.
 
 [This screenshot](doc/xmobar-sawfish.png) shows xmobar running under
-[sawfish], with antialiased fonts. And [this
-one](doc/xmobar-xmonad.png) is my desktop with [xmonad] and two
-instances of xmobar.
+[sawfish], and [this one](doc/xmobar-xmonad.png) is a desktop with
+[xmonad] and two instances of xmobar.
 
 [xmonad]: http://xmonad.org
 [Ion3]: http://tuomov.iki.fi/software/
 
 # Bug Reports
 
-To submit bug reports you can use the [bug tracker over at Github].
-
-Note: the old bug tracker at Google code is deprecated.  Please use
-Github's for new bugs.
-
-[bug tracker over at Github]: https://github.com/jaor/xmobar/issues
+To submit bug reports you can use the [bug tracker over at
+Github](https://github.com/jaor/xmobar/issues).
 
 # Installation
 
@@ -74,7 +69,7 @@ source tree:
 There is also a barebones `stack.yaml` file that will allow you to
 build the xmobar executable with stances of the form:
 
-        stack build --flag xmobar:all_extensions
+        stack install --flag xmobar:all_extensions
 
 
 ## Optional features
