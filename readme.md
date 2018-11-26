@@ -370,23 +370,25 @@ xmobar --help):
     Options:
       -h, -?        --help                 This help
       -V            --version              Show version information
-      -f font name  --font=font name       The font name
+      -D            --debug                Emit verbose debugging messages
+      -f font name  --font=font name       Font name
       -w class      --wmclass=class        X11 WM_CLASS property
       -n name       --wmname=name          X11 WM_NAME property
-      -B bg color   --bgcolor=bg color     The background color. Default black
-      -F fg color   --fgcolor=fg color     The foreground color. Default grey
-      -A alpha      --alpha=alpha          The transparency: 0 is transparent, 255 (the default) is opaque
+      -B bg color   --bgcolor=bg color     Background color. Default black
+      -F fg color   --fgcolor=fg color     Foreground color. Default grey
+      -A alpha      --alpha=alpha          Transparency: 0 is transparent
+                                           and 255 (the default) is opaque
       -o            --top                  Place xmobar at the top of the screen
       -b            --bottom               Place xmobar at the bottom of the screen
       -p            --position=position    Specify position, same as in config file
       -d            --dock                 Try to start xmobar as a dock
       -a alignsep   --alignsep=alignsep    Separators for left, center and right text
                                            alignment. Default: '}{'
-      -s char       --sepchar=char         The character used to separate commands in
+      -s char       --sepchar=char         Character used to separate commands in
                                            the output template. Default '%'
-      -t template   --template=template    The output template
+      -t template   --template=template    Output template
       -i path       --iconroot=path        Default directory for icon pattern files
-      -c commands   --commands=commands    The list of commands to be executed
+      -c commands   --commands=commands    List of commands to be executed
       -C command    --add-command=command  Add to the list of commands to be executed
       -x screen     --screen=screen        On which X screen number to start
 

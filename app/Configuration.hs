@@ -29,9 +29,11 @@ import qualified Xmobar as X
 -- | Reads the configuration files or quits with an error
 readConfig :: FilePath -> String -> IO (X.Config,[String])
 readConfig f usage = do
-  let err m = error $ f ++ ": " ++ m ++ "\n" ++ usage
+  let err m = error $ f ++ ": " ++ m
   file <- liftIO $ fileExist f
-  r <- if file then X.readConfig X.defaultConfig f else err "file not found"
+  r <- if file
+       then X.readConfig X.defaultConfig f
+       else err $ "file not found" ++ "\n" ++ usage
   case r of
     Left e -> err (show e)
     Right res -> return res

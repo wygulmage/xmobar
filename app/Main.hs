@@ -38,11 +38,12 @@ main = do
   (c,defaultings) <- case file of
                        [cfgfile] -> C.readConfig cfgfile usage
                        _ -> C.readDefaultConfig usage
-  unless (null defaultings) $ putStrLn $
+  unless (null defaultings || (not $ any (== Debug) o)) $ putStrLn $
     "Fields missing from config defaulted: " ++ intercalate "," defaultings
   doOpts c o >>= xmobar
 
 data Opts = Help
+          | Debug
           | Version
           | Font       String
           | BgColor    String
@@ -61,13 +62,14 @@ data Opts = Help
           | Position   String
           | WmClass    String
           | WmName     String
-       deriving Show
+       deriving (Show, Eq)
 
 options :: [OptDescr Opts]
 options =
     [ Option "h?" ["help"] (NoArg Help) "This help"
+    , Option "D" ["debug"] (NoArg Debug) "Emit verbose debugging messages"
     , Option "V" ["version"] (NoArg Version) "Show version information"
-    , Option "f" ["font"] (ReqArg Font "font name") "The font name"
+    , Option "f" ["font"] (ReqArg Font "font name") "Font name"
     , Option "w" ["wmclass"] (ReqArg WmClass "class") "X11 WM_CLASS property"
     , Option "n" ["wmname"] (ReqArg WmName "name") "X11 WM_NAME property"
     , Option "B" ["bgcolor"] (ReqArg BgColor "bg color" )
@@ -77,7 +79,7 @@ options =
     , Option "i" ["iconroot"] (ReqArg IconRoot "path")
       "Root directory for icon pattern paths. Default '.'"
     , Option "A" ["alpha"] (ReqArg Alpha "alpha")
-      "The transparency: 0 is transparent, 255 is opaque. Default: 255"
+      "Transparency: 0 is transparent, 255 is opaque. Default: 255"
     , Option "o" ["top"] (NoArg T) "Place xmobar at the top of the screen"
     , Option "b" ["bottom"] (NoArg B)
       "Place xmobar at the bottom of the screen"
@@ -86,12 +88,12 @@ options =
     , Option "a" ["alignsep"] (ReqArg AlignSep "alignsep")
       "Separators for left, center and right text\nalignment. Default: '}{'"
     , Option "s" ["sepchar"] (ReqArg SepChar "char")
-      ("The character used to separate commands in" ++
+      ("Character used to separate commands in" ++
        "\nthe output template. Default '%'")
     , Option "t" ["template"] (ReqArg Template "template")
-      "The output template"
+      "Output template"
     , Option "c" ["commands"] (ReqArg Commands "commands")
-      "The list of commands to be executed"
+      "List of commands to be executed"
     , Option "C" ["add-command"] (ReqArg AddCommand "command")
       "Add to the list of commands to be executed"
     , Option "x" ["screen"] (ReqArg OnScr "screen")
@@ -133,6 +135,7 @@ doOpts conf (o:oo) =
   case o of
     Help -> putStr   usage >> exitSuccess
     Version -> putStrLn info  >> exitSuccess
+    Debug -> doOpts' conf
     Font s -> doOpts' (conf {font = s})
     WmClass s -> doOpts' (conf {wmClass = s})
     WmName s -> doOpts' (conf {wmName = s})
@@ -160,7 +163,7 @@ doOpts conf (o:oo) =
             _  -> Left ("xmobar: cannot read list of commands " ++
                         "specified with the -" ++ c:" option\n")
         readStr str = [x | (x,t) <- reads str, ("","") <- lex t]
-        doOpts' opts = doOpts opts oo
+        doOpts' c = doOpts c oo
         readPosition string =
             case readMaybe string of
                 Just x  -> doOpts' (conf { position = x })
