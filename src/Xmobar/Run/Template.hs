@@ -75,5 +75,5 @@ splitTemplate alignSep template =
                    (ce,_:ri) -> [le, ce, ri]
                    _         -> def
     _         -> def
-  where [l, r] = if (length alignSep == 2) then alignSep else defaultAlign
+  where [l, r] = if length alignSep == 2 then alignSep else defaultAlign
         def = [template, "", ""]

@@ -27,7 +27,7 @@ import Text.Read (readMaybe)
 import Xmobar
 
 import Paths_xmobar (version)
-import Configuration (readConfig, readDefaultConfig)
+import Configuration as C (readConfig, readDefaultConfig)
 
 -- $main
 
@@ -36,8 +36,8 @@ main :: IO ()
 main = do
   (o,file) <- getArgs >>= getOpts
   (c,defaultings) <- case file of
-                       [cfgfile] -> readConfig cfgfile usage
-                       _ -> readDefaultConfig usage
+                       [cfgfile] -> C.readConfig cfgfile usage
+                       _ -> C.readDefaultConfig usage
   unless (null defaultings) $ putStrLn $
     "Fields missing from config defaulted: " ++ intercalate "," defaultings
   doOpts c o >>= xmobar

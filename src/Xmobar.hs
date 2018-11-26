@@ -21,6 +21,7 @@ module Xmobar (xmobar
               , Runnable (..)
               , Exec (..)
               , module Xmobar.Config.Types
+              , module Xmobar.Config.Parse
               , module Xmobar.Plugins.BufferedPipeReader
               , module Xmobar.Plugins.CommandReader
               , module Xmobar.Plugins.Date
@@ -43,6 +44,7 @@ module Xmobar (xmobar
 import Xmobar.Run.Runnable
 import Xmobar.Run.Commands
 import Xmobar.Config.Types
+import Xmobar.Config.Parse
 import Xmobar.Plugins.BufferedPipeReader
 import Xmobar.Plugins.CommandReader
 import Xmobar.Plugins.Date
