@@ -104,7 +104,7 @@ library
                    Xmobar.Run.Runnable
                    Xmobar.App.EventLoop,
                    Xmobar.App.Main,
-                   Xmobar.App.Defaults,
+                   Xmobar.App.Config,
                    Xmobar.System.Utils,
                    Xmobar.System.StatFS,
                    Xmobar.System.Environment,

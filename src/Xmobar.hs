@@ -64,4 +64,4 @@ import Xmobar.Plugins.StdinReader
 import Xmobar.Plugins.XMonadLog
 
 import Xmobar.App.Main(xmobar)
-import Xmobar.App.Defaults(defaultConfig, getXdgConfigFile)
+import Xmobar.App.Config(defaultConfig, getXdgConfigFile)

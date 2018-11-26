@@ -15,7 +15,7 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.App.Defaults (defaultConfig, getXdgConfigFile) where
+module Xmobar.App.Config (defaultConfig, getXdgConfigFile) where
 
 import System.Environment
 import System.Directory (getHomeDirectory)
