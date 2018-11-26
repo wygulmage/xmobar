@@ -105,6 +105,7 @@ library
                    Xmobar.App.EventLoop,
                    Xmobar.App.Main,
                    Xmobar.App.Config,
+                   Xmobar.App.Compile,
                    Xmobar.System.Utils,
                    Xmobar.System.StatFS,
                    Xmobar.System.Environment,
@@ -170,6 +171,7 @@ library
       parsec == 3.1.*,
       parsec-numbers >= 0.1.0,
       stm >= 2.3 && < 2.6,
+      extensible-exceptions == 0.1.*,
       async
 
     if impl(ghc < 8.0.2)
