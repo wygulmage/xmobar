@@ -73,9 +73,9 @@ shouldRecompile src bin lib = do
       trace "Xmobar doing recompile because some files have changed."
       return True
     else do
-      trace $ "Xmobar skipping recompile because it is not forced \
-              \ (e.g. via --recompile), and not any *.hs / *.lhs / *.hsc \
-              \ files in lib/ have been changed."
+      trace "Xmobar skipping recompile because it is not forced \
+            \ (e.g. via --recompile), and not any *.hs / *.lhs / *.hsc \
+            \ files in lib/ have been changed."
       return False
   where isSource = flip elem [".hs",".lhs",".hsc"] . takeExtension
         allFiles t = do
@@ -91,7 +91,7 @@ runProc :: FilePath -> [String] -> FilePath -> Handle -> IO ProcessHandle
 runProc bin args dir eh =
   runProcess bin args (Just dir) Nothing Nothing Nothing (Just eh)
 
-xmessage :: [Char] -> IO System.Posix.Types.ProcessID
+xmessage :: String -> IO System.Posix.Types.ProcessID
 xmessage msg = forkProcess $
   executeFile "xmessage" True ["-default", "okay", replaceUnicode msg] Nothing
   where -- Replace some of the unicode symbols GHC uses in its output
@@ -101,7 +101,7 @@ xmessage msg = forkProcess $
          '\8217' -> '`'  -- ’
          _ -> c
 
-ghcErrorMsg :: (Monad m, Show a) => [Char] -> a -> [Char] -> m String
+ghcErrorMsg :: (Monad m, Show a) => String -> a -> String -> m String
 ghcErrorMsg src status ghcErr = return . unlines $
   ["Error detected while loading xmobar configuration file: " ++ src]
   ++ lines (if null ghcErr then show status else ghcErr)

@@ -37,7 +37,7 @@ main = do
   (c,defaultings) <- case file of
                        [cfgfile] -> config cfgfile usage
                        _ -> defConfig usage
-  unless (null defaultings || (not $ any (== Debug) o)) $ putStrLn $
+  unless (null defaultings || notElem Debug o) $ putStrLn $
     "Fields missing from config defaulted: " ++ intercalate "," defaultings
   doOpts c o >>= xmobar
 
