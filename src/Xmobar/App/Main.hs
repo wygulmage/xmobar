@@ -15,18 +15,24 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.App.Main (xmobar, doOpts) where
+module Xmobar.App.Main (xmobar, xmobarMain) where
+
+import Control.Concurrent.Async (Async, cancel)
+import Control.Exception (bracket)
+import Control.Monad (unless)
 
 import Data.Foldable (for_)
 import qualified Data.Map as Map
-import System.Exit
-import Text.Read (readMaybe)
+import Data.List (intercalate)
+import System.Posix.Process (executeFile)
+import System.Environment (getArgs)
+import System.FilePath
+import System.FilePath.Posix (takeBaseName, takeDirectory)
 
 import Graphics.X11.Xlib
-import Control.Concurrent.Async (Async, cancel)
-import Control.Exception (bracket)
 
 import Xmobar.Config.Types
+import Xmobar.Config.Parse
 import Xmobar.System.Signal (setupSignalHandler, withDeferSignals)
 import Xmobar.Run.Template
 import Xmobar.X11.Types
@@ -34,6 +40,8 @@ import Xmobar.X11.Text
 import Xmobar.X11.Window
 import Xmobar.App.Opts
 import Xmobar.App.EventLoop (startLoop, startCommand)
+import Xmobar.App.Compile (recompile)
+import Xmobar.App.Config
 
 xmobar :: Config -> IO ()
 xmobar conf = withDeferSignals $ do
@@ -58,45 +66,32 @@ cleanupThreads vars =
   for_ (concat vars) $ \(asyncs, _) ->
     for_ asyncs cancel
 
-doOpts :: Config -> [Opts] -> IO Config
-doOpts conf [] =
-  return (conf {lowerOnStart = lowerOnStart conf && overrideRedirect conf})
-doOpts conf (o:oo) =
-  case o of
-    Help -> putStr   usage >> exitSuccess
-    Version -> putStrLn info  >> exitSuccess
-    Debug -> doOpts' conf
-    Font s -> doOpts' (conf {font = s})
-    WmClass s -> doOpts' (conf {wmClass = s})
-    WmName s -> doOpts' (conf {wmName = s})
-    BgColor s -> doOpts' (conf {bgColor = s})
-    FgColor s -> doOpts' (conf {fgColor = s})
-    Alpha n -> doOpts' (conf {alpha = read n})
-    T -> doOpts' (conf {position = Top})
-    B -> doOpts' (conf {position = Bottom})
-    D -> doOpts' (conf {overrideRedirect = False})
-    AlignSep s -> doOpts' (conf {alignSep = s})
-    SepChar s -> doOpts' (conf {sepChar = s})
-    Template s -> doOpts' (conf {template = s})
-    IconRoot s -> doOpts' (conf {iconRoot = s})
-    OnScr n -> doOpts' (conf {position = OnScreen (read n) $ position conf})
-    Commands s -> case readCom 'c' s of
-                    Right x -> doOpts' (conf {commands = x})
-                    Left e -> putStr (e ++ usage) >> exitWith (ExitFailure 1)
-    AddCommand s -> case readCom 'C' s of
-                      Right x -> doOpts' (conf {commands = commands conf ++ x})
-                      Left e -> putStr (e ++ usage) >> exitWith (ExitFailure 1)
-    Position s -> readPosition s
-  where readCom c str =
-          case readStr str of
-            [x] -> Right x
-            _  -> Left ("xmobar: cannot read list of commands " ++
-                        "specified with the -" ++ c:" option\n")
-        readStr str = [x | (x,t) <- reads str, ("","") <- lex t]
-        doOpts' c = doOpts c oo
-        readPosition string =
-            case readMaybe string of
-                Just x  -> doOpts' (conf { position = x })
-                Nothing -> do
-                    putStrLn "Can't parse position option, ignoring"
-                    doOpts' conf
+buildLaunch :: Bool -> Bool -> FilePath -> IO ()
+buildLaunch verb force p = do
+  let exec = takeBaseName p
+      dir = takeDirectory p
+  recompile dir exec force verb
+  executeFile (dir </> exec) False [] Nothing
+
+xmobar' :: Config -> [String] -> IO ()
+xmobar' cfg defs = do
+  unless (null defs || not (verbose cfg)) $ putStrLn $
+    "Fields missing from config defaulted: " ++ intercalate "," defs
+  xmobar cfg
+
+xmobarMain :: IO ()
+xmobarMain = do
+  args <- getArgs
+  (flags, rest) <- getOpts args
+  cf <- case rest of
+          (c:_) -> return (Just c)
+          _ -> xmobarConfigFile
+  case cf of
+    Nothing -> case rest of
+                (c:_) -> error $ c ++ ": file not found"
+                _ -> xmobar defaultConfig
+    Just p -> do d <- doOpts defaultConfig flags
+                 r <- readConfig d p
+                 case r of
+                   Left _ -> buildLaunch (verbose d) (forceRecompile flags) p
+                   Right (c, defs) -> xmobar' c defs

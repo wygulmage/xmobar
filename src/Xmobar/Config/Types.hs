@@ -64,6 +64,7 @@ data Config =
            , alignSep :: String     -- ^ Separators for left, center and
                                     --   right text alignment
            , template :: String     -- ^ The output template
+           , verbose :: Bool        -- ^ Emit additional debug messages
            } deriving (Read)
 
 data XPosition = Top

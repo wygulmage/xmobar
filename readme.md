@@ -364,7 +364,8 @@ xmobar --help):
     Options:
       -h, -?        --help                 This help
       -V            --version              Show version information
-      -D            --debug                Emit verbose debugging messages
+      -v            --verbose              Emit verbose debugging messages
+      -r            --recompile            Force recompilation (for Haskell FILE)
       -f font name  --font=font name       Font name
       -w class      --wmclass=class        X11 WM_CLASS property
       -n name       --wmname=name          X11 WM_NAME property

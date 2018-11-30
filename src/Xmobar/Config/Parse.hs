@@ -67,7 +67,7 @@ parseConfig defaultConfig =
               <|?> pAllDesktops <|?> pOverrideRedirect <|?> pPickBroadest
               <|?> pLowerOnStart <|?> pPersistent <|?> pIconRoot
               <|?> pCommands <|?> pSepChar <|?> pAlignSep <|?> pTemplate
-
+              <|?> pVerbose
 
       fields    = [ "font", "additionalFonts","bgColor", "fgColor"
                   , "wmClass", "wmName", "sepChar"
@@ -75,7 +75,7 @@ parseConfig defaultConfig =
                   , "position" , "textOffset", "textOffsets", "iconOffset"
                   , "allDesktops", "overrideRedirect", "pickBroadest"
                   , "hideOnStart", "lowerOnStart", "persistent", "iconRoot"
-                  , "alpha", "commands"
+                  , "alpha", "commands", "verbose"
                   ]
 
       pFont = strField font "font"
@@ -103,6 +103,7 @@ parseConfig defaultConfig =
       pPickBroadest = readField pickBroadest "pickBroadest"
       pIconRoot = readField iconRoot "iconRoot"
       pAlpha = readField alpha "alpha"
+      pVerbose = readField verbose "verbose"
 
       pCommands = field commands "commands" readCommands
 

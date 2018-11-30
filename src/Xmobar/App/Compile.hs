@@ -15,7 +15,7 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.App.Compile(recompile) where
+module Xmobar.App.Compile(recompile, xmessage) where
 
 import Control.Monad.IO.Class
 import Control.Monad.Fix (fix)
@@ -33,25 +33,23 @@ import System.Posix.Process(executeFile, forkProcess, getAnyProcessStatus)
 import System.Posix.Types(ProcessID)
 import System.Posix.Signals
 
-import Xmobar.App.Config
-
 isExecutable :: FilePath -> IO Bool
 isExecutable f =
   E.catch (executable <$> getPermissions f) (\(SomeException _) -> return False)
 
-checkBuildScript :: FilePath -> IO Bool
-checkBuildScript buildscript = do
+checkBuildScript :: Bool -> FilePath -> IO Bool
+checkBuildScript verb buildscript = do
   exists <- doesFileExist buildscript
   if exists
     then do
       isExe <- isExecutable buildscript
       if isExe
         then do
-          trace $ "Xmobar will use build script at "
-                  ++ show buildscript ++ " to recompile."
+          trace verb $ "Xmobar will use build script at "
+                       ++ show buildscript ++ " to recompile."
           return True
         else do
-          trace $ unlines
+          trace verb $ unlines
             [ "Xmobar will not use build script, because "
               ++ show buildscript ++ " is not executable."
             , "Suggested resolution to use it: chmod u+x "
@@ -59,23 +57,23 @@ checkBuildScript buildscript = do
             ]
           return False
     else do
-      trace $ "Xmobar will use ghc to recompile, because "
-              ++ show buildscript ++ " does not exist."
+      trace verb $ "Xmobar will use ghc to recompile, because "
+                   ++ show buildscript ++ " does not exist."
       return False
 
-shouldRecompile :: FilePath -> FilePath -> FilePath -> IO Bool
-shouldRecompile src bin lib = do
+shouldRecompile :: Bool -> FilePath -> FilePath -> FilePath -> IO Bool
+shouldRecompile verb src bin lib = do
   libTs <- mapM getModTime . filter isSource =<< allFiles lib
   srcT <- getModTime src
   binT <- getModTime bin
   if any (binT <) (srcT : libTs)
     then do
-      trace "Xmobar doing recompile because some files have changed."
+      trace verb "Xmobar doing recompile because some files have changed."
       return True
     else do
-      trace "Xmobar skipping recompile because it is not forced \
-            \ (e.g. via --recompile), and not any *.hs / *.lhs / *.hsc \
-            \ files in lib/ have been changed."
+      trace verb "Xmobar skipping recompile because it is not forced \
+                 \ (e.g. via --recompile), and not any *.hs / *.lhs / *.hsc \
+                 \ files in lib/ have been changed."
       return False
   where isSource = flip elem [".hs",".lhs",".hsc"] . takeExtension
         allFiles t = do
@@ -109,8 +107,8 @@ ghcErrorMsg src status ghcErr = return . unlines $
 
 -- | A 'trace' for the 'X' monad. Logs a string to stderr. The result may
 -- be found in your .xsession-errors file
-trace :: MonadIO m => String -> m ()
-trace = liftIO . hPutStrLn stderr
+trace :: MonadIO m => Bool -> String -> m ()
+trace verb msg = when verb (liftIO $ hPutStrLn stderr msg)
 
 -- | 'recompile force', recompile the xmobar configuration file when
 -- any of the following apply:
@@ -126,24 +124,22 @@ trace = liftIO . hPutStrLn stderr
 -- and any files in the aforementioned @lib@ directory.
 --
 -- Compilation errors (if any) are logged to the @xmobar.errors@ file
--- in the xmobar data directory.  If GHC indicates failure with a
+-- in the given directory.  If GHC indicates failure with a
 -- non-zero exit code, an xmessage displaying that file is spawned.
 --
 -- 'False' is returned if there are compilation errors.
 --
-recompile :: MonadIO m => String -> Bool -> m Bool
-recompile execName force = liftIO $ do
-    cfgdir  <- xmobarConfigDir
-    datadir <- xmobarDataDir
-    let bin  = datadir </> execName
-        err  = datadir </> (execName ++ ".errors")
-        src  = cfgdir </> (execName ++ ".hs")
-        lib  = cfgdir </> "lib"
-        script = cfgdir </> "build"
-    useScript <- checkBuildScript script
+recompile :: MonadIO m => String -> String -> Bool -> Bool -> m Bool
+recompile dir execName force verb = liftIO $ do
+    let bin  = dir </> execName
+        err  = dir </> (execName ++ ".errors")
+        src  = dir </> (execName ++ ".hs")
+        lib  = dir </> "lib"
+        script = dir </> "build"
+    useScript <- checkBuildScript verb script
     sc <- if useScript || force
           then return True
-          else shouldRecompile src bin lib
+          else shouldRecompile verb src bin lib
     if sc
       then do
         uninstallSignalHandlers
@@ -151,16 +147,15 @@ recompile execName force = liftIO $ do
                     \errHandle ->
                       waitForProcess =<<
                         if useScript
-                        then runScript script bin cfgdir errHandle
-                        else runGHC bin cfgdir errHandle
+                        then runScript script bin dir errHandle
+                        else runGHC bin dir errHandle
         installSignalHandlers
         if status == ExitSuccess
-            then trace "Xmobar recompilation process exited with success!"
+            then trace verb "Xmobar recompilation process exited with success!"
             else do
                 msg <- readFile err >>= ghcErrorMsg src status
                 hPutStrLn stderr msg
-                xmessage msg
-                return ()
+                exitWith (ExitFailure 1)
         return (status == ExitSuccess)
       else return True
  where opts bin = ["--make" , execName ++ ".hs" , "-i" , "-ilib"

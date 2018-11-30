@@ -61,6 +61,7 @@ defaultConfig =
            , alignSep = "}{"
            , template = "%StdinReader% }{ " ++
                         "<fc=#00FF00>%uname%</fc> * <fc=#FF0000>%theDate%</fc>"
+           , verbose = False
            }
 
 -- | Return the path to the xmobar configuration directory.  This
@@ -136,8 +137,11 @@ findFirstDirWithEnv envName paths = do
       Nothing -> findFirstDirOf paths
       Just envPath -> findFirstDirOf (return envPath:paths)
 
-xmobarConfigFile :: IO FilePath
-xmobarConfigFile = do
-  f <- fmap (</> "xmobarrc") xmobarConfigDir
-  fe <- fileExist f
-  if fe then return f else fmap (</> ".xmobarrc") getHomeDirectory
+xmobarConfigFile :: IO (Maybe FilePath)
+xmobarConfigFile =
+  ffirst [ xdg "xmobar.hs", xdg "xmobarrc", home ".xmobarrc"]
+  where xdg p = fmap (</> p) xmobarConfigDir
+        home p = fmap (</> p) getHomeDirectory
+        ffirst [] = return Nothing
+        ffirst (f:fs) =
+          f >>= fileExist >>= \e -> if e then fmap Just f else ffirst fs

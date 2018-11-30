@@ -14,16 +14,21 @@
 --
 ------------------------------------------------------------------------------
 
-
 module Xmobar.App.Opts where
 
+import Control.Monad (when)
 import System.Console.GetOpt
+import System.Exit (exitSuccess, exitWith, ExitCode(..))
 import Data.Version (showVersion)
+import Text.Read (readMaybe)
 
 import Paths_xmobar (version)
 
+import Xmobar.Config.Types
+
 data Opts = Help
-          | Debug
+          | Verbose
+          | Recompile
           | Version
           | Font       String
           | BgColor    String
@@ -47,7 +52,8 @@ data Opts = Help
 options :: [OptDescr Opts]
 options =
     [ Option "h?" ["help"] (NoArg Help) "This help"
-    , Option "D" ["debug"] (NoArg Debug) "Emit verbose debugging messages"
+    , Option "v" ["verbose"] (NoArg Verbose) "Emit verbose debugging messages"
+    , Option "r" ["recompile"] (NoArg Recompile) "Force recompilation"
     , Option "V" ["version"] (NoArg Version) "Show version information"
     , Option "f" ["font"] (ReqArg Font "font name") "Font name"
     , Option "w" ["wmclass"] (ReqArg WmClass "class") "X11 WM_CLASS property"
@@ -83,10 +89,13 @@ options =
     ]
 
 getOpts :: [String] -> IO ([Opts], [String])
-getOpts argv =
-    case getOpt Permute options argv of
-      (o,n,[])   -> return (o,n)
-      (_,_,errs) -> error (concat errs ++ usage)
+getOpts argv = do
+   (o,n) <-  case getOpt Permute options argv of
+               (o,n,[])   -> return (o,n)
+               (_,_,errs) -> error (concat errs ++ usage)
+   when (Help `elem` o) (putStr usage >> exitSuccess)
+   when (Version `elem` o) (putStr info >> exitSuccess)
+   return (o, n)
 
 usage :: String
 usage = usageInfo header options ++ footer
@@ -107,3 +116,50 @@ license = "\nThis program is distributed in the hope that it will be useful," ++
           "\nbut WITHOUT ANY WARRANTY; without even the implied warranty of" ++
           "\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." ++
           "\nSee the License for more details."
+
+doOpts :: Config -> [Opts] -> IO Config
+doOpts conf [] =
+  return (conf {lowerOnStart = lowerOnStart conf && overrideRedirect conf})
+doOpts conf (o:oo) =
+  case o of
+    Help -> doOpts' conf
+    Version -> doOpts' conf
+    Recompile -> doOpts' conf
+    Verbose -> doOpts' (conf {verbose = True})
+    Font s -> doOpts' (conf {font = s})
+    WmClass s -> doOpts' (conf {wmClass = s})
+    WmName s -> doOpts' (conf {wmName = s})
+    BgColor s -> doOpts' (conf {bgColor = s})
+    FgColor s -> doOpts' (conf {fgColor = s})
+    Alpha n -> doOpts' (conf {alpha = read n})
+    T -> doOpts' (conf {position = Top})
+    B -> doOpts' (conf {position = Bottom})
+    D -> doOpts' (conf {overrideRedirect = False})
+    AlignSep s -> doOpts' (conf {alignSep = s})
+    SepChar s -> doOpts' (conf {sepChar = s})
+    Template s -> doOpts' (conf {template = s})
+    IconRoot s -> doOpts' (conf {iconRoot = s})
+    OnScr n -> doOpts' (conf {position = OnScreen (read n) $ position conf})
+    Commands s -> case readCom 'c' s of
+                    Right x -> doOpts' (conf {commands = x})
+                    Left e -> putStr (e ++ usage) >> exitWith (ExitFailure 1)
+    AddCommand s -> case readCom 'C' s of
+                      Right x -> doOpts' (conf {commands = commands conf ++ x})
+                      Left e -> putStr (e ++ usage) >> exitWith (ExitFailure 1)
+    Position s -> readPosition s
+  where readCom c str =
+          case readStr str of
+            [x] -> Right x
+            _  -> Left ("xmobar: cannot read list of commands " ++
+                        "specified with the -" ++ c:" option\n")
+        readStr str = [x | (x,t) <- reads str, ("","") <- lex t]
+        doOpts' c = doOpts c oo
+        readPosition string =
+            case readMaybe string of
+                Just x  -> doOpts' (conf { position = x })
+                Nothing -> do
+                    putStrLn "Can't parse position option, ignoring"
+                    doOpts' conf
+
+forceRecompile :: [Opts] -> Bool
+forceRecompile = elem Recompile

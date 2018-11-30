@@ -99,7 +99,8 @@ startLoop xcfg@(XConf _ _ w _ _ _ _) sig vs = do
             ConfigureEvent {} -> atomically $ putTMVar signal Reposition
             ExposeEvent {} -> atomically $ putTMVar signal Wakeup
             RRScreenChangeNotifyEvent {} -> atomically $ putTMVar signal Reposition
-            ButtonEvent {} -> atomically $ putTMVar signal (Action (ev_button ev) (fi $ ev_x ev))
+            ButtonEvent {} -> atomically $
+                   putTMVar signal (Action (ev_button ev) (fi $ ev_x ev))
             _ -> return ()
 
 -- | Send signal to eventLoop every time a var is updated
