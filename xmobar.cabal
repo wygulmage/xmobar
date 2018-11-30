@@ -95,15 +95,17 @@ library
     hs-source-dirs:  src
 
     exposed-modules: Xmobar
+                     Xmobar.App.Main
+                     Xmobar.App.Opts
 
-    other-modules: Xmobar.Config.Types,
+    other-modules: Paths_xmobar,
+                   Xmobar.Config.Types,
                    Xmobar.Config.Parse,
                    Xmobar.Run.Types,
                    Xmobar.Run.Template,
                    Xmobar.Run.Commands,
                    Xmobar.Run.Runnable
                    Xmobar.App.EventLoop,
-                   Xmobar.App.Main,
                    Xmobar.App.Config,
                    Xmobar.App.Compile,
                    Xmobar.System.Utils,
@@ -258,7 +260,7 @@ library
 executable xmobar
     hs-source-dirs:     app
     main-is:            Main.hs
-    other-modules:      Paths_xmobar
+--    other-modules:      Paths_xmobar
     build-depends:      base,
                         containers,
                         async,
