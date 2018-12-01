@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.App.Compile
@@ -71,9 +73,9 @@ shouldRecompile verb src bin lib = do
       trace verb "Xmobar doing recompile because some files have changed."
       return True
     else do
-      trace verb "Xmobar skipping recompile because it is not forced \
-                 \ (e.g. via --recompile), and not any *.hs / *.lhs / *.hsc \
-                 \ files in lib/ have been changed."
+      trace verb $ "Xmobar skipping recompile because it is not forced "
+                   ++ "(e.g. via --recompile), and not any *.hs / *.lhs / *.hsc"
+                   ++ "files in lib/ have been changed."
       return False
   where isSource = flip elem [".hs",".lhs",".hsc"] . takeExtension
         allFiles t = do
@@ -159,7 +161,14 @@ recompile dir execName force verb = liftIO $ do
         return (status == ExitSuccess)
       else return True
  where opts bin = ["--make" , execName ++ ".hs" , "-i" , "-ilib"
-                  , "-fforce-recomp" , "-main-is", "main" , "-v0" , "-o", bin]
+                  , "-fforce-recomp" , "-main-is", "main" , "-v0"]
+#ifdef THREADED_RUNTIME
+                  ++ ["-threaded"]
+#endif
+#ifdef DRTSOPTS
+                  ++ ["-rtsopts", "-with-rtsopts", "-V0"]
+#endif
+                  ++ ["-o", bin]
        runGHC bin = runProc "ghc" (opts bin)
        runScript script bin = runProc script [bin]
 
