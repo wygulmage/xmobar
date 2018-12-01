@@ -1,4 +1,4 @@
-## Version 0.29
+## Version 0.29 (December, 2018)
 
 _New features_
 
@@ -8,6 +8,10 @@ _New features_
   - `TopProc` ignores kernel threads (see also [issue #369]).
   - `Wireless` simple autodetection of wirless interface name (if set
     to "").
+  - Experimental support for using xmobar as a library, so that
+    configurations are in fact Haskell programs a la Xmonad (beta
+    stage, with help from Pavan Rikhi). Traditional config files are
+    still (and will continue to be) supported.
 
 _Bug fixes_
 

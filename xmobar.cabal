@@ -1,5 +1,5 @@
 name:               xmobar
-version:            0.28.1
+version:            0.29
 homepage:           http://xmobar.org
 synopsis:           A Minimalistic Text Based Status Bar
 description: 	    Xmobar is a minimalistic text based status bar.
@@ -187,7 +187,6 @@ library
        -- -threaded is a workaround for 100% CPU busy loop
        -- (http://hackage.haskell.org/trac/ghc/ticket/4934).
        -- See also comments in https://github.com/jaor/xmobar/pull/36
-       ghc-options: -threaded
        cpp-options: -DTHREADED_RUNTIME
 
     if flag(with_rtsopts)
