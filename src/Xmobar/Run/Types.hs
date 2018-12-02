@@ -18,8 +18,6 @@
 
 module Xmobar.Run.Types(runnableTypes) where
 
-import Xmobar.Run.Commands
-
 import {-# SOURCE #-} Xmobar.Run.Runnable()
 import Xmobar.Plugins.Monitors
 import Xmobar.Plugins.Date
@@ -41,6 +39,8 @@ import Xmobar.Plugins.MBox
 #ifdef DATEZONE
 import Xmobar.Plugins.DateZone
 #endif
+
+import Xmobar.Run.Command
 
 -- | An alias for tuple types that is more convenient for long lists.
 type a :*: b = (a, b)

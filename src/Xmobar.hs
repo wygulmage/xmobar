@@ -20,6 +20,7 @@ module Xmobar (xmobar
               , defaultConfig
               , Runnable (..)
               , Exec (..)
+              , Command (..)
               , module Xmobar.Config.Types
               , module Xmobar.Config.Parse
               , module Xmobar.Plugins.BufferedPipeReader
@@ -42,7 +43,8 @@ module Xmobar (xmobar
               ) where
 
 import Xmobar.Run.Runnable
-import Xmobar.Run.Commands
+import Xmobar.Run.Exec
+import Xmobar.Run.Command
 import Xmobar.Config.Types
 import Xmobar.Config.Parse
 import Xmobar.Plugins.BufferedPipeReader

@@ -38,7 +38,7 @@ import Data.Maybe (fromJust, isJust)
 
 import Xmobar.System.Signal
 import Xmobar.Config.Types
-import Xmobar.Run.Commands
+import Xmobar.Run.Exec
 import Xmobar.Run.Runnable
 import Xmobar.X11.Actions
 import Xmobar.X11.Parsers

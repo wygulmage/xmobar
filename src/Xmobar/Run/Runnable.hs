@@ -24,7 +24,7 @@ module Xmobar.Run.Runnable where
 import Control.Monad
 import Text.Read
 import Xmobar.Run.Types (runnableTypes)
-import Xmobar.Run.Commands
+import Xmobar.Run.Exec
 
 data Runnable = forall r . (Exec r, Read r, Show r) => Run r
 

@@ -20,7 +20,7 @@ import Control.Concurrent.STM
 import System.IO
 import System.IO.Unsafe(unsafePerformIO)
 
-import Xmobar.Run.Commands
+import Xmobar.Run.Exec
 import Xmobar.System.Signal
 import Xmobar.System.Environment
 import Xmobar.System.Utils(hGetLineSafe)

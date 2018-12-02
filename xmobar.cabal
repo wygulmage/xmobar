@@ -101,7 +101,8 @@ library
                    Xmobar.Config.Parse,
                    Xmobar.Run.Types,
                    Xmobar.Run.Template,
-                   Xmobar.Run.Commands,
+                   Xmobar.Run.Exec,
+                   Xmobar.Run.Command,
                    Xmobar.Run.Runnable
                    Xmobar.App.EventLoop,
                    Xmobar.App.Config,

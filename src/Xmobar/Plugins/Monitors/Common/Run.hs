@@ -27,7 +27,7 @@ import Control.Monad.Reader
 import System.Console.GetOpt
 
 import Xmobar.Plugins.Monitors.Common.Types
-import Xmobar.Run.Commands (tenthSeconds)
+import Xmobar.Run.Exec (tenthSeconds)
 
 options :: [OptDescr Opts]
 options =

@@ -22,7 +22,7 @@
 
 module Xmobar.Plugins.DateZone (DateZone(..)) where
 
-import Xmobar.Run.Commands
+import Xmobar.Run.Exec
 
 #ifdef DATEZONE
 import Control.Concurrent.STM

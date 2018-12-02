@@ -20,7 +20,7 @@ module Xmobar.Plugins.XMonadLog (XMonadLog(..)) where
 import Control.Monad
 import Graphics.X11
 import Graphics.X11.Xlib.Extras
-import Xmobar.Run.Commands
+import Xmobar.Run.Exec
 #ifdef UTF8
 #undef UTF8
 import Codec.Binary.UTF8.String as UTF8

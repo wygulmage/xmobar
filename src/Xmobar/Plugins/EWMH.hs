@@ -22,7 +22,7 @@ import Control.Monad.State
 import Control.Monad.Reader
 import Graphics.X11 hiding (Modifier, Color)
 import Graphics.X11.Xlib.Extras
-import Xmobar.Run.Commands
+import Xmobar.Run.Exec
 #ifdef UTF8
 #undef UTF8
 import Codec.Binary.UTF8.String as UTF8
