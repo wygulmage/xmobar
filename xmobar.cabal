@@ -18,9 +18,9 @@ build-type:         Simple
 
 extra-source-files: readme.md, changelog.md,
                     examples/padding-icon.sh,
-                    examples/xmobar.config, examples/xmonadpropwrite.hs
-                    examples/Plugins/helloworld.config,
-                    examples/Plugins/HelloWorld.hs
+                    examples/xmobar.config,
+                    examples/xmobar.hs,
+                    examples/xmonadpropwrite.hs
 
 source-repository head
   type:      git

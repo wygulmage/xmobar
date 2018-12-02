@@ -1501,74 +1501,23 @@ This implementation is equivalent to the one you can read in
 `alias` is the name to be used in the output template. Default alias
 will be the data type constructor.
 
-Implementing a plugin requires importing the plugin API (the `Exec`
-class definition), that is exported by `Plugins.hs`. So you just need
-to import it in your module with:
-
-        import Plugins
-
 After that your type constructor can be used as an argument for the
 Runnable type constructor `Run` in the `commands` list of the
 configuration options.
 
-This requires importing your plugin into `Config.hs` and adding your
-type to the type list in the type signature of `Config.runnableTypes`.
+## Using a Plugin
 
-For a very basic example see `examples/Plugins/HelloWorld.hs` or the
-other plugins that are distributed with xmobar.
+To use your new plugin, you need to use a pure Haskell configuration
+for xmobar, and load your definitions there.  You can see an example
+in [examples/xmobar.hs] showing you how to write a Haskell
+configuration that uses a new plugin, all in one file.
 
-## Installing/Removing a Plugin
+When xmobar runs with the full path to that Haskell file as its
+argument (or if you put it in `~/.config/xmobar/xmobar.hs`), and with
+the xmobar library installed, the Haskell code will be compiled as
+needed, and the new executable spawned for you.
 
-Installing a plugin should require 3 steps. Here we are going to
-install the HelloWorld plugin that comes with xmobar, assuming that
-you copied it to `src/Plugins`:
-
-1. import the plugin module in `Config.hs`, by adding:
-
-        import Plugins.HelloWorld
-
-2. add the plugin data type to the list of data types in the type
-   signature of `runnableTypes` in `Config.hs`. For instance, for the
-   HelloWorld plugin, change `runnableTypes` into:
-
-        runnableTypes :: Command :*: Monitors :*: HelloWorld :*: ()
-        runnableTypes = undefined
-
-3. Rebuild and reinstall xmobar. Now test it with:
-
-        xmobar Plugins/helloworld.config
-
-As you may see in the example configuration file, the plugin can be
-used by adding, in the `commands` list:
-
-        Run HelloWorld
-
-and, in the output template, the alias of the plugin:
-
-        %helloWorld%
-
-That's it.
-
-To remove a plugin, just remove its type from the type signature of
-runnableTypes and remove the imported modules.
-
-To remove the system monitor plugin:
-
-1. remove, from `Config.hs`, the line
-
-        import Plugins.Monitors
-
-2. in `Config.hs` change
-
-         runnableTypes :: Command :*: Monitors :*: ()
-         runnableTypes = undefined
-
-    to
-
-         runnableTypes :: Command :*: ()
-         runnableTypes = undefined
-
-3. rebuild xmobar.
+That's it!
 
 # Authors and credits
 
