@@ -316,9 +316,12 @@ test-suite XmobarTest
 
   other-modules: Xmobar.Plugins.Monitors.CommonSpec
                  Xmobar.Plugins.Monitors.Common
+                 Xmobar.Plugins.Monitors.Common.Parsers
+                 Xmobar.Plugins.Monitors.Common.Run
+                 Xmobar.Plugins.Monitors.Common.Types
+                 Xmobar.Plugins.Monitors.Common.Output
+                 Xmobar.Run.Exec
                  Xmobar.System.Signal
-                 Xmobar.System.Utils
-                 Xmobar.Run.Commands
 
   if flag(with_alsa) || flag(all_extensions)
       build-depends: alsa-mixer > 0.2.0.2,
