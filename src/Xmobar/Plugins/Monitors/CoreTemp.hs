@@ -15,8 +15,6 @@
 module Xmobar.Plugins.Monitors.CoreTemp where
 
 import Xmobar.Plugins.Monitors.Common
-import Xmobar.Plugins.Monitors.CoreCommon
-
 
 import Data.Char (isDigit)
 

@@ -15,7 +15,6 @@
 module Xmobar.Plugins.Monitors.CpuFreq where
 
 import Xmobar.Plugins.Monitors.Common
-import Xmobar.Plugins.Monitors.CoreCommon
 
 -- |
 -- Cpu frequency default configuration. Default template contains only

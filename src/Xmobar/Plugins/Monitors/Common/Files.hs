@@ -2,7 +2,7 @@
 
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Plugins.Monitors.CoreCommon
+-- Module      :  Plugins.Monitors.Files
 -- Copyright   :  (c) Juraj Hercek
 -- License     :  BSD-style (see LICENSE)
 --
@@ -10,11 +10,11 @@
 -- Stability   :  unstable
 -- Portability :  unportable
 --
--- The common part for cpu core monitors (e.g. cpufreq, coretemp)
+-- Specialized helpers to access files and their contents
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.Monitors.CoreCommon where
+module Xmobar.Plugins.Monitors.Common.Files (checkedDataRetrieval) where
 
 #if __GLASGOW_HASKELL__ < 800
 import Control.Applicative
@@ -24,8 +24,11 @@ import Data.Char hiding (Space)
 import Data.Function
 import Data.List
 import Data.Maybe
-import Xmobar.Plugins.Monitors.Common
 import System.Directory
+
+import Xmobar.Plugins.Monitors.Common.Types
+import Xmobar.Plugins.Monitors.Common.Parsers
+import Xmobar.Plugins.Monitors.Common.Output
 
 checkedDataRetrieval :: (Ord a, Num a)
                      => String -> [[String]] -> Maybe (String, String -> Int)

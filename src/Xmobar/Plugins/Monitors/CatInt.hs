@@ -13,7 +13,6 @@
 module Xmobar.Plugins.Monitors.CatInt where
 
 import Xmobar.Plugins.Monitors.Common
-import Xmobar.Plugins.Monitors.CoreCommon
 
 catIntConfig :: IO MConfig
 catIntConfig = mkMConfig "<v>" ["v"]

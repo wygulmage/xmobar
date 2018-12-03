@@ -18,9 +18,11 @@ module Xmobar.Plugins.Monitors.Common
   , module Xmobar.Plugins.Monitors.Common.Run
   , module Xmobar.Plugins.Monitors.Common.Output
   , module Xmobar.Plugins.Monitors.Common.Parsers
+  , module Xmobar.Plugins.Monitors.Common.Files
   ) where
 
 import Xmobar.Plugins.Monitors.Common.Types
 import Xmobar.Plugins.Monitors.Common.Run
 import Xmobar.Plugins.Monitors.Common.Output
 import Xmobar.Plugins.Monitors.Common.Parsers
+import Xmobar.Plugins.Monitors.Common.Files

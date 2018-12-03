@@ -141,7 +141,7 @@ library
                    Xmobar.Plugins.Monitors.Common.Run,
                    Xmobar.Plugins.Monitors.Common.Output,
                    Xmobar.Plugins.Monitors.Common.Parsers,
-                   Xmobar.Plugins.Monitors.CoreCommon,
+                   Xmobar.Plugins.Monitors.Common.Files,
                    Xmobar.Plugins.Monitors.CoreTemp,
                    Xmobar.Plugins.Monitors.CpuFreq,
                    Xmobar.Plugins.Monitors.Cpu,
@@ -320,6 +320,7 @@ test-suite XmobarTest
                  Xmobar.Plugins.Monitors.Common.Run
                  Xmobar.Plugins.Monitors.Common.Types
                  Xmobar.Plugins.Monitors.Common.Output
+                 Xmobar.Plugins.Monitors.Common.Files
                  Xmobar.Run.Exec
                  Xmobar.System.Signal
 
