@@ -161,5 +161,8 @@ doOpts conf (o:oo) =
                     putStrLn "Can't parse position option, ignoring"
                     doOpts' conf
 
-forceRecompile :: [Opts] -> Bool
-forceRecompile = elem Recompile
+recompileFlag :: [Opts] -> Bool
+recompileFlag = elem Recompile
+
+verboseFlag :: [Opts] -> Bool
+verboseFlag = elem Verbose

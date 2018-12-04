@@ -73,8 +73,8 @@ buildLaunch verb force p = do
   recompile dir exec force verb
   executeFile (dir </> exec) False [] Nothing
 
-xmobar' :: Config -> [String] -> IO ()
-xmobar' cfg defs = do
+xmobar' :: [String] -> Config -> IO ()
+xmobar' defs cfg = do
   unless (null defs || not (verbose cfg)) $ putStrLn $
     "Fields missing from config defaulted: " ++ intercalate "," defs
   xmobar cfg
@@ -84,14 +84,15 @@ xmobarMain = do
   args <- getArgs
   (flags, rest) <- getOpts args
   cf <- case rest of
-          (c:_) -> return (Just c)
-          _ -> xmobarConfigFile
+          [c] -> return (Just c)
+          [] -> xmobarConfigFile
+          _ -> error $ "Too many arguments: " ++ show rest
   case cf of
     Nothing -> case rest of
                 (c:_) -> error $ c ++ ": file not found"
                 _ -> xmobar defaultConfig
-    Just p -> do d <- doOpts defaultConfig flags
-                 r <- readConfig d p
+    Just p -> do r <- readConfig defaultConfig p
                  case r of
-                   Left _ -> buildLaunch (verbose d) (forceRecompile flags) p
-                   Right (c, defs) -> xmobar' c defs
+                   Left _ ->
+                     buildLaunch (verboseFlag flags) (recompileFlag flags) p
+                   Right (c, defs) -> doOpts c flags >>= xmobar' defs

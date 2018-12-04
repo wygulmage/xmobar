@@ -1,3 +1,12 @@
+## Version 0.29.1 (December, 2018)
+
+_Bug fixes_
+
+  - Honour command line flags (fixes [issue #370])
+  - Expose Cmd and CmdX in Xmobar interface
+
+[issue #370]: https://github.com/jaor/xmobar/issues/370
+
 ## Version 0.29 (December, 2018)
 
 _New features_
