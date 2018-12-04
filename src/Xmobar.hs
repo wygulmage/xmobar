@@ -11,7 +11,7 @@
 -- Stability   :  unstable
 -- Portability :  unportable
 --
--- A status bar for the Xmonad Window Manager
+-- Public interface of the xmobar library
 --
 -----------------------------------------------------------------------------
 
