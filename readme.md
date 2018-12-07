@@ -321,7 +321,6 @@ Other configuration options:
 
 - `template` The output template.
 
-
 - `wmClass` The value for the window's X11 WM_CLASS property.
   Defaults to "xmobar".
 
@@ -400,7 +399,7 @@ meaning that the first process will get the dbus interface. Other
 processes will run without further problems, yet have no dbus
 interface.
 
-[src/Signal.hs]: https://github.com/jaor/xmobar/raw/master/src/Signal.hs
+[src/Signal.hs]: https://github.com/jaor/xmobar/blob/master/src/Xmobar/System/Signal.hs
 
 - Bus Name: `org.Xmobar.Control`
 - Object Path: `/org/Xmobar/Control`
