@@ -16,7 +16,6 @@
 -- and xmobar will compile and launch it for you and
 ------------------------------------------------------------------------------
 
-
 import Xmobar
 
 -- Example user-defined plugin

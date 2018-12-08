@@ -28,6 +28,7 @@ import System.Posix.Process (executeFile)
 import System.Environment (getArgs)
 import System.FilePath
 import System.FilePath.Posix (takeBaseName, takeDirectory)
+import Text.Parsec.Error (ParseError)
 
 import Graphics.X11.Xlib
 
@@ -40,7 +41,7 @@ import Xmobar.X11.Text
 import Xmobar.X11.Window
 import Xmobar.App.Opts
 import Xmobar.App.EventLoop (startLoop, startCommand)
-import Xmobar.App.Compile (recompile)
+import Xmobar.App.Compile (recompile, trace)
 import Xmobar.App.Config
 
 xmobar :: Config -> IO ()
@@ -66,12 +67,17 @@ cleanupThreads vars =
   for_ (concat vars) $ \(asyncs, _) ->
     for_ asyncs cancel
 
-buildLaunch :: Bool -> Bool -> FilePath -> IO ()
-buildLaunch verb force p = do
+buildLaunch :: Bool -> Bool -> FilePath -> ParseError -> IO ()
+buildLaunch verb force p e = do
   let exec = takeBaseName p
       dir = takeDirectory p
-  recompile dir exec force verb
-  executeFile (dir </> exec) False [] Nothing
+      ext = takeExtension p
+  if ext `elem` [".hs", ".hsc", ".lhs"]
+    then recompile dir exec force verb >>
+         executeFile (dir </> exec) False [] Nothing
+    else trace True ("Invalid configuration file: " ++ show e) >>
+         trace True "\n(No compilation attempted: \
+                    \only .hs, .hsc or .lhs files are compiled)"
 
 xmobar' :: [String] -> Config -> IO ()
 xmobar' defs cfg = do
@@ -93,6 +99,6 @@ xmobarMain = do
                 _ -> xmobar defaultConfig
     Just p -> do r <- readConfig defaultConfig p
                  case r of
-                   Left _ ->
-                     buildLaunch (verboseFlag flags) (recompileFlag flags) p
+                   Left e ->
+                     buildLaunch (verboseFlag flags) (recompileFlag flags) p e
                    Right (c, defs) -> doOpts c flags >>= xmobar' defs

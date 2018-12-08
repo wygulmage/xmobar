@@ -17,7 +17,7 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.App.Compile(recompile, xmessage) where
+module Xmobar.App.Compile(recompile, trace, xmessage) where
 
 import Control.Monad.IO.Class
 import Control.Monad.Fix (fix)
@@ -70,12 +70,12 @@ shouldRecompile verb src bin lib = do
   binT <- getModTime bin
   if any (binT <) (srcT : libTs)
     then do
-      trace verb "Xmobar doing recompile because some files have changed."
+      trace verb "Xmobar recompiling because some files have changed."
       return True
     else do
       trace verb $ "Xmobar skipping recompile because it is not forced "
                    ++ "(e.g. via --recompile), and not any *.hs / *.lhs / *.hsc"
-                   ++ "files in lib/ have been changed."
+                   ++ " files in lib/ have been changed."
       return False
   where isSource = flip elem [".hs",".lhs",".hsc"] . takeExtension
         allFiles t = do
