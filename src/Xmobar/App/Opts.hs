@@ -14,7 +14,7 @@
 --
 ------------------------------------------------------------------------------
 
-module Xmobar.App.Opts where
+module Xmobar.App.Opts (recompileFlag, verboseFlag, getOpts, doOpts) where
 
 import Control.Monad (when)
 import System.Console.GetOpt

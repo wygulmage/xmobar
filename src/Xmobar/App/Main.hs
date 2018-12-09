@@ -15,7 +15,7 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.App.Main (xmobar, xmobarMain) where
+module Xmobar.App.Main (xmobar, xmobarMain, configFromArgs) where
 
 import Control.Concurrent.Async (Async, cancel)
 import Control.Exception (bracket)
@@ -39,7 +39,7 @@ import Xmobar.Run.Template
 import Xmobar.X11.Types
 import Xmobar.X11.Text
 import Xmobar.X11.Window
-import Xmobar.App.Opts
+import Xmobar.App.Opts (recompileFlag, verboseFlag, getOpts, doOpts)
 import Xmobar.App.EventLoop (startLoop, startCommand)
 import Xmobar.App.Compile (recompile, trace)
 import Xmobar.App.Config
@@ -61,6 +61,9 @@ xmobar conf = withDeferSignals $ do
         to = textOffset conf
         ts = textOffsets conf ++ replicate (length fl) (-1)
     startLoop (XConf d r w (fs:fl) (to:ts) ic conf) sig vars
+
+configFromArgs :: Config -> IO Config
+configFromArgs cfg = getArgs >>= getOpts >>= doOpts cfg . fst
 
 cleanupThreads :: [[([Async ()], a)]] -> IO ()
 cleanupThreads vars =
