@@ -223,7 +223,7 @@ library
        cpp-options: -DLIBMPD
 
     if flag(with_alsa) || flag(all_extensions)
-       build-depends: alsa-mixer > 0.2.0.2
+       build-depends: alsa-mixer > 0.2.0.2 && < 0.3
        build-depends: alsa-core == 0.5.*,
                       process >= 1.4.3.0
        exposed-modules: Xmobar.Plugins.Monitors.Volume
@@ -325,7 +325,7 @@ test-suite XmobarTest
                  Xmobar.System.Signal
 
   if flag(with_alsa) || flag(all_extensions)
-      build-depends: alsa-mixer > 0.2.0.2,
+      build-depends: alsa-mixer > 0.2.0.2 && < 0.3,
                      alsa-core == 0.5.*,
                      process >= 1.4.3.0
       other-modules: Xmobar.Plugins.Monitors.Volume
