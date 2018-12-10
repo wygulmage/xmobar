@@ -1,3 +1,11 @@
+## Version 0.29.3 (December, 2018)
+
+_Bug fixes_
+
+  - Upper bound for alsa_mixer (see [issue #372])
+
+[issue #372]: https://github.com/jaor/xmobar/issues/372
+
 ## Version 0.29.2 (December, 2018)
 
 _Bug fixes_
