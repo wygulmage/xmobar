@@ -1,9 +1,20 @@
-resolver: lts-12.1
+# Compiling with ghc 8.6.3
+resolver: lts-13.0
+
+# To use ghc 4.4 try:
+# resolver: lts-12.24
+
 packages:
-- .
+ - .
+
+flags:
+ xmobar:
+   all_extensions: true
+
 extra-deps:
-- iwlib-0.1.0
-- parsec-numbers-0.1.0
-- alsa-mixer-0.2.0.3
-- libmpd-0.9.0.9
- 
+ - iwlib-0.1.0
+
+# Add to extra-deps for lts-12.24:
+# - parsec-numbers-0.1.0
+# - libmpd-0.9.0.9
+# - alsa-mixer-0.3.0
