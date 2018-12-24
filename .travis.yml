@@ -1,5 +1,7 @@
 language: haskell
 
+dist: xenial
+
 ghc:
   - 8.0
   - 8.2
