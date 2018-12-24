@@ -151,7 +151,7 @@ runVolumeWith opts mixerName controlName = do
                    val <- getVal $ volumeControl control
                    db <- getDB $ volumeControl control
                    sw <- getSw $ switchControl control
-                   return (lo, hi, val, db, sw))
+                   return (fmap toInteger lo, fmap toInteger hi, val, db, sw))
                 (const $ return (Nothing, Nothing, Nothing, Nothing, Nothing))
 
     volumeControl :: Maybe Control -> Maybe Volume
@@ -171,7 +171,9 @@ runVolumeWith opts mixerName controlName = do
     liftMonitor Nothing = unavailable
     liftMonitor (Just m) = m
 
-    channel v r = AE.catch (getChannel FrontLeft v) (const $ return $ Just r)
+    channel' v r = AE.catch (getChannel FrontLeft v) (const $ return $ Just r)
+
+    channel v r = channel' v r >>= \x -> return (x >>= Just . toInteger)
 
     getDB :: Maybe Volume -> IO (Maybe Integer)
     getDB Nothing = return Nothing
@@ -183,7 +185,7 @@ runVolumeWith opts mixerName controlName = do
 
     getSw :: Maybe Switch -> IO (Maybe Bool)
     getSw Nothing = return Nothing
-    getSw (Just s) = channel s False
+    getSw (Just s) = channel' s False
 
     getFormatDB :: VolumeOpts -> Maybe Integer -> Monitor String
     getFormatDB _ Nothing = unavailable
