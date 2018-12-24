@@ -1,3 +1,7 @@
+## Version 0.29.4 (December, 2018)
+
+Upgrade to alsa-mixer 0.3.0.  See issues #372 and #373.
+
 ## Version 0.29.3 (December, 2018)
 
 _Bug fixes_

@@ -1,5 +1,5 @@
 name:               xmobar
-version:            0.29.3
+version:            0.29.4
 homepage:           http://xmobar.org
 synopsis:           A Minimalistic Text Based Status Bar
 description: 	    Xmobar is a minimalistic text based status bar.
@@ -325,8 +325,8 @@ test-suite XmobarTest
                  Xmobar.System.Signal
 
   if flag(with_alsa) || flag(all_extensions)
-      build-depends: alsa-mixer > 0.2.0.2 && < 0.4,
-                     alsa-core == 0.5.*,
+      build-depends: alsa-mixer,
+                     alsa-core,
                      process >= 1.4.3.0
       other-modules: Xmobar.Plugins.Monitors.Volume
                      Xmobar.Plugins.Monitors.Alsa
