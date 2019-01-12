@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.App.Main
--- Copyright: (c) 2018 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2018, 2019 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: jao@gnu.org
@@ -99,7 +99,7 @@ xmobarMain = do
   case cf of
     Nothing -> case rest of
                 (c:_) -> error $ c ++ ": file not found"
-                _ -> xmobar defaultConfig
+                _ -> doOpts defaultConfig flags >>= xmobar
     Just p -> do r <- readConfig defaultConfig p
                  case r of
                    Left e ->
