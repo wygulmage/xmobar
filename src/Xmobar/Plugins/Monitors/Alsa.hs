@@ -87,12 +87,12 @@ startAlsaPlugin mixerName controlName args cb = do
     runMB args Volume.volumeConfig run wait_ cb
 
 withMonitorWaiter :: String -> Maybe FilePath -> (String -> IO ()) -> (IO () -> IO a) -> IO a
-withMonitorWaiter mixerName alsaCtlPath outputCallback cont = do
+withMonitorWaiter mixerName alsaCtlPathOverride outputCallback cont = do
   mvar <- newMVar ()
 
-  path <- determineAlsaCtlPath
+  effectivePath <- determineAlsaCtlPath
 
-  bracket (async $ readerThread mvar path) cancel $ \a -> do
+  bracket (async $ alsaReaderThread mixerName effectivePath outputCallback mvar) cancel $ \a -> do
 
     -- Throw on this thread if there's an exception
     -- on the reader thread.
@@ -101,42 +101,10 @@ withMonitorWaiter mixerName alsaCtlPath outputCallback cont = do
     cont $ takeMVar mvar
 
   where
-
-    readerThread mvar path =
-      let createProc = (proc "stdbuf" ["-oL", path, "monitor", mixerName])
-                          {std_out = CreatePipe}
-
-          runAlsaOnce =
-            withCreateProcess createProc $ \_ (Just alsaOut) _ _ -> do
-              hSetBuffering alsaOut LineBuffering
-
-              tryPutMVar mvar () -- Refresh immediately after restarting alsactl
-
-              forever $ do
-                c <- hGetChar alsaOut
-                when (c == '\n') $
-                  -- This uses 'tryPutMVar' because 'putMVar' would make 'runVolume' run
-                  -- once for each event. But we want it to run only once after a burst
-                  -- of events.
-                  void $ tryPutMVar mvar ()
-      in do
-        limiter <- createRateLimiter alsaCtlRestartRateLimit
-
-        forever $ do
-          limiter
-
-          catchJust
-            (guard . isEOFError)
-            runAlsaOnce
-            pure
-
-          outputCallback "Restarting alsactl..."
-
-
     defaultPath = "/usr/sbin/alsactl"
 
     determineAlsaCtlPath =
-      case alsaCtlPath of
+      case alsaCtlPathOverride of
         Just path -> do
           found <- doesFileExist path
           if found
@@ -158,6 +126,39 @@ withMonitorWaiter mixerName alsaCtlPath outputCallback cont = do
                       show defaultPath ++
                       "; please specify with --" ++
                       alsaCtlOptionName ++ "=/path/to/alsactl"
+
+
+alsaReaderThread :: String -> String -> (String -> IO a) -> MVar () -> IO b
+alsaReaderThread mixerName alsaCtlPath outputCallback mvar =
+  let createProc = (proc "stdbuf" ["-oL", alsaCtlPath, "monitor", mixerName])
+                      {std_out = CreatePipe}
+
+      runAlsaOnce =
+        withCreateProcess createProc $ \_ (Just alsaOut) _ _ -> do
+          hSetBuffering alsaOut LineBuffering
+
+          tryPutMVar mvar () -- Refresh immediately after restarting alsactl
+
+          forever $ do
+            c <- hGetChar alsaOut
+            when (c == '\n') $
+              -- This uses 'tryPutMVar' because 'putMVar' would make 'runVolume' run
+              -- once for each event. But we want it to run only once after a burst
+              -- of events.
+              void $ tryPutMVar mvar ()
+  in do
+    limiter <- createRateLimiter alsaCtlRestartRateLimit
+
+    forever $ do
+      limiter
+
+      catchJust
+        (guard . isEOFError)
+        runAlsaOnce
+        pure
+
+      outputCallback "Restarting alsactl..."
+
 
 
 -- This is necessarily very inefficient on 'String's
