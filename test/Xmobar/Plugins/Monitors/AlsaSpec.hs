@@ -58,7 +58,9 @@ runFakeAlsactlTest =
             waiterTaskIsRunning <- newEmptyMVar :: IO (MVar ())
             waiterTaskIsWaiting <- newEmptyMVar :: IO (MVar ())
 
-            withMonitorWaiter fifoPath (Just fakeAlsactlPath) $ \waitFunc -> do
+            let outputCallback msg = fail ("Did not expect the output callback to be invoked (message: "++show msg++")")
+
+            withMonitorWaiter fifoPath (Just fakeAlsactlPath) outputCallback $ \waitFunc -> do
 
               let addToTimeline e =  modifyMVar_ timeline (pure . (e :))
 

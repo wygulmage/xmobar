@@ -12,6 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
+{-# LANGUAGE PatternGuards #-}
 module Xmobar.Plugins.Monitors.Alsa
   ( startAlsaPlugin
   , withMonitorWaiter
@@ -23,13 +24,19 @@ import Control.Concurrent
 import Control.Concurrent.Async
 import Control.Exception
 import Control.Monad
+import Data.IORef
+import Data.Time.Clock
 import Xmobar.Plugins.Monitors.Common
 import qualified Xmobar.Plugins.Monitors.Volume as Volume;
 import System.Console.GetOpt
 import System.Directory
 import System.Exit
 import System.IO
+import System.IO.Error
 import System.Process
+
+alsaCtlRestartRateLimit :: NominalDiffTime
+alsaCtlRestartRateLimit = 3 -- 'Num NominalDiffTime' assumes seconds
 
 data AlsaOpts = AlsaOpts
     { aoVolumeOpts :: Volume.VolumeOpts
@@ -76,11 +83,11 @@ startAlsaPlugin mixerName controlName args cb = do
         opts2 <- io $ parseOpts args2
         Volume.runVolumeWith (aoVolumeOpts opts2) mixerName controlName
 
-  withMonitorWaiter mixerName (aoAlsaCtlPath opts) $ \wait_ ->
+  withMonitorWaiter mixerName (aoAlsaCtlPath opts) cb $ \wait_ ->
     runMB args Volume.volumeConfig run wait_ cb
 
-withMonitorWaiter :: String -> Maybe FilePath -> (IO () -> IO a) -> IO a
-withMonitorWaiter mixerName alsaCtlPath cont = do
+withMonitorWaiter :: String -> Maybe FilePath -> (String -> IO ()) -> (IO () -> IO a) -> IO a
+withMonitorWaiter mixerName alsaCtlPath outputCallback cont = do
   mvar <- newMVar ()
 
   path <- determineAlsaCtlPath
@@ -98,17 +105,33 @@ withMonitorWaiter mixerName alsaCtlPath cont = do
     readerThread mvar path =
       let createProc = (proc "stdbuf" ["-oL", path, "monitor", mixerName])
                           {std_out = CreatePipe}
-      in
-        withCreateProcess createProc $ \_ (Just alsaOut) _ _ -> do
-          hSetBuffering alsaOut LineBuffering
 
-          forever $ do
-            c <- hGetChar alsaOut
-            when (c == '\n') $
-              -- This uses 'tryPutMVar' because 'putMVar' would make 'runVolume' run
-              -- once for each event. But we want it to run only once after a burst
-              -- of events.
-              void $ tryPutMVar mvar ()
+          runAlsaOnce =
+            withCreateProcess createProc $ \_ (Just alsaOut) _ _ -> do
+              hSetBuffering alsaOut LineBuffering
+
+              tryPutMVar mvar () -- Refresh immediately after restarting alsactl
+
+              forever $ do
+                c <- hGetChar alsaOut
+                when (c == '\n') $
+                  -- This uses 'tryPutMVar' because 'putMVar' would make 'runVolume' run
+                  -- once for each event. But we want it to run only once after a burst
+                  -- of events.
+                  void $ tryPutMVar mvar ()
+      in do
+        limiter <- createRateLimiter alsaCtlRestartRateLimit
+
+        forever $ do
+          limiter
+
+          catchJust
+            (guard . isEOFError)
+            runAlsaOnce
+            pure
+
+          outputCallback "Restarting alsactl..."
+
 
     defaultPath = "/usr/sbin/alsactl"
 
@@ -144,3 +167,30 @@ trimTrailingNewline x =
     '\n' : '\r' : y -> reverse y
     '\n' : y -> reverse y
     _ -> x
+
+-- |
+-- Returns an IO action that completes at most once per @interval@.
+-- The returned cation is not safe for concurrent use.
+createRateLimiter :: NominalDiffTime -> IO (IO ())
+createRateLimiter interval = do
+  prevTimeRef <- newIORef Nothing
+
+  let
+    limiter = do
+      prevTime0 <- readIORef prevTimeRef
+      curTime <- getCurrentTime
+
+      case prevTime0 of
+        Just prevTime | diff <- interval - (curTime `diffUTCTime` prevTime),
+                        diff > 0
+                        -> do
+                            threadDelayNDT diff
+                            writeIORef prevTimeRef . Just =<< getCurrentTime
+
+        _ -> writeIORef prevTimeRef (Just curTime)
+
+  pure limiter
+
+threadDelayNDT :: NominalDiffTime -> IO ()
+threadDelayNDT ndt =
+  threadDelay (round (realToFrac ndt * 1e6 :: Double))
