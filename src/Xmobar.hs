@@ -3,7 +3,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Xmobar
--- Copyright   :  (c) 2011, 2012, 2013, 2014, 2015, 2017, 2018 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2011, 2012, 2013, 2014, 2015, 2017, 2018, 2019 Jose Antonio Ortega Ruiz
 --                (c) 2007 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -19,6 +19,7 @@ module Xmobar (xmobar
               , xmobarMain
               , defaultConfig
               , configFromArgs
+              , tenthSeconds
               , Runnable (..)
               , Exec (..)
               , Command (..)

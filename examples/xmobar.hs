@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- |
--- Copyright: (c) 2018 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2018, 2019 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: jao@gnu.org
@@ -30,6 +30,7 @@ instance Exec HelloWorld where
 -- Configuration, using predefined monitors as well as our HelloWorld
 -- plugin:
 
+config :: Config
 config = defaultConfig {
   font = "xft:Sans Mono-9"
   , additionalFonts = []
