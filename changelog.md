@@ -1,3 +1,12 @@
+## Version 0.29.5 (January, 2019)
+
+_Bug fixes_
+
+  - Honour command line flags when starting xmobar without any
+    configuration file (issue #375).
+  - `Alsa` plugin: restart `alsactl` if it quits, e.g. because of a
+    sleep/awake cycle (issue #376).
+
 ## Version 0.29.4 (December, 2018)
 
 Upgrade to alsa-mixer 0.3.0.  See issues #372 and #373.
