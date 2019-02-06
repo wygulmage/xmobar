@@ -192,7 +192,7 @@ getData :: String -> IO String
 #ifdef HTTP_CONDUIT
 getData station = CE.catch (do
     manager <- newManager tlsManagerSettings
-    request <- parseUrl $ stationUrl station
+    request <- parseUrlThrow $ stationUrl station
     res <- httpLbs request manager
     return $  B.unpack $ responseBody res
     ) errHandler
@@ -222,7 +222,7 @@ runWeather str =
 weatherReady :: [String] -> Monitor Bool
 #ifdef HTTP_CONDUIT
 weatherReady str = do
-    initRequest <- parseUrl $ stationUrl $ head str
+    initRequest <- parseUrlThrow $ stationUrl $ head str
     let request = initRequest{method = methodHead}
     io $ CE.catch ( do
         manager <- newManager tlsManagerSettings
