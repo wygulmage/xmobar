@@ -183,8 +183,7 @@ parseData =
        return [WI st ss y m d h w v sk tC tF dC dF rh p]
 
 defUrl :: String
--- "http://weather.noaa.gov/pub/data/observations/metar/decoded/"
-defUrl = "http://tgftp.nws.noaa.gov/data/observations/metar/decoded/"
+defUrl = "https://tgftp.nws.noaa.gov/data/observations/metar/decoded/"
 
 stationUrl :: String -> String
 stationUrl station = defUrl ++ station ++ ".TXT"
