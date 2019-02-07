@@ -19,14 +19,10 @@ import Xmobar.Plugins.Monitors.Common
 
 import qualified Control.Exception as CE
 
-#ifdef HTTP_CONDUIT
 import Network.HTTP.Conduit
 import Network.HTTP.Types.Status
 import Network.HTTP.Types.Method
 import qualified Data.ByteString.Lazy.Char8 as B
-#else
-import Network.HTTP
-#endif
 
 import Text.ParserCombinators.Parsec
 
@@ -189,7 +185,6 @@ stationUrl :: String -> String
 stationUrl station = defUrl ++ station ++ ".TXT"
 
 getData :: String -> IO String
-#ifdef HTTP_CONDUIT
 getData station = CE.catch (do
     manager <- newManager tlsManagerSettings
     request <- parseUrlThrow $ stationUrl station
@@ -198,13 +193,6 @@ getData station = CE.catch (do
     ) errHandler
     where errHandler :: CE.SomeException -> IO String
           errHandler _ = return "<Could not retrieve data>"
-#else
-getData station = do
-    let request = getRequest (stationUrl station)
-    CE.catch (simpleHTTP request >>= getResponseBody) errHandler
-    where errHandler :: CE.IOException -> IO String
-          errHandler _ = return "<Could not retrieve data>"
-#endif
 
 formatWeather :: [WeatherInfo] -> Monitor String
 formatWeather [WI st ss y m d h (WindInfo wc wa wm wk wkh wms) v sk tC tF dC dF r p] =
@@ -220,7 +208,6 @@ runWeather str =
        formatWeather i
 
 weatherReady :: [String] -> Monitor Bool
-#ifdef HTTP_CONDUIT
 weatherReady str = do
     initRequest <- parseUrlThrow $ stationUrl $ head str
     let request = initRequest{method = methodHead}
@@ -234,21 +221,3 @@ weatherReady str = do
             | statusIsServerError status = False
             | statusIsClientError status = False
             | otherwise = True
-#else
-weatherReady str = do
-    let station = head str
-        request = headRequest (stationUrl station)
-    io $ CE.catch (simpleHTTP request >>= checkResult) errHandler
-    where errHandler :: CE.IOException -> IO Bool
-          errHandler _ = return False
-          checkResult result =
-            case result of
-                Left _ -> return False
-                Right response ->
-                    case rspCode response of
-                        -- Permission or network errors are failures; anything
-                        -- else is recoverable.
-                        (4, _, _) -> return False
-                        (5, _, _) -> return False
-                        (_, _, _) -> return True
-#endif

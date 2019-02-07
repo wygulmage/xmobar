@@ -1,4 +1,4 @@
-## Version 0.29.5 (January, 2019)
+## Version 0.29.5 (February, 2019)
 
 _Bug fixes_
 
@@ -6,6 +6,8 @@ _Bug fixes_
     configuration file (issue #375).
   - `Alsa` plugin: restart `alsactl` if it quits, e.g. because of a
     sleep/awake cycle (issue #376).
+  - `Weather` using the new HTTPS URL, which requires http-conduit as
+    a dependency (issue #378).
 
 ## Version 0.29.4 (December, 2018)
 

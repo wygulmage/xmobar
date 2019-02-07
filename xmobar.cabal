@@ -87,10 +87,6 @@ flag with_weather
   description: Enable weather plugin.
   default: True
 
-flag with_conduit
-  description: Use http-conduits for weather data, used only if with_weather.
-  default: False
-
 library
     hs-source-dirs:  src
 
@@ -251,15 +247,11 @@ library
        cpp-options: -DXPM
 
     if flag(with_weather) || flag(all_extensions)
-       build-depends: HTTP >= 4000.2.4
        exposed-modules: Xmobar.Plugins.Monitors.Weather
        cpp-options: -DWEATHER
-       if flag(with_conduit)
-          -- use http-conduit  instead of simple-http
-          build-depends: http-conduit, http-types
-          cpp-options: -DHTTP_CONDUIT
+       build-depends: http-conduit, http-types
 
-    if flag(with_uvmeter) && flag(with_conduit)
+    if flag(with_uvmeter)
        exposed-modules: Xmobar.Plugins.Monitors.UVMeter
        build-depends: http-conduit, http-types
        cpp-options: -DUVMETER
