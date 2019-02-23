@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.MarqueePipeReader where
+module Xmobar.Plugins.MarqueePipeReader(MarqueePipeReader(..)) where
 
 import System.IO (openFile, IOMode(ReadWriteMode), Handle)
 import Xmobar.System.Environment

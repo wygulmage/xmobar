@@ -40,6 +40,7 @@ module Xmobar (xmobar
 #endif
               , module Xmobar.Plugins.Monitors
               , module Xmobar.Plugins.PipeReader
+              , module Xmobar.Plugins.MarqueePipeReader
               , module Xmobar.Plugins.StdinReader
               , module Xmobar.Plugins.XMonadLog
               ) where
@@ -65,6 +66,7 @@ import Xmobar.Plugins.MBox
 import Xmobar.Plugins.Monitors
 import Xmobar.Plugins.PipeReader
 import Xmobar.Plugins.StdinReader
+import Xmobar.Plugins.MarqueePipeReader
 import Xmobar.Plugins.XMonadLog
 
 import Xmobar.App.Main(xmobar, xmobarMain, configFromArgs)
