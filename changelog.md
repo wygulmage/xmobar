@@ -1,4 +1,4 @@
-## Version 0.29.5 (February, 2019)
+## Version 0.29.5 (March, 2019)
 
 _Bug fixes_
 
@@ -8,6 +8,7 @@ _Bug fixes_
     sleep/awake cycle (issue #376).
   - `Weather` using the new HTTPS URL, which requires http-conduit as
     a dependency (issue #378).
+  - `MarqueePipeReader` exported at the API level (issue #381).
 
 ## Version 0.29.4 (December, 2018)
 
