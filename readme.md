@@ -1504,8 +1504,8 @@ configuration options.
 
 To use your new plugin, you need to use a pure Haskell configuration
 for xmobar, and load your definitions there.  You can see an example
-in [examples/xmobar.hs] showing you how to write a Haskell
-configuration that uses a new plugin, all in one file.
+in [examples/xmobar.hs](./examples/xmobar.hs) showing you how to write
+a Haskell configuration that uses a new plugin, all in one file.
 
 When xmobar runs with the full path to that Haskell file as its
 argument (or if you put it in `~/.config/xmobar/xmobar.hs`), and with
