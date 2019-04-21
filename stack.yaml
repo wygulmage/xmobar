@@ -1,5 +1,5 @@
-# Compiling with ghc 8.6.3
-resolver: lts-13.0
+# Compiling with ghc 8.6.4
+resolver: lts-13.17
 
 # To use ghc 4.4 try:
 # resolver: lts-12.24

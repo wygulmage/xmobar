@@ -16,3 +16,4 @@ codex.tags
 cabal.project.localtags
 *.swp
 tags
+/cabal.project.local
