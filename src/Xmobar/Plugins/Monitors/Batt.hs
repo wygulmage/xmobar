@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Batt
--- Copyright   :  (c) 2010, 2011, 2012, 2013, 2015, 2016, 2018 Jose A Ortega
+-- Copyright   :  (c) 2010, 2011, 2012, 2013, 2015, 2016, 2018, 2019 Jose A Ortega
 --                (c) 2010 Andrea Rossato, Petr Rockai
 -- License     :  BSD-style (see LICENSE)
 --
@@ -209,7 +209,8 @@ runBatt' bfs args = do
       do l <- fmtPercent x
          ws <- fmtWatts w opts suffix d
          si <- getIconPattern opts s x
-         parseTemplate (l ++ [fmtStatus opts s nas, fmtTime $ floor t, ws, si])
+         st <- showWithColors' (fmtStatus opts s nas) (100 * x)
+         parseTemplate (l ++ [st, fmtTime $ floor t, ws, si])
     NA -> getConfigValue naString
   where fmtPercent :: Float -> Monitor [String]
         fmtPercent x = do
