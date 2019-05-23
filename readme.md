@@ -964,11 +964,15 @@ more than one battery.
 
 - Aliases to `diskio`
 - Disks: list of pairs of the form (device or mount point, template),
-  where the template can contain `<total>`, `<read>`, `<write>` for total,
-  read and write speed, respectively. There are also bar versions of each:
-  `<totalbar>`, `<totalvbar>`, `<totalipat>`,
-  `<readbar>`, `<readvbar>`, `<readipat>`,
-  `<writebar>`, `<writevbar>`, and `<writeipat>`.
+  where the template can contain `<total>`, `<read>`, `<write>` for
+  total, read and write speed, respectively, as well as `<totalb>`,
+  `<readb>`, `<writeb>`, which report number of bytes during the last
+  refresh period rather than speed. There are also bar versions of
+  each: `<totalbar>`, `<totalvbar>`, `<totalipat>`, `<readbar>`,
+  `<readvbar>`, `<readipat>`, `<writebar>`, `<writevbar>`, and
+  `<writeipat>`; and their "bytes" counterparts: `<totalbbar>`,
+  `<totalbvbar>`, `<totalbipat>`, `<readbbar>`, `<readbvbar>`,
+  `<readbipat>`, `<writebbar>`, `<writebvbar>`, and `<writebipat>`.
 - Thresholds refer to speed in b/s
 - Args: default monitor arguments. `-t`/`--template` is ignored. Plus
   - `--total-icon-pattern`: dynamic string for total disk I/O in `<totalipat>`.

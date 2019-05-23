@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Disk
--- Copyright   :  (c) 2010, 2011, 2012, 2014, 2018 Jose A Ortega Ruiz
+-- Copyright   :  (c) 2010, 2011, 2012, 2014, 2018, 2019 Jose A Ortega Ruiz
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A Ortega Ruiz <jao@gnu.org>
@@ -54,9 +54,13 @@ parseDiskIOOpts argv =
 
 diskIOConfig :: IO MConfig
 diskIOConfig = mkMConfig "" ["total", "read", "write"
+                            ,"totalb", "readb", "writeb"
                             ,"totalbar", "readbar", "writebar"
+                            ,"totalbbar", "readbbar", "writebbar"
                             ,"totalvbar", "readvbar", "writevbar"
+                            ,"totalbvbar", "readbvbar", "writebvbar"
                             ,"totalipat", "readipat", "writeipat"
+                            ,"totalbipat", "readbipat", "writebipat"
                             ]
 
 data DiskUOpts = DiskUOpts
@@ -148,11 +152,16 @@ parseDev dat dev =
   case find ((==dev) . fst) dat of
     Nothing -> (dev, [0, 0, 0])
     Just (_, xs) ->
-      let rSp = speed (xs !! 2) (xs !! 3)
-          wSp = speed (xs !! 6) (xs !! 7)
-          sp =  speed (xs !! 2 + xs !! 6) (xs !! 3 + xs !! 7)
-          speed x t = if t == 0 then 0 else 500 * x / t
-          dat' = if length xs > 6 then [sp, rSp, wSp] else [0, 0, 0]
+      let r = xs !! 2
+          w = xs !! 6
+          t = r + w
+          rSp = speed r (xs !! 3)
+          wSp = speed w (xs !! 7)
+          sp =  speed t (xs !! 3 + xs !! 7)
+          speed x d = if d == 0 then 0 else 500 * x / d
+          dat' = if length xs > 6
+                 then [sp, rSp, wSp, t, r, w]
+                 else [0, 0, 0, 0, 0, 0]
       in (dev, dat')
 
 speedToStr :: Float -> String
@@ -184,7 +193,9 @@ runDiskIO' opts (tmp, xs) = do
   b <- mapM (showLogBar 0.8) xs
   vb <- mapM (showLogVBar 0.8) xs
   ipat <- mapM (\(f,v) -> showLogIconPattern (f opts) 0.8 v)
-        $ zip [totalIconPattern, readIconPattern, writeIconPattern] xs
+        $ zip [totalIconPattern, readIconPattern, writeIconPattern
+              , totalIconPattern, readIconPattern, writeIconPattern]
+              xs
   setConfigValue tmp template
   parseTemplate $ s ++ b ++ vb ++ ipat
 

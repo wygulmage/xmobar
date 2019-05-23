@@ -1,3 +1,12 @@
+## Version 0.30
+
+_New features_
+
+  - `DiskIO`: Additional template variables for absolute number of
+    bytes rather than speeds (see [issue #390].
+
+[issue #390]: https://github.com/jaor/xmobar/issues/390
+
 ## Version 0.29.5 (March, 2019)
 
 _Bug fixes_
