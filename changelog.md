@@ -4,6 +4,8 @@ _New features_
 
   - `DiskIO`: Additional template variables for absolute number of
     bytes rather than speeds (see [issue #390].
+  - `WeatherX`: An extension to the `Weather` monitor allowing the
+    spefication of custom strings or icons for sky conditions.
 
 [issue #390]: https://github.com/jaor/xmobar/issues/390
 

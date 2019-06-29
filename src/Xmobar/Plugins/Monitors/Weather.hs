@@ -23,6 +23,7 @@ import Network.HTTP.Conduit
 import Network.HTTP.Types.Status
 import Network.HTTP.Types.Method
 import qualified Data.ByteString.Lazy.Char8 as B
+import Data.Char (toLower)
 
 import Text.ParserCombinators.Parsec
 
@@ -43,6 +44,7 @@ weatherConfig = mkMConfig
        , "windMs"
        , "visibility"
        , "skyCondition"
+       , "skyConditionS"
        , "tempC"
        , "tempF"
        , "dewPointC"
@@ -194,18 +196,28 @@ getData station = CE.catch (do
     where errHandler :: CE.SomeException -> IO String
           errHandler _ = return "<Could not retrieve data>"
 
-formatWeather :: [WeatherInfo] -> Monitor String
-formatWeather [WI st ss y m d h (WindInfo wc wa wm wk wkh wms) v sk tC tF dC dF r p] =
+formatSk :: Eq p => [(p, p)] -> p -> p
+formatSk ((a,b):sks) sk = if a == sk then b else formatSk sks sk
+formatSk [] sk = sk
+
+formatWeather :: [(String,String)] -> [WeatherInfo] -> Monitor String
+formatWeather sks [WI st ss y m d h (WindInfo wc wa wm wk wkh wms) v sk tC tF dC dF r p] =
     do cel <- showWithColors show tC
        far <- showWithColors show tF
-       parseTemplate [st, ss, y, m, d, h, wc, wa, wm, wk, wkh, wms, v, sk, cel, far, show dC, show dF, show r , show p ]
-formatWeather _ = getConfigValue naString
+       let sk' = formatSk sks (map toLower sk)
+       parseTemplate [st, ss, y, m, d, h, wc, wa, wm, wk, wkh
+                     , wms, v, sk, sk', cel, far
+                     , show dC, show dF, show r , show p ]
+formatWeather _ _ = getConfigValue naString
 
 runWeather :: [String] -> Monitor String
-runWeather str =
-    do d <- io $ getData $ head str
+runWeather = runWeather' []
+
+runWeather' :: [(String, String)] -> [String] -> Monitor String
+runWeather' sks args =
+    do d <- io $ getData $ head args
        i <- io $ runP parseData d
-       formatWeather i
+       formatWeather sks i
 
 weatherReady :: [String] -> Monitor Bool
 weatherReady str = do

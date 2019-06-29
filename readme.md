@@ -739,6 +739,39 @@ something like:
 - Default template: `<station>: <tempC>C, rh <rh>% (<hour>)`
 - Retrieves weather information from http://tgftp.nws.noaa.gov.
 
+### `WeatherX StationID SkyConditions Args RefreshRate`
+
+- Works in the same way as `Weather`, but takes an additional
+  argument, a list of pairs from sky conditions to their replacement
+  (typically a unicode string or an icon specification).
+- Use the variable `skyConditionS` to display the replacement of the
+  corresponding sky condition.  All other `Weather` template variables
+  are available as well.
+
+For example:
+
+```haskell
+  WeatherX "LEBL"
+           [ ("clear", "🌣")
+           , ("sunny", "🌣")
+           , ("mostly clear", "🌤")
+           , ("mostly sunny", "🌤")
+           , ("partly sunny", "⛅")
+           , ("fair", "🌑")
+           , ("cloudy","☁")
+           , ("overcast","☁")
+           , ("partly cloudy", "⛅")
+           , ("mostly cloudy", "🌧")
+           , ("considerable cloudiness", "⛈")]
+           ["-t", "<fn=2><skyConditionS></fn> <tempC>° <rh>%  <windKmh> (<hour>)"
+           , "-L","10", "-H", "25", "--normal", "black"
+           , "--high", "lightgoldenrod4", "--low", "darkseagreen4"]
+           18000
+```
+
+As mentioned, the replacement string can also be an icon
+specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
+
 ### `Network Interface Args RefreshRate`
 
 - Aliases to the interface name: so `Network "eth0" []` can be used as
