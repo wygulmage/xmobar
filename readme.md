@@ -898,6 +898,12 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
   - `-p`: color to display positive power (battery charging)
   - `-f`: file in `/sys/class/power_supply` with AC info (default:
     "AC/online")
+  - `-A`: a number between 0 and 100, threshold below which the action
+    given by `-a`, if any, is performed (default: 5)
+  - `-a`: a string with a system command that is run when the
+    percentage left in the battery is less or equal than the threshold
+    given by the `-A` option.  If not present, no action is
+    undertaken.
   - `--on-icon-pattern`: dynamic string for current battery charge
     when AC is "on" in `leftipat`.
   - `--off-icon-pattern`: dynamic string for current battery charge
@@ -916,14 +922,18 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
                        "-L", "10", "-H", "80", "-p", "3",
                        "--", "-O", "<fc=green>On</fc> - ", "-i", "",
                        "-L", "-15", "-H", "-5",
-                       "-l", "red", "-m", "blue", "-h", "green"]
+                       "-l", "red", "-m", "blue", "-h", "green"
+                       "-a", "notify-send -u critical 'Battery running out!!'",
+                       "-A", "3"]
                       600
 
   In the above example, the thresholds before the "--" separator
   affect only the `<left>` and `<leftbar>` fields, while those after
   the separator affect how `<watts>` is displayed. For this monitor,
   neither the generic nor the specific options have any effect on
-  `<timeleft>`.
+  `<timeleft>`.  We are also telling the monitor to execute the unix
+  command `notify-send` when the percentage left in the battery
+  reaches 6%.
 
   It is also possible to specify template variables in the `-O` and
   `-o` switches, as in the following example:

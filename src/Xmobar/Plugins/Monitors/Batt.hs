@@ -15,6 +15,8 @@
 
 module Xmobar.Plugins.Monitors.Batt ( battConfig, runBatt, runBatt' ) where
 
+import System.Process (system)
+import Control.Monad (void)
 import Control.Exception (SomeException, handle)
 import Xmobar.Plugins.Monitors.Common
 import System.FilePath ((</>))
@@ -36,6 +38,8 @@ data BattOpts = BattOpts
   , highWColor :: Maybe String
   , lowThreshold :: Float
   , highThreshold :: Float
+  , onLowAction :: Maybe String
+  , actionThreshold :: Float
   , onlineFile :: FilePath
   , scale :: Float
   , onIconPattern :: Maybe IconPattern
@@ -52,6 +56,8 @@ defaultOpts = BattOpts
   , lowWColor = Nothing
   , mediumWColor = Nothing
   , highWColor = Nothing
+  , onLowAction = Nothing
+  , actionThreshold = 6
   , lowThreshold = 10
   , highThreshold = 12
   , onlineFile = "AC/online"
@@ -74,6 +80,9 @@ options =
   , Option "H" ["hight"] (ReqArg (\x o -> o { highThreshold = read x }) "") ""
   , Option "f" ["online"] (ReqArg (\x o -> o { onlineFile = x }) "") ""
   , Option "s" ["scale"] (ReqArg (\x o -> o {scale = read x}) "") ""
+  , Option "a" ["action"] (ReqArg (\x o -> o { onLowAction = Just x }) "") ""
+  , Option "A" ["action-threshold"]
+               (ReqArg (\x o -> o { actionThreshold = read x }) "") ""
   , Option "" ["on-icon-pattern"] (ReqArg (\x o ->
      o { onIconPattern = Just $ parseIconPattern x }) "") ""
   , Option "" ["off-icon-pattern"] (ReqArg (\x o ->
@@ -172,6 +181,14 @@ sortOn f =
 mostCommonDef :: Eq a => a -> [a] -> a
 mostCommonDef x xs = head $ last $ [x] : sortOn length (group xs)
 
+maybeAlert :: BattOpts -> Float -> IO ()
+maybeAlert opts left =
+  case onLowAction opts of
+    Nothing -> do return ()
+    Just x -> if not (isNaN left) && actionThreshold opts >= (100 * left)
+              then void $ system x
+              else return ()
+
 readBatteries :: BattOpts -> [Files] -> IO Result
 readBatteries opts bfs =
     do let bfs' = filter (/= NoFiles) bfs
@@ -192,6 +209,7 @@ readBatteries opts bfs =
                  | time == 0 = Idle
                  | ac = Charging
                  | otherwise = Discharging
+       maybeAlert opts left
        return $ if isNaN left then NA else Result left watts time racst
 
 runBatt :: [String] -> Monitor String

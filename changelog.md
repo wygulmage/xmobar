@@ -6,6 +6,9 @@ _New features_
     bytes rather than speeds (see [issue #390].
   - `WeatherX`: An extension to the `Weather` monitor allowing the
     spefication of custom strings or icons for sky conditions.
+  - The battery monitors accept the new arguments `-a` and `-A` to
+    specify a system command executed if battery left goes beyond a
+    given threshold.
 
 [issue #390]: https://github.com/jaor/xmobar/issues/390
 
