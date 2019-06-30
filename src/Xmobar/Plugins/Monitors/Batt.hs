@@ -208,7 +208,7 @@ readBatteries opts bfs =
                  | time == 0 = Idle
                  | ac = Charging
                  | otherwise = Discharging
-       maybeAlert opts left
+       when (not ac) (maybeAlert opts left)
        return $ if isNaN left then NA else Result left watts time racst
 
 runBatt :: [String] -> Monitor String
