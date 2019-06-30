@@ -16,7 +16,7 @@
 module Xmobar.Plugins.Monitors.Batt ( battConfig, runBatt, runBatt' ) where
 
 import System.Process (system)
-import Control.Monad (void)
+import Control.Monad (void, when)
 import Control.Exception (SomeException, handle)
 import Xmobar.Plugins.Monitors.Common
 import System.FilePath ((</>))
@@ -184,10 +184,9 @@ mostCommonDef x xs = head $ last $ [x] : sortOn length (group xs)
 maybeAlert :: BattOpts -> Float -> IO ()
 maybeAlert opts left =
   case onLowAction opts of
-    Nothing -> do return ()
-    Just x -> if not (isNaN left) && actionThreshold opts >= (100 * left)
-              then void $ system x
-              else return ()
+    Nothing -> return ()
+    Just x -> when (not (isNaN left) && actionThreshold opts >= (100 * left))
+                $ void $ system x
 
 readBatteries :: BattOpts -> [Files] -> IO Result
 readBatteries opts bfs =
