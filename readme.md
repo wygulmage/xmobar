@@ -11,8 +11,7 @@ Xmobar was inspired by the [Ion3] status bar, and supports similar
 features, like dynamic color management, icons, output templates, and
 extensibility through plugins.
 
-These are two xmobar instances using [the author's
-configuration](https://gitlab.com/jaor/xmobar-config/):
+These are two xmobar instances using the author's configuration:
 
 ![top](https://gitlab.com/jaor/xmobar-config/raw/master/img/xmobar-top.png)
 
@@ -1566,6 +1565,13 @@ the xmobar library installed, the Haskell code will be compiled as
 needed, and the new executable spawned for you.
 
 That's it!
+
+## Configurations written in pure Haskell
+
+xmobar can be used as a pure Haskell program, that is compiled with
+your specific configuration, expressed as Haskell source code.  For an
+example, see [the author's
+configuration](https://gitlab.com/jaor/xmobar-config/).
 
 # Authors and credits
 
