@@ -16,7 +16,7 @@
 module Xmobar.Plugins.Monitors.Batt ( battConfig, runBatt, runBatt' ) where
 
 import System.Process (system)
-import Control.Monad (void, when)
+import Control.Monad (void, unless)
 import Control.Exception (SomeException, handle)
 import Xmobar.Plugins.Monitors.Common
 import System.FilePath ((</>))
@@ -185,7 +185,7 @@ maybeAlert :: BattOpts -> Float -> IO ()
 maybeAlert opts left =
   case onLowAction opts of
     Nothing -> return ()
-    Just x -> when (not (isNaN left) && actionThreshold opts >= (100 * left))
+    Just x -> unless (isNaN left || actionThreshold opts < 100 * left)
                 $ void $ system x
 
 readBatteries :: BattOpts -> [Files] -> IO Result
@@ -208,7 +208,7 @@ readBatteries opts bfs =
                  | time == 0 = Idle
                  | ac = Charging
                  | otherwise = Discharging
-       when (not ac) (maybeAlert opts left)
+       unless ac (maybeAlert opts left)
        return $ if isNaN left then NA else Result left watts time racst
 
 runBatt :: [String] -> Monitor String
