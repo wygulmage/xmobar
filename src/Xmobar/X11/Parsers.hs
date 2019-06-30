@@ -55,7 +55,7 @@ stringParser :: String -> FontIndex -> Maybe [Action]
                 -> Parser [[(Widget, ColorString, FontIndex, Maybe [Action])]]
 stringParser c f a = manyTill (allParsers c f a) eof
 
--- | Parses a maximal string without color markup.
+-- | Parses a maximal string without markup.
 textParser :: String -> FontIndex -> Maybe [Action]
               -> Parser [(Widget, ColorString, FontIndex, Maybe [Action])]
 textParser c f a = do s <- many1 $

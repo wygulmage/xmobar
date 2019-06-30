@@ -11,9 +11,15 @@ Xmobar was inspired by the [Ion3] status bar, and supports similar
 features, like dynamic color management, icons, output templates, and
 extensibility through plugins.
 
-[This screenshot](doc/xmobar-sawfish.png) shows xmobar running under
-[sawfish], and [this one](doc/xmobar-xmonad.png) is a desktop with
-[xmonad] and two instances of xmobar.
+These are two xmobar instances using [the author's
+configuration](https://gitlab.com/jaor/xmobar-config/):
+
+![top](https://gitlab.com/jaor/xmobar-config/raw/master/img/xmobar-top.png)
+
+![bottom](https://gitlab.com/jaor/xmobar-config/raw/master/img/xmobar-bottom.png)
+
+and [this one](doc/xmobar-xmonad.png) is a full desktop with [xmonad]
+and, again, two instances of xmobar.
 
 [xmonad]: http://xmonad.org
 [Ion3]: http://tuomov.iki.fi/software/
