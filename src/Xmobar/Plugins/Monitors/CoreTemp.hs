@@ -27,7 +27,7 @@ coreTempConfig = mkMConfig coreTempTemplate coreTempOptions
 -- insert numbers.
 coreTempFilePaths :: [[FilePath]]
 coreTempFilePaths = [ ["/sys/bus/platform/devices/coretemp." , "/temp" , "_input"]
-                    , ["/sys/bus/platform/devices/coretemp.", "/hwmon/hwmon", "/temp", "_input"]
+                    , ["/sys/bus/platform/devices/coretemp." , "/hwmon/hwmon" , "/temp" , "_input"]
                     ]
 
 coreTempNormalize :: Double -> Double
