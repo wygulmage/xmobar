@@ -16,13 +16,13 @@
 module Xmobar.Plugins.Monitors.CoreTemp (startCoreTemp) where
 
 import Xmobar.Plugins.Monitors.Common
-import Data.Char (isDigit)
 
 -- | Generate Config with a default template and options.
 coreTempConfig :: IO MConfig
 coreTempConfig = mkMConfig coreTempTemplate coreTempOptions
   where coreTempTemplate = "Temp: <total>°C"
-        coreTempOptions = map ((++) "core" . show) [0 :: Int ..]
+        coreTempOptions = map (("core" ++) . show) [0 :: Int ..] ++
+                          ["total"]
 
 -- | FilePaths to read temperature from. Strings are seperated, where to
 -- insert numbers.
@@ -31,15 +31,21 @@ coreTempFilePaths = [ ["/sys/bus/platform/devices/coretemp." , "/temp" , "_input
                     , ["/sys/bus/platform/devices/coretemp.", "/hwmon/hwmon", "/temp", "_input"]
                     ]
 
+coreTempNormalize :: Double -> Double
+coreTempNormalize = (/ 1000)
+
 -- | Retrieves Monitor String holding the core temperatures.
 runCoreTemp :: [String] -> Monitor String
 runCoreTemp _ = do
-   dn <- getConfigValue decDigits
-   failureMessage <- getConfigValue naString
-   let lbl  = Just ("_label", read . dropWhile (not . isDigit))
-       divisor = 1e3 :: Double
-       show' = showDigits (max 0 dn)
-   checkedDataRetrieval failureMessage coreTempFilePaths lbl (/divisor) show'
+   confDecDigits <- getConfigValue decDigits
+   confNaString <- getConfigValue naString
+   let coreLabel = Nothing
+       coreTempShow = showDigits (max 0 confDecDigits)
+   checkedDataRetrieval confNaString
+                        coreTempFilePaths
+                        coreLabel
+                        coreTempNormalize
+                        coreTempShow
 
 startCoreTemp :: [String] -> Int -> (String -> IO ()) -> IO ()
 startCoreTemp a r cb = runM a coreTempConfig runCoreTemp r cb
