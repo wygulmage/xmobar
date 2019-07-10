@@ -47,4 +47,4 @@ runCoreTemp _ = do
                        coreTempShow
 
 startCoreTemp :: [String] -> Int -> (String -> IO ()) -> IO ()
-startCoreTemp a r cb = runM a coreTempConfig runCoreTemp r cb
+startCoreTemp a = runM a coreTempConfig runCoreTemp
