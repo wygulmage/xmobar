@@ -37,15 +37,15 @@ coreTempNormalize = (/ 1000)
 -- | Retrieves Monitor String holding the core temperatures.
 runCoreTemp :: [String] -> Monitor String
 runCoreTemp _ = do
-   confDecDigits <- getConfigValue decDigits
-   confNaString <- getConfigValue naString
-   let coreLabel = Nothing
-       coreTempShow = showDigits (max 0 confDecDigits)
-   checkedDataRetrieval confNaString
-                        coreTempFilePaths
-                        coreLabel
-                        coreTempNormalize
-                        coreTempShow
+  confDecDigits <- getConfigValue decDigits
+  confNaString <- getConfigValue naString
+  let coreLabel = Nothing
+      coreTempShow = showDigits (max 0 confDecDigits)
+  checkedDataRetrieval confNaString
+                       coreTempFilePaths
+                       coreLabel
+                       coreTempNormalize
+                       coreTempShow
 
 startCoreTemp :: [String] -> Int -> (String -> IO ()) -> IO ()
 startCoreTemp a r cb = runM a coreTempConfig runCoreTemp r cb
