@@ -20,9 +20,8 @@ import Xmobar.Plugins.Monitors.Common
 -- | Generate Config with a default template and options.
 coreTempConfig :: IO MConfig
 coreTempConfig = mkMConfig coreTempTemplate coreTempOptions
-  where coreTempTemplate = "Temp: <total>°C"
-        coreTempOptions = map (("core" ++) . show) [0 :: Int ..] ++
-                          ["total"]
+  where coreTempTemplate = "Temp: <core0>°C"
+        coreTempOptions = map (("core" ++) . show) [0 :: Int ..]
 
 -- | FilePaths to read temperature from. Strings are seperated, where to
 -- insert numbers.
