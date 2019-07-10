@@ -174,7 +174,7 @@ instance Exec Monitors where
     start (BatteryN s a r _) = runM a battConfig (runBatt' s) r
     start (Brightness a r) = runM a brightConfig runBright r
     start (CpuFreq a r) = runM a cpuFreqConfig runCpuFreq r
-    start (CoreTemp a r) = runM a coreTempConfig runCoreTemp r
+    start (CoreTemp a r) = startCoreTemp a r
     start (DiskU s a r) = runM a diskUConfig (runDiskU s) r
     start (DiskIO s a r) = startDiskIO s a r
     start (Uptime a r) = runM a uptimeConfig runUptime r

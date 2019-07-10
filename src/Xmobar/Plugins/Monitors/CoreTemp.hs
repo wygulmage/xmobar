@@ -1,10 +1,11 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.CoreTemp
--- Copyright   :  (c) Juraj Hercek
+-- Copyright   :  (c) 2019 Felix Springer
+--                (c) Juraj Hercek
 -- License     :  BSD-style (see LICENSE)
 --
--- Maintainer  :  Juraj Hercek <juhe_haskell@hck.sk>
+-- Maintainer  :  Felix Springer <felixspringer149@gmail.com>
 -- Stability   :  unstable
 -- Portability :  unportable
 --
@@ -12,32 +13,33 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.Monitors.CoreTemp where
+module Xmobar.Plugins.Monitors.CoreTemp (startCoreTemp) where
 
 import Xmobar.Plugins.Monitors.Common
-
 import Data.Char (isDigit)
 
--- |
--- Core temperature default configuration. Default template contains only one
--- core temperature, user should specify custom template in order to get more
--- core frequencies.
+-- | Generate Config with a default template and options.
 coreTempConfig :: IO MConfig
-coreTempConfig = mkMConfig
-       "Temp: <core0>C" -- template
-       (map ((++) "core" . show) [0 :: Int ..]) -- available
-                                                -- replacements
+coreTempConfig = mkMConfig coreTempTemplate coreTempOptions
+  where coreTempTemplate = "Temp: <total>°C"
+        coreTempOptions = map ((++) "core" . show) [0 :: Int ..]
 
--- |
--- Function retrieves monitor string holding the core temperature
--- (or temperatures)
+-- | FilePaths to read temperature from. Strings are seperated, where to
+-- insert numbers.
+coreTempFilePaths :: [[FilePath]]
+coreTempFilePaths = [ ["/sys/bus/platform/devices/coretemp." , "/temp" , "_input"]
+                    , ["/sys/bus/platform/devices/coretemp.", "/hwmon/hwmon", "/temp", "_input"]
+                    ]
+
+-- | Retrieves Monitor String holding the core temperatures.
 runCoreTemp :: [String] -> Monitor String
 runCoreTemp _ = do
    dn <- getConfigValue decDigits
    failureMessage <- getConfigValue naString
-   let path = ["/sys/bus/platform/devices/coretemp.", "/temp", "_input"]
-       path' = ["/sys/bus/platform/devices/coretemp.", "/hwmon/hwmon", "/temp", "_input"]
-       lbl  = Just ("_label", read . dropWhile (not . isDigit))
+   let lbl  = Just ("_label", read . dropWhile (not . isDigit))
        divisor = 1e3 :: Double
        show' = showDigits (max 0 dn)
-   checkedDataRetrieval failureMessage [path, path'] lbl (/divisor) show'
+   checkedDataRetrieval failureMessage coreTempFilePaths lbl (/divisor) show'
+
+startCoreTemp :: [String] -> Int -> (String -> IO ()) -> IO ()
+startCoreTemp a r cb = runM a coreTempConfig runCoreTemp r cb
