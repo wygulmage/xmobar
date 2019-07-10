@@ -16,35 +16,90 @@
 module Xmobar.Plugins.Monitors.CoreTemp (startCoreTemp) where
 
 import Xmobar.Plugins.Monitors.Common
+import System.Console.GetOpt
+
+data CTOpts = CTOpts { loadIconPattern :: Maybe IconPattern
+                        , mintemp :: Float
+                        , maxtemp :: Float
+                        }
+
+defaultOpts :: CTOpts
+defaultOpts = CTOpts { loadIconPattern = Nothing
+                     , mintemp = 0
+                     , maxtemp = 1
+                     }
+
+options :: [OptDescr (CTOpts -> CTOpts)]
+options = [ Option [] ["load-icon-pattern"]
+              (ReqArg
+                (\ arg opts -> opts { loadIconPattern = Just $ parseIconPattern arg })
+                "")
+              ""
+          , Option [] ["mintemp"]
+              (ReqArg
+                (\ arg opts -> opts { mintemp = read arg / 100 })
+                "")
+              ""
+          , Option [] ["maxtemp"]
+              (ReqArg
+                (\ arg opts -> opts { maxtemp = read arg / 100 })
+                "")
+              ""
+          ]
+
+parseOpts :: [String] -> IO CTOpts
+parseOpts argv = case getOpt Permute options argv of
+                   (opts , _ , []  ) -> return $ foldr id defaultOpts opts
+                   (_    , _ , errs) -> ioError . userError $ concat errs
 
 -- | Generate Config with a default template and options.
-coreTempConfig :: IO MConfig
-coreTempConfig = mkMConfig coreTempTemplate coreTempOptions
-  where coreTempTemplate = "Temp: <core0>°C"
-        coreTempOptions = map (("core" ++) . show) [0 :: Int ..]
+cTConfig :: IO MConfig
+cTConfig = mkMConfig cTTemplate cTOptions
+  where cTTemplate = "Temp: <max>°C"
+        cTOptions = [ "bar" , "vbar" , "ipat" , "max" , "maxpc" , "avg" , "avgpc" ] ++
+                      (map (("core" ++) . show) [0 :: Int ..])
 
--- | FilePaths to read temperature from. Strings are seperated, where to
--- insert numbers.
-coreTempFilePaths :: [[FilePath]]
-coreTempFilePaths = [ ["/sys/bus/platform/devices/coretemp." , "/temp" , "_input"]
-                    , ["/sys/bus/platform/devices/coretemp." , "/hwmon/hwmon" , "/temp" , "_input"]
-                    ]
+cTFilePath :: FilePath
+cTFilePath = "/sys/bus/platform/devices/coretemp.0/hwmon/hwmon1/temp2_input"
 
-coreTempNormalize :: Double -> Double
-coreTempNormalize = (/ 1000)
+cTData :: IO [Float]
+cTData = do a <- readFile cTFilePath
+            return $ [ parseContent a ]
+  where parseContent = read . head . lines :: String -> Float
 
--- | Retrieves Monitor String holding the core temperatures.
-runCoreTemp :: [String] -> Monitor String
-runCoreTemp _ = do
-  confDecDigits <- getConfigValue decDigits
-  confNaString <- getConfigValue naString
-  let coreLabel = Nothing
-      coreTempShow = showDigits (max 0 confDecDigits)
-  checkedDataRetrieval confNaString
-                       coreTempFilePaths
-                       coreLabel
-                       coreTempNormalize
-                       coreTempShow
+parseCT :: IO [Float]
+parseCT = do rawCTs <- cTData
+             let normalizedCTs = map ((/ 100000)) rawCTs :: [Float]
+             return normalizedCTs
+
+formatCT :: CTOpts -> [Float] -> Monitor [String]
+formatCT opts cTs = do let CTOpts { mintemp = minT
+                                  , maxtemp = maxT } = opts
+                           domainT = maxT - minT
+                           maxCT = maximum cTs
+                           avgCT = sum cTs / (fromIntegral $ length cTs)
+                           maxCTPc = (maxCT - minT) / domainT
+                           avgCTPc = (avgCT - minT) / domainT
+
+                       cTShows <- showPercentsWithColors cTs
+                       cTBar <- showPercentBar (100 * maxCTPc) maxCTPc
+                       cTVBar <- showVerticalBar (100 * maxCTPc) maxCTPc
+                       cTIcon <- showIconPattern (loadIconPattern opts) maxCTPc
+                       maxCTShow <- showPercentWithColors maxCT
+                       maxCTPcShow <- showPercentWithColors maxCTPc
+                       avgCTShow <- showPercentWithColors avgCT
+                       avgCTPcShow <- showPercentWithColors avgCTPc
+
+                       return (cTBar : cTVBar : cTIcon :
+                         maxCTShow : maxCTPcShow :
+                         avgCTShow : avgCTPcShow :
+                         cTShows)
+
+runCT :: [String] -> Monitor String
+runCT argv = do cTs <- io $ parseCT
+                opts <- io $ parseOpts argv
+                l <- formatCT opts cTs
+                parseTemplate l
 
 startCoreTemp :: [String] -> Int -> (String -> IO ()) -> IO ()
-startCoreTemp a = runM a coreTempConfig runCoreTemp
+startCoreTemp a = runM a cTConfig runCT
