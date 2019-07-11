@@ -65,14 +65,14 @@ cTConfig = mkMConfig cTTemplate cTOptions
   where cTTemplate = "Temp: <max>°C - <maxpc>%"
         cTOptions = [ "max" , "maxpc" , "maxbar" , "maxvbar" , "maxipat"
                     , "avg" , "avgpc" , "avgbar" , "avgvbar" , "avgipat"
-                    ] ++ (map (("core" ++) . show) [0 :: Int ..])
+                    ] ++ map (("core" ++) . show) [0 :: Int ..]
 
 -- | Returns the first coretemp.N path found.
 coretempPath :: IO String
 coretempPath = do xs <- filterM doesDirectoryExist ps
                   let x = head xs
                   return x
-  where ps = [ "/sys/bus/platform/devices/coretemp." ++ (show (x :: Int)) ++ "/" | x <- [0..9] ]
+  where ps = [ "/sys/bus/platform/devices/coretemp." ++ show (x :: Int) ++ "/" | x <- [0..9] ]
 
 -- | Returns the first hwmonN path found.
 hwmonPath :: IO String
@@ -101,8 +101,7 @@ labelToCore = (++ "input") . reverse . drop 5 . reverse
 -- | Reads core-temperatures as data from the system.
 cTData :: IO [Float]
 cTData = do fps <- corePaths
-            fs <- traverse readSingleFile fps
-            return fs
+            traverse readSingleFile fps
   where readSingleFile :: FilePath -> IO Float
         readSingleFile s = do a <- readFile s
                               return $ parseContent a
@@ -122,7 +121,7 @@ formatCT opts cTs = do let CTOpts { mintemp = minT
                                   , maxtemp = maxT } = opts
                            domainT = maxT - minT
                            maxCT = maximum cTs
-                           avgCT = sum cTs / (fromIntegral $ length cTs)
+                           avgCT = sum cTs / fromIntegral (length cTs)
                            calcPc t = (t - minT) / domainT
                            maxCTPc = calcPc maxCT
                            avgCTPc = calcPc avgCT
@@ -130,13 +129,13 @@ formatCT opts cTs = do let CTOpts { mintemp = minT
                        cs <- traverse showTempWithColors cTs
 
                        m <- showTempWithColors maxCT
-                       mp <- showWithColors' (show $ (round $ 100*maxCTPc :: Int)) maxCT
+                       mp <- showWithColors' (show (round (100*maxCTPc) :: Int)) maxCT
                        mb <- showPercentBar maxCT maxCTPc
                        mv <- showVerticalBar maxCT maxCTPc
                        mi <- showIconPattern (loadIconPattern opts) maxCTPc
 
                        a <- showTempWithColors avgCT
-                       ap <- showWithColors' (show $ (round $ 100*avgCTPc :: Int)) avgCT
+                       ap <- showWithColors' (show (round (100*avgCTPc) :: Int)) avgCT
                        ab <- showPercentBar avgCT avgCTPc
                        av <- showVerticalBar avgCT avgCTPc
                        ai <- showIconPattern (loadIconPattern opts) avgCTPc
@@ -150,7 +149,7 @@ formatCT opts cTs = do let CTOpts { mintemp = minT
 
 
 runCT :: [String] -> Monitor String
-runCT argv = do cTs <- io $ parseCT
+runCT argv = do cTs <- io parseCT
                 opts <- io $ parseOpts argv
                 l <- formatCT opts cTs
                 parseTemplate l
