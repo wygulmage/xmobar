@@ -2,7 +2,6 @@
 -- |
 -- Module      :  Plugins.Monitors.CoreTemp
 -- Copyright   :  (c) 2019 Felix Springer
---                (c) Juraj Hercek
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Felix Springer <felixspringer149@gmail.com>
