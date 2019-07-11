@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Plugins.Monitors.CoreTemp
+-- Module      :  Plugins.Monitors.MultiCoreTemp
 -- Copyright   :  (c) 2019 Felix Springer
 -- License     :  BSD-style (see LICENSE)
 --
@@ -12,7 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.Monitors.CoreTemp (startCoreTemp) where
+module Xmobar.Plugins.Monitors.MultiCoreTemp (startMultiCoreTemp) where
 
 import Xmobar.Plugins.Monitors.Common
 import Control.Monad (filterM)
@@ -23,9 +23,9 @@ import System.Directory ( doesDirectoryExist
 
 -- | Declare Options.
 data CTOpts = CTOpts { loadIconPattern :: Maybe IconPattern
-                        , mintemp :: Float
-                        , maxtemp :: Float
-                        }
+                     , mintemp :: Float
+                     , maxtemp :: Float
+                     }
 
 -- | Set default Options.
 defaultOpts :: CTOpts
@@ -154,5 +154,5 @@ runCT argv = do cTs <- io parseCT
                 l <- formatCT opts cTs
                 parseTemplate l
 
-startCoreTemp :: [String] -> Int -> (String -> IO ()) -> IO ()
-startCoreTemp a = runM a cTConfig runCT
+startMultiCoreTemp :: [String] -> Int -> (String -> IO ()) -> IO ()
+startMultiCoreTemp a = runM a cTConfig runCT

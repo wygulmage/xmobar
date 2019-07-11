@@ -34,6 +34,7 @@ import Xmobar.Plugins.Monitors.Thermal
 import Xmobar.Plugins.Monitors.ThermalZone
 import Xmobar.Plugins.Monitors.CpuFreq
 import Xmobar.Plugins.Monitors.CoreTemp
+import Xmobar.Plugins.Monitors.MultiCoreTemp
 import Xmobar.Plugins.Monitors.Disk
 import Xmobar.Plugins.Monitors.Top
 import Xmobar.Plugins.Monitors.Uptime
@@ -72,6 +73,7 @@ data Monitors = Network      Interface   Args Rate
               | Brightness   Args        Rate
               | CpuFreq      Args        Rate
               | CoreTemp     Args        Rate
+              | MultiCoreTemp Args       Rate
               | TopProc      Args        Rate
               | TopMem       Args        Rate
               | Uptime       Args        Rate
@@ -132,6 +134,7 @@ instance Exec Monitors where
     alias (TopProc _ _) = "top"
     alias (TopMem _ _) = "topmem"
     alias (CoreTemp _ _) = "coretemp"
+    alias (MultiCoreTemp _ _) = "multicoretemp"
     alias DiskU {} = "disku"
     alias DiskIO {} = "diskio"
     alias (Uptime _ _) = "uptime"
@@ -175,6 +178,7 @@ instance Exec Monitors where
     start (Brightness a r) = runM a brightConfig runBright r
     start (CpuFreq a r) = runM a cpuFreqConfig runCpuFreq r
     start (CoreTemp a r) = startCoreTemp a r
+    start (MultiCoreTemp a r) = startMultiCoreTemp a r
     start (DiskU s a r) = runM a diskUConfig (runDiskU s) r
     start (DiskIO s a r) = startDiskIO s a r
     start (Uptime a r) = runM a uptimeConfig runUptime r
