@@ -18,7 +18,9 @@ module Xmobar.Plugins.Monitors.CoreTemp (startCoreTemp) where
 import Xmobar.Plugins.Monitors.Common
 import Control.Monad (filterM)
 import System.Console.GetOpt
-import System.Directory (doesDirectoryExist)
+import System.Directory ( doesDirectoryExist
+                        , doesFileExist
+                        )
 
 -- | Declare Options.
 data CTOpts = CTOpts { loadIconPattern :: Maybe IconPattern
@@ -70,26 +72,31 @@ coretempPath :: IO String
 coretempPath = do xs <- filterM doesDirectoryExist ps
                   let x = head xs
                   return x
-  where ps = [ "/sys/bus/platform/devices/coretemp." ++ (show (x :: Int)) | x <- [0..9] ]
+  where ps = [ "/sys/bus/platform/devices/coretemp." ++ (show (x :: Int)) ++ "/" | x <- [0..9] ]
 
 hwmonPath :: IO String
 hwmonPath = do p <- coretempPath
-               xs <- filterM doesDirectoryExist [ p ++ "/hwmon/hwmon" ++ show (x :: Int) | x <- [0..9] ]
+               xs <- filterM doesDirectoryExist [ p ++ "hwmon/hwmon" ++ show (x :: Int) ++ "/" | x <- [0..9] ]
                let x = head xs
                return x
 
 corePaths :: IO [String]
 corePaths = do p <- hwmonPath
-               return [ p ]
+               ls <- filterM doesFileExist [ p ++ "temp" ++ show (x :: Int) ++ "_label" | x <- [0..9] ]
+               cls <- filterM isLabelFromCore ls
+               return $ map labelToCore cls
 
-cTFilePaths = [ "/sys/bus/platform/devices/coretemp.0/hwmon/hwmon1/temp2_input"
-              , "/sys/bus/platform/devices/coretemp.0/hwmon/hwmon1/temp3_input"
-              , "/sys/bus/platform/devices/coretemp.0/hwmon/hwmon1/temp4_input"
-              , "/sys/bus/platform/devices/coretemp.0/hwmon/hwmon1/temp5_input"
-              ]
+isLabelFromCore :: FilePath -> IO Bool
+isLabelFromCore p = do a <- readFile p
+                       return $ take 4 a == "Core"
+
+labelToCore :: FilePath -> FilePath
+labelToCore = (++ "input") . reverse . drop 5 . reverse
 
 cTData :: IO [Float]
-cTData = traverse readSingleFile cTFilePaths
+cTData = do fps <- corePaths
+            fs <- traverse readSingleFile fps
+            return fs
   where readSingleFile :: FilePath -> IO Float
         readSingleFile s = do a <- readFile s
                               return $ parseContent a
@@ -137,8 +144,3 @@ runCT argv = do cTs <- io $ parseCT
 
 startCoreTemp :: [String] -> Int -> (String -> IO ()) -> IO ()
 startCoreTemp a = runM a cTConfig runCT
-
----
-
---showTemps :: [Float] -> Monitor [String]
---showTemps fs = do fstrs <- mapM 
