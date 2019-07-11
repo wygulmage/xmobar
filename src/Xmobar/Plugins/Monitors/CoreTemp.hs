@@ -123,18 +123,19 @@ formatCT opts cTs = do let CTOpts { mintemp = minT
                            domainT = maxT - minT
                            maxCT = maximum cTs
                            avgCT = sum cTs / (fromIntegral $ length cTs)
-                           maxCTPc = (maxCT - minT) / domainT
-                           avgCTPc = (avgCT - minT) / domainT
+                           calcPc t = (t - minT) / domainT
+                           maxCTPc = calcPc maxCT
+                           avgCTPc = calcPc avgCT
 
-                       cs <- showPercentsWithColors cTs
+                       cs <- traverse showTempWithColors cTs
 
-                       m <- showWithColors (show . (round :: Float -> Int)) maxCT
+                       m <- showTempWithColors maxCT
                        mp <- showWithColors' (show $ (round $ 100*maxCTPc :: Int)) maxCT
                        mb <- showPercentBar maxCT maxCTPc
                        mv <- showVerticalBar maxCT maxCTPc
                        mi <- showIconPattern (loadIconPattern opts) maxCTPc
 
-                       a <- showWithColors (show . (round :: Float -> Int)) avgCT
+                       a <- showTempWithColors avgCT
                        ap <- showWithColors' (show $ (round $ 100*avgCTPc :: Int)) avgCT
                        ab <- showPercentBar avgCT avgCTPc
                        av <- showVerticalBar avgCT avgCTPc
@@ -144,6 +145,9 @@ formatCT opts cTs = do let CTOpts { mintemp = minT
                            as = [ a , ap , ab , av , ai ]
 
                        return (ms ++ as ++ cs)
+  where showTempWithColors :: Float -> Monitor String
+        showTempWithColors = showWithColors (show . (round :: Float -> Int))
+
 
 runCT :: [String] -> Monitor String
 runCT argv = do cTs <- io $ parseCT
