@@ -143,6 +143,7 @@ library
                    Xmobar.Plugins.Monitors.Cpu,
                    Xmobar.Plugins.Monitors.Disk,
                    Xmobar.Plugins.Monitors.Mem,
+                   Xmobar.Plugins.Monitors.MultiCoreTemp,
                    Xmobar.Plugins.Monitors.MultiCpu,
                    Xmobar.Plugins.Monitors.Net,
                    Xmobar.Plugins.Monitors.Swap,
