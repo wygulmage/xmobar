@@ -1098,7 +1098,8 @@ more than one battery.
 
 - Aliases to `multicoretemp`
 - Args: default monitor arguments, plus:
-  - `--temp-icon-pattern`: dynamic string for overall cpu load in `maxipat` and `avgipat`.
+  - `--max-icon-pattern`: dynamic string for overall cpu load in `maxipat`.
+  - `--avg-icon-pattern`: dynamic string for overall cpu load in `avgipat`.
   - `--mintemp`: temperature in degree Celsius, that sets the lower limit for percentage calculation.
   - `--maxtemp`: temperature in degree Celsius, that sets the upper limit for percentage calculation.
 - Thresholds refer to temperature in degree Celsius
