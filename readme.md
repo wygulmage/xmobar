@@ -1094,6 +1094,30 @@ more than one battery.
                        "-L", "40", "-H", "60",
                        "-l", "lightblue", "-n", "gray90", "-h", "red"] 50
 
+### `MultiCoreTemp Args RefreshRate`
+
+- Aliases to `multicoretemp`
+- Args: default monitor arguments, plus:
+  - `--temp-icon-pattern`: dynamic string for overall cpu load in `maxipat` and `avgipat`.
+  - `--mintemp`: temperature in degree Celsius, that sets the lower limit for percentage calculation.
+  - `--maxtemp`: temperature in degree Celsius, that sets the upper limit for percentage calculation.
+- Thresholds refer to temperature in degree Celsius
+- Variables that can be used with the `-t`/`--template` argument:
+            `max`, `maxpc`, `maxbar`, `maxvbar`, `maxipat`,
+            `avg`, `avgpc`, `avgbar`, `avgvbar`, `avgipat`,
+            `core0`, `core1`, ..., `coreN`
+
+  The *pc, *bar, *vbar and *ipat variables are showing percentages on the scale
+  defined by `--mintemp` and `--maxtemp`.
+- Default template: `Temp: <max>°C - <maxpc>%`
+- This monitor requires coretemp module to be loaded in kernel
+- Example:
+
+         Run CoreTemp ["-t", "Temp: <max>°C | <maxpc>%",
+                       "-L", "60", "-H", "80",
+                       "-l", "green", "-n", "yellow", "-h", "red"
+                       "--", "--mintemp", "20", "--maxtemp", "100"] 50
+
 ### `Volume Mixer Element Args RefreshRate`
 
 - Aliases to the mixer name and element name separated by a colon. Thus,
