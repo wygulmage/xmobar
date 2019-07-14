@@ -22,23 +22,30 @@ import System.Directory ( doesDirectoryExist
                         )
 
 -- | Declare Options.
-data CTOpts = CTOpts { loadIconPattern :: Maybe IconPattern
+data CTOpts = CTOpts { maxIconPattern :: Maybe IconPattern
+                     , avgIconPattern :: Maybe IconPattern
                      , mintemp :: Float
                      , maxtemp :: Float
                      }
 
 -- | Set default Options.
 defaultOpts :: CTOpts
-defaultOpts = CTOpts { loadIconPattern = Nothing
+defaultOpts = CTOpts { maxIconPattern = Nothing
+                     , avgIconPattern = Nothing
                      , mintemp = 0
                      , maxtemp = 100
                      }
 
 -- | Apply configured Options.
 options :: [OptDescr (CTOpts -> CTOpts)]
-options = [ Option [] ["load-icon-pattern"]
+options = [ Option [] ["max-icon-pattern"]
               (ReqArg
-                (\ arg opts -> opts { loadIconPattern = Just $ parseIconPattern arg })
+                (\ arg opts -> opts { maxIconPattern = Just $ parseIconPattern arg })
+                "")
+              ""
+          , Option [] ["avg-icon-pattern"]
+              (ReqArg
+                (\ arg opts -> opts { avgIconPattern = Just $ parseIconPattern arg })
                 "")
               ""
           , Option [] ["mintemp"]
@@ -132,13 +139,13 @@ formatCT opts cTs = do let CTOpts { mintemp = minT
                        mp <- showWithColors' (show (round (100*maxCTPc) :: Int)) maxCT
                        mb <- showPercentBar maxCT maxCTPc
                        mv <- showVerticalBar maxCT maxCTPc
-                       mi <- showIconPattern (loadIconPattern opts) maxCTPc
+                       mi <- showIconPattern (maxIconPattern opts) maxCTPc
 
                        a <- showTempWithColors avgCT
                        ap <- showWithColors' (show (round (100*avgCTPc) :: Int)) avgCT
                        ab <- showPercentBar avgCT avgCTPc
                        av <- showVerticalBar avgCT avgCTPc
-                       ai <- showIconPattern (loadIconPattern opts) avgCTPc
+                       ai <- showIconPattern (avgIconPattern opts) avgCTPc
 
                        let ms = [ m , mp , mb , mv , mi ]
                            as = [ a , ap , ab , av , ai ]
