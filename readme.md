@@ -1109,14 +1109,15 @@ more than one battery.
 
   The *pc, *bar, *vbar and *ipat variables are showing percentages on the scale
   defined by `--mintemp` and `--maxtemp`.
+  The max* and avg* variables to the highest and the average core temperature.
 - Default template: `Temp: <max>°C - <maxpc>%`
 - This monitor requires coretemp module to be loaded in kernel
 - Example:
 
-         Run CoreTemp ["-t", "Temp: <max>°C | <maxpc>%",
-                       "-L", "60", "-H", "80",
-                       "-l", "green", "-n", "yellow", "-h", "red"
-                       "--", "--mintemp", "20", "--maxtemp", "100"] 50
+         Run MultiCoreTemp ["-t", "Temp: <avg>°C | <avgpc>%",
+                            "-L", "60", "-H", "80",
+                            "-l", "green", "-n", "yellow", "-h", "red"
+                            "--", "--mintemp", "20", "--maxtemp", "100"] 50
 
 ### `Volume Mixer Element Args RefreshRate`
 
