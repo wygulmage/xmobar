@@ -1100,8 +1100,10 @@ more than one battery.
 - Args: default monitor arguments, plus:
   - `--max-icon-pattern`: dynamic string for overall cpu load in `maxipat`.
   - `--avg-icon-pattern`: dynamic string for overall cpu load in `avgipat`.
-  - `--mintemp`: temperature in degree Celsius, that sets the lower limit for percentage calculation.
-  - `--maxtemp`: temperature in degree Celsius, that sets the upper limit for percentage calculation.
+  - `--mintemp`: temperature in degree Celsius, that sets the lower
+    limit for percentage calculation.
+  - `--maxtemp`: temperature in degree Celsius, that sets the upper
+    limit for percentage calculation.
 - Thresholds refer to temperature in degree Celsius
 - Variables that can be used with the `-t`/`--template` argument:
             `max`, `maxpc`, `maxbar`, `maxvbar`, `maxipat`,
@@ -1617,10 +1619,10 @@ Thiago Negri, Edward O'Callaghan, Svein Ove, Martin Perner, Jens
 Petersen, Alexander Polakov, Pavan Rikhi, Petr Rockai, Andrew
 Sackville-West, Markus Scherer, Daniel Schüssler, Olivier Schneider,
 Alexander Shabalin, Valentin Shirokov, Peter Simons, Alexander
-Solovyov, Will Song, John Soros, Travis Staton, Artem Tarasov, Samuli
-Thomasson, Edward Tjörnhammar, Sergei Trofimovich, Thomas Tuegel, Jan
-Vornberger, Anton Vorontsov, Daniel Wagner, Zev Weiss, Phil Xiaojun
-Hu, Edward Z. Yang and Norbert Zeh.
+Solovyov, Will Song, John Soros, Felix Springer, Travis Staton, Artem
+Tarasov, Samuli Thomasson, Edward Tjörnhammar, Sergei Trofimovich,
+Thomas Tuegel, Jan Vornberger, Anton Vorontsov, Daniel Wagner, Zev
+Weiss, Phil Xiaojun Hu, Edward Z. Yang and Norbert Zeh.
 
 [jao]: http://jao.io
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors

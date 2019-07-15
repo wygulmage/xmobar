@@ -2,6 +2,7 @@
 
 _New features_
 
+  - New monitor `MultiCoreTemp`, thanks to Felix Springer.
   - `DiskIO`: Additional template variables for absolute number of
     bytes rather than speeds (see [issue #390].
   - `WeatherX`: An extension to the `Weather` monitor allowing the
