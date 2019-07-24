@@ -1547,15 +1547,15 @@ optional ones (alias and rate):
 
 `start` must receive a callback to be used to display the `String`
 produced by the plugin. This method can be used for plugins that need
-to perform asynchronous actions. See `Plugins/PipeReader.hs` for an
-example.
+to perform asynchronous actions. See
+`src/Xmobar/Plugins/PipeReader.hs` for an example.
 
 `run` can be used for simpler plugins. If you define only `run` the
 plugin will be run every second. To overwrite this default you just
 need to implement `rate`, which must return the number of tenth of
-seconds between every successive runs. See `Plugins/HelloWorld.hs` for
-an example of a plugin that runs just once, and `Plugins/Date.hs` for
-one that implements `rate`.
+seconds between every successive runs. See `examples/xmobar.hs` for an
+example of a plugin that runs just once, and
+`src/Xmobar/Plugins/Date.hs` for one that implements `rate`.
 
 Notice that Date could be implemented as:
 
