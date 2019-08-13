@@ -23,6 +23,7 @@ import Prelude
 import Data.Char
 import Control.Concurrent
 
+import Xmobar.App.Timer (doEveryTenthSeconds)
 import Xmobar.System.Signal
 
 -- | Work around to the Int max bound: since threadDelay takes an Int, it
@@ -33,10 +34,6 @@ tenthSeconds s | s >= x = do threadDelay (x * 100000)
                              tenthSeconds (s - x)
                | otherwise = threadDelay (s * 100000)
                where x = (maxBound :: Int) `div` 100000
-
-doEveryTenthSeconds :: Int -> IO () -> IO ()
-doEveryTenthSeconds r action = go
-    where go = action >> tenthSeconds r >> go
 
 class Show e => Exec e where
     alias   :: e -> String

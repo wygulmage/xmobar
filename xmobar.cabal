@@ -105,6 +105,7 @@ library
                    Xmobar.App.Main,
                    Xmobar.App.Opts,
                    Xmobar.App.Compile,
+                   Xmobar.App.Timer,
                    Xmobar.System.Utils,
                    Xmobar.System.StatFS,
                    Xmobar.System.Environment,
@@ -320,6 +321,7 @@ test-suite XmobarTest
                  Xmobar.Plugins.Monitors.Common.Output
                  Xmobar.Plugins.Monitors.Common.Files
                  Xmobar.Run.Exec
+                 Xmobar.App.Timer
                  Xmobar.System.Signal
 
   if flag(with_alsa) || flag(all_extensions)

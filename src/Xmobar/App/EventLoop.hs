@@ -17,7 +17,12 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.App.EventLoop (startLoop, startCommand) where
+module Xmobar.App.EventLoop
+    ( startLoop
+    , startCommand
+    , newRefreshLock
+    , refreshLock
+    ) where
 
 import Prelude hiding (lookup)
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
@@ -31,7 +36,7 @@ import Control.Monad.Reader
 import Control.Concurrent
 import Control.Concurrent.Async (Async, async)
 import Control.Concurrent.STM
-import Control.Exception (handle, SomeException(..))
+import Control.Exception (bracket_, handle, SomeException(..))
 import Data.Bits
 import Data.Map hiding (foldr, map, filter)
 import Data.Maybe (fromJust, isJust)
@@ -63,15 +68,34 @@ import Xmobar.System.DBus
 runX :: XConf -> X () -> IO ()
 runX xc f = runReaderT f xc
 
+newRefreshLock :: IO (TMVar ())
+newRefreshLock = atomically $ newTMVar ()
+
+refreshLock :: TMVar () -> IO a -> IO a
+refreshLock var = bracket_ lock unlock
+    where
+        lock = atomically $ takeTMVar var
+        unlock = atomically $ putTMVar var ()
+
+refreshLockT :: TMVar () -> STM a -> STM a
+refreshLockT var action = do
+    takeTMVar var
+    r <- action
+    putTMVar var ()
+    return r
+
 -- | Starts the main event loop and threads
-startLoop :: XConf -> TMVar SignalType -> [[([Async ()], TVar String)]]
-             -> IO ()
-startLoop xcfg@(XConf _ _ w _ _ _ _) sig vs = do
+startLoop :: XConf
+          -> TMVar SignalType
+          -> TMVar ()
+          -> [[([Async ()], TVar String)]]
+          -> IO ()
+startLoop xcfg@(XConf _ _ w _ _ _ _) sig pauser vs = do
 #ifdef XFT
     xftInitFtLibrary
 #endif
     tv <- atomically $ newTVar []
-    _ <- forkIO (handle (handler "checker") (checker tv [] vs sig))
+    _ <- forkIO (handle (handler "checker") (checker tv [] vs sig pauser))
 #ifdef THREADED_RUNTIME
     _ <- forkOS (handle (handler "eventer") (eventer sig))
 #else
@@ -111,15 +135,16 @@ checker :: TVar [String]
            -> [String]
            -> [[([Async ()], TVar String)]]
            -> TMVar SignalType
+           -> TMVar ()
            -> IO ()
-checker tvar ov vs signal = do
-      nval <- atomically $ do
+checker tvar ov vs signal pauser = do
+      nval <- atomically $ refreshLockT pauser $ do
               nv <- mapM concatV vs
               guard (nv /= ov)
               writeTVar tvar nv
               return nv
       atomically $ putTMVar signal Wakeup
-      checker tvar nval vs signal
+      checker tvar nval vs signal pauser
     where
       concatV = fmap concat . mapM (readTVar . snd)
 
