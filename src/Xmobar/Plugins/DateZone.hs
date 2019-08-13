@@ -72,7 +72,7 @@ instance Exec DateZone where
        else
         go (date f locale)
 
-      where go func = func >>= cb >> tenthSeconds r >> go func
+      where go func = doEveryTenthSeconds r $ func >>= cb
 
 {-# NOINLINE localeLock #-}
 -- ensures that only one plugin instance sets the locale

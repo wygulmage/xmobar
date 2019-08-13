@@ -17,7 +17,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Run.Exec (Exec (..), tenthSeconds) where
+module Xmobar.Run.Exec (Exec (..), tenthSeconds, doEveryTenthSeconds) where
 
 import Prelude
 import Data.Char
@@ -34,6 +34,10 @@ tenthSeconds s | s >= x = do threadDelay (x * 100000)
                | otherwise = threadDelay (s * 100000)
                where x = (maxBound :: Int) `div` 100000
 
+doEveryTenthSeconds :: Int -> IO () -> IO ()
+doEveryTenthSeconds r action = go
+    where go = action >> tenthSeconds r >> go
+
 class Show e => Exec e where
     alias   :: e -> String
     alias   e    = takeWhile (not . isSpace) $ show e
@@ -43,6 +47,6 @@ class Show e => Exec e where
     run     _    = return ""
     start   :: e -> (String -> IO ()) -> IO ()
     start   e cb = go
-        where go = run e >>= cb >> tenthSeconds (rate e) >> go
+        where go = doEveryTenthSeconds (rate e) $ run e >>= cb
     trigger :: e -> (Maybe SignalType -> IO ()) -> IO ()
     trigger _ sh  = sh Nothing
