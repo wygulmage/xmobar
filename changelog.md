@@ -1,4 +1,4 @@
-## Version 0.30
+## Version 0.30 (August, 2019)
 
 _New features_
 
