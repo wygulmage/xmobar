@@ -1,10 +1,19 @@
+## Version 0.31
+
+_New features_
+
+  - New option `--contiguous-icons` for `MultiCpu` to draw icons
+    without padding (see [issue #388]).
+
+[issue #388]: https://github.com/jaor/xmobar/issues/388
+
 ## Version 0.30 (August, 2019)
 
 _New features_
 
   - New monitor `MultiCoreTemp`, thanks to Felix Springer.
   - `DiskIO`: Additional template variables for absolute number of
-    bytes rather than speeds (see [issue #390].
+    bytes rather than speeds (see [issue #390]).
   - `WeatherX`: An extension to the `Weather` monitor allowing the
     spefication of custom strings or icons for sky conditions.
   - The battery monitors accept the new arguments `-a` and `-A` to

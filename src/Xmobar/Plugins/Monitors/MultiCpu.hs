@@ -25,6 +25,7 @@ data MultiCpuOpts = MultiCpuOpts
   { loadIconPatterns :: [IconPattern]
   , loadIconPattern :: Maybe IconPattern
   , fallbackIconPattern :: Maybe IconPattern
+  , contiguous :: Bool
   }
 
 defaultOpts :: MultiCpuOpts
@@ -32,6 +33,7 @@ defaultOpts = MultiCpuOpts
   { loadIconPatterns = []
   , loadIconPattern = Nothing
   , fallbackIconPattern = Nothing
+  , contiguous = False
   }
 
 options :: [OptDescr (MultiCpuOpts -> MultiCpuOpts)]
@@ -42,6 +44,7 @@ options =
      o { loadIconPatterns = parseIconPattern x : loadIconPatterns o }) "") ""
   , Option "" ["fallback-icon-pattern"] (ReqArg (\x o ->
      o { fallbackIconPattern = Just $ parseIconPattern x }) "") ""
+  , Option "" ["contiguous-icons"] (NoArg (\o -> o {contiguous = True})) ""
   ]
 
 parseOpts :: [String] -> IO MultiCpuOpts
@@ -87,7 +90,8 @@ percent b a = if tot > 0 then map (/ tot) $ take 4 dif else [0, 0, 0, 0]
 
 formatMultiCpus :: MultiCpuOpts -> [[Float]] -> Monitor [String]
 formatMultiCpus _ [] = return []
-formatMultiCpus opts xs = concat <$> mapM (\(i, x) -> formatCpu opts i x) (zip [0..] xs)
+formatMultiCpus opts xs =
+  concat <$> mapM (\(i, x) -> formatCpu opts i x) (zip [0..] xs)
 
 formatCpu :: MultiCpuOpts -> Int -> [Float] -> Monitor [String]
 formatCpu opts i xs
@@ -100,7 +104,8 @@ formatCpu opts i xs
                       return (b:h:d:ps)
   where tryString
           | i == 0 = loadIconPattern opts
-          | i <= length (loadIconPatterns opts) = Just $ loadIconPatterns opts !! (i - 1)
+          | i <= length (loadIconPatterns opts) =
+              Just $ loadIconPatterns opts !! (i - 1)
           | otherwise = fallbackIconPattern opts
 
 splitEvery :: Int -> [a] -> [[a]]
@@ -109,16 +114,17 @@ splitEvery n = unfoldr (\x -> if null x then Nothing else Just $ splitAt n x)
 groupData :: [String] -> [[String]]
 groupData = transpose . tail . splitEvery vNum
 
-formatAutoCpus :: [String] -> Monitor [String]
-formatAutoCpus [] = return $ replicate vNum ""
-formatAutoCpus xs = return $ map unwords (groupData xs)
+formatAutoCpus :: MultiCpuOpts -> [String] -> Monitor [String]
+formatAutoCpus _ [] = return $ replicate vNum ""
+formatAutoCpus opts xs =
+  return $ map (if (contiguous opts) then concat else unwords) (groupData xs)
 
 runMultiCpu :: CpuDataRef -> [String] -> Monitor String
 runMultiCpu cref argv =
   do c <- io $ parseCpuData cref
      opts <- io $ parseOpts argv
      l <- formatMultiCpus opts c
-     a <- formatAutoCpus l
+     a <- formatAutoCpus opts l
      parseTemplate $ a ++ l
 
 startMultiCpu :: [String] -> Int -> (String -> IO ()) -> IO ()

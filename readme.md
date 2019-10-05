@@ -866,6 +866,8 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
                               corresponds to nth cpu.
   - `--fallback-icon-pattern`: dynamic string used by `autoipat` and `ipat{i}` when no
                              `--load-icon-patterns` has been provided for `cpu{i}`
+  - `--contiguous-icons`: flag (no value needs to be provided) that
+                          causes the load icons to be drawn without padding.
 - Thresholds refer to percentage of CPU load
 - Variables that can be used with the `-t`/`--template` argument:
 	    `autototal`, `autobar`, `autovbar`, `autoipat`, `autouser`, `autonice`,
