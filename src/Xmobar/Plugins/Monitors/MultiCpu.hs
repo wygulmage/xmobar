@@ -117,7 +117,7 @@ groupData = transpose . tail . splitEvery vNum
 formatAutoCpus :: MultiCpuOpts -> [String] -> Monitor [String]
 formatAutoCpus _ [] = return $ replicate vNum ""
 formatAutoCpus opts xs =
-  return $ map (if (contiguous opts) then concat else unwords) (groupData xs)
+  return $ map (if contiguous opts then concat else unwords) (groupData xs)
 
 runMultiCpu :: CpuDataRef -> [String] -> Monitor String
 runMultiCpu cref argv =
