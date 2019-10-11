@@ -1623,8 +1623,8 @@ Sackville-West, Markus Scherer, Daniel Schüssler, Olivier Schneider,
 Alexander Shabalin, Valentin Shirokov, Peter Simons, Alexander
 Solovyov, Will Song, John Soros, Felix Springer, Travis Staton, Artem
 Tarasov, Samuli Thomasson, Edward Tjörnhammar, Sergei Trofimovich,
-Thomas Tuegel, Jan Vornberger, Anton Vorontsov, Daniel Wagner, Zev
-Weiss, Phil Xiaojun Hu, Edward Z. Yang and Norbert Zeh.
+Thomas Tuegel, John Tyree, Jan Vornberger, Anton Vorontsov, Daniel
+Wagner, Zev Weiss, Phil Xiaojun Hu, Edward Z. Yang and Norbert Zeh.
 
 [jao]: http://jao.io
 [incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
