@@ -284,12 +284,9 @@ runBatt' bfs args = do
         fmtStatus opts Charging _ _ = onString opts
         fmtStatus opts Discharging _ battStatus =
           (case battStatus of
-            BattHigh   -> highString
+            BattHigh -> highString
             BattMedium -> mediumString
-            BattLow    -> lowString
-          )
-          <> offString
-          $  opts
+            BattLow -> lowString) opts ++ offString opts
         maybeColor Nothing str = str
         maybeColor (Just c) str = "<fc=" ++ c ++ ">" ++ str ++ "</fc>"
         color x o | x >= 0 = maybeColor (posColor o)
