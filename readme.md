@@ -917,6 +917,13 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
     when AC is "off" in `leftipat`.
   - `--idle-icon-pattern`: dynamic string for current battery charge
     when AC is "idle" in `leftipat`.
+  - `--lows`: string for AC "off" status and power lower than the `-L`
+    threshold (default: "")
+  - `--mediums`: string for AC "off" status and power lower than the `-H`
+    threshold (default: "")
+  - `--high`: string for AC "off" status and power higher than the `-H`
+    threshold (default: "")
+
 
 - Variables that can be used with the `-t`/`--template` argument:
 	    `left`, `leftbar`, `leftvbar`, `leftipat`, `timeleft`, `watts`, `acstatus`

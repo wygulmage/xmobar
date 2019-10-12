@@ -5,6 +5,8 @@ _New features_
   - New option `--contiguous-icons` for `MultiCpu` to draw icons
     without padding (see [issue #388]).
   - New version of libmpd (0.9.0.10), thanks to John Tyree
+  - New options `--lows`, `--mediums`, and `--highs` for `Battery`
+    to display an additional string depending on battery level.
 
 [issue #388]: https://github.com/jaor/xmobar/issues/388
 
