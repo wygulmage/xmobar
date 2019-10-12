@@ -198,11 +198,11 @@ For the output template:
   managers to feed xmobar strings with `<action>` tags mixed with un-trusted
   content (e.g. window titles).  For example, if xmobar is invoked as
 
-    ```xmobar -c "[Run UnsafeStdinReader]" -t "%UnsafeStdinReader%"```
+        xmobar -c "[Run UnsafeStdinReader]" -t "%UnsafeStdinReader%"
 
   and receives on standard input the line
 
-    ```<action=`echo test` button=1><raw=41:<action=`echo mooo` button=1>foo</action>/></action>```
+        <action=`echo test` button=1><raw=41:<action=`echo mooo` button=1>foo</action>/></action>`
 
   then it will display the text ```<action=`echo mooo` button=1>foo</action>```,
   which, when clicked, will cause `test` to be echoed.
@@ -1159,29 +1159,33 @@ more than one battery.
 
 ### `Alsa Mixer Element Args`
 
-Like [Volume](#volume-mixer-element-args-refreshrate), but with the following differences:
-- Uses event-based refreshing via `alsactl monitor` instead of polling, so it will refresh
-  instantly when there's a volume change, and won't use CPU until a change happens.
-- Aliases to `alsa:` followed by the mixer name and element name separated by a colon. Thus,
-  `Alsa "default" "Master" []` can be used as `%alsa:default:Master%`.
+Like [Volume](#volume-mixer-element-args-refreshrate), but with the
+following differences:
+- Uses event-based refreshing via `alsactl monitor` instead of
+  polling, so it will refresh instantly when there's a volume change,
+  and won't use CPU until a change happens.
+- Aliases to `alsa:` followed by the mixer name and element name
+  separated by a colon. Thus, `Alsa "default" "Master" []` can be used
+  as `%alsa:default:Master%`.
 - Additional options (after the `--`):
     - `--alsactl=/path/to/alsactl`
-        - If this option is not specified, `alsactl` will be sought in your `PATH`
-          first, and failing that, at `/usr/sbin/alsactl` (this is its location on
-          Debian systems. `alsactl monitor` works as a non-root user despite living
-          in `/usr/sbin`.).
-- `stdbuf` (from coreutils) must be (and most probably already is) in your `PATH`.
+        - If this option is not specified, `alsactl` will be sought in
+          your `PATH` first, and failing that, at `/usr/sbin/alsactl`
+          (this is its location on Debian systems. `alsactl monitor`
+          works as a non-root user despite living in `/usr/sbin`.).
+- `stdbuf` (from coreutils) must be (and most probably already is) in
+  your `PATH`.
 
 ### `MPD Args RefreshRate`
 
 - This monitor will only be compiled if you ask for it using the
   `with_mpd` flag. It needs [libmpd] 5.0 or later (available on Hackage).
 - Aliases to `mpd`
-- Args: default monitor arguments. In addition you can provide
-  `-P`, `-S` and `-Z`, with an string argument, to represent the
-  playing, stopped and paused states in the `statei` template field.
-  The environment variables `MPD_HOST` and `MPD_PORT` are used to configure the
-  mpd server to communicate with. Also available:
+- Args: default monitor arguments. In addition you can provide `-P`,
+  `-S` and `-Z`, with an string argument, to represent the playing,
+  stopped and paused states in the `statei` template field.  The
+  environment variables `MPD_HOST` and `MPD_PORT` are used to
+  configure the mpd server to communicate with. Also available:
   - `lapsed-icon-pattern`: dynamic string for current track position in `ipat`.
 - Variables that can be used with the `-t`/`--template` argument:
              `bar`, `vbar`, `ipat`, `state`, `statei`, `volume`, `length`,
@@ -1405,7 +1409,7 @@ will display "N/A" if for some reason the `date` invocation fails.
 
 ## Other Plugins
 
-<font size="+1">**`StdinReader`**</font>
+### `StdinReader`
 
 - Aliases to StdinReader
 - Displays any text received by xmobar on its standard input.
@@ -1413,7 +1417,7 @@ will display "N/A" if for some reason the `date` invocation fails.
   actions via stdin.  This is safer than `UnsafeStdinReader` because there is
   no need to escape the content before passing it to xmobar's standard input.
 
-<font size="+1">**`UnsafeStdinReader`**</font>
+### `UnsafeStdinReader`
 
 - Aliases to UnsafeStdinReader
 - Displays any text received by xmobar on its standard input.
@@ -1427,13 +1431,13 @@ will display "N/A" if for some reason the `date` invocation fails.
   clicking on xmobar:
   ```<action=`xdotool key alt+1`>ws1</action> <action=`xdotool key alt+1`>ws2</action>```
 
-<font size="+1">**`Date Format Alias RefreshRate`**</font>
+### `Date Format Alias RefreshRate`
 
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
 - Sample usage: `Run Date "%a %b %_d %Y <fc=#ee9a00>%H:%M:%S</fc>" "date" 10`
 
-<font size="+1">**`DateZone Format Locale Zone Alias RefreshRate`**</font>
+### `DateZone Format Locale Zone Alias RefreshRate`
 
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
@@ -1446,17 +1450,17 @@ will display "N/A" if for some reason the `date` invocation fails.
 - Sample usage:
   `Run DateZone "%a %H:%M:%S" "de_DE.UTF-8" "Europe/Vienna" "viennaTime" 10`
 
-<font size="+1">**`CommandReader "/path/to/program" Alias`**</font>
+### `CommandReader "/path/to/program" Alias`
 
 - Runs the given program, and displays its standard output.
 
-<font size="+1">**`PipeReader "default text:/path/to/pipe" Alias`**</font>
+### `PipeReader "default text:/path/to/pipe" Alias`
 
 - Reads its displayed output from the given pipe.
 - Prefix an optional default text separated by a colon
 - Expands environment variables in the first argument of syntax '${VAR}' or '$VAR'
 
-<font size="+1">**`MarqueePipeReader "default text:/path/to/pipe" (length, rate, sep) Alias`**</font>
+### `MarqueePipeReader "default text:/path/to/pipe" (length, rate, sep) Alias`
 
 - Generally equivalent to PipeReader
 - Text is displayed as marquee with the specified length, rate in 10th
@@ -1466,9 +1470,7 @@ will display "N/A" if for some reason the `date` invocation fails.
 
 - Expands environment variables in the first argument
 
-<font size="+1">
-**`BufferedPipeReader Alias [(Timeout, Bool, "/path/to/pipe1"), ..]`**
-</font>
+### `BufferedPipeReader Alias [(Timeout, Bool, "/path/to/pipe1"), ..]`
 
 - Display data from multiple pipes.
 - Timeout (in tenth of seconds) is the value after which the previous
@@ -1500,7 +1502,7 @@ will display "N/A" if for some reason the `date` invocation fails.
 [examples/status.sh]: http://github.com/jaor/xmobar/raw/master/examples/status.sh
 
 
-<font size="+1">**`XMonadLog`**</font>
+### `XMonadLog`
 
 - Aliases to XMonadLog
 - Displays information from xmonad's `_XMONAD_LOG`. You can set this
@@ -1518,7 +1520,7 @@ will display "N/A" if for some reason the `date` invocation fails.
 
 [here]: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Hooks-DynamicLog.html
 
-<font size="+1">**`UnsafeXMonadLog`**</font>
+### `UnsafeXMonadLog`
 
 - Aliases to UnsafeXMonadLog
 - Similar to StdinReader versus UnsafeStdinReader, this does not strip `<action

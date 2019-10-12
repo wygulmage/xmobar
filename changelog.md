@@ -1,4 +1,4 @@
-## Version 0.31
+## Version 0.31 (October, 2019)
 
 _New features_
 
