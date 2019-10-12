@@ -45,6 +45,9 @@ data BattOpts = BattOpts
   , onIconPattern :: Maybe IconPattern
   , offIconPattern :: Maybe IconPattern
   , idleIconPattern :: Maybe IconPattern
+  , lowString :: String
+  , mediumString :: String
+  , highString :: String
   }
 
 defaultOpts :: BattOpts
@@ -65,6 +68,9 @@ defaultOpts = BattOpts
   , onIconPattern = Nothing
   , offIconPattern = Nothing
   , idleIconPattern = Nothing
+  , lowString = ""
+  , mediumString = ""
+  , highString = ""
   }
 
 options :: [OptDescr (BattOpts -> BattOpts)]
@@ -89,6 +95,9 @@ options =
      o { offIconPattern = Just $ parseIconPattern x }) "") ""
   , Option "" ["idle-icon-pattern"] (ReqArg (\x o ->
      o { idleIconPattern = Just $ parseIconPattern x }) "") ""
+  , Option "" ["lows"] (ReqArg (\x o -> o { lowString = x }) "") ""
+  , Option "" ["mediums"] (ReqArg (\x o -> o { mediumString = x }) "") ""
+  , Option "" ["highs"] (ReqArg (\x o -> o { highString = x }) "") ""
   ]
 
 parseOpts :: [String] -> IO BattOpts
@@ -124,6 +133,23 @@ data Battery = Battery
   , power :: !Float
   , status :: !String
   }
+
+data BatteryStatus
+  = BattHigh
+  | BattMedium
+  | BattLow
+
+-- | Convert the current battery charge into a 'BatteryStatus'
+getBattStatus
+  :: Float    -- ^ Current battery charge, assumed to be in [0,1]
+  -> BattOpts -- ^ Battery options, including high/low thresholds
+  -> BatteryStatus
+getBattStatus charge opts
+  | c >= highThreshold opts = BattHigh
+  | c >= lowThreshold  opts = BattMedium
+  | otherwise = BattLow
+ where
+   c = 100 * min 1 charge
 
 safeFileExist :: String -> String -> IO Bool
 safeFileExist d f = handle noErrors $ fileExist (d </> f)
@@ -226,7 +252,9 @@ runBatt' bfs args = do
       do l <- fmtPercent x
          ws <- fmtWatts w opts suffix d
          si <- getIconPattern opts s x
-         st <- showWithColors' (fmtStatus opts s nas) (100 * x)
+         st <- showWithColors'
+                 (fmtStatus opts s nas (getBattStatus x opts))
+                 (100 * x)
          parseTemplate (l ++ [st, fmtTime $ floor t, ws, si])
     NA -> getConfigValue naString
   where fmtPercent :: Float -> Monitor [String]
@@ -244,11 +272,24 @@ runBatt' bfs args = do
                                     then minutes else '0' : minutes
           where hours = show (x `div` 3600)
                 minutes = show ((x `mod` 3600) `div` 60)
-        fmtStatus opts Idle _ = idleString opts
-        fmtStatus _ Unknown na = na
-        fmtStatus opts Full _ = idleString opts
-        fmtStatus opts Charging _ = onString opts
-        fmtStatus opts Discharging _ = offString opts
+        fmtStatus
+          :: BattOpts
+          -> Status
+          -> String -- ^ What to in case battery status is unknown
+          -> BatteryStatus
+          -> String
+        fmtStatus opts Idle _ _ = idleString opts
+        fmtStatus _ Unknown na _ = na
+        fmtStatus opts Full _ _ = idleString opts
+        fmtStatus opts Charging _ _ = onString opts
+        fmtStatus opts Discharging _ battStatus =
+          (case battStatus of
+            BattHigh   -> highString
+            BattMedium -> mediumString
+            BattLow    -> lowString
+          )
+          <> offString
+          $  opts
         maybeColor Nothing str = str
         maybeColor (Just c) str = "<fc=" ++ c ++ ">" ++ str ++ "</fc>"
         color x o | x >= 0 = maybeColor (posColor o)
