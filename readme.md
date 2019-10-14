@@ -1155,6 +1155,25 @@ more than one battery.
     - `--highd` _number_ High threshold for dB. Defaults to -5.0.
     - `--lowd` _number_ Low threshold for dB. Defaults to -30.0.
     - `--volume-icon-pattern` _string_ dynamic string for current volume in `volumeipat`.
+    - `-H` _number_ High threshold for volume (in %). Defaults to 60.0.
+        - Long option: `--highv`
+    - `-L` _number_ Low threshold for volume (in %). Defaults to 20.0.
+        - Long option: `--lowv`
+    - `-h`: _string_ High string
+        - The string added in front of `<status>` when the mixer element
+          is on and the volume percentage is higher than the `-H` threshold.
+          Defaults to "".
+        - Long option: `--highs`
+    - `-m`: _string_ Medium string
+        - The string added in front of `<status>` when the mixer element
+          is on and the volume percentage is lower than the `-H` threshold.
+          Defaults to "".
+        - Long option: `--mediums`
+    - `-l`: _string_ Low string
+        - The string added in front of `<status>` when the mixer element
+          is on and the volume percentage is lower than the `-L` threshold.
+          Defaults to "".
+        - Long option: `--lows`
 - Variables that can be used with the `-t`/`--template` argument:
             `volume`, `volumebar`, `volumevbar`, `volumeipat`, `dB`, `status`
 - Note that `dB` might only return 0 on your system. This is known
