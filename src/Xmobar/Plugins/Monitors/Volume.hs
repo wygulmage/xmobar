@@ -44,6 +44,9 @@ data VolumeOpts = VolumeOpts
     , volumeIconPattern :: Maybe IconPattern
     , lowVolThresh :: Maybe Float
     , highVolThresh :: Maybe Float
+    , lowString :: String
+    , mediumString :: String
+    , highString :: String
     }
 
 defaultOpts :: VolumeOpts
@@ -55,8 +58,11 @@ defaultOpts = VolumeOpts
     , highDbThresh = -5.0
     , lowDbThresh = -30.0
     , volumeIconPattern = Nothing
-    , lowVolThresh = Just 20
-    , highVolThresh = Just 60
+    , lowVolThresh = Just 20.0
+    , highVolThresh = Just 60.0
+    , lowString = ""
+    , mediumString = ""
+    , highString = ""
     }
 
 options :: [OptDescr (VolumeOpts -> VolumeOpts)]
@@ -71,6 +77,9 @@ options =
        o { volumeIconPattern = Just $ parseIconPattern x }) "") ""
     , Option "L" ["lowv"] (ReqArg (\x o -> o { lowVolThresh = Just $ read x }) "") ""
     , Option "H" ["highv"] (ReqArg (\x o -> o { highVolThresh = Just $ read x }) "") ""
+    , Option "l" ["lows"] (ReqArg (\x o -> o { lowString = x }) "") ""
+    , Option "m" ["mediums"] (ReqArg (\x o -> o { mediumString = x }) "") ""
+    , Option "h" ["highs"] (ReqArg (\x o -> o { highString = x }) "") ""
     ]
 
 parseOpts :: [String] -> IO VolumeOpts
