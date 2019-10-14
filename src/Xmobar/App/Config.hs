@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.Config.Defaults
--- Copyright: (c) 2018 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2018, 2019 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: jao@gnu.org
@@ -20,6 +20,8 @@ module Xmobar.App.Config (defaultConfig,
                           xmobarConfigDir,
                           xmobarDataDir,
                           xmobarConfigFile) where
+
+import Control.Monad (when)
 
 import System.Environment
 import System.Directory
@@ -79,10 +81,10 @@ defaultConfig =
 --
 -- The first directory that exists will be used.  If none of the
 -- directories exist then (1) will be used if it is set, otherwise (2)
--- will be used.  Either way, a directory will be created if necessary.
+-- will be used.
 xmobarConfigDir :: IO String
 xmobarConfigDir =
-    findFirstDirWithEnv "XMOBAR_CONFIG_DIR"
+    findFirstDirWithEnv False "XMOBAR_CONFIG_DIR"
       [ getAppUserDataDirectory "xmobar"
       , getXdgDirectory XdgConfig "xmobar"
       ]
@@ -103,24 +105,25 @@ xmobarConfigDir =
 -- necessary.
 xmobarDataDir :: IO String
 xmobarDataDir =
-    findFirstDirWithEnv "XMOBAR_DATA_DIR"
+    findFirstDirWithEnv True "XMOBAR_DATA_DIR"
       [ getAppUserDataDirectory "xmobar"
       , getXdgDirectory XdgData "xmobar"
       ]
 
 -- | Helper function that will find the first existing directory and
--- return its path.  If none of the directories can be found, create
--- and return the first from the list.  If the list is empty this
--- function returns the historical @~\/.xmobar@ directory.
-findFirstDirOf :: [IO FilePath] -> IO FilePath
-findFirstDirOf [] = findFirstDirOf [getAppUserDataDirectory "xmobar"]
-findFirstDirOf possibles = do
+-- return its path.  If none of the directories can be found,
+-- optionally create and return the first from the list.  If the list
+-- is empty this function returns the historical @~\/.xmobar@
+-- directory.
+findFirstDirOf :: Bool -> [IO FilePath] -> IO FilePath
+findFirstDirOf create [] = findFirstDirOf create [getAppUserDataDirectory "xmobar"]
+findFirstDirOf create possibles = do
     found <- go possibles
     case found of
       Just path -> return path
       Nothing ->  do
         primary <- head possibles
-        createDirectoryIfMissing True primary
+        when create (createDirectoryIfMissing True primary)
         return primary
   where
     go [] = return Nothing
@@ -130,12 +133,12 @@ findFirstDirOf possibles = do
 
 -- | Simple wrapper around @findFirstDirOf@ that allows the primary
 -- path to be specified by an environment variable.
-findFirstDirWithEnv :: String -> [IO FilePath] -> IO FilePath
-findFirstDirWithEnv envName paths = do
+findFirstDirWithEnv :: Bool -> String -> [IO FilePath] -> IO FilePath
+findFirstDirWithEnv create envName paths = do
     envPath' <- lookupEnv envName
     case envPath' of
-      Nothing -> findFirstDirOf paths
-      Just envPath -> findFirstDirOf (return envPath:paths)
+      Nothing -> findFirstDirOf create paths
+      Just envPath -> findFirstDirOf create (return envPath:paths)
 
 xmobarConfigFile :: IO (Maybe FilePath)
 xmobarConfigFile =
