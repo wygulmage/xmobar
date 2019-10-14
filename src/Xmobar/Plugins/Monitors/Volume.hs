@@ -65,6 +65,25 @@ defaultOpts = VolumeOpts
     , highString = ""
     }
 
+data VolumeStatus
+    = VolLow
+    | VolMedium
+    | VolHigh
+    | VolOff
+
+-- | Set the volume status according to user set thresholds and the current
+-- volume
+getVolStatus :: Float -- ^ Low volume threshold, in [0,100]
+             -> Float -- ^ High volume threshold, in  [0,100]
+             -> Float -- ^ Current volume, in [0,1]
+             -> VolumeStatus
+getVolStatus lo hi val'
+    | val >= hi = VolHigh
+    | val >= lo = VolMedium
+    | otherwise = VolLow
+  where
+    val = val' * 100
+
 options :: [OptDescr (VolumeOpts -> VolumeOpts)]
 options =
     [ Option "O" ["on"] (ReqArg (\x o -> o { onString = x }) "") ""
@@ -122,6 +141,14 @@ switchHelper opts cHelp strHelp = return $
 formatSwitch :: VolumeOpts -> Bool -> Monitor String
 formatSwitch opts True = switchHelper opts onColor onString
 formatSwitch opts False = switchHelper opts offColor offString
+-- | Convert the current volume status into user defined strings
+volHelper :: VolumeStatus -> VolumeOpts -> String
+volHelper volStatus opts =
+    case volStatus of
+        VolHigh -> highString opts
+        VolMedium -> mediumString opts
+        VolLow -> lowString opts
+        VolOff -> ""
 
 colorHelper :: Maybe String -> String
 colorHelper = maybe "" (\c -> "<fc=" ++ c ++ ">")
