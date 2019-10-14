@@ -21,7 +21,7 @@ module Xmobar.Plugins.Monitors.Volume
   , VolumeOpts
   ) where
 
-import Control.Applicative ((<$>))
+import Control.Applicative ( (<$>), liftA3 )
 import Control.Monad ( liftM2, liftM3, mplus )
 import Data.Traversable (sequenceA)
 import Xmobar.Plugins.Monitors.Common
@@ -132,15 +132,18 @@ formatVolDStr ipat lo hi v =
 switchHelper :: VolumeOpts
              -> (VolumeOpts -> Maybe String)
              -> (VolumeOpts -> String)
+             -> VolumeStatus
              -> Monitor String
-switchHelper opts cHelp strHelp = return $
+switchHelper opts cHelp strHelp vs = return $
     colorHelper (cHelp opts)
+    ++ volHelper vs opts
     ++ strHelp opts
     ++ maybe "" (const "</fc>") (cHelp opts)
 
-formatSwitch :: VolumeOpts -> Bool -> Monitor String
-formatSwitch opts True = switchHelper opts onColor onString
-formatSwitch opts False = switchHelper opts offColor offString
+formatSwitch :: VolumeOpts -> Bool -> VolumeStatus -> Monitor String
+formatSwitch opts True vs = switchHelper opts onColor onString vs
+formatSwitch opts False _  = switchHelper opts offColor offString VolOff
+
 -- | Convert the current volume status into user defined strings
 volHelper :: VolumeStatus -> VolumeOpts -> String
 volHelper volStatus opts =
@@ -180,7 +183,11 @@ runVolumeWith opts mixerName controlName = do
     b <- liftMonitor $ liftM3 formatVolBar lo hi val
     v <- liftMonitor $ liftM3 formatVolVBar lo hi val
     d <- getFormatDB opts db
-    s <- getFormatSwitch opts sw
+    let volStat = liftA3 getVolStatus
+                         (lowVolThresh opts)
+                         (highVolThresh opts)
+                         (liftA3 percent val lo hi) -- current volume in %
+    s <- getFormatSwitch opts sw volStat
     ipat <- liftMonitor $ liftM3 (formatVolDStr $ volumeIconPattern opts) lo hi val
     parseTemplate [p, b, v, d, s, ipat]
 
@@ -233,8 +240,9 @@ runVolumeWith opts mixerName controlName = do
     getFormatDB _ Nothing = unavailable
     getFormatDB opts' (Just d) = formatDb opts' d
 
-    getFormatSwitch :: VolumeOpts -> Maybe Bool -> Monitor String
-    getFormatSwitch _ Nothing = unavailable
-    getFormatSwitch opts' (Just sw) = formatSwitch opts' sw
+    getFormatSwitch :: VolumeOpts -> Maybe Bool -> Maybe VolumeStatus -> Monitor String
+    getFormatSwitch _ Nothing _ = unavailable
+    getFormatSwitch _ _ Nothing = unavailable
+    getFormatSwitch opts' (Just sw) (Just vs) = formatSwitch opts' sw vs
 
     unavailable = getConfigValue naString
