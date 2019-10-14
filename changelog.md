@@ -4,6 +4,9 @@ _New features_
 
   - New options `--lows`, `--mediums`, and `--highs` for `Battery`
     to display an additional string depending on battery level.
+  - New options `-L` and `-H` for `Volume` to set low and high volume
+    levels, as well as `-l`, `-m`, and `-h` to display an additional
+    string depending on current volume level.
 
 
 ## Version 0.31 (October, 2019)
