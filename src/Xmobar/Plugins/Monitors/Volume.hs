@@ -42,6 +42,8 @@ data VolumeOpts = VolumeOpts
     , highDbThresh :: Float
     , lowDbThresh :: Float
     , volumeIconPattern :: Maybe IconPattern
+    , lowVolThresh :: Maybe Float
+    , highVolThresh :: Maybe Float
     }
 
 defaultOpts :: VolumeOpts
@@ -53,6 +55,8 @@ defaultOpts = VolumeOpts
     , highDbThresh = -5.0
     , lowDbThresh = -30.0
     , volumeIconPattern = Nothing
+    , lowVolThresh = Just 20
+    , highVolThresh = Just 60
     }
 
 options :: [OptDescr (VolumeOpts -> VolumeOpts)]
@@ -65,6 +69,8 @@ options =
     , Option "c" ["offc"] (ReqArg (\x o -> o { offColor = Just x }) "") ""
     , Option "" ["volume-icon-pattern"] (ReqArg (\x o ->
        o { volumeIconPattern = Just $ parseIconPattern x }) "") ""
+    , Option "L" ["lowv"] (ReqArg (\x o -> o { lowVolThresh = Just $ read x }) "") ""
+    , Option "H" ["highv"] (ReqArg (\x o -> o { highVolThresh = Just $ read x }) "") ""
     ]
 
 parseOpts :: [String] -> IO VolumeOpts
