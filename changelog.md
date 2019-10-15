@@ -4,11 +4,12 @@ _New features_
 
   - New plugin `MailX` extending `Mail` with colors and prefix/suffix.
   - New options `--lows`, `--mediums`, and `--highs` for `Battery`
-    to display an additional string depending on battery level.
-  - New option `-P` in `Battery` to add a `%` symbol to `<left>`.
+    to display an additional string depending on battery level (thanks
+    to slotThe).
   - New options `-L` and `-H` for `Volume` to set low and high volume
     levels, as well as `-l`, `-m`, and `-h` to display an additional
-    string depending on current volume level.
+    string depending on current volume level (thanks to slotThe).
+  - New option `-P` in `Battery` to add a `%` symbol to `<left>`.
 
 _Bug fixes_
 
