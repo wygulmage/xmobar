@@ -9,6 +9,14 @@ _New features_
     levels, as well as `-l`, `-m`, and `-h` to display an additional
     string depending on current volume level.
 
+_Bug fixes_
+
+   - `Kbd` plugin: ignore "terminate" layout token (thanks to Greg
+     Steuck).
+   - Fixed compilation with GHC 8.8.x (thanks to Vanessa McHale).
+   - Avoid creating `~/.xmobar` ([issue #405]).
+
+[issue #405]: https://github.com/jaor/xmobar/issues/405
 
 ## Version 0.31 (October, 2019)
 
