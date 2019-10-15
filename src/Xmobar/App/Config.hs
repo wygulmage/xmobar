@@ -96,8 +96,8 @@ xmobarConfigDir =
 -- Several directories are considered.  In order of preference:
 --
 --   1. The directory specified in the @XMOBAR_DATA_DIR@ environment variable.
---   2. The @~\/.xmobar@ directory.
---   3. The @XDG_DATA_HOME/xmobar@ directory.
+--   2. The @XDG_DATA_HOME/xmobar@ directory.
+--   3. The @~\/.xmobar@ directory.
 --
 -- The first directory that exists will be used.  If none of the
 -- directories exist then (1) will be used if it is set, otherwise (2)
@@ -106,8 +106,8 @@ xmobarConfigDir =
 xmobarDataDir :: IO String
 xmobarDataDir =
     findFirstDirWithEnv True "XMOBAR_DATA_DIR"
-      [ getAppUserDataDirectory "xmobar"
-      , getXdgDirectory XdgData "xmobar"
+      [ getXdgDirectory XdgData "xmobar"
+      , getAppUserDataDirectory "xmobar"
       ]
 
 -- | Helper function that will find the first existing directory and
