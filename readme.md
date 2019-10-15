@@ -1275,6 +1275,30 @@ following differences:
                    ("lists", "~/var/mail/lists")]
                   "mail"
 
+### `MailX Args Opts Alias`
+
+- Args: list of maildirs in form
+  `[("name1","path1","color1"),...]`. Paths may start with a '~'
+  to expand to the user's home directory.  When mails are present,
+  counts are displayed with the given name and color.
+- Opts is a possibly empty list of options, as flags. Possible values:
+   -d dir  --dir dir a string giving the base directory where maildir files with
+                     a relative path live.
+   -p prefix --prefix prefix  a string giving a prefix for the list
+                      of displayed mail counts
+   -s suffix --suffix suffix  a string giving a suffix for the list
+                      of displayed mail counts
+- This plugin requires inotify support in your Linux kernel and the
+  [hinotify] package. To activate, pass `--flags="with_inotify"`
+  during compilation.
+- Example:
+
+         Run MailX [("I", "inbox", "green"),
+                    ("L", "lists", "orange")]
+                   ["-d", "~/var/mail", "-p", " ", "-s", " "]
+                   "mail"
+
+
 ### `MBox Mboxes Opts Alias`
 
 - Mboxes a list of mbox files of the form `[("name", "path", "color")]`,

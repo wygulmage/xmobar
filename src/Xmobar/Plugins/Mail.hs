@@ -13,7 +13,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.Mail(Mail(..)) where
+module Xmobar.Plugins.Mail(Mail(..),MailX(..)) where
 
 import Xmobar.Run.Exec
 #ifdef INOTIFY
@@ -26,6 +26,7 @@ import Control.Concurrent.STM
 import System.Directory
 import System.FilePath
 import System.INotify
+import System.Console.GetOpt
 
 import Data.List (isPrefixOf)
 import Data.Set (Set)
@@ -47,23 +48,56 @@ pack = id
 import System.IO
 #endif
 
+data MOptions = MOptions
+               { oDir :: FilePath
+               , oPrefix :: String
+               , oSuffix :: String
+               }
+
+defaults :: MOptions
+defaults = MOptions {oDir = "", oPrefix = "", oSuffix = ""}
+
+options :: [OptDescr (MOptions -> MOptions)]
+options =
+  [ Option "d" ["dir"] (ReqArg (\x o -> o { oDir = x }) "") ""
+  , Option "p" ["prefix"] (ReqArg (\x o -> o { oPrefix = x }) "") ""
+  , Option "s" ["suffix"] (ReqArg (\x o -> o { oSuffix = x }) "") ""
+  ]
+
+parseOptions :: [String] -> IO MOptions
+parseOptions args =
+  case getOpt Permute options args of
+    (o, _, []) -> return $ foldr id defaults o
+    (_, _, errs) -> ioError . userError $ concat errs
+
 
 -- | A list of mail box names and paths to maildirs.
 data Mail = Mail [(String, FilePath)] String
     deriving (Read, Show)
 
+-- | A list of mail box names, paths to maildirs and display colors.
+data MailX = MailX [(String, FilePath, String)] [String] String
+    deriving (Read, Show)
+
 instance Exec Mail where
-    alias (Mail _ a) = a
+  alias (Mail _ a) = a
+  start (Mail ms a) = start (MailX (map (\(n,p) -> (n,p,"")) ms) [] a)
+
+instance Exec MailX where
+    alias (MailX _ _ a) = a
 #ifndef INOTIFY
     start _ _ =
         hPutStrLn stderr $ "Warning: xmobar is not compiled with -fwith_inotify,"
                         ++ " but the Mail plugin requires it."
 #else
-    start (Mail ms _) cb = do
+    start (MailX ms args _) cb = do
         vs <- mapM (const $ newTVarIO S.empty) ms
-
-        let ts = map fst ms
-            rs = map ((</> "new") . snd) ms
+        opts <- parseOptions args
+        let prefix = oPrefix opts
+            suffix = oSuffix opts
+            dir = oDir opts
+            ps = map (\(_,p,_) -> if null dir then p else dir </> p) ms
+            rs = map (</> "new") ps
             ev = [Move, MoveIn, MoveOut, Create, Delete]
 
         ds <- mapM expandHome rs
@@ -76,9 +110,11 @@ instance Exec Mail where
             atomically $ modifyTVar v (S.union s)
 
         changeLoop (mapM (fmap S.size . readTVar) vs) $ \ns ->
-            cb . unwords $ [m ++ show n
-                            | (m, n) <- zip ts ns
-                            , n /= 0 ]
+            let showmbx m n c = if c == ""
+                                then m ++ show n
+                                else "<fc=" ++ c ++ ">" ++ m ++ show n ++ "</fc>"
+                cnts = [showmbx m n c | ((m,_,c), n) <- zip ms ns , n /= 0 ]
+            in cb $ if null cnts then "" else prefix ++ unwords cnts ++ suffix
 
 handle :: TVar (Set String) -> Event -> IO ()
 handle v e = atomically $ modifyTVar v $ case e of
