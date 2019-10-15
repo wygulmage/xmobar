@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.Plugins.Monitors.Strings
--- Copyright: (c) 2018 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2018, 2019 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: jao@gnu.org
@@ -18,6 +18,7 @@
 module Xmobar.Plugins.Monitors.Common.Output ( IconPattern
                                              , parseIconPattern
                                              , padString
+                                             , colorizeString
                                              , showWithPadding
                                              , showWithColors
                                              , showWithColors'

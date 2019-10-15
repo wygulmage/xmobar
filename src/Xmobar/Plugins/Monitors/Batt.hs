@@ -48,6 +48,7 @@ data BattOpts = BattOpts
   , lowString :: String
   , mediumString :: String
   , highString :: String
+  , incPerc :: Bool
   }
 
 defaultOpts :: BattOpts
@@ -71,6 +72,7 @@ defaultOpts = BattOpts
   , lowString = ""
   , mediumString = ""
   , highString = ""
+  , incPerc = False
   }
 
 options :: [OptDescr (BattOpts -> BattOpts)]
@@ -87,6 +89,7 @@ options =
   , Option "f" ["online"] (ReqArg (\x o -> o { onlineFile = x }) "") ""
   , Option "s" ["scale"] (ReqArg (\x o -> o {scale = read x}) "") ""
   , Option "a" ["action"] (ReqArg (\x o -> o { onLowAction = Just x }) "") ""
+  , Option "P" ["percent"] (NoArg (\o -> o {incPerc = True})) ""
   , Option "A" ["action-threshold"]
                (ReqArg (\x o -> o { actionThreshold = read x }) "") ""
   , Option "" ["on-icon-pattern"] (ReqArg (\x o ->
@@ -243,13 +246,14 @@ runBatt = runBatt' ["BAT", "BAT0", "BAT1", "BAT2"]
 runBatt' :: [String] -> [String] -> Monitor String
 runBatt' bfs args = do
   opts <- io $ parseOpts args
+  let sp = incPerc opts
   c <- io $ readBatteries opts =<< mapM batteryFiles bfs
   suffix <- getConfigValue useSuffix
   d <- getConfigValue decDigits
   nas <- getConfigValue naString
   case c of
     Result x w t s ->
-      do l <- fmtPercent x
+      do l <- fmtPercent x sp
          ws <- fmtWatts w opts suffix d
          si <- getIconPattern opts s x
          st <- showWithColors'
@@ -257,13 +261,14 @@ runBatt' bfs args = do
                  (100 * x)
          parseTemplate (l ++ [st, fmtTime $ floor t, ws, si])
     NA -> getConfigValue naString
-  where fmtPercent :: Float -> Monitor [String]
-        fmtPercent x = do
+  where fmtPercent :: Float -> Bool -> Monitor [String]
+        fmtPercent x sp = do
           let x' = minimum [1, x]
+          pc <- if sp then colorizeString (100 * x') "%" else return ""
           p <- showPercentWithColors x'
           b <- showPercentBar (100 * x') x'
           vb <- showVerticalBar (100 * x') x'
-          return [b, vb, p]
+          return [b, vb, p ++ pc]
         fmtWatts x o s d = do
           ws <- showWithPadding $ showDigits d x ++ (if s then "W" else "")
           return $ color x o ws

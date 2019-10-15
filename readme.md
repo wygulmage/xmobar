@@ -911,6 +911,7 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
     percentage left in the battery is less or equal than the threshold
     given by the `-A` option.  If not present, no action is
     undertaken.
+  - `-P`: to include a percentage symbol in `left`.
   - `--on-icon-pattern`: dynamic string for current battery charge
     when AC is "on" in `leftipat`.
   - `--off-icon-pattern`: dynamic string for current battery charge
