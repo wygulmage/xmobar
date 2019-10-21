@@ -11,7 +11,7 @@ _New features_
     string depending on current volume level (thanks to *slotThe*).
   - New option `-P` in `Battery` to add a `%` symbol to `<left>`.
   - New option `--devices` in `DynNetwork` to select what interfaces
-    to monitor (thanks to *vindex0*).
+    to monitor (thanks to *vindex10*).
 
 _Bug fixes_
 
