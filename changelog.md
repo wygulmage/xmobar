@@ -5,11 +5,13 @@ _New features_
   - New plugin `MailX` extending `Mail` with colors and prefix/suffix.
   - New options `--lows`, `--mediums`, and `--highs` for `Battery`
     to display an additional string depending on battery level (thanks
-    to slotThe).
+    to *slotThe*).
   - New options `-L` and `-H` for `Volume` to set low and high volume
     levels, as well as `-l`, `-m`, and `-h` to display an additional
-    string depending on current volume level (thanks to slotThe).
+    string depending on current volume level (thanks to *slotThe*).
   - New option `-P` in `Battery` to add a `%` symbol to `<left>`.
+  - New option `--devices` in `DynNetwork` to select what interfaces
+    to monitor (thanks to *vindex0*).
 
 _Bug fixes_
 
