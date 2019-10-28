@@ -47,7 +47,10 @@ import Xmobar.X11.Text
 import Xmobar.X11.Draw
 import Xmobar.X11.Bitmap as Bitmap
 import Xmobar.X11.Types
+
+#ifndef THREADED_RUNTIME
 import Xmobar.X11.Events(nextEvent')
+#endif
 
 #ifdef XFT
 import Graphics.X11.Xft
