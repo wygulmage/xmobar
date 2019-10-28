@@ -13,6 +13,8 @@
 --
 -----------------------------------------------------------------------------
 
+{-# LANGUAGE OverloadedStrings #-}
+
 module Xmobar.Plugins.Monitors.Net (
                         startNet
                       , startDynNet
@@ -20,16 +22,18 @@ module Xmobar.Plugins.Monitors.Net (
 
 import Xmobar.Plugins.Monitors.Common
 
-import Data.Word (Word64)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
+import Data.Monoid ((<>))
 import Data.Time.Clock (UTCTime, getCurrentTime, diffUTCTime)
+import Data.Word (Word64)
 import Control.Monad (forM, filterM)
 import System.Directory (getDirectoryContents, doesFileExist)
 import System.FilePath ((</>))
 import System.Console.GetOpt
 import System.IO.Error (catchIOError)
+import System.IO.Unsafe (unsafeInterleaveIO)
 
-import qualified Data.ByteString.Lazy.Char8 as B
+import qualified Data.ByteString.Char8 as B
 
 type DevList = [String]
 
@@ -79,10 +83,8 @@ instance Show UnitPerSec where
     show MBs = "MB/s"
     show GBs = "GB/s"
 
-data NetDev num
-    = NA
-    | NI String
-    | ND String num num deriving (Eq,Show,Read)
+data NetDev num = N String (NetDevInfo num) | NA deriving (Eq,Show,Read)
+data NetDevInfo num = NI | ND num num deriving (Eq,Show,Read)
 
 type NetDevRawTotal = NetDev Word64
 type NetDevRate = NetDev Float
@@ -93,17 +95,16 @@ type NetDevRef = IORef (NetDevRawTotal, UTCTime)
 -- Note that names don't matter. Therefore, if only the names differ,
 -- a compare evaluates to EQ while (==) evaluates to False.
 instance Ord num => Ord (NetDev num) where
-    compare NA NA              = EQ
-    compare NA _               = LT
-    compare _  NA              = GT
-    compare (NI _) (NI _)      = EQ
-    compare (NI _) ND {}       = LT
-    compare ND {} (NI _)     = GT
-    compare (ND _ x1 y1) (ND _ x2 y2) =
-        if downcmp /= EQ
-           then downcmp
-           else y1 `compare` y2
-      where downcmp = x1 `compare` x2
+    compare NA NA             = EQ
+    compare NA _              = LT
+    compare _  NA             = GT
+    compare (N _ i1) (N _ i2) = i1 `compare` i2
+
+instance Ord num => Ord (NetDevInfo num) where
+    compare NI NI                 = EQ
+    compare NI ND {}              = LT
+    compare ND {} NI              = GT
+    compare (ND x1 y1) (ND x2 y2) = x1 `compare` x2 <> y1 `compare` y2
 
 netConfig :: IO MConfig
 netConfig = mkMConfig
@@ -122,25 +123,20 @@ existingDevs = getDirectoryContents "/sys/class/net" >>= filterM isDev
 isUp :: String -> IO Bool
 isUp d = flip catchIOError (const $ return False) $ do
   operstate <- B.readFile (operstateDir d)
-  return $! (B.unpack . head . B.lines) operstate `elem`  ["up", "unknown"]
+  return $! (head . B.lines) operstate `elem` ["up", "unknown"]
 
 readNetDev :: [String] -> IO NetDevRawTotal
-readNetDev (d:x:y:_) = do
-  up <- isUp d
-  return (if up then ND d (r x) (r y) else NI d)
+readNetDev ~[d, x, y] = do
+  up <- unsafeInterleaveIO $ isUp d
+  return $ N d (if up then ND (r x) (r y) else NI)
     where r s | s == "" = 0
               | otherwise = read s
-
-readNetDev _ = return NA
 
 netParser :: B.ByteString -> IO [NetDevRawTotal]
 netParser = mapM (readNetDev . splitDevLine) . readDevLines
   where readDevLines = drop 2 . B.lines
-        splitDevLine = selectCols . wordsBy (`elem` " :") . B.unpack
+        splitDevLine = map B.unpack . selectCols . filter (not . B.null) . B.splitWith (`elem` [' ',':'])
         selectCols cols = map (cols!!) [0,1,9]
-        wordsBy f s = case dropWhile f s of
-          [] -> []
-          s' -> w : wordsBy f s'' where (w, s'') = break f s'
 
 findNetDev :: String -> IO NetDevRawTotal
 findNetDev dev = do
@@ -148,8 +144,7 @@ findNetDev dev = do
   case filter isDev nds of
     x:_ -> return x
     _ -> return NA
-  where isDev (ND d _ _) = d == dev
-        isDev (NI d) = d == dev
+  where isDev (N d _) = d == dev
         isDev NA = False
 
 formatNet :: Maybe IconPattern -> Float -> Monitor (String, String, String, String)
@@ -168,11 +163,11 @@ formatNet mipat d = do
 printNet :: NetOpts -> NetDevRate -> Monitor String
 printNet opts nd =
   case nd of
-    ND d r t -> do
+    N d (ND r t) -> do
         (rx, rb, rvb, ripat) <- formatNet (rxIconPattern opts) r
         (tx, tb, tvb, tipat) <- formatNet (txIconPattern opts) t
         parseTemplate [d,rx,tx,rb,rvb,ripat,tb,tvb,tipat]
-    NI _ -> return ""
+    N _ NI -> return ""
     NA -> getConfigValue naString
 
 parseNet :: NetDevRef -> String -> IO NetDevRate
@@ -184,9 +179,9 @@ parseNet nref nd = do
   let scx = realToFrac (diffUTCTime t1 t0)
       scx' = if scx > 0 then scx else 1
       rate da db = takeDigits 2 $ fromIntegral (db - da) / scx'
-      diffRate (ND d ra ta) (ND _ rb tb) = ND d (rate ra rb) (rate ta tb)
-      diffRate (NI d) _ = NI d
-      diffRate _ (NI d) = NI d
+      diffRate (N d (ND ra ta)) (N _ (ND rb tb)) = N d (ND (rate ra rb) (rate ta tb))
+      diffRate (N d NI) _ = N d NI
+      diffRate _ (N d NI) = N d NI
       diffRate _ _ = NA
   return $ diffRate n0 n1
 
