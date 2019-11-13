@@ -2,6 +2,7 @@
 
 _New features_
 
+  - New options `--host` and `--port` for `MPD` monitor.
   - New plugin `MailX` extending `Mail` with colors and prefix/suffix.
   - New options `--lows`, `--mediums`, and `--highs` for `Battery`
     to display an additional string depending on battery level (thanks

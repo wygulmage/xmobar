@@ -34,6 +34,8 @@ data MOpts = MOpts
   , mStopped :: String
   , mPaused :: String
   , mLapsedIconPattern :: Maybe IconPattern
+  , mPort :: Maybe String
+  , mHost :: Maybe String
   }
 
 defaultOpts :: MOpts
@@ -42,6 +44,8 @@ defaultOpts = MOpts
   , mStopped = "><"
   , mPaused = "||"
   , mLapsedIconPattern = Nothing
+  , mPort = Nothing
+  , mHost = Nothing
   }
 
 options :: [OptDescr (MOpts -> MOpts)]
@@ -49,15 +53,20 @@ options =
   [ Option "P" ["playing"] (ReqArg (\x o -> o { mPlaying = x }) "") ""
   , Option "S" ["stopped"] (ReqArg (\x o -> o { mStopped = x }) "") ""
   , Option "Z" ["paused"] (ReqArg (\x o -> o { mPaused = x }) "") ""
+  , Option "p" ["port"] (ReqArg (\x o -> o { mPort = Just x }) "") ""
+  , Option "h" ["host"] (ReqArg (\x o -> o { mHost = Just x }) "") ""
   , Option "" ["lapsed-icon-pattern"] (ReqArg (\x o ->
      o { mLapsedIconPattern = Just $ parseIconPattern x }) "") ""
   ]
 
+withMPD :: MOpts -> M.MPD a -> IO (M.Response a)
+withMPD opts = M.withMPD_ (mHost opts) (mPort opts)
+
 runMPD :: [String] -> Monitor String
 runMPD args = do
   opts <- io $ mopts args
-  status <- io $ M.withMPD M.status
-  song <- io $ M.withMPD M.currentSong
+  status <- io $ withMPD opts M.status
+  song <- io $ withMPD opts M.currentSong
   s <- parseMPD status song opts
   parseTemplate s
 
@@ -69,8 +78,9 @@ mpdWait = do
     _ -> return ()
 
 mpdReady :: [String] -> Monitor Bool
-mpdReady _ = do
-  response <- io $ M.withMPD M.ping
+mpdReady args = do
+  opts <- io $ mopts args
+  response <- io $ withMPD opts M.ping
   case response of
     Right _         -> return True
     -- Only cases where MPD isn't responding is an issue; bogus information at

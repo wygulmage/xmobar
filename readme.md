@@ -1214,7 +1214,9 @@ following differences:
   `-S` and `-Z`, with an string argument, to represent the playing,
   stopped and paused states in the `statei` template field.  The
   environment variables `MPD_HOST` and `MPD_PORT` are used to
-  configure the mpd server to communicate with. Also available:
+  configure the mpd server to communicate with, unless given in the
+  additional arguments `-p` (`--port`) and `-h` (`--host`). Also
+  available:
   - `lapsed-icon-pattern`: dynamic string for current track position in `ipat`.
 - Variables that can be used with the `-t`/`--template` argument:
              `bar`, `vbar`, `ipat`, `state`, `statei`, `volume`, `length`,
