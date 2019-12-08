@@ -31,6 +31,7 @@ data DiskIOOpts = DiskIOOpts
   { totalIconPattern :: Maybe IconPattern
   , writeIconPattern :: Maybe IconPattern
   , readIconPattern :: Maybe IconPattern
+  , contiguous :: Bool
   }
 
 parseDiskIOOpts :: [String] -> IO DiskIOOpts
@@ -42,6 +43,7 @@ parseDiskIOOpts argv =
           { totalIconPattern = Nothing
           , writeIconPattern = Nothing
           , readIconPattern = Nothing
+          , contiguous = False
           }
        options =
           [ Option "" ["total-icon-pattern"] (ReqArg (\x o ->
@@ -50,6 +52,7 @@ parseDiskIOOpts argv =
              o { writeIconPattern = Just $ parseIconPattern x}) "") ""
           , Option "" ["read-icon-pattern"] (ReqArg (\x o ->
              o { readIconPattern = Just $ parseIconPattern x}) "") ""
+          , Option "c" ["contiguous"] (NoArg (\o -> o {contiguous = True})) ""
           ]
 
 diskIOConfig :: IO MConfig
@@ -66,6 +69,7 @@ diskIOConfig = mkMConfig "" ["total", "read", "write"
 data DiskUOpts = DiskUOpts
   { freeIconPattern :: Maybe IconPattern
   , usedIconPattern :: Maybe IconPattern
+  , contiguousU :: Bool
   }
 
 parseDiskUOpts :: [String] -> IO DiskUOpts
@@ -76,12 +80,14 @@ parseDiskUOpts argv =
  where defaultOpts = DiskUOpts
           { freeIconPattern = Nothing
           , usedIconPattern = Nothing
+          , contiguousU = False
           }
        options =
           [ Option "" ["free-icon-pattern"] (ReqArg (\x o ->
              o { freeIconPattern = Just $ parseIconPattern x}) "") ""
           , Option "" ["used-icon-pattern"] (ReqArg (\x o ->
              o { usedIconPattern = Just $ parseIconPattern x}) "") ""
+          , Option "c" ["contiguous"] (NoArg (\o -> o {contiguousU = True})) ""
           ]
 
 diskUConfig :: IO MConfig
@@ -147,25 +153,26 @@ mountedData dref devs = do
   return $ map (parseDev (zipWith diff dt' dt)) devs
   where diff (dev, xs) (_, ys) = (dev, zipWith (-) xs ys)
 
+
 parseDev :: [(DevName, [Float])] -> DevName -> (DevName, [Float])
 parseDev dat dev =
   case find ((==dev) . fst) dat of
     Nothing -> (dev, [0, 0, 0])
     Just (_, xs) ->
-      let r = xs !! 2
-          w = xs !! 6
+      let r = 4096 * xs !! 2
+          w = 4096 * xs !! 6
           t = r + w
           rSp = speed r (xs !! 3)
           wSp = speed w (xs !! 7)
           sp =  speed t (xs !! 3 + xs !! 7)
-          speed x d = if d == 0 then 0 else 500 * x / d
+          speed x d = if d == 0 then 0 else x / d
           dat' = if length xs > 6
                  then [sp, rSp, wSp, t, r, w]
                  else [0, 0, 0, 0, 0, 0]
       in (dev, dat')
 
 speedToStr :: Float -> String
-speedToStr = showWithUnits 2 1
+speedToStr = showWithUnits 2 1 . (/ 1024)
 
 sizeToStr :: Integer -> String
 sizeToStr = showWithUnits 3 0 . fromIntegral
@@ -205,7 +212,7 @@ runDiskIO dref disks argv = do
   dev <- io $ mountedOrDiskDevices (map fst disks)
   dat <- io $ mountedData dref (map fst dev)
   strs <- mapM (runDiskIO' opts) $ devTemplates disks dev dat
-  return $ unwords strs
+  return $ (if contiguous opts then concat else unwords) strs
 
 startDiskIO :: [(String, String)] ->
                [String] -> Int -> (String -> IO ()) -> IO ()
@@ -249,4 +256,4 @@ runDiskU disks argv = do
   devs <- io $ mountedDevices (map fst disks)
   opts <- io $ parseDiskUOpts argv
   strs <- mapM (\(d, p) -> runDiskU' opts (findTempl d p disks) p) devs
-  return $ unwords strs
+  return $ (if contiguousU opts then concat else unwords) strs
