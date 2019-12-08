@@ -13,6 +13,7 @@ _New features_
   - New option `-P` in `Battery` to add a `%` symbol to `<left>`.
   - New option `--devices` in `DynNetwork` to select what interfaces
     to monitor (thanks to *vindex10*).
+  - DateZone plugin now also checks TZDIR (thanks to Emmanuel Rosa).
 
 _Bug fixes_
 
