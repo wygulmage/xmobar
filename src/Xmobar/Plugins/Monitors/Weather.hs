@@ -45,6 +45,7 @@ weatherConfig = mkMConfig
        , "visibility"
        , "skyCondition"
        , "skyConditionS"
+       , "weather"
        , "tempC"
        , "tempF"
        , "dewPointC"
@@ -73,6 +74,7 @@ data WeatherInfo =
        , windInfo     :: WindInfo
        , visibility   :: String
        , skyCondition :: String
+       , weather      :: String
        , tempC        :: Int
        , tempF        :: Int
        , dewPointC    :: Int
@@ -169,6 +171,7 @@ parseData =
        w <- pWind
        v <- getAfterString "Visibility: "
        sk <- getAfterString "Sky conditions: "
+       we <- getAfterString "Weather: "
        skipTillString "Temperature: "
        (tC,tF) <- pTemp
        skipTillString "Dew Point: "
@@ -178,7 +181,7 @@ parseData =
        skipTillString "Pressure (altimeter): "
        p <- pPressure
        manyTill skipRestOfLine eof
-       return [WI st ss y m d h w v sk tC tF dC dF rh p]
+       return [WI st ss y m d h w v sk we tC tF dC dF rh p]
 
 defUrl :: String
 defUrl = "https://tgftp.nws.noaa.gov/data/observations/metar/decoded/"
@@ -201,12 +204,12 @@ formatSk ((a,b):sks) sk = if a == sk then b else formatSk sks sk
 formatSk [] sk = sk
 
 formatWeather :: [(String,String)] -> [WeatherInfo] -> Monitor String
-formatWeather sks [WI st ss y m d h (WindInfo wc wa wm wk wkh wms) v sk tC tF dC dF r p] =
+formatWeather sks [WI st ss y m d h (WindInfo wc wa wm wk wkh wms) v sk we tC tF dC dF r p] =
     do cel <- showWithColors show tC
        far <- showWithColors show tF
        let sk' = formatSk sks (map toLower sk)
        parseTemplate [st, ss, y, m, d, h, wc, wa, wm, wk, wkh
-                     , wms, v, sk, sk', cel, far
+                     , wms, v, sk, sk', we, cel, far
                      , show dC, show dF, show r , show p ]
 formatWeather _ _ = getConfigValue naString
 

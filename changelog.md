@@ -1,4 +1,11 @@
-## Version 0.32
+## Version 0.33
+
+_New features_
+
+  - New template parameter `<weather>` for the `Weather` plugin, potentially
+    displaying specific weather conditions that are occurring near the station.
+
+## Version 0.32 (December, 2019)
 
 _New features_
 
