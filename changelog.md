@@ -3,7 +3,8 @@
 _New features_
 
   - New template parameter `<weather>` for the `Weather` plugin, potentially
-    displaying specific weather conditions that are occurring near the station.
+    displaying specific weather conditions that are occurring near the
+    station (thanks to *slotThe*).
 
 ## Version 0.32 (December, 2019)
 
