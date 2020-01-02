@@ -5,6 +5,8 @@ _New features_
   - New template parameter `<weather>` for the `Weather` plugin, potentially
     displaying specific weather conditions that are occurring near the
     station (thanks to *slotThe*).
+  - New option `--weathers`, for `Weather` to display a default string in
+    case the `weather` field is not reported.
 
 ## Version 0.32 (December, 2019)
 

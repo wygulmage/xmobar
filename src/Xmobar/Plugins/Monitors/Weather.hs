@@ -37,7 +37,7 @@ import System.Console.GetOpt
 -- | Options the user may specify.
 data WeatherOpts = WeatherOpts
   { weatherString :: String
-  } deriving Show
+  }
 
 -- | Default values for options.
 defaultOpts :: WeatherOpts

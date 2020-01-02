@@ -735,7 +735,11 @@ something like:
 - Aliases to the Station ID: so `Weather "LIPB" []` can be used in
   template as `%LIPB%`
 - Thresholds refer to temperature in the selected units
-- Args: default monitor arguments
+- Args: default monitor arguments, plus:
+  - `--weathers` _string_ : display a default string when the `weather`
+    monitor is not reported.
+    - short option: `-w`
+    - Default: ""
 - Variables that can be used with the `-t`/`--template` argument:
 	    `station`, `stationState`, `year`, `month`, `day`, `hour`,
 	    `windCardinal`, `windAzimuth`, `windMph`, `windKnots`, `windMs`, `windKmh`
