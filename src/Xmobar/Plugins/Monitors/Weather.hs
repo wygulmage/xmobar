@@ -26,6 +26,37 @@ import qualified Data.ByteString.Lazy.Char8 as B
 import Data.Char (toLower)
 
 import Text.ParserCombinators.Parsec
+import System.Console.GetOpt
+    ( ArgDescr(ReqArg)
+    , ArgOrder(Permute)
+    , OptDescr(Option)
+    , getOpt
+    )
+
+
+-- | Options the user may specify.
+data WeatherOpts = WeatherOpts
+  { weatherString :: String
+  } deriving Show
+
+-- | Default values for options.
+defaultOpts :: WeatherOpts
+defaultOpts = WeatherOpts
+  { weatherString = ""
+  }
+
+-- | Apply options.
+options :: [OptDescr (WeatherOpts -> WeatherOpts)]
+options =
+  [ Option "w" ["weathers"] (ReqArg (\s o -> o { weatherString = s }) "") ""
+  ]
+
+-- | Try to parse arguments from the config file and apply them.
+parseOpts :: [String] -> IO WeatherOpts
+parseOpts argv =
+    case getOpt Permute options argv of
+        (o, _, []  ) -> return $ foldr id defaultOpts o
+        (_, _, errs) -> ioError . userError $ concat errs
 
 weatherConfig :: IO MConfig
 weatherConfig = mkMConfig
@@ -203,15 +234,25 @@ formatSk :: Eq p => [(p, p)] -> p -> p
 formatSk ((a,b):sks) sk = if a == sk then b else formatSk sks sk
 formatSk [] sk = sk
 
-formatWeather :: [(String,String)] -> [WeatherInfo] -> Monitor String
-formatWeather sks [WI st ss y m d h (WindInfo wc wa wm wk wkh wms) v sk we tC tF dC dF r p] =
+formatWeather
+    :: WeatherOpts        -- ^ Formatting options from the cfg file
+    -> [(String,String)]  -- ^ 'SkyConditionS' for 'WeatherX'
+    -> [WeatherInfo]      -- ^ The actual weather info
+    -> Monitor String
+formatWeather opts sks [WI st ss y m d h (WindInfo wc wa wm wk wkh wms) v sk we tC tF dC dF r p] =
     do cel <- showWithColors show tC
        far <- showWithColors show tF
        let sk' = formatSk sks (map toLower sk)
+           we' = showWeather (weatherString opts) we
        parseTemplate [st, ss, y, m, d, h, wc, wa, wm, wk, wkh
-                     , wms, v, sk, sk', we, cel, far
+                     , wms, v, sk, sk', we', cel, far
                      , show dC, show dF, show r , show p ]
-formatWeather _ _ = getConfigValue naString
+formatWeather _ _ _ = getConfigValue naString
+
+-- | Show the 'weather' field with a default string in case it was empty.
+showWeather :: String -> String -> String
+showWeather "" d = d
+showWeather s  _ = s
 
 runWeather :: [String] -> Monitor String
 runWeather = runWeather' []
@@ -219,8 +260,9 @@ runWeather = runWeather' []
 runWeather' :: [(String, String)] -> [String] -> Monitor String
 runWeather' sks args =
     do d <- io $ getData $ head args
+       o <- io $ parseOpts args
        i <- io $ runP parseData d
-       formatWeather sks i
+       formatWeather o sks i
 
 weatherReady :: [String] -> Monitor Bool
 weatherReady str = do
