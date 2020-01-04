@@ -87,6 +87,10 @@ flag with_weather
   description: Enable weather plugin.
   default: True
 
+flag with_freebsd
+  description: Enable FreeBSD support.
+  default: False
+
 library
     hs-source-dirs:  src
 
@@ -257,6 +261,9 @@ library
        build-depends: http-conduit, http-types
        cpp-options: -DUVMETER
 
+    if flag(with_freebsd)
+       build-depends: bsd-sysctl
+       cpp-options: -DFREEBSD
 executable xmobar
     hs-source-dirs:     app
     main-is:            Main.hs
