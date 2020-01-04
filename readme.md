@@ -737,7 +737,7 @@ something like:
 - Thresholds refer to temperature in the selected units
 - Args: default monitor arguments, plus:
   - `--weathers` _string_ : display a default string when the `weather`
-    monitor is not reported.
+    variable is not reported.
     - short option: `-w`
     - Default: ""
 - Variables that can be used with the `-t`/`--template` argument:
