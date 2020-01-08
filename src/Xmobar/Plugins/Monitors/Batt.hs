@@ -175,11 +175,12 @@ readBatteriesFbsd opts = do
   tm <- sysctlReadInt "hw.acpi.battery.time"
   st <- sysctlReadInt "hw.acpi.battery.state"
   acline <- sysctlReadInt "hw.acpi.acline"
-  let sts = battStatusFbsd $ fromIntegral st
-      p = fromIntegral lf / 100
+  let p = fromIntegral lf / 100
       w = fromIntegral rt
       t = fromIntegral tm * 60
       ac = acline == 1
+      -- battery full when rate is 0 and on ac.
+      sts = if (w == 0 && ac) then Full else (battStatusFbsd $ fromIntegral st)
   unless ac (maybeAlert opts p)
   return (Result p w t sts)
 
