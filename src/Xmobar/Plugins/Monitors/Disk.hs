@@ -34,26 +34,24 @@ data DiskIOOpts = DiskIOOpts
   , contiguous :: Bool
   }
 
-parseDiskIOOpts :: [String] -> IO DiskIOOpts
-parseDiskIOOpts argv =
-  case getOpt Permute options argv of
-    (o, _, []) -> return $ foldr id defaultOpts o
-    (_, _, errs) -> ioError . userError $ concat errs
- where defaultOpts = DiskIOOpts
-          { totalIconPattern = Nothing
-          , writeIconPattern = Nothing
-          , readIconPattern = Nothing
-          , contiguous = False
-          }
-       options =
-          [ Option "" ["total-icon-pattern"] (ReqArg (\x o ->
-             o { totalIconPattern = Just $ parseIconPattern x}) "") ""
-          , Option "" ["write-icon-pattern"] (ReqArg (\x o ->
-             o { writeIconPattern = Just $ parseIconPattern x}) "") ""
-          , Option "" ["read-icon-pattern"] (ReqArg (\x o ->
-             o { readIconPattern = Just $ parseIconPattern x}) "") ""
-          , Option "c" ["contiguous"] (NoArg (\o -> o {contiguous = True})) ""
-          ]
+dioDefaultOpts :: DiskIOOpts
+dioDefaultOpts = DiskIOOpts
+   { totalIconPattern = Nothing
+   , writeIconPattern = Nothing
+   , readIconPattern = Nothing
+   , contiguous = False
+   }
+
+dioOptions :: [OptDescr (DiskIOOpts -> DiskIOOpts)]
+dioOptions =
+   [ Option "" ["total-icon-pattern"] (ReqArg (\x o ->
+      o { totalIconPattern = Just $ parseIconPattern x}) "") ""
+   , Option "" ["write-icon-pattern"] (ReqArg (\x o ->
+      o { writeIconPattern = Just $ parseIconPattern x}) "") ""
+   , Option "" ["read-icon-pattern"] (ReqArg (\x o ->
+      o { readIconPattern = Just $ parseIconPattern x}) "") ""
+   , Option "c" ["contiguous"] (NoArg (\o -> o {contiguous = True})) ""
+   ]
 
 diskIOConfig :: IO MConfig
 diskIOConfig = mkMConfig "" ["total", "read", "write"
@@ -72,23 +70,21 @@ data DiskUOpts = DiskUOpts
   , contiguousU :: Bool
   }
 
-parseDiskUOpts :: [String] -> IO DiskUOpts
-parseDiskUOpts argv =
-  case getOpt Permute options argv of
-    (o, _, []) -> return $ foldr id defaultOpts o
-    (_, _, errs) -> ioError . userError $ concat errs
- where defaultOpts = DiskUOpts
-          { freeIconPattern = Nothing
-          , usedIconPattern = Nothing
-          , contiguousU = False
-          }
-       options =
-          [ Option "" ["free-icon-pattern"] (ReqArg (\x o ->
-             o { freeIconPattern = Just $ parseIconPattern x}) "") ""
-          , Option "" ["used-icon-pattern"] (ReqArg (\x o ->
-             o { usedIconPattern = Just $ parseIconPattern x}) "") ""
-          , Option "c" ["contiguous"] (NoArg (\o -> o {contiguousU = True})) ""
-          ]
+duDefaultOpts :: DiskUOpts
+duDefaultOpts = DiskUOpts
+   { freeIconPattern = Nothing
+   , usedIconPattern = Nothing
+   , contiguousU = False
+   }
+
+duOptions :: [OptDescr (DiskUOpts -> DiskUOpts)]
+duOptions =
+   [ Option "" ["free-icon-pattern"] (ReqArg (\x o ->
+      o { freeIconPattern = Just $ parseIconPattern x}) "") ""
+   , Option "" ["used-icon-pattern"] (ReqArg (\x o ->
+      o { usedIconPattern = Just $ parseIconPattern x}) "") ""
+   , Option "c" ["contiguous"] (NoArg (\o -> o {contiguousU = True})) ""
+   ]
 
 diskUConfig :: IO MConfig
 diskUConfig = mkMConfig ""
@@ -208,7 +204,7 @@ runDiskIO' opts (tmp, xs) = do
 
 runDiskIO :: DevDataRef -> [(String, String)] -> [String] -> Monitor String
 runDiskIO dref disks argv = do
-  opts <- io $ parseDiskIOOpts argv
+  opts <- io $ parseOptsWith dioOptions dioDefaultOpts argv
   dev <- io $ mountedOrDiskDevices (map fst disks)
   dat <- io $ mountedData dref (map fst dev)
   strs <- mapM (runDiskIO' opts) $ devTemplates disks dev dat
@@ -254,6 +250,6 @@ runDiskU' opts tmp path = do
 runDiskU :: [(String, String)] -> [String] -> Monitor String
 runDiskU disks argv = do
   devs <- io $ mountedDevices (map fst disks)
-  opts <- io $ parseDiskUOpts argv
+  opts <- io $ parseOptsWith duOptions duDefaultOpts argv
   strs <- mapM (\(d, p) -> runDiskU' opts (findTempl d p disks) p) devs
   return $ (if contiguousU opts then concat else unwords) strs

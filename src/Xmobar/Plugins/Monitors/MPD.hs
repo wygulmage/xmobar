@@ -64,7 +64,7 @@ withMPD opts = M.withMPD_ (mHost opts) (mPort opts)
 
 runMPD :: [String] -> Monitor String
 runMPD args = do
-  opts <- io $ mopts args
+  opts <- io $ parseOptsWith options defaultOpts args
   status <- io $ withMPD opts M.status
   song <- io $ withMPD opts M.currentSong
   s <- parseMPD status song opts
@@ -79,7 +79,7 @@ mpdWait = do
 
 mpdReady :: [String] -> Monitor Bool
 mpdReady args = do
-  opts <- io $ mopts args
+  opts <- io $ parseOptsWith options defaultOpts args
   response <- io $ withMPD opts M.ping
   case response of
     Right _         -> return True
@@ -88,12 +88,6 @@ mpdReady args = do
     Left M.NoMPD    -> return False
     Left (M.ConnectionError _) -> return False
     Left _          -> return True
-
-mopts :: [String] -> IO MOpts
-mopts argv =
-  case getOpt Permute options argv of
-    (o, _, []) -> return $ foldr id defaultOpts o
-    (_, _, errs) -> ioError . userError $ concat errs
 
 parseMPD :: M.Response M.Status -> M.Response (Maybe M.Song) -> MOpts
             -> Monitor [String]
