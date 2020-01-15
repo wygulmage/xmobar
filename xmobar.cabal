@@ -176,8 +176,7 @@ library
       parsec-numbers >= 0.1.0,
       stm >= 2.3 && < 2.6,
       extensible-exceptions == 0.1.*,
-      async,
-      http-conduit
+      async
 
     if impl(ghc < 8.0.2)
        -- Disable building with GHC before 8.0.2.
@@ -251,11 +250,11 @@ library
     if flag(with_weather) || flag(all_extensions)
        exposed-modules: Xmobar.Plugins.Monitors.Weather
        cpp-options: -DWEATHER
-       build-depends: http-types
+       build-depends: http-conduit, http-types
 
     if flag(with_uvmeter)
        exposed-modules: Xmobar.Plugins.Monitors.UVMeter
-       build-depends: http-types
+       build-depends: http-conduit, http-types
        cpp-options: -DUVMETER
 
     if os(freebsd)
@@ -311,7 +310,6 @@ test-suite XmobarTest
                  async,
                  temporary,
                  hspec == 2.*,
-                 http-conduit,
                  xmobar
 
   other-modules: Xmobar.Plugins.Monitors.CommonSpec
@@ -333,3 +331,6 @@ test-suite XmobarTest
                      Xmobar.Plugins.Monitors.AlsaSpec
 
       cpp-options: -DALSA
+
+  if flag(with_weather) || flag(all_extensions) || flag(with_uvmeter)
+      build-depends: http-conduit
