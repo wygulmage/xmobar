@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.Plugins.Monitors.Types
@@ -29,10 +27,7 @@ module Xmobar.Plugins.Monitors.Common.Types ( Monitor
 
 import Data.IORef (IORef, modifyIORef, newIORef, readIORef)
 import Control.Monad.Reader (ReaderT, ask, liftIO)
-#if defined(WEATHER) || defined(UVMETER)
 import Network.HTTP.Conduit (Manager, newManager, tlsManagerSettings)
-#endif
-
 
 type Monitor a = ReaderT MConfig IO a
 
@@ -61,9 +56,7 @@ data MConfig =
        , naString :: IORef String
        , maxTotalWidth :: IORef Int
        , maxTotalWidthEllipsis :: IORef String
-#if defined(WEATHER) || defined(UVMETER)
        , manager :: IORef Manager
-#endif
        }
 
 -- | from 'http:\/\/www.haskell.org\/hawiki\/MonadState'
@@ -111,12 +104,8 @@ mkMConfig tmpl exprts =
        na <- newIORef "N/A"
        mt <- newIORef 0
        mtel <- newIORef ""
-#if defined(WEATHER) || defined(UVMETER)
        man <- newIORef =<< newManager tlsManagerSettings
        return $ MC nc l lc h hc t e p d mn mx mel pc pr bb bf bw up na mt mtel man
-#else
-       return $ MC nc l lc h hc t e p d mn mx mel pc pr bb bf bw up na mt mtel
-#endif
 
 data Opts = HighColor String
           | NormalColor String
