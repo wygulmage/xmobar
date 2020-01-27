@@ -18,14 +18,14 @@ module Xmobar.Plugins.Monitors.UVMeter where
 import Xmobar.Plugins.Monitors.Common
 
 import qualified Control.Exception as CE
-import Network.HTTP.Conduit (httpLbs, parseRequest, responseBody)
+import Network.HTTP.Conduit
+       (parseRequest, newManager, tlsManagerSettings, httpLbs,
+        responseBody)
 import Data.ByteString.Lazy.Char8 as B
 import Text.Read (readMaybe)
 import Text.Parsec
 import Text.Parsec.String
 import Control.Monad (void)
-import Control.Monad.Reader (asks)
-import Data.IORef (readIORef)
 
 
 uvConfig :: IO MConfig
@@ -40,18 +40,16 @@ newtype UvInfo = UV { index :: String }
 uvURL :: String
 uvURL = "https://uvdata.arpansa.gov.au/xml/uvvalues.xml"
 
--- | Get the UV data from the given url.
-getData :: Monitor String
-getData = do
-    man <- io =<< readIORef <$> asks manager
-    io $ CE.catch
-        (do request <- parseRequest uvURL
-            res <- httpLbs request man
-            return $ B.unpack $ responseBody res)
-        errHandler
-  where
-    errHandler :: CE.SomeException -> IO String
-    errHandler _ = return "<Could not retrieve data>"
+getData :: IO String
+getData =
+  CE.catch (do request <- parseRequest uvURL
+               manager <- newManager tlsManagerSettings
+               res <- httpLbs request manager
+               return $ B.unpack $ responseBody res)
+           errHandler
+  where errHandler
+          :: CE.SomeException -> IO String
+        errHandler _ = return "<Could not retrieve data>"
 
 textToXMLDocument :: String -> Either ParseError [XML]
 textToXMLDocument = parse document ""
@@ -75,7 +73,7 @@ getUVRating _ [] = Nothing
 runUVMeter :: [String] -> Monitor String
 runUVMeter [] = return "N.A."
 runUVMeter (s:_) = do
-    resp <- getData
+    resp <- io getData
     case textToXMLDocument resp of
         Right doc -> formatUVRating (getUVRating s doc)
         Left _ -> getConfigValue naString

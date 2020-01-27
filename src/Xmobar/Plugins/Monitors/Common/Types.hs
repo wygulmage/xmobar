@@ -25,9 +25,8 @@ module Xmobar.Plugins.Monitors.Common.Types ( Monitor
                                             , io
                                             ) where
 
-import Data.IORef (IORef, modifyIORef, newIORef, readIORef)
-import Control.Monad.Reader (ReaderT, ask, liftIO)
-import Network.HTTP.Conduit (Manager, newManager, tlsManagerSettings)
+import Data.IORef
+import Control.Monad.Reader
 
 type Monitor a = ReaderT MConfig IO a
 
@@ -56,7 +55,6 @@ data MConfig =
        , naString :: IORef String
        , maxTotalWidth :: IORef Int
        , maxTotalWidthEllipsis :: IORef String
-       , manager :: IORef Manager
        }
 
 -- | from 'http:\/\/www.haskell.org\/hawiki\/MonadState'
@@ -104,8 +102,7 @@ mkMConfig tmpl exprts =
        na <- newIORef "N/A"
        mt <- newIORef 0
        mtel <- newIORef ""
-       man <- newIORef =<< newManager tlsManagerSettings
-       return $ MC nc l lc h hc t e p d mn mx mel pc pr bb bf bw up na mt mtel man
+       return $ MC nc l lc h hc t e p d mn mx mel pc pr bb bf bw up na mt mtel
 
 data Opts = HighColor String
           | NormalColor String

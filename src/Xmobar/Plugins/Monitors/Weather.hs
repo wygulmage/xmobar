@@ -19,13 +19,11 @@ import Xmobar.Plugins.Monitors.Common
 
 import qualified Control.Exception as CE
 
-import Control.Monad.Reader (asks)
+import Network.HTTP.Conduit
+import Network.HTTP.Types.Status
+import Network.HTTP.Types.Method
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.Char (toLower)
-import Data.IORef (readIORef)
-import Network.HTTP.Conduit
-import Network.HTTP.Types.Method (methodHead)
-import Network.HTTP.Types.Status
 
 import Text.ParserCombinators.Parsec
 import System.Console.GetOpt (ArgDescr(ReqArg), OptDescr(Option))
@@ -210,18 +208,15 @@ defUrl = "https://tgftp.nws.noaa.gov/data/observations/metar/decoded/"
 stationUrl :: String -> String
 stationUrl station = defUrl ++ station ++ ".TXT"
 
--- | Get the decoded weather data from the given station.
-getData :: String -> Monitor String
-getData station = do
-    man <- io =<< readIORef <$> asks manager
-    io $ CE.catch ( do
-        request <- parseUrlThrow $ stationUrl station
-        res <- httpLbs request man
-        return $ B.unpack $ responseBody res
-        ) errHandler
-  where
-    errHandler :: CE.SomeException -> IO String
-    errHandler _ = return "<Could not retrieve data>"
+getData :: String -> IO String
+getData station = CE.catch (do
+    manager <- newManager tlsManagerSettings
+    request <- parseUrlThrow $ stationUrl station
+    res <- httpLbs request manager
+    return $  B.unpack $ responseBody res
+    ) errHandler
+    where errHandler :: CE.SomeException -> IO String
+          errHandler _ = return "<Could not retrieve data>"
 
 formatSk :: Eq p => [(p, p)] -> p -> p
 formatSk ((a,b):sks) sk = if a == sk then b else formatSk sks sk
@@ -247,38 +242,27 @@ showWeather :: String -> String -> String
 showWeather "" d = d
 showWeather s  _ = s
 
--- | Run the 'Weather' monitor.
 runWeather :: [String] -> Monitor String
 runWeather = runWeather' []
 
--- | Run the 'WeatherX' monitor.
-runWeather'
-    :: [(String, String)]  -- ^ 'SkyConditionS' replacement strings
-    -> [String]            -- ^ User supplied arguments
-    -> Monitor String
+runWeather' :: [(String, String)] -> [String] -> Monitor String
 runWeather' sks args =
-    do d <- getData $ head args
+    do d <- io $ getData $ head args
        o <- io $ parseOptsWith options defaultOpts args
        i <- io $ runP parseData d
        formatWeather o sks i
 
--- | Test internet connectivity before executing the monitor.
 weatherReady :: [String] -> Monitor Bool
 weatherReady str = do
     initRequest <- parseUrlThrow $ stationUrl $ head str
     let request = initRequest{method = methodHead}
-    man <- io =<< readIORef <$> asks manager
     io $ CE.catch ( do
-        res  <- httpLbs request man
-        return $ checkResult $ responseStatus res ) errHandler
-  where
-    -- | If any exception occurs, indicate that the monitor is not ready.
-    errHandler :: CE.SomeException -> IO Bool
-    errHandler _ = return False
-
-    -- | Check for and indicate any errors in the http response.
-    checkResult :: Status -> Bool
-    checkResult status
-        | statusIsServerError status = False
-        | statusIsClientError status = False
-        | otherwise = True
+        manager <- newManager tlsManagerSettings
+        res     <- httpLbs request manager
+        return $ checkResult $responseStatus res ) errHandler
+    where errHandler :: CE.SomeException -> IO Bool
+          errHandler _ = return False
+          checkResult status
+            | statusIsServerError status = False
+            | statusIsClientError status = False
+            | otherwise = True
