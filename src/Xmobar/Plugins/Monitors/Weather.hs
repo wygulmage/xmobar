@@ -25,8 +25,6 @@ import Data.Maybe (fromMaybe)
 import Network.HTTP.Conduit
 import Network.HTTP.Types.Status
 import Network.HTTP.Types.Method
-import qualified Data.ByteString.Lazy.Char8 as B
-import Data.Char (toLower)
 
 import Text.ParserCombinators.Parsec
 import System.Console.GetOpt (ArgDescr(ReqArg), OptDescr(Option))
