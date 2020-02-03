@@ -19,6 +19,10 @@ import Xmobar.Plugins.Monitors.Common
 
 import qualified Control.Exception as CE
 
+import Control.Monad.Reader (asks)
+import qualified Data.ByteString.Lazy.Char8 as B
+import Data.Char (toLower)
+import Data.IORef (newIORef, readIORef)
 import Network.HTTP.Conduit
 import Network.HTTP.Types.Status
 import Network.HTTP.Types.Method

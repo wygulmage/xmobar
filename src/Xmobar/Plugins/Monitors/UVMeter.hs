@@ -22,6 +22,7 @@ import Network.HTTP.Conduit
        (parseRequest, newManager, tlsManagerSettings, httpLbs,
         responseBody)
 import Data.ByteString.Lazy.Char8 as B
+import Data.IORef (newIORef, readIORef)
 import Text.Read (readMaybe)
 import Text.Parsec
 import Text.Parsec.String
