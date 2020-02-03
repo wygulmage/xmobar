@@ -19,10 +19,9 @@ import Xmobar.Plugins.Monitors.Common
 
 import qualified Control.Exception as CE
 
-import Control.Monad.Reader (asks)
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.Char (toLower)
-import Data.IORef (newIORef, readIORef)
+import Data.Maybe (fromMaybe)
 import Network.HTTP.Conduit
 import Network.HTTP.Types.Status
 import Network.HTTP.Types.Method
@@ -34,20 +33,23 @@ import System.Console.GetOpt (ArgDescr(ReqArg), OptDescr(Option))
 
 
 -- | Options the user may specify.
-newtype WeatherOpts = WeatherOpts
+data WeatherOpts = WeatherOpts
   { weatherString :: String
+  , useManager    :: Bool
   }
 
 -- | Default values for options.
 defaultOpts :: WeatherOpts
 defaultOpts = WeatherOpts
   { weatherString = ""
+  , useManager    = True
   }
 
 -- | Apply options.
 options :: [OptDescr (WeatherOpts -> WeatherOpts)]
 options =
-  [ Option "w" ["weathers"] (ReqArg (\s o -> o { weatherString = s }) "") ""
+  [ Option "w" ["weathers"  ] (ReqArg (\s o -> o { weatherString = s   }) "") ""
+  , Option "m" ["useManager"] (ReqArg (\b o -> o { useManager = read b }) "") ""
   ]
 
 weatherConfig :: IO MConfig
@@ -212,15 +214,19 @@ defUrl = "https://tgftp.nws.noaa.gov/data/observations/metar/decoded/"
 stationUrl :: String -> String
 stationUrl station = defUrl ++ station ++ ".TXT"
 
-getData :: String -> IO String
-getData station = CE.catch (do
-    manager <- newManager tlsManagerSettings
-    request <- parseUrlThrow $ stationUrl station
-    res <- httpLbs request manager
-    return $  B.unpack $ responseBody res
-    ) errHandler
-    where errHandler :: CE.SomeException -> IO String
-          errHandler _ = return "<Could not retrieve data>"
+-- | Get the decoded weather data from the given station.
+getData :: Maybe Manager -> String -> IO String
+getData weMan station = CE.catch
+    (do man <- flip fromMaybe weMan <$> mkManager
+        -- Create a new manager if none was present or the user does not want to
+        -- use one.
+        request <- parseUrlThrow $ stationUrl station
+        res <- httpLbs request man
+        return $ B.unpack $ responseBody res)
+    errHandler
+  where
+    errHandler :: CE.SomeException -> IO String
+    errHandler _ = return "<Could not retrieve data>"
 
 formatSk :: Eq p => [(p, p)] -> p -> p
 formatSk ((a,b):sks) sk = if a == sk then b else formatSk sks sk
@@ -246,27 +252,73 @@ showWeather :: String -> String -> String
 showWeather "" d = d
 showWeather s  _ = s
 
-runWeather :: [String] -> Monitor String
-runWeather = runWeather' []
+-- | Start a weather monitor, create a new 'Maybe Manager', should the user have
+-- chosen to use one.
+startWeather'
+    :: [(String, String)]  -- ^ 'SkyConditionS' replacement strings
+    -> String              -- ^ Weather station
+    -> [String]            -- ^ User supplied arguments
+    -> Int                 -- ^ Update rate
+    -> (String -> IO ())
+    -> IO ()
+startWeather' sks station args rate cb = do
+    opts  <- parseOptsWith options defaultOpts (getArgvs args)
+    weRef <- tryMakeManager opts
+    runMD
+        (station : args)
+        weatherConfig
+        (runWeather sks weRef opts)
+        rate
+        weatherReady
+        cb
 
-runWeather' :: [(String, String)] -> [String] -> Monitor String
-runWeather' sks args =
-    do d <- io $ getData $ head args
-       o <- io $ parseOptsWith options defaultOpts args
-       i <- io $ runP parseData d
-       formatWeather o sks i
+-- | Same as 'startWeather'', only for 'Weather' instead of 'WeatherX', meaning
+-- no 'SkyConditionS'.
+startWeather :: String -> [String] -> Int -> (String -> IO ()) -> IO ()
+startWeather = startWeather' []
+
+-- | Run a weather monitor.
+runWeather
+    :: [(String, String)]  -- ^ 'SkyConditionS' replacement strings
+    -> Maybe Manager       -- ^ Whether to use a 'Manager'
+    -> WeatherOpts         -- ^ Weather specific options
+    -> [String]            -- ^ User supplied arguments
+    -> Monitor String
+runWeather sks weMan opts args = do
+    d <- io $ getData weMan (head args)
+    i <- io $ runP parseData d
+    formatWeather opts sks i
 
 weatherReady :: [String] -> Monitor Bool
-weatherReady str = do
+weatherReady str = io $ do
     initRequest <- parseUrlThrow $ stationUrl $ head str
-    let request = initRequest{method = methodHead}
-    io $ CE.catch ( do
-        manager <- newManager tlsManagerSettings
-        res     <- httpLbs request manager
-        return $ checkResult $responseStatus res ) errHandler
-    where errHandler :: CE.SomeException -> IO Bool
-          errHandler _ = return False
-          checkResult status
-            | statusIsServerError status = False
-            | statusIsClientError status = False
-            | otherwise = True
+    let request = initRequest { method = methodHead }
+
+    CE.catch
+        (do man <- mkManager
+            res  <- httpLbs request man
+            return $ checkResult $ responseStatus res)
+        errHandler
+  where
+    -- | If any exception occurs, indicate that the monitor is not ready.
+    errHandler :: CE.SomeException -> IO Bool
+    errHandler _ = return False
+
+    -- | Check for and indicate any errors in the http response.
+    checkResult :: Status -> Bool
+    checkResult status
+        | statusIsServerError status = False
+        | statusIsClientError status = False
+        | otherwise = True
+
+-- | Possibly create a new 'Manager', based upon the users preference.  If one
+-- is created, this 'Manager' will be used throughout the monitor.
+tryMakeManager :: WeatherOpts -> IO (Maybe Manager)
+tryMakeManager opts =
+    if useManager opts
+        then Just <$> mkManager
+        else pure Nothing
+
+-- | Create a new 'Manager' for managing network connections.
+mkManager :: IO Manager
+mkManager = newManager $ tlsManagerSettings { managerConnCount = 1 }
