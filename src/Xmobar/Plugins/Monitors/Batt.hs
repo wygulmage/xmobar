@@ -227,7 +227,7 @@ readBattery sc files =
            a' = max a b -- sometimes the reported max charge is lower than
        return $ Battery (3600 * a' / sc') -- wattseconds
                         (3600 * b / sc') -- wattseconds
-                        (d / sc') -- watts
+                        (abs d / sc') -- watts
                         s -- string: Discharging/Charging/Full
     where grab f = handle onError $ withFile f ReadMode (fmap read . hGetLine)
           onError = const (return (-1)) :: SomeException -> IO Float
