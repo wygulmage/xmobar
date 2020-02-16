@@ -20,6 +20,8 @@ _New features_
   - New more efficient time coalescing strategy for monitor updates,
     available with the threaded runtime: use the `with_threaded` flag
     to enable it (see #410; thanks to Tomáš Janoušek).
+  - `Wireless` supports current nl80211 API on Linux now, old Wext ioctls still
+    available as compile-time option (thanks to Paul Fertser).
 
 ## Version 0.32 (December, 2019)
 

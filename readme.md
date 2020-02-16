@@ -117,11 +117,15 @@ Otherwise, you'll need to install them yourself.
   option is needed for the MBox and Mail plugins to work. Requires the
   [hinotify] package.
 
-- `with_iwlib` Support for wireless cards. Enables the Wireless
-   plugin. No Haskell library is required, but you will need the
-   [iwlib] C library and headers in your system (e.g., install
-   `libiw-dev` in Debian-based systems or `wireless_tools` on Arch
-   Linux).
+- `with_nl80211` Support for wireless cards on Linux via nl80211 (all
+   upstream drivers). Enables the Wireless plugin. Requires [netlink]
+   and [cereal] packages.
+
+- `with_iwlib` Support for wireless cards via Wext ioctls
+   (deprecated). Enables the Wireless plugin. No Haskell library is
+   required, but you will need the [iwlib] C library and headers in your
+   system (e.g., install `libiw-dev` in Debian-based systems or
+   `wireless_tools` on Arch Linux). Conflicts with `with_nl80211`.
 
 - `with_alsa` Support for ALSA sound cards. Enables the Volume
    plugin. Requires the [alsa-mixer] package.  To install the latter,
@@ -820,18 +824,21 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
 
 ### `Wireless Interface Args RefreshRate`
 
-- If set to "", the interface is looked up in /proc/net/wireless.
+- If set to "", first suitable wireless interface is used.
 - Aliases to the interface name with the suffix "wi": thus, `Wireless
   "wlan0" []` can be used as `%wlan0wi%`, and `Wireless "" []` as `%wi%`.
 - Args: default monitor arguments, plus:
   - `--quality-icon-pattern`: dynamic string for connection quality in `qualityipat`.
 - Variables that can be used with the `-t`/`--template` argument:
-            `essid`, `quality`, `qualitybar`, `qualityvbar`, `qualityipat`
-- Thresholds refer to link quality in a `[0, 100]` scale
-- Default template: `<essid> <quality>`
-- Requires the C library [iwlib] (part of the wireless tools suite)
-  installed in your system. In addition, to activate this plugin you
-  must pass `--flags="with_iwlib"` during compilation
+            `ssid`, `signal`, `quality`, `qualitybar`, `qualityvbar`, `qualityipat`
+- Thresholds refer to link quality on a `[0, 100]` scale. Note that
+  `quality` is calculated from `signal` (in dBm) by a possibly lossy
+  conversion. It is also not taking into account many factors such as
+  noise level, air busy time, transcievers' capabilities and the
+  others which can have drastic impact on the link performance.
+- Default template: `<ssid> <quality>`
+- To activate this plugin you must pass `--flags="with_nl80211"` or
+  `--flags="with_iwlib"` during compilation
 
 ### `Memory Args RefreshRate`
 

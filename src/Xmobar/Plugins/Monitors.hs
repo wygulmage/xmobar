@@ -42,7 +42,7 @@ import Xmobar.Plugins.Monitors.CatInt
 #ifdef UVMETER
 import Xmobar.Plugins.Monitors.UVMeter
 #endif
-#ifdef IWLIB
+#if defined IWLIB || defined USE_NL80211
 import Xmobar.Plugins.Monitors.Wireless
 #endif
 #ifdef LIBMPD
@@ -85,7 +85,7 @@ data Monitors = Network      Interface   Args Rate
 #ifdef UVMETER
               | UVMeter      Station     Args Rate
 #endif
-#ifdef IWLIB
+#if defined IWLIB || defined USE_NL80211
               | Wireless Interface  Args Rate
 #endif
 #ifdef LIBMPD
@@ -142,7 +142,7 @@ instance Exec Monitors where
 #ifdef UVMETER
     alias (UVMeter s _ _) = "uv " ++ s
 #endif
-#ifdef IWLIB
+#if defined IWLIB || defined USE_NL80211
     alias (Wireless i _ _) = i ++ "wi"
 #endif
 #ifdef LIBMPD
@@ -186,7 +186,7 @@ instance Exec Monitors where
 #ifdef UVMETER
     start (UVMeter s a r) = startUVMeter s a r
 #endif
-#ifdef IWLIB
+#if defined IWLIB || defined USE_NL80211
     start (Wireless i a r) = runM a wirelessConfig (runWireless i) r
 #endif
 #ifdef LIBMPD
