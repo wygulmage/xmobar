@@ -17,6 +17,9 @@ _New features_
   - New option `--useManager` for `Weather` and `UVMeter` to decide whether to
     use one single manager per monitor for managing network connections or
     create a new one every time a connection is made.
+  - New more efficient time coalescing strategy for monitor updates,
+    available with the threaded runtime: use the `with_threaded` flag
+    to enable it (see #410; thanks to Tomáš Janoušek).
 
 ## Version 0.32 (December, 2019)
 

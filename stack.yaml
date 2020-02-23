@@ -7,6 +7,7 @@ packages:
 flags:
  xmobar:
    all_extensions: true
+   with_threaded: true
 
 extra-deps:
  - iwlib-0.1.0
