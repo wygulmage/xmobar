@@ -72,7 +72,7 @@ flag with_xpm
   default: False
 
 flag with_threaded
-  description: Use threaded runtime.
+  description: Use threaded runtime. Required for timer coalescing (less power usage).
   default: False
 
 flag with_rtsopts

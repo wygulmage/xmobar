@@ -23,30 +23,27 @@ import Control.Concurrent.Async (withAsync)
 import Control.Concurrent.STM
 import Control.Exception
 import Control.Monad (forever, forM, guard)
-import Data.Foldable (foldrM)
-import Data.IORef
+import Data.Foldable (foldrM, for_)
 import Data.Int (Int64)
 import Data.Map (Map)
 import qualified Data.Map as M
-import Data.Maybe (isJust)
+import Data.Maybe (isJust, fromJust)
 import Data.Time.Clock.POSIX (getPOSIXTime)
 import Data.Unique
 import System.IO.Unsafe (unsafePerformIO)
 
-newtype Timer = Timer (TVar Periods)
-
 type Periods = Map Unique Period
 
-data Tick = Tick (TMVar ()) | TimeOut
+data Tick = Tick (TMVar ()) | UnCoalesce
 
 data Period = Period { rate :: Int64, next :: Int64, tick :: TMVar Tick }
 
-data TimeOutException = TimeOutException deriving Show
-instance Exception TimeOutException
+data UnCoalesceException = UnCoalesceException deriving Show
+instance Exception UnCoalesceException
 
-{-# NOINLINE timer #-}
-timer :: IORef (Maybe Timer)
-timer = unsafePerformIO (newIORef Nothing)
+{-# NOINLINE periodsVar #-}
+periodsVar :: TVar (Maybe Periods)
+periodsVar = unsafePerformIO $ newTVarIO Nothing
 
 now :: IO Int64
 now = do
@@ -68,24 +65,27 @@ newPeriod r = do
 -- second or when the next timer is due), coalescing is disabled for it and it
 -- falls back to periodic sleep.
 doEveryTenthSeconds :: Int -> IO () -> IO ()
-doEveryTenthSeconds r action = do
-    Just t <- readIORef timer
-    doEveryTenthSecondsCoalesced t r action `catch` \TimeOutException ->
+doEveryTenthSeconds r action =
+    doEveryTenthSecondsCoalesced r action `catch` \UnCoalesceException ->
         doEveryTenthSecondsSleeping r action
 
 -- | Perform a given action every N tenths of a second,
 -- coalesce with other timers using a given Timer instance.
-doEveryTenthSecondsCoalesced :: Timer -> Int -> IO () -> IO ()
-doEveryTenthSecondsCoalesced (Timer periodsVar) r action = do
+doEveryTenthSecondsCoalesced :: Int -> IO () -> IO ()
+doEveryTenthSecondsCoalesced r action = do
     (u, p) <- newPeriod (fromIntegral r)
     bracket_ (push u p) (pop u) $ forever $ bracket (wait p) done $ const action
     where
-        push u p = atomically $ modifyTVar periodsVar (M.insert u p)
-        pop u = atomically $ modifyTVar periodsVar (M.delete u)
+        push u p = atomically $ modifyTVar' periodsVar $ \case
+            Just periods -> Just $ M.insert u p periods
+            Nothing -> throw UnCoalesceException
+        pop u = atomically $ modifyTVar' periodsVar $ \case
+            Just periods -> Just $ M.delete u periods
+            Nothing -> Nothing
 
         wait p = atomically (takeTMVar $ tick p) >>= \case
             Tick doneVar -> return doneVar
-            TimeOut -> throwIO TimeOutException
+            UnCoalesce -> throwIO UnCoalesceException
         done doneVar = atomically $ putTMVar doneVar ()
 
 -- | Perform a given action every N tenths of a second,
@@ -105,25 +105,39 @@ tenthSeconds s | s >= x = do threadDelay (x * 100000)
                | otherwise = threadDelay (s * 100000)
                where x = (maxBound :: Int) `div` 100000
 
--- | Start the timer coordination thread.
+-- | Start the timer coordination thread and perform a given IO action (this
+-- is meant to surround the entire xmobar execution), terminating the timer
+-- thread afterwards.
+--
+-- Additionally, if the timer thread fails, individual
+-- 'doEveryTenthSecondsCoalesced' invocations that are waiting to be
+-- coordinated by it are notified to fall back to periodic sleeping.
+--
+-- The timer thread _will_ fail immediately when running in a non-threaded
+-- RTS.
 withTimer :: (IO () -> IO ()) -> IO a -> IO a
-withTimer pauseRefresh action = do
-    periodsVar <- atomically $ newTVar M.empty
-    withAsync (timerLoop pauseRefresh periodsVar) $ \_ ->
-        bracket_
-            (writeIORef timer (Just (Timer periodsVar)))
-            (writeIORef timer Nothing) -- TODO: kill all periods?
-            action
+withTimer pauseRefresh action =
+    withAsync (timerThread `finally` cleanup) $ const action
+    where
+        timerThread = do
+            atomically $ writeTVar periodsVar $ Just M.empty
+            timerLoop pauseRefresh
 
-timerLoop :: (IO () -> IO ()) -> TVar Periods -> IO ()
-timerLoop pauseRefresh periodsVar = forever $ do
+        cleanup = atomically $ readTVar periodsVar >>= \case
+            Just periods -> do
+                for_ periods unCoalesceTimer'
+                writeTVar periodsVar Nothing
+            Nothing -> return ()
+
+timerLoop :: (IO () -> IO ()) -> IO ()
+timerLoop pauseRefresh = forever $ do
     tNow <- now
     (toFire, tMaybeNext) <- atomically $ do
-        periods <- readTVar periodsVar
+        periods <- fromJust <$> readTVar periodsVar
         let toFire = timersToFire tNow periods
         let periods' = advanceTimers tNow periods
         let tMaybeNext = nextFireTime periods'
-        writeTVar periodsVar periods'
+        writeTVar periodsVar $ Just periods'
         return (toFire, tMaybeNext)
     pauseRefresh $ do
         -- To avoid multiple refreshes, pause refreshing for up to 1 second,
@@ -135,8 +149,8 @@ timerLoop pauseRefresh periodsVar = forever $ do
             Nothing -> 1000000
         fired <- fireTimers toFire
         timeouted <- waitForTimers timeoutVar fired
-        timeoutTimers timeouted periodsVar
-    delayUntilNextFire periodsVar
+        unCoalesceTimers timeouted
+    delayUntilNextFire
 
 advanceTimers :: Int64 -> Periods -> Periods
 advanceTimers t = M.map advance
@@ -168,20 +182,26 @@ waitForTimers timeoutVar fired = atomically $ do
     return [u | (u, False) <- dones]
 
 -- | Handle slow timers (drop and signal them to stop coalescing).
-timeoutTimers :: [Unique] -> TVar Periods -> IO ()
-timeoutTimers timers periodsVar = atomically $ do
-    periods <- readTVar periodsVar
-    periods' <- foldrM timeoutTimer periods timers
-    writeTVar periodsVar periods'
+unCoalesceTimers :: [Unique] -> IO ()
+unCoalesceTimers timers = atomically $ do
+    periods <- fromJust <$> readTVar periodsVar
+    periods' <- foldrM unCoalesceTimer periods timers
+    writeTVar periodsVar $ Just periods'
 
-timeoutTimer :: Unique -> Periods -> STM Periods
-timeoutTimer u periods = do
-    putTMVar (tick (periods M.! u)) TimeOut
+unCoalesceTimer :: Unique -> Periods -> STM Periods
+unCoalesceTimer u periods = do
+    unCoalesceTimer' (periods M.! u)
     return $ u `M.delete` periods
 
-delayUntilNextFire :: TVar Periods -> IO ()
-delayUntilNextFire periodsVar = do
-    tMaybeNext <- fmap nextFireTime $ readTVarIO periodsVar
+unCoalesceTimer' :: Period -> STM ()
+unCoalesceTimer' p = do
+    _ <- tryTakeTMVar (tick p)
+    putTMVar (tick p) UnCoalesce
+
+delayUntilNextFire :: IO ()
+delayUntilNextFire = do
+    Just periods <- readTVarIO periodsVar
+    let tMaybeNext = nextFireTime periods
     tNow <- now
     delayVar <- case tMaybeNext of
         Just tNext -> do
@@ -195,6 +215,7 @@ delayUntilNextFire periodsVar = do
         Nothing -> atomically $ newTVar False
     atomically $ do
         delayOver <- readTVar delayVar
-        tMaybeNext' <- fmap nextFireTime $ readTVar periodsVar
+        periods' <- fromJust <$> readTVar periodsVar
+        let tMaybeNext' = nextFireTime periods'
         -- Return also if a new period is added (it may fire sooner).
         guard $ delayOver || tMaybeNext /= tMaybeNext'
