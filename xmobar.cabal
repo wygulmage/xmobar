@@ -1,5 +1,5 @@
 name:               xmobar
-version:            0.32
+version:            0.33
 homepage:           http://xmobar.org
 synopsis:           A Minimalistic Text Based Status Bar
 description: 	    Xmobar is a minimalistic text based status bar.
@@ -213,16 +213,17 @@ library
        exposed-modules: Xmobar.Plugins.Mail, Xmobar.Plugins.MBox
        cpp-options: -DINOTIFY
 
+    if flag(with_iwlib) || flag(with_nl80211) || flag(all_extensions)
+       exposed-modules: Xmobar.Plugins.Monitors.Wireless
+
     if flag(with_iwlib)
        extra-libraries: iw
        build-depends: iwlib >= 0.1.0 && < 0.2
-       exposed-modules: Xmobar.Plugins.Monitors.Wireless
        cpp-options: -DIWLIB
 
-    if flag(with_nl80211) || flag(all_extensions)
+    if !flag(with_iwlib) && (flag(with_nl80211) || flag(all_extensions))
        build-depends: netlink >= 1.1.1.0,
                       cereal >= 0.5.8.1
-       exposed-modules: Xmobar.Plugins.Monitors.Wireless
        cpp-options: -DUSE_NL80211
 
     if flag(with_mpd) || flag(all_extensions)
