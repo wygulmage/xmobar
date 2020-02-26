@@ -111,7 +111,7 @@ runWireless iface args = do
 #else
   let s = if qlty >= 0 then Just (qlty * 0.7 - 110) else Nothing
 #endif
-  sp <- showWithPadding $ fromMaybe "" (show <$> s)
+  sp <- showWithPadding $ maybe "" show s
   q <- if qlty >= 0
        then showPercentWithColors (qlty / 100)
        else showWithPadding ""
