@@ -798,11 +798,14 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
 - Args: default monitor arguments, plus:
   - `--rx-icon-pattern`: dynamic string for reception rate in `rxipat`.
   - `--tx-icon-pattern`: dynamic string for transmission rate in `txipat`.
+  - `--up`: string used for the `up` variable value when the
+    interface is up.
 - Variables that can be used with the `-t`/`--template` argument:
   `dev`, `rx`, `tx`, `rxbar`, `rxvbar`, `rxipat`, `txbar`, `txvbar`,
-  `txipat`. Reception and transmission rates (`rx` and `tx`) are displayed
-  by default as Kb/s, without any suffixes, but you can set the `-S` to
-  "True" to make them displayed with adaptive units (Kb/s, Mb/s, etc.).
+  `txipat`, `up`. Reception and transmission rates (`rx` and `tx`) are
+  displayed by default as Kb/s, without any suffixes, but you can set
+  the `-S` to "True" to make them displayed with adaptive units (Kb/s,
+  Mb/s, etc.).
 - Default template: `<dev>: <rx>KB|<tx>KB`
 
 ### `DynNetwork Args RefreshRate`

@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Net
--- Copyright   :  (c) 2011, 2012, 2013, 2014, 2017 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2011, 2012, 2013, 2014, 2017, 2020 Jose Antonio Ortega Ruiz
 --                (c) 2007-2010 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -49,6 +49,7 @@ data NetOpts = NetOpts
   { rxIconPattern :: Maybe IconPattern
   , txIconPattern :: Maybe IconPattern
   , onlyDevList :: Maybe DevList
+  , upIndicator :: String
   }
 
 defaultOpts :: NetOpts
@@ -56,6 +57,7 @@ defaultOpts = NetOpts
   { rxIconPattern = Nothing
   , txIconPattern = Nothing
   , onlyDevList = Nothing
+  , upIndicator = "+"
   }
 
 options :: [OptDescr (NetOpts -> NetOpts)]
@@ -64,6 +66,7 @@ options =
      o { rxIconPattern = Just $ parseIconPattern x }) "") ""
   , Option "" ["tx-icon-pattern"] (ReqArg (\x o ->
      o { txIconPattern = Just $ parseIconPattern x }) "") ""
+  , Option "" ["up"] (ReqArg (\x o -> o { upIndicator = x }) "") ""
   , Option "" ["devices"] (ReqArg (\x o ->
      o { onlyDevList = Just $ parseDevList x }) "") ""
   ]
@@ -103,7 +106,7 @@ instance Ord num => Ord (NetDevInfo num) where
 netConfig :: IO MConfig
 netConfig = mkMConfig
     "<dev>: <rx>KB|<tx>KB"      -- template
-    ["dev", "rx", "tx", "rxbar", "rxvbar", "rxipat", "txbar", "txvbar", "txipat"]     -- available replacements
+    ["dev", "rx", "tx", "rxbar", "rxvbar", "rxipat", "txbar", "txvbar", "txipat", "up"]     -- available replacements
 
 operstateDir :: String -> FilePath
 operstateDir d = "/sys/class/net" </> d </> "operstate"
@@ -160,7 +163,7 @@ printNet opts nd =
     N d (ND r t) -> do
         (rx, rb, rvb, ripat) <- formatNet (rxIconPattern opts) r
         (tx, tb, tvb, tipat) <- formatNet (txIconPattern opts) t
-        parseTemplate [d,rx,tx,rb,rvb,ripat,tb,tvb,tipat]
+        parseTemplate [d,rx,tx,rb,rvb,ripat,tb,tvb,tipat, upIndicator opts]
     N _ NI -> return ""
     NA -> getConfigValue naString
 
