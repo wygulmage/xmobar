@@ -210,11 +210,11 @@ library
 
     if flag(with_inotify) || flag(all_extensions)
        build-depends: hinotify >= 0.3 && < 0.5
-       exposed-modules: Xmobar.Plugins.Mail, Xmobar.Plugins.MBox
+       other-modules: Xmobar.Plugins.Mail, Xmobar.Plugins.MBox
        cpp-options: -DINOTIFY
 
     if flag(with_iwlib) || flag(with_nl80211) || flag(all_extensions)
-       exposed-modules: Xmobar.Plugins.Monitors.Wireless
+       other-modules: Xmobar.Plugins.Monitors.Wireless
 
     if flag(with_iwlib)
        extra-libraries: iw
@@ -228,25 +228,25 @@ library
 
     if flag(with_mpd) || flag(all_extensions)
        build-depends: libmpd >= 0.9.0.10
-       exposed-modules: Xmobar.Plugins.Monitors.MPD
+       other-modules: Xmobar.Plugins.Monitors.MPD
        cpp-options: -DLIBMPD
 
     if flag(with_alsa) || flag(all_extensions)
        build-depends: alsa-mixer >= 0.3 && < 0.4
        build-depends: alsa-core == 0.5.*,
                       process >= 1.4.3.0
-       exposed-modules: Xmobar.Plugins.Monitors.Volume
+       other-modules: Xmobar.Plugins.Monitors.Volume
                         Xmobar.Plugins.Monitors.Alsa
        cpp-options: -DALSA
 
     if flag(with_datezone) || flag(all_extensions)
        build-depends: timezone-olson == 0.1.*, timezone-series == 0.1.*
-       exposed-modules: Xmobar.Plugins.DateZone
+       other-modules: Xmobar.Plugins.DateZone
        cpp-options: -DDATEZONE
 
     if flag(with_mpris) || flag(all_extensions)
        build-depends: dbus >= 1
-       exposed-modules: Xmobar.Plugins.Monitors.Mpris
+       other-modules: Xmobar.Plugins.Monitors.Mpris
        cpp-options: -DMPRIS
 
     if flag(with_dbus) || flag(all_extensions)
@@ -260,12 +260,12 @@ library
        cpp-options: -DXPM
 
     if flag(with_weather) || flag(all_extensions)
-       exposed-modules: Xmobar.Plugins.Monitors.Weather
+       other-modules: Xmobar.Plugins.Monitors.Weather
        cpp-options: -DWEATHER
        build-depends: http-conduit, http-types
 
     if flag(with_uvmeter)
-       exposed-modules: Xmobar.Plugins.Monitors.UVMeter
+       other-modules: Xmobar.Plugins.Monitors.UVMeter
        build-depends: http-conduit, http-types
        cpp-options: -DUVMETER
 
