@@ -20,14 +20,17 @@ import Xmobar.Plugins.Monitors.Common
 import System.Console.GetOpt
 import qualified Network.MPD as M
 import Control.Concurrent (threadDelay)
+import Control.Monad.Except (catchError)
+
+templateVars :: [String]
+templateVars = [ "bar", "vbar", "ipat", "state", "statei", "volume", "length"
+               , "lapsed", "remaining", "plength", "ppos", "flags", "file"
+               , "name", "artist", "composer", "performer"
+               , "album", "title", "track", "genre", "date"
+               ]
 
 mpdConfig :: IO MConfig
-mpdConfig = mkMConfig "MPD: <state>"
-              [ "bar", "vbar", "ipat", "state", "statei", "volume", "length"
-              , "lapsed", "remaining", "plength", "ppos", "flags", "file"
-              , "name", "artist", "composer", "performer"
-              , "album", "title", "track", "genre", "date"
-              ]
+mpdConfig = mkMConfig "MPD: <state>" templateVars
 
 data MOpts = MOpts
   { mPlaying :: String
@@ -60,7 +63,8 @@ options =
   ]
 
 withMPD :: MOpts -> M.MPD a -> IO (M.Response a)
-withMPD opts = M.withMPD_ (mHost opts) (mPort opts)
+withMPD opts a =
+  M.withMPD_ (mHost opts) (mPort opts) a `catchError` (\_ -> return (Left M.NoMPD))
 
 runMPD :: [String] -> Monitor String
 runMPD args = do
@@ -74,7 +78,7 @@ mpdWait :: IO ()
 mpdWait = do
   status <- M.withMPD $ M.idle [M.PlayerS, M.MixerS, M.OptionsS]
   case status of
-    Left _ -> threadDelay 10000000
+    Left _ -> threadDelay 5000
     _ -> return ()
 
 mpdReady :: [String] -> Monitor Bool
@@ -91,7 +95,7 @@ mpdReady args = do
 
 parseMPD :: M.Response M.Status -> M.Response (Maybe M.Song) -> MOpts
             -> Monitor [String]
-parseMPD (Left e) _ _ = return $ show e:replicate 19 ""
+parseMPD (Left _) _ _ = return $ "N/A": repeat ""
 parseMPD (Right st) song opts = do
   songData <- parseSong song
   bar <- showPercentBar (100 * b) b
