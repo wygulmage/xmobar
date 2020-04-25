@@ -31,7 +31,7 @@ data StdinReader = StdinReader | UnsafeStdinReader
 
 instance Exec StdinReader where
   start stdinReader cb = do
-    s <- handle (\(SomeException e) -> do hPrint stderr e; return "") getLine
+    s <- getLine
     cb $ escape stdinReader s
     eof <- isEOF
     if eof
