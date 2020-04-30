@@ -20,8 +20,7 @@ module Xmobar.Run.Command where
 import Control.Exception (handle, SomeException(..))
 import System.Process
 import System.Exit
-import System.IO (hClose)
-import Xmobar.System.Utils (hGetLineSafe)
+import System.IO (hClose, hGetLine)
 
 import Xmobar.Run.Exec
 
@@ -47,7 +46,7 @@ instance Exec Command where
                 exit <- waitForProcess p
                 let closeHandles = hClose o >> hClose i >> hClose e
                     getL = handle (\(SomeException _) -> return "")
-                                  (hGetLineSafe o)
+                                  (hGetLine o)
                 case exit of
                   ExitSuccess -> do str <- getL
                                     closeHandles

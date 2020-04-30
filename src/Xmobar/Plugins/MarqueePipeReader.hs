@@ -14,10 +14,9 @@
 
 module Xmobar.Plugins.MarqueePipeReader(MarqueePipeReader(..)) where
 
-import System.IO (openFile, IOMode(ReadWriteMode), Handle)
+import System.IO (openFile, IOMode(ReadWriteMode), Handle, hGetLine)
 import Xmobar.System.Environment
 import Xmobar.Run.Exec(Exec(alias, start), tenthSeconds)
-import Xmobar.System.Utils(hGetLineSafe)
 import System.Posix.Files (getFileStatus, isNamedPipe)
 import Control.Concurrent(forkIO, threadDelay)
 import Control.Concurrent.STM (TChan, atomically, writeTChan, tryReadTChan, newTChan)
@@ -39,7 +38,7 @@ instance Exec MarqueePipeReader where
         unless (null def) (cb def)
         checkPipe pipe
         h <- openFile pipe ReadWriteMode
-        line <- hGetLineSafe h
+        line <- hGetLine h
         chan <- atomically newTChan
         forkIO $ writer (toInfTxt line sep) sep len rate chan cb
         forever $ pipeToChan h chan
@@ -50,7 +49,7 @@ instance Exec MarqueePipeReader where
 
 pipeToChan :: Handle -> TChan String -> IO ()
 pipeToChan h chan = do
-    line <- hGetLineSafe h
+    line <- hGetLine h
     atomically $ writeTChan chan line
 
 writer :: String -> Separator -> Length -> Rate -> TChan String -> (String -> IO ()) -> IO ()

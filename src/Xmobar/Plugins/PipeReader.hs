@@ -16,7 +16,6 @@ module Xmobar.Plugins.PipeReader(PipeReader(..)) where
 
 import System.IO
 import Xmobar.Run.Exec(Exec(..))
-import Xmobar.System.Utils(hGetLineSafe)
 import Xmobar.System.Environment(expandEnv)
 import System.Posix.Files
 import Control.Concurrent(threadDelay)
@@ -34,7 +33,7 @@ instance Exec PipeReader where
         unless (null def) (cb def)
         checkPipe pipe
         h <- openFile pipe ReadWriteMode
-        forever (hGetLineSafe h >>= cb)
+        forever (hGetLine h >>= cb)
       where
         split c xs | c `elem` xs = let (pre, post) = span (c /=) xs
                                    in (pre, dropWhile (c ==) post)

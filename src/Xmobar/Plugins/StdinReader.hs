@@ -25,7 +25,6 @@ import System.IO
 import Control.Exception (SomeException(..), handle)
 import Xmobar.Run.Exec
 import Xmobar.X11.Actions (stripActions)
-import Xmobar.System.Utils (hGetLineSafe)
 
 data StdinReader = StdinReader | UnsafeStdinReader
   deriving (Read, Show)
@@ -33,7 +32,7 @@ data StdinReader = StdinReader | UnsafeStdinReader
 instance Exec StdinReader where
   start stdinReader cb = do
     s <- handle (\(SomeException e) -> do hPrint stderr e; return "")
-                (hGetLineSafe stdin)
+                (hGetLine stdin)
     cb $ escape stdinReader s
     eof <- isEOF
     if eof

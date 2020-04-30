@@ -23,7 +23,6 @@ import System.IO.Unsafe(unsafePerformIO)
 import Xmobar.Run.Exec
 import Xmobar.System.Signal
 import Xmobar.System.Environment
-import Xmobar.System.Utils(hGetLineSafe)
 
 data BufferedPipeReader = BufferedPipeReader String [(Int, Bool, String)]
     deriving (Read, Show)
@@ -55,7 +54,7 @@ instance Exec BufferedPipeReader where
         reader :: (Int, Bool, FilePath) -> TChan (Int, Bool, String) -> IO ()
         reader p@(to, tg, fp) tc = do
             fp' <- expandEnv fp
-            openFile fp' ReadWriteMode >>= hGetLineSafe >>= \dt ->
+            openFile fp' ReadWriteMode >>= hGetLine >>= \dt ->
                 atomically $ writeTChan tc (to, tg, dt)
             reader p tc
 

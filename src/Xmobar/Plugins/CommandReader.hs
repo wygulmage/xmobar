@@ -17,7 +17,6 @@ module Xmobar.Plugins.CommandReader(CommandReader(..)) where
 
 import System.IO
 import Xmobar.Run.Exec
-import Xmobar.System.Utils (hGetLineSafe)
 import System.Process(runInteractiveCommand, getProcessExitCode)
 
 data CommandReader = CommandReader String String
@@ -31,7 +30,7 @@ instance Exec CommandReader where
         hClose hstderr
         hSetBinaryMode hstdout False
         hSetBuffering hstdout LineBuffering
-        forever ph (hGetLineSafe hstdout >>= cb)
+        forever ph (hGetLine hstdout >>= cb)
         where forever ph a =
                   do a
                      ec <- getProcessExitCode ph

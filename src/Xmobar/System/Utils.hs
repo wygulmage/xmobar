@@ -17,7 +17,7 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.System.Utils (expandHome, changeLoop, hGetLineSafe)
+module Xmobar.System.Utils (expandHome, changeLoop)
 where
 
 import Control.Monad
@@ -26,18 +26,6 @@ import Control.Concurrent.STM
 import System.Environment
 import System.FilePath
 import System.IO
-
-#if defined XFT || defined UTF8
-import qualified System.IO as S (hGetLine)
-#endif
-
-hGetLineSafe :: Handle -> IO String
-#if defined XFT || defined UTF8
-hGetLineSafe = S.hGetLine
-#else
-hGetLineSafe = hGetLine
-#endif
-
 
 expandHome :: FilePath -> IO FilePath
 expandHome ('~':'/':path) = fmap (</> path) (getEnv "HOME")

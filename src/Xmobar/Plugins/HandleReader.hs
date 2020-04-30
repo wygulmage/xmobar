@@ -19,10 +19,10 @@ where
 
 import           System.IO                      ( Handle
                                                 , hIsEOF
+                                                , hGetLine
                                                 )
 
 import           Xmobar.Run.Exec                ( Exec(..) )
-import           Xmobar.System.Utils            ( hGetLineSafe )
 
 
 -- | A HandleReader displays any text received from a Handle.
@@ -59,7 +59,7 @@ instance Read HandleReader where
 instance Exec HandleReader where
     -- | Read from the 'Handle' until it is closed.
     start (HandleReader handle _) cb =
-        untilM (hIsEOF handle) $ hGetLineSafe handle >>= cb
+        untilM (hIsEOF handle) $ hGetLine handle >>= cb
     -- | Use the 2nd argument to HandleReader as its alias.
     alias (HandleReader _ a) = a
 
