@@ -3,7 +3,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: Utils
--- Copyright: (c) 2010, 2018 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2010, 2018, 2020 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: Jose A Ortega Ruiz <jao@gnu.org>
@@ -25,7 +25,6 @@ import Control.Concurrent.STM
 
 import System.Environment
 import System.FilePath
-import System.IO
 
 expandHome :: FilePath -> IO FilePath
 expandHome ('~':'/':path) = fmap (</> path) (getEnv "HOME")
