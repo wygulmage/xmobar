@@ -10,7 +10,7 @@
 --
 -- The 'Exec' class and the 'Command' data type.
 --
--- The 'Exec' class rappresents the executable types, whose constructors may
+-- The 'Exec' class represents the executable types, whose constructors may
 -- appear in the 'Config.commands' field of the 'Config.Config' data type.
 --
 -- The 'Command' data type is for OS commands to be run by xmobar

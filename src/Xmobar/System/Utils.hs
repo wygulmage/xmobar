@@ -17,7 +17,7 @@
 ------------------------------------------------------------------------------
 
 
-module Xmobar.System.Utils (expandHome, changeLoop)
+module Xmobar.System.Utils (expandHome, changeLoop, onSomeException)
 where
 
 import Control.Monad
@@ -25,6 +25,7 @@ import Control.Concurrent.STM
 
 import System.Environment
 import System.FilePath
+import Control.Exception
 
 expandHome :: FilePath -> IO FilePath
 expandHome ('~':'/':path) = fmap (</> path) (getEnv "HOME")
@@ -39,3 +40,13 @@ changeLoop s f = atomically s >>= go
             new <- s
             guard (new /= old)
             return new)
+
+-- | Like 'finally', but only performs the final action if there was an
+-- exception raised by the computation.
+--
+-- Note that this implementation is a slight modification of
+-- onException function.
+onSomeException :: IO a -> (SomeException -> IO b) -> IO a
+onSomeException io what = io `catch` \e -> do _ <- what e
+                                              throwIO (e :: SomeException)
+
