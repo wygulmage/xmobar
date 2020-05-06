@@ -256,5 +256,5 @@ runVolumeWith opts mixerName controlName = do
 
     -- | Determine whether the volume is off based on the value of 'sw' from
     -- 'runVolumeWith'.
-    isVolOff = not . (Just True ==)
+    isVolOff = (Just True /=)
     unavailable = getConfigValue naString
