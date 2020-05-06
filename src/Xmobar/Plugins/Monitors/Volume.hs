@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Volume
--- Copyright   :  (c) 2011, 2013, 2015, 2018 Thomas Tuegel
+-- Copyright   :  (c) 2011, 2013, 2015, 2018, 2020 Thomas Tuegel
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Jose A. Ortega Ruiz <jao@gnu.org>
@@ -23,7 +23,6 @@ module Xmobar.Plugins.Monitors.Volume
 
 import Control.Applicative ( (<$>), liftA3 )
 import Control.Monad ( liftM2, liftM3, mplus )
-import Data.Maybe (fromMaybe)
 import Data.Traversable (sequenceA)
 import Xmobar.Plugins.Monitors.Common
 import Sound.ALSA.Mixer
@@ -257,6 +256,5 @@ runVolumeWith opts mixerName controlName = do
 
     -- | Determine whether the volume is off based on the value of 'sw' from
     -- 'runVolumeWith'.
-    isVolOff = not . fromMaybe False
-
+    isVolOff = not . (Just True ==)
     unavailable = getConfigValue naString
