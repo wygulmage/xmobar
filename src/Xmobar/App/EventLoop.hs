@@ -40,6 +40,7 @@ import Control.Exception (bracket_, handle, SomeException(..))
 import Data.Bits
 import Data.Map hiding (foldr, map, filter)
 import Data.Maybe (fromJust, isJust)
+import qualified Data.List.NonEmpty as NE
 
 import Xmobar.System.Signal
 import Xmobar.Config.Types
@@ -52,6 +53,7 @@ import Xmobar.X11.Text
 import Xmobar.X11.Draw
 import Xmobar.X11.Bitmap as Bitmap
 import Xmobar.X11.Types
+import Xmobar.System.Utils (safeIndex)
 
 #ifndef THREADED_RUNTIME
 import Xmobar.X11.Events(nextEvent')
@@ -208,7 +210,7 @@ eventLoop tv xc@(XConf d r w fs vos is cfg) as signal = do
             eventLoop tv xc as signal
 
         reposWindow rcfg = do
-          r' <- repositionWin d w (head fs) rcfg
+          r' <- repositionWin d w (NE.head fs) rcfg
           eventLoop tv (XConf d r' w fs vos is rcfg) as signal
 
         updateConfigPosition ocfg =
@@ -262,7 +264,7 @@ updateActions conf (Rectangle _ _ wid _) ~[left,center,right] = do
       strLn :: [(Widget, String, Int, Maybe [Action])] -> IO [(Maybe [Action], Position, Position)]
       strLn  = liftIO . mapM getCoords
       iconW i = maybe 0 Bitmap.width (lookup i $ iconS conf)
-      getCoords (Text s,_,i,a) = textWidth d (fs!!i) s >>= \tw -> return (a, 0, fi tw)
+      getCoords (Text s,_,i,a) = textWidth d (safeIndex fs i) s >>= \tw -> return (a, 0, fi tw)
       getCoords (Icon s,_,_,a) = return (a, 0, fi $ iconW s)
       partCoord off xs = map (\(a, x, x') -> (fromJust a, x, x')) $
                          filter (\(a, _,_) -> isJust a) $

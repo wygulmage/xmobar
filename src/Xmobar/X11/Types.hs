@@ -20,6 +20,7 @@ module Xmobar.X11.Types (X, XConf (..)) where
 import Graphics.X11.Xlib
 import Control.Monad.Reader
 import Data.Map
+import qualified Data.List.NonEmpty as NE
 
 import Xmobar.X11.Bitmap
 import Xmobar.X11.Text
@@ -33,7 +34,7 @@ data XConf =
     XConf { display   :: Display
           , rect      :: Rectangle
           , window    :: Window
-          , fontListS :: [XFont]
+          , fontListS :: NE.NonEmpty XFont
           , verticalOffsets :: [Int]
           , iconS     :: Map FilePath Bitmap
           , config    :: Config

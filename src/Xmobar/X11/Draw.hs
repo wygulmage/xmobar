@@ -25,6 +25,7 @@ import Control.Monad.Reader
 import Control.Monad (when)
 import Control.Arrow ((&&&))
 import Data.Map hiding (foldr, map, filter)
+import qualified Data.List.NonEmpty as NE
 
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
 import Graphics.X11.Xlib.Extras
@@ -37,6 +38,7 @@ import Xmobar.X11.Text
 import Xmobar.X11.ColorCache
 import Xmobar.X11.Window (drawBorder)
 import Xmobar.X11.Parsers (Widget(..))
+import Xmobar.System.Utils (safeIndex)
 
 #ifdef XFT
 import Xmobar.X11.MinXft
@@ -55,7 +57,7 @@ drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
       strLn = liftIO . mapM getWidth
       iconW i = maybe 0 B.width (lookup i $ iconS r)
       getWidth (Text s,cl,i,_) =
-        textWidth d (fs!!i) s >>= \tw -> return (Text s,cl,i,fi tw)
+        textWidth d (safeIndex fs i) s >>= \tw -> return (Text s,cl,i,fi tw)
       getWidth (Icon s,cl,i,_) = return (Icon s,cl,i,fi $ iconW s)
 
   p <- liftIO $ createPixmap d w wid ht
@@ -126,7 +128,7 @@ printString dpy drw fs@(Xft fonts) _ fc bc x y s al =
 #endif
 
 -- | An easy way to print the stuff we need to print
-printStrings :: Drawable -> GC -> [XFont] -> [Int] -> Position
+printStrings :: Drawable -> GC -> NE.NonEmpty XFont -> [Int] -> Position
              -> Align -> [(Widget, String, Int, Position)] -> X ()
 printStrings _ _ _ _ _ _ [] = return ()
 printStrings dr gc fontlist voffs offs a sl@((s,c,i,l):xs) = do
@@ -136,7 +138,7 @@ printStrings dr gc fontlist voffs offs a sl@((s,c,i,l):xs) = do
       Rectangle _ _ wid ht = rect r
       totSLen = foldr (\(_,_,_,len) -> (+) len) 0 sl
       remWidth = fi wid - fi totSLen
-      fontst = fontlist !! i
+      fontst = safeIndex fontlist i
       offset = case a of
                  C -> (remWidth + offs) `div` 2
                  R -> remWidth
@@ -144,7 +146,7 @@ printStrings dr gc fontlist voffs offs a sl@((s,c,i,l):xs) = do
       (fc,bc) = case break (==',') c of
                  (f,',':b) -> (f, b           )
                  (f,    _) -> (f, bgColor conf)
-  valign <- verticalOffset ht s (head fontlist) (voffs !! i) conf
+  valign <- verticalOffset ht s (NE.head fontlist) (voffs !! i) conf
   case s of
     (Text t) -> liftIO $ printString d dr fontst gc fc bc offset valign t alph
     (Icon p) -> liftIO $ maybe (return ())
