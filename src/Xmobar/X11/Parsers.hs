@@ -20,6 +20,7 @@ import Xmobar.Config.Types
 import Xmobar.X11.Actions
 
 import Control.Monad (guard, mzero)
+import Data.Maybe (fromMaybe)
 import Text.ParserCombinators.Parsec
 import Text.Read (readMaybe)
 import Graphics.X11.Types (Button)
@@ -139,7 +140,7 @@ fontParser :: ColorString -> Maybe [Action]
               -> Parser [(Widget, ColorString, FontIndex, Maybe [Action])]
 fontParser c a = do
   f <- between (string "<fn=") (string ">") colors
-  s <- manyTill (allParsers c (maybe 0 id $ readMaybe f) a) (try $ string "</fn>")
+  s <- manyTill (allParsers c (fromMaybe 0 $ readMaybe f) a) (try $ string "</fn>")
   return (concat s)
 
 -- | Parses a color specification (hex or named)

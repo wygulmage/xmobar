@@ -67,6 +67,6 @@ onSomeException io what = io `catch` \e -> do _ <- what e
 {-# INLINE (!!?) #-}
 
 safeIndex :: NE.NonEmpty a -> Int -> a
-safeIndex xs index = case (NE.toList xs) !!? index of
+safeIndex xs index = case NE.toList xs !!? index of
                        Nothing -> NE.head xs
                        Just value -> value
