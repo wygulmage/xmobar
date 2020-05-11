@@ -27,6 +27,7 @@ module Xmobar.System.Utils
 import Control.Monad
 import Control.Concurrent.STM
 import qualified Data.List.NonEmpty as NE
+import Data.Maybe (fromMaybe)
 
 import System.Environment
 import System.FilePath
@@ -67,6 +68,4 @@ onSomeException io what = io `catch` \e -> do _ <- what e
 {-# INLINE (!!?) #-}
 
 safeIndex :: NE.NonEmpty a -> Int -> a
-safeIndex xs index = case NE.toList xs !!? index of
-                       Nothing -> NE.head xs
-                       Just value -> value
+safeIndex xs index = fromMaybe (NE.head xs) (NE.toList xs !!? index)
