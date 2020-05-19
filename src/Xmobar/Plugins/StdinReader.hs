@@ -22,21 +22,31 @@ import Prelude
 import System.Posix.Process
 import System.Exit
 import System.IO
-import Control.Exception (SomeException(..), handle)
 import Xmobar.Run.Exec
 import Xmobar.X11.Actions (stripActions)
+import Xmobar.System.Utils (onSomeException)
 
 data StdinReader = StdinReader | UnsafeStdinReader
   deriving (Read, Show)
 
 instance Exec StdinReader where
   start stdinReader cb = do
-    s <- handle (\(SomeException e) -> do hPrint stderr e; return "") getLine
-    cb $ escape stdinReader s
+    -- The EOF check is necessary for certain systems
+    -- More details here https://github.com/jaor/xmobar/issues/442
     eof <- isEOF
     if eof
-      then exitImmediately ExitSuccess
-      else start stdinReader cb
+       then do
+         hPrint stderr $ "xmobar: eof at an early stage"
+         exitImmediately ExitSuccess                
+       else return ()
+    s <-
+      getLine `onSomeException`
+      (\e -> do
+         let errorMessage = "xmobar: Received exception " <> show e
+         hPrint stderr errorMessage
+         cb errorMessage)
+    cb $ escape stdinReader s
+    start stdinReader cb
 
 escape :: StdinReader -> String -> String
 escape StdinReader = stripActions
