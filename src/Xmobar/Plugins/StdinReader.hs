@@ -25,6 +25,7 @@ import System.IO
 import Xmobar.Run.Exec
 import Xmobar.X11.Actions (stripActions)
 import Xmobar.System.Utils (onSomeException)
+import Control.Monad (when)
 
 data StdinReader = StdinReader | UnsafeStdinReader
   deriving (Read, Show)
@@ -34,11 +35,9 @@ instance Exec StdinReader where
     -- The EOF check is necessary for certain systems
     -- More details here https://github.com/jaor/xmobar/issues/442
     eof <- isEOF
-    if eof
-       then do
-         hPrint stderr $ "xmobar: eof at an early stage"
-         exitImmediately ExitSuccess                
-       else return ()
+    when eof $
+      do hPrint stderr "xmobar: eof at an early stage"
+         exitImmediately ExitSuccess
     s <-
       getLine `onSomeException`
       (\e -> do
