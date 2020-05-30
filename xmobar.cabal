@@ -263,7 +263,7 @@ library
     if flag(with_weather) || flag(all_extensions)
        other-modules: Xmobar.Plugins.Monitors.Weather
        cpp-options: -DWEATHER
-       build-depends: http-conduit, http-types
+       build-depends: http-conduit, http-types, http-client-tls
 
     if flag(with_uvmeter)
        other-modules: Xmobar.Plugins.Monitors.UVMeter

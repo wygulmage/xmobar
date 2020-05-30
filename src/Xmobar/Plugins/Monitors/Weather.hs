@@ -21,10 +21,10 @@ import qualified Control.Exception as CE
 
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.Char (toLower)
-import Data.Maybe (fromMaybe)
 import Network.HTTP.Conduit
 import Network.HTTP.Types.Status
 import Network.HTTP.Types.Method
+import Network.HTTP.Client.TLS (getGlobalManager)
 
 import Text.ParserCombinators.Parsec
 import System.Console.GetOpt (ArgDescr(ReqArg), OptDescr(Option))
@@ -33,21 +33,18 @@ import System.Console.GetOpt (ArgDescr(ReqArg), OptDescr(Option))
 -- | Options the user may specify.
 data WeatherOpts = WeatherOpts
   { weatherString :: String
-  , useManager    :: Bool
   }
 
 -- | Default values for options.
 defaultOpts :: WeatherOpts
 defaultOpts = WeatherOpts
   { weatherString = ""
-  , useManager    = True
   }
 
 -- | Apply options.
 options :: [OptDescr (WeatherOpts -> WeatherOpts)]
 options =
   [ Option "w" ["weathers"  ] (ReqArg (\s o -> o { weatherString = s   }) "") ""
-  , Option "m" ["useManager"] (ReqArg (\b o -> o { useManager = read b }) "") ""
   ]
 
 weatherConfig :: IO MConfig
@@ -213,12 +210,10 @@ stationUrl :: String -> String
 stationUrl station = defUrl ++ station ++ ".TXT"
 
 -- | Get the decoded weather data from the given station.
-getData :: Maybe Manager -> String -> IO String
-getData weMan station = CE.catch
-    (do man <- flip fromMaybe weMan <$> mkManager
-        -- Create a new manager if none was present or the user does not want to
-        -- use one.
-        request <- parseUrlThrow $ stationUrl station
+getData :: String -> IO String
+getData station = CE.catch
+    (do request <- parseUrlThrow $ stationUrl station
+        man <- getGlobalManager
         res <- httpLbs request man
         return $ B.unpack $ responseBody res)
     errHandler
@@ -261,11 +256,10 @@ startWeather'
     -> IO ()
 startWeather' sks station args rate cb = do
     opts  <- parseOptsWith options defaultOpts (getArgvs args)
-    weRef <- tryMakeManager opts
     runMD
         (station : args)
         weatherConfig
-        (runWeather sks weRef opts)
+        (runWeather sks opts)
         rate
         weatherReady
         cb
@@ -278,12 +272,11 @@ startWeather = startWeather' []
 -- | Run a weather monitor.
 runWeather
     :: [(String, String)]  -- ^ 'SkyConditionS' replacement strings
-    -> Maybe Manager       -- ^ Whether to use a 'Manager'
     -> WeatherOpts         -- ^ Weather specific options
     -> [String]            -- ^ User supplied arguments
     -> Monitor String
-runWeather sks weMan opts args = do
-    d <- io $ getData weMan (head args)
+runWeather sks opts args = do
+    d <- io $ getData (head args)
     i <- io $ runP parseData d
     formatWeather opts sks i
 
@@ -293,7 +286,7 @@ weatherReady str = io $ do
     let request = initRequest { method = methodHead }
 
     CE.catch
-        (do man <- mkManager
+        (do man <- getGlobalManager
             res  <- httpLbs request man
             return $ checkResult $ responseStatus res)
         errHandler
@@ -308,15 +301,3 @@ weatherReady str = io $ do
         | statusIsServerError status = False
         | statusIsClientError status = False
         | otherwise = True
-
--- | Possibly create a new 'Manager', based upon the users preference.  If one
--- is created, this 'Manager' will be used throughout the monitor.
-tryMakeManager :: WeatherOpts -> IO (Maybe Manager)
-tryMakeManager opts =
-    if useManager opts
-        then Just <$> mkManager
-        else pure Nothing
-
--- | Create a new 'Manager' for managing network connections.
-mkManager :: IO Manager
-mkManager = newManager $ tlsManagerSettings { managerConnCount = 1 }
