@@ -21,14 +21,11 @@ import qualified Control.Exception as CE
 import Network.HTTP.Conduit
     ( Manager
     , httpLbs
-    , managerConnCount
-    , newManager
     , parseRequest
     , responseBody
-    , tlsManagerSettings
     )
+import Network.HTTP.Client.TLS (getGlobalManager)
 import Data.ByteString.Lazy.Char8 as B
-import Data.Maybe (fromMaybe)
 import System.Console.GetOpt (ArgDescr(ReqArg), OptDescr(Option))
 import Text.Read (readMaybe)
 import Text.Parsec
@@ -66,12 +63,9 @@ uvURL :: String
 uvURL = "https://uvdata.arpansa.gov.au/xml/uvvalues.xml"
 
 -- | Get the UV data from the given url.
-getData :: Maybe Manager -> IO String
-getData uvMan = CE.catch
-    (do man <- flip fromMaybe uvMan <$> mkManager
-        -- Create a new manager if none was present or the user does not want to
-        -- use one, otherwise use the provided manager.
-        request <- parseRequest uvURL
+getData ::Manager -> IO String
+getData man = CE.catch
+    (do request <- parseRequest uvURL
         res <- httpLbs request man
         return $ B.unpack $ responseBody res)
     errHandler
@@ -105,15 +99,13 @@ startUVMeter
     -> Int       -- ^ Update rate
     -> (String -> IO ())
     -> IO ()
-startUVMeter station args rate cb = do
-    opts  <- parseOptsWith options defaultOpts (getArgvs args)
-    uvMan <- tryMakeManager opts
-    runM (station : args) uvConfig (runUVMeter uvMan) rate cb
+startUVMeter station args = runM (station : args) uvConfig runUVMeter
 
-runUVMeter :: Maybe Manager -> [String] -> Monitor String
-runUVMeter _ [] = return "N.A."
-runUVMeter uvMan (s:_) = do
-    resp <- io $ getData uvMan
+runUVMeter :: [String] -> Monitor String
+runUVMeter [] = return "N.A."
+runUVMeter (s:_) = do
+    man <- io getGlobalManager
+    resp <- io $ getData man
     case textToXMLDocument resp of
         Right doc -> formatUVRating (getUVRating s doc)
         Left _ -> getConfigValue naString
@@ -195,15 +187,3 @@ attribute = do
     char '"'
     spaces
     return (Attribute (name, value))
-
--- | Possibly create a new 'Manager', based upon the users preference.  If one
--- is created, this 'Manager' will be used throughout the monitor.
-tryMakeManager :: UVMeterOpts -> IO (Maybe Manager)
-tryMakeManager opts =
-    if useManager opts
-        then Just <$> mkManager
-        else pure Nothing
-
--- | Create a new 'Manager' for managing network connections.
-mkManager :: IO Manager
-mkManager = newManager $ tlsManagerSettings {managerConnCount = 1}
