@@ -43,10 +43,15 @@ cpuConfig = mkMConfig
 type CpuDataRef = IORef [Int]
 
 cpuData :: IO [Int]
-cpuData = cpuParser `fmap` B.readFile "/proc/stat"
+cpuData = cpuParser <$> B.readFile "/proc/stat"
+
+readInt :: B.ByteString -> Int
+readInt bs = case B.readInt bs of
+               Nothing -> 0
+               Just (i, _) -> i
 
 cpuParser :: B.ByteString -> [Int]
-cpuParser = map (read . B.unpack) . tail . B.words . head . B.lines
+cpuParser = map readInt . tail . B.words . head . B.lines
 
 parseCpu :: CpuDataRef -> IO [Float]
 parseCpu cref =
