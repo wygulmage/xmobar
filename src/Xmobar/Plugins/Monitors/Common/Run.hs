@@ -22,6 +22,7 @@ module Xmobar.Plugins.Monitors.Common.Run ( runM
                                           , runML
                                           , runMLD
                                           , getArgvs
+                                          , doArgs
                                           ) where
 
 import Control.Exception (SomeException,handle)
@@ -35,8 +36,8 @@ import Xmobar.Run.Exec (doEveryTenthSeconds)
 options :: [OptDescr Opts]
 options =
     [
-      Option "H" ["High"] (ReqArg High "number") "The high threshold"
-    , Option "L" ["Low"] (ReqArg Low "number") "The low threshold"
+      Option ['H'] ["High"] (ReqArg High "number") "The high threshold"
+    , Option ['L'] ["Low"] (ReqArg Low "number") "The low threshold"
     , Option "h" ["high"] (ReqArg HighColor "color number") "Color for the high threshold: ex \"#FF0000\""
     , Option "n" ["normal"] (ReqArg NormalColor "color number") "Color for the normal threshold: ex \"#00FF00\""
     , Option "l" ["low"] (ReqArg LowColor "color number") "Color for the low threshold: ex \"#0000FF\""

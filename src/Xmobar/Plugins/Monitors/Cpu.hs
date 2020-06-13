@@ -13,7 +13,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.Monitors.Cpu (startCpu) where
+module Xmobar.Plugins.Monitors.Cpu (startCpu, runCpu, cpuConfig, CpuDataRef, parseCpu) where
 
 import Xmobar.Plugins.Monitors.Common
 import qualified Data.ByteString.Lazy.Char8 as B
