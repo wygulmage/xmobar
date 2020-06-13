@@ -1135,6 +1135,14 @@ more than one battery.
     limit for percentage calculation.
   - `--maxtemp`: temperature in degree Celsius, that sets the upper
     limit for percentage calculation.
+  - `--hwmonitor-path`: this monitor tries to find coretemp devices by
+    looking for them in directories following the pattern
+    `/sys/bus/platform/devices/coretemp.*/hwmon/hwmon*`, but some
+    processors (notably Ryzen) might expose those files in a different
+    tree (e.g., my Ryzen Thinkpad puts them in
+    `/sys/class/hwmon/hwmon3`).  With this option, it is possible to
+    explicitly specify the full path to the directory where the
+    `tempN_label` and `tempN_input` files are located.
 - Thresholds refer to temperature in degree Celsius
 - Variables that can be used with the `-t`/`--template` argument:
             `max`, `maxpc`, `maxbar`, `maxvbar`, `maxipat`,

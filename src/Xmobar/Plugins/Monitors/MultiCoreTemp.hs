@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.MultiCoreTemp
--- Copyright   :  (c) 2019 Felix Springer
+-- Copyright   :  (c) 2019, 2020 Felix Springer
 -- License     :  BSD-style (see LICENSE)
 --
 -- Maintainer  :  Felix Springer <felixspringer149@gmail.com>
@@ -26,6 +26,7 @@ data CTOpts = CTOpts { maxIconPattern :: Maybe IconPattern
                      , avgIconPattern :: Maybe IconPattern
                      , mintemp :: Float
                      , maxtemp :: Float
+                     , hwMonitorPath :: Maybe String
                      }
 
 -- | Set default Options.
@@ -34,6 +35,7 @@ defaultOpts = CTOpts { maxIconPattern = Nothing
                      , avgIconPattern = Nothing
                      , mintemp = 0
                      , maxtemp = 100
+                     , hwMonitorPath = Nothing
                      }
 
 -- | Apply configured Options.
@@ -58,6 +60,11 @@ options = [ Option [] ["max-icon-pattern"]
                 (\ arg opts -> opts { maxtemp = read arg })
                 "")
               ""
+          , Option [] ["hwmon-path"]
+              (ReqArg
+                (\ arg opts -> opts { hwMonitorPath = Just arg })
+                "")
+              ""
           ]
 
 -- | Generate Config with a default template and options.
@@ -68,41 +75,47 @@ cTConfig = mkMConfig cTTemplate cTOptions
                     , "avg" , "avgpc" , "avgbar" , "avgvbar" , "avgipat"
                     ] ++ map (("core" ++) . show) [0 :: Int ..]
 
--- | Returns the first coretemp.N path found.
+
+-- | Returns the first coretemp.N path found, or /sys/class.
 coretempPath :: IO String
 coretempPath = do xs <- filterM doesDirectoryExist ps
-                  let x = head xs
-                  return x
-  where ps = [ "/sys/bus/platform/devices/coretemp." ++ show (x :: Int) ++ "/" | x <- [0..9] ]
+                  return (if null xs then "/sys/class/" else head xs)
+  where ps = [ "/sys/bus/platform/devices/coretemp." ++ show (x :: Int) ++ "/"
+             | x <- [0..9] ]
 
--- | Returns the first hwmonN path found.
-hwmonPath :: IO String
-hwmonPath = do p <- coretempPath
-               xs <- filterM doesDirectoryExist [ p ++ "hwmon/hwmon" ++ show (x :: Int) ++ "/" | x <- [0..9] ]
-               let x = head xs
-               return x
+-- | Returns the first hwmonN in coretemp path found or the ones in sys/class.
+hwmonPaths :: IO [String]
+hwmonPaths = do p <- coretempPath
+                let cps  = [ p ++ "hwmon/hwmon" ++ show (x :: Int) ++ "/"
+                           | x <- [0..9] ]
+                xs <- filterM doesDirectoryExist cps
+                return xs
 
 -- | Checks Labels, if they refer to a core and returns Strings of core-
 -- temperatures.
-corePaths :: IO [String]
-corePaths = do p <- hwmonPath
-               ls <- filterM doesFileExist [ p ++ "temp" ++ show (x :: Int) ++ "_label" | x <- [0..9] ]
-               cls <- filterM isLabelFromCore ls
-               return $ map labelToCore cls
+corePaths :: Maybe String -> IO [String]
+corePaths s = do ps <- case s of
+                        Just pth -> return [pth]
+                        _ -> hwmonPaths
+                 let cps = [p ++ "temp" ++ show (x :: Int) ++ "_label"
+                           | x <- [0..9], p <- ps ]
+                 ls <- filterM doesFileExist cps
+                 cls <- filterM isLabelFromCore ls
+                 return $ map labelToCore cls
 
 -- | Checks if Label refers to a core.
 isLabelFromCore :: FilePath -> IO Bool
 isLabelFromCore p = do a <- readFile p
-                       return $ take 4 a == "Core"
+                       return $ take 4 a `elem` ["Core", "Tdie", "Tctl"]
 
 -- | Transform a path to Label to a path to core-temperature.
 labelToCore :: FilePath -> FilePath
 labelToCore = (++ "input") . reverse . drop 5 . reverse
 
 -- | Reads core-temperatures as data from the system.
-cTData :: IO [Float]
-cTData = do fps <- corePaths
-            traverse readSingleFile fps
+cTData :: Maybe String -> IO [Float]
+cTData p = do fps <- corePaths p
+              traverse readSingleFile fps
   where readSingleFile :: FilePath -> IO Float
         readSingleFile s = do a <- readFile s
                               return $ parseContent a
@@ -110,10 +123,10 @@ cTData = do fps <- corePaths
                 parseContent = read . head . lines
 
 -- | Transforms data of temperatures into temperatures of degree Celsius.
-parseCT :: IO [Float]
-parseCT = do rawCTs <- cTData
-             let normalizedCTs = map (/ 1000) rawCTs :: [Float]
-             return normalizedCTs
+parseCT :: CTOpts -> IO [Float]
+parseCT opts = do rawCTs <- cTData (hwMonitorPath opts)
+                  let normalizedCTs = map (/ 1000) rawCTs :: [Float]
+                  return normalizedCTs
 
 -- | Performs calculation for maximum and average.
 -- Sets up Bars and Values to be printed.
@@ -150,8 +163,8 @@ formatCT opts cTs = do let CTOpts { mintemp = minT
 
 
 runCT :: [String] -> Monitor String
-runCT argv = do cTs <- io parseCT
-                opts <- io $ parseOptsWith options defaultOpts argv
+runCT argv = do opts <- io $ parseOptsWith options defaultOpts argv
+                cTs <- io $ parseCT opts
                 l <- formatCT opts cTs
                 parseTemplate l
 
