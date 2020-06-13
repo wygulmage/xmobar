@@ -88,8 +88,7 @@ hwmonPaths :: IO [String]
 hwmonPaths = do p <- coretempPath
                 let cps  = [ p ++ "hwmon/hwmon" ++ show (x :: Int) ++ "/"
                            | x <- [0..9] ]
-                xs <- filterM doesDirectoryExist cps
-                return xs
+                filterM doesDirectoryExist cps
 
 -- | Checks Labels, if they refer to a core and returns Strings of core-
 -- temperatures.

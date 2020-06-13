@@ -1139,10 +1139,11 @@ more than one battery.
     looking for them in directories following the pattern
     `/sys/bus/platform/devices/coretemp.*/hwmon/hwmon*`, but some
     processors (notably Ryzen) might expose those files in a different
-    tree (e.g., my Ryzen Thinkpad puts them in
-    `/sys/class/hwmon/hwmon3`).  With this option, it is possible to
-    explicitly specify the full path to the directory where the
-    `tempN_label` and `tempN_input` files are located.
+    tree (e.g., Ryzen) puts them somewhere in
+    "/sys/class/hwmon/hwmon*", and the lookup is most costly.  With
+    this option, it is possible to explicitly specify the full path to
+    the directory where the `tempN_label` and `tempN_input` files are
+    located.
 - Thresholds refer to temperature in degree Celsius
 - Variables that can be used with the `-t`/`--template` argument:
             `max`, `maxpc`, `maxbar`, `maxvbar`, `maxipat`,
