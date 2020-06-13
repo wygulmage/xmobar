@@ -76,19 +76,23 @@ cTConfig = mkMConfig cTTemplate cTOptions
                     ] ++ map (("core" ++) . show) [0 :: Int ..]
 
 
--- | Returns the first coretemp.N path found, or /sys/class.
-coretempPath :: IO String
+-- | Returns the first coretemp.N path found.
+coretempPath :: IO (Maybe String)
 coretempPath = do xs <- filterM doesDirectoryExist ps
-                  return (if null xs then "/sys/class/" else head xs)
+                  return (if null xs then Nothing else Just $ head xs)
   where ps = [ "/sys/bus/platform/devices/coretemp." ++ show (x :: Int) ++ "/"
              | x <- [0..9] ]
 
 -- | Returns the first hwmonN in coretemp path found or the ones in sys/class.
 hwmonPaths :: IO [String]
 hwmonPaths = do p <- coretempPath
-                let cps  = [ p ++ "hwmon/hwmon" ++ show (x :: Int) ++ "/"
+                let (sc, path) = case p of
+                                   Just s -> (False, s)
+                                   Nothing -> (True, "/sys/class/")
+                let cps  = [ path ++ "hwmon/hwmon" ++ show (x :: Int) ++ "/"
                            | x <- [0..9] ]
-                filterM doesDirectoryExist cps
+                ecps <- filterM doesDirectoryExist cps
+                return $ if sc || null ecps then ecps else [head ecps]
 
 -- | Checks Labels, if they refer to a core and returns Strings of core-
 -- temperatures.
