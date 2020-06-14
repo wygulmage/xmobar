@@ -73,11 +73,11 @@ data MConfig =
 
 data PureConfig =
   PureConfig
-    { pNormalColor :: (Maybe String)
+    { pNormalColor :: Maybe String
     , pLow :: Int
-    , pLowColor :: (Maybe String)
+    , pLowColor :: Maybe String
     , pHigh :: Int
-    , pHighColor :: (Maybe String)
+    , pHighColor :: Maybe String
     , pTemplate :: String
     , pExport :: [String]
     , pPpad :: Int

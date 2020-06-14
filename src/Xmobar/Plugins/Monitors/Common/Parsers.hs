@@ -54,7 +54,7 @@ runExportParser (x:xs) = do
 pureParseTemplate :: PureConfig -> TemplateInput -> IO String
 pureParseTemplate PureConfig{..} TemplateInput{..} =
     do let m = let expSnds :: [([(String, String, String)], String)]  = zip (map snd temAllTemplate) temMonitorValues
-               in Map.fromList $ zip (map fst temAllTemplate) $ expSnds
+               in Map.fromList $ zip (map fst temAllTemplate) expSnds
        s <- minCombine m temInputTemplate
        let (n, s') = if pMaxTotalWidth > 0 && length s > pMaxTotalWidth
                      then trimTo (pMaxTotalWidth - length pMaxTotalWidthEllipsis) "" s

@@ -134,7 +134,7 @@ parseCpu cref =
            tot = fromIntegral $ sum dif
            safeDiv n = case tot of
                          0 -> 0
-                         v -> (fromIntegral n) / v
+                         v -> fromIntegral n / v
            percent = map safeDiv dif
        return $ convertToCpuData percent
 
@@ -181,9 +181,9 @@ computeFields [] _ = []
 computeFields (x:xs) inputFields =
   if x `elem` inputFields
     then (Field {fieldName = x, fieldCompute = Compute}) :
-         (computeFields xs inputFields)
+         computeFields xs inputFields
     else (Field {fieldName = x, fieldCompute = Skip}) :
-         (computeFields xs inputFields)
+         computeFields xs inputFields
 
 formatCpu :: CpuArguments -> CpuData -> IO [String]
 formatCpu CpuArguments{..} cpuInfo = do
