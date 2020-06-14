@@ -114,16 +114,16 @@ data CpuData = CpuData {
     }
 
 convertToCpuData :: [Float] -> CpuData
-convertToCpuData (u:n:s:ie:iw:_) = CpuData {
-                                   cpuUser = u,
-                                   cpuNice = n,
-                                   cpuSystem = s,
-                                   cpuIdle = ie,
-                                   cpuIowait = iw,
-                                   cpuTotal = sum [u,n,s]
-                                 }
+convertToCpuData (u:n:s:ie:iw:_) =
+  CpuData
+    { cpuUser = u
+    , cpuNice = n
+    , cpuSystem = s
+    , cpuIdle = ie
+    , cpuIowait = iw
+    , cpuTotal = sum [u, n, s]
+    }
 convertToCpuData args = error $ "convertToCpuData: Unexpected list" <> show args
-
 
 parseCpu :: CpuDataRef -> IO CpuData
 parseCpu cref =
@@ -146,19 +146,23 @@ data Field = Field {
 data ShouldCompute = Compute | Skip deriving (Eq, Ord, Show)
 
 formatField :: PureConfig -> CpuOpts -> CpuData -> Field -> IO String
-formatField  cpuParams cpuOpts cpuInfo@CpuData{..} Field{..}
-    | fieldName == barField = if fieldCompute == Compute
-                              then pShowPercentBar cpuParams (100 * cpuTotal) cpuTotal
-                              else pure []
-    | fieldName == vbarField = if fieldCompute == Compute
-                               then pShowVerticalBar cpuParams (100 * cpuTotal) cpuTotal
-                               else pure []
-    | fieldName == ipatField = if fieldCompute == Compute
-                               then pShowIconPattern (loadIconPattern cpuOpts) cpuTotal
-                               else pure []
-    | otherwise = if fieldCompute == Compute
-                  then pShowPercentWithColors cpuParams (getFieldValue fieldName cpuInfo)
-                  else pure []
+formatField cpuParams cpuOpts cpuInfo@CpuData {..} Field {..}
+  | fieldName == barField =
+    if fieldCompute == Compute
+      then pShowPercentBar cpuParams (100 * cpuTotal) cpuTotal
+      else pure []
+  | fieldName == vbarField =
+    if fieldCompute == Compute
+      then pShowVerticalBar cpuParams (100 * cpuTotal) cpuTotal
+      else pure []
+  | fieldName == ipatField =
+    if fieldCompute == Compute
+      then pShowIconPattern (loadIconPattern cpuOpts) cpuTotal
+      else pure []
+  | otherwise =
+    if fieldCompute == Compute
+      then pShowPercentWithColors cpuParams (getFieldValue fieldName cpuInfo)
+      else pure []
 
 getFieldValue :: String -> CpuData -> Float
 getFieldValue field CpuData{..}
@@ -178,7 +182,8 @@ computeFields (x:xs) inputFields =
   if x `elem` inputFields
     then (Field {fieldName = x, fieldCompute = Compute}) :
          (computeFields xs inputFields)
-    else (Field {fieldName = x, fieldCompute = Skip}) : (computeFields xs inputFields)
+    else (Field {fieldName = x, fieldCompute = Skip}) :
+         (computeFields xs inputFields)
 
 formatCpu :: CpuArguments -> CpuData -> IO [String]
 formatCpu CpuArguments{..} cpuInfo = do
@@ -189,20 +194,23 @@ getInputFields :: CpuArguments -> [String]
 getInputFields CpuArguments{..} = map (\(_,f,_) -> f) cpuInputTemplate
 
 optimizeAllTemplate :: CpuArguments -> CpuArguments
-optimizeAllTemplate args@CpuArguments{..} =
+optimizeAllTemplate args@CpuArguments {..} =
   let inputFields = getInputFields args
-      allTemplates = filter (\(field, _) -> field `elem` inputFields) cpuAllTemplate
-  in args { cpuAllTemplate = allTemplates }
+      allTemplates =
+        filter (\(field, _) -> field `elem` inputFields) cpuAllTemplate
+   in args {cpuAllTemplate = allTemplates}
 
-data CpuArguments = CpuArguments {
-      cpuDataRef :: !CpuDataRef,
-      cpuParams :: !PureConfig,
-      cpuArgs :: ![String],
-      cpuOpts :: !CpuOpts,
-      cpuInputTemplate :: ![(String, String, String)], -- [("Cpu: ","total","% "),("","user","%")]
-      cpuAllTemplate :: ![(String, [(String, String, String)])], -- [("bar",[]),("vbar",[]),("ipat",[]),("total",[]),...]
-      cpuFields :: ![Field]
+data CpuArguments =
+  CpuArguments
+    { cpuDataRef :: !CpuDataRef
+    , cpuParams :: !PureConfig
+    , cpuArgs :: ![String]
+    , cpuOpts :: !CpuOpts
+    , cpuInputTemplate :: ![(String, String, String)] -- [("Cpu: ","total","% "),("","user","%")]
+    , cpuAllTemplate :: ![(String, [(String, String, String)])] -- [("bar",[]),("vbar",[]),("ipat",[]),("total",[]),...]
+    , cpuFields :: ![Field]
     }
+
 
 getArguments :: [String] -> IO CpuArguments
 getArguments cpuArgs = do
@@ -212,20 +220,31 @@ getArguments cpuArgs = do
   cpuParams <- computePureConfig cpuArgs cpuConfig
   cpuInputTemplate <- runTemplateParser cpuParams
   cpuAllTemplate <- runExportParser (pExport cpuParams)
-  nonOptions <- case getOpt Permute pluginOptions cpuArgs of
-                  (_, n, []) -> pure n
-                  (_,_,errs) -> error $ "getArguments: " <> show errs
-  cpuOpts <- case getOpt Permute options nonOptions of
-                  (o, _, []) -> pure $ foldr id defaultOpts o
-                  (_,_,errs) -> error $ "getArguments options: " <> show errs
-  let cpuFields = computeFields (map fst cpuAllTemplate) (map (\(_,f,_) -> f) cpuInputTemplate)
-  pure $ optimizeAllTemplate CpuArguments{..}
+  nonOptions <-
+    case getOpt Permute pluginOptions cpuArgs of
+      (_, n, []) -> pure n
+      (_, _, errs) -> error $ "getArguments: " <> show errs
+  cpuOpts <-
+    case getOpt Permute options nonOptions of
+      (o, _, []) -> pure $ foldr id defaultOpts o
+      (_, _, errs) -> error $ "getArguments options: " <> show errs
+  let cpuFields =
+        computeFields
+          (map fst cpuAllTemplate)
+          (map (\(_, f, _) -> f) cpuInputTemplate)
+  pure $ optimizeAllTemplate CpuArguments {..}
+
 
 runCpu :: CpuArguments -> IO String
-runCpu args@CpuArguments{..} = do
+runCpu args@CpuArguments {..} = do
   cpuValue <- parseCpu cpuDataRef
   temMonitorValues <- formatCpu args cpuValue
-  let templateInput = TemplateInput { temInputTemplate = cpuInputTemplate, temAllTemplate = cpuAllTemplate, ..}
+  let templateInput =
+        TemplateInput
+          { temInputTemplate = cpuInputTemplate
+          , temAllTemplate = cpuAllTemplate
+          , ..
+          }
   pureParseTemplate cpuParams templateInput
 
 startCpu :: [String] -> Int -> (String -> IO ()) -> IO ()
