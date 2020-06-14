@@ -23,6 +23,8 @@ module Xmobar.Plugins.Monitors.Common.Run ( runM
                                           , runMLD
                                           , getArgvs
                                           , doArgs
+                                          , computePureConfig
+                                          , commonOptions
                                           ) where
 
 import Control.Exception (SomeException,handle)
@@ -32,6 +34,8 @@ import System.Console.GetOpt
 
 import Xmobar.Plugins.Monitors.Common.Types
 import Xmobar.Run.Exec (doEveryTenthSeconds)
+
+commonOptions = options
 
 options :: [OptDescr Opts]
 options =
@@ -65,6 +69,8 @@ getArgvs args =
     case getOpt Permute options args of
         (_, n, []  ) -> n
         (_, _, errs) -> errs
+
+
 
 doArgs :: [String]
        -> ([String] -> Monitor String)
@@ -140,3 +146,18 @@ runMLD args conf action looper detect cb = handle (cb . showException) loop
 
 showException :: SomeException -> String
 showException = ("error: "++) . show . flip asTypeOf undefined
+
+computePureConfig :: [String] -> IO MConfig -> IO PureConfig
+computePureConfig args mconfig = do
+  newConfig <- getMConfig args mconfig
+  getPureConfig newConfig
+
+getMConfig :: [String] -> IO MConfig -> IO MConfig
+getMConfig args mconfig = do
+  config <- mconfig
+  runReaderT (updateOptions args >> ask) config
+
+updateOptions :: [String] -> Monitor ()
+updateOptions args= case getOpt Permute options args of
+                      (o, _, []) -> doConfigOptions o
+                      _ -> return ()

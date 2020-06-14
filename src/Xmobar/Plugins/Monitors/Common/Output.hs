@@ -1,3 +1,5 @@
+{-#LANGUAGE RecordWildCards#-}
+
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.Plugins.Monitors.Strings
@@ -37,6 +39,10 @@ module Xmobar.Plugins.Monitors.Common.Output ( IconPattern
                                              , parseFloat
                                              , parseInt
                                              , stringParser
+                                             , pShowPercentsWithColors
+                                             , pShowPercentBar
+                                             , pShowVerticalBar
+                                             , pShowIconPattern
                                              ) where
 
 import Data.Char
@@ -44,10 +50,76 @@ import Data.List (intercalate, sort)
 import qualified Data.ByteString.Lazy.Char8 as B
 import Numeric
 import Control.Monad (zipWithM)
-
+import Control.Monad.IO.Class (MonadIO(..))
 import Xmobar.Plugins.Monitors.Common.Types
 
 type IconPattern = Int -> String
+
+pShowVerticalBar :: (MonadIO m) => PureConfig -> Float -> Float -> m String
+pShowVerticalBar p v x = pColorizeString p v [convert $ 100 * x]
+  where convert :: Float -> Char
+        convert val
+          | t <= 9600 = ' '
+          | t > 9608 = chr 9608
+          | otherwise = chr t
+          where t = 9600 + (round val `div` 12)
+
+pShowPercentsWithColors :: (MonadIO m) => PureConfig -> [Float] -> m [String]
+pShowPercentsWithColors p fs =
+  do let fstrs = map (pFloatToPercent p) fs
+         temp = map (*100) fs
+     zipWithM (pShowWithColors p . const) fstrs temp
+
+pShowPercentWithColors :: (MonadIO m) => PureConfig -> Float -> m String
+pShowPercentWithColors p f = fmap head $ pShowPercentsWithColors p [f]
+
+pShowPercentBar :: (MonadIO m) => PureConfig -> Float -> Float -> m String
+pShowPercentBar p@PureConfig{..} v x = do
+  let bb = pBarBack
+      bf = pBarFore
+      bw = pBarWidth
+  let len = min bw $ round (fromIntegral bw * x)
+  s <- pColorizeString p v (take len $ cycle bf)
+  return $ s ++ take (bw - len) (cycle bb)
+
+pShowWithColors :: (Num a, Ord a, MonadIO m) => PureConfig -> (a -> String) -> a -> m String
+pShowWithColors p f x = do
+  let str = pShowWithPadding p (f x)
+  pColorizeString p x str
+
+pColorizeString :: (Num a, Ord a, MonadIO m) => PureConfig -> a -> String -> m String
+pColorizeString p x s = do
+    let h = pHigh p
+        l = pLow p
+    let col = pSetColor p s
+        [ll,hh] = map fromIntegral $ sort [l, h] -- consider high < low
+    pure $ head $ [col pHighColor   | x > hh ] ++
+                  [col pNormalColor | x > ll ] ++
+                  [col pLowColor    | True]
+
+pSetColor :: PureConfig -> String -> PSelector (Maybe String) -> String
+pSetColor config str s =
+    do let a = getPConfigValue config s
+       case a of
+            Nothing -> str
+            Just c -> "<fc=" ++ c ++ ">" ++ str ++ "</fc>"
+
+pShowWithPadding :: PureConfig -> String -> String
+pShowWithPadding PureConfig{..} s = let mn = pMinWidth
+                                        mx = pMaxWidth
+                                        p = pPadChars
+                                        pr = pPadRight
+                                        ellipsis = pMaxWidthEllipsis
+                                    in padString mn mx p pr ellipsis s
+
+pFloatToPercent :: PureConfig -> Float -> String
+pFloatToPercent PureConfig{..} n = let pad = pPpad
+                                       pc = pPadChars
+                                       pr = pPadRight
+                                       up = pUseSuffix
+                                       p = showDigits 0 (n * 100)
+                                       ps = if up then "%" else ""
+                                   in padString pad pad pc pr "" p ++ ps
 
 parseIconPattern :: String -> IconPattern
 parseIconPattern path =
@@ -168,6 +240,15 @@ showPercentBar v x = do
 showIconPattern :: Maybe IconPattern -> Float -> Monitor String
 showIconPattern Nothing _ = return ""
 showIconPattern (Just str) x = return $ str $ convert $ 100 * x
+  where convert val
+          | t <= 0 = 0
+          | t > 8 = 8
+          | otherwise = t
+          where t = round val `div` 12
+
+pShowIconPattern :: Maybe IconPattern -> Float -> IO String
+pShowIconPattern Nothing _ = return ""
+pShowIconPattern (Just str) x = return $ str $ convert $ 100 * x
   where convert val
           | t <= 0 = 0
           | t > 8 = 8

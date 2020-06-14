@@ -18,24 +18,12 @@ main = do
 runMonitor :: MConfig -> Monitor a -> IO a
 runMonitor config r = runReaderT r config
 
-data CpuArguments = CpuArguments {
-      cpuRef :: CpuDataRef,
-      cpuMConfig :: MConfig,
-      cpuArgs :: [String]
-    }
-
 mkCpuArgs :: IO CpuArguments
-mkCpuArgs = do
-  cpuRef <- newIORef []
-  _ <- parseCpu cpuRef
-  cpuMConfig <- cpuConfig
-  let cpuArgs = ["-L","3","-H","50","--normal","green","--high","red"]
-  pure $ CpuArguments {..}
-
+mkCpuArgs = getArguments ["-L","3","-H","50","--normal","green","--high","red", "-t", "Cpu: <total>%"]
+  
 -- | The action which will be benchmarked
 cpuAction :: CpuArguments -> IO String
-cpuAction CpuArguments{..} = runMonitor cpuMConfig (doArgs cpuArgs (runCpu cpuRef) (\_ -> return True))
-
+cpuAction = runCpu
 
 cpuBenchmark :: CpuArguments -> Benchmarkable
 cpuBenchmark cpuParams = nfIO $ cpuAction cpuParams

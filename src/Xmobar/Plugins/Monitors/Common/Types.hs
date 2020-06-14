@@ -1,3 +1,5 @@
+{-#LANGUAGE RecordWildCards#-}
+
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.Plugins.Monitors.Types
@@ -23,6 +25,12 @@ module Xmobar.Plugins.Monitors.Common.Types ( Monitor
                                             , getConfigValue
                                             , mkMConfig
                                             , io
+                                            , PureConfig (..)
+                                            , getPConfigValue
+                                            , getConfigValue
+                                            , getPureConfig
+                                            , PSelector
+                                            , TemplateInput(..)
                                             ) where
 
 import Control.Monad.Reader (ReaderT, ask, liftIO)
@@ -33,6 +41,12 @@ type Monitor a = ReaderT MConfig IO a
 
 io :: IO a -> Monitor a
 io = liftIO
+
+data TemplateInput = TemplateInput {
+      temMonitorValues :: [String],
+      temInputTemplate :: [(String, String, String)],
+      temAllTemplate :: [(String, [(String, String, String)])]
+    }
 
 data MConfig =
     MC { normalColor :: IORef (Maybe String)
@@ -58,13 +72,72 @@ data MConfig =
        , maxTotalWidthEllipsis :: IORef String
        }
 
+data PureConfig =
+  PureConfig
+    { pNormalColor :: (Maybe String)
+    , pLow :: Int
+    , pLowColor :: (Maybe String)
+    , pHigh :: Int
+    , pHighColor :: (Maybe String)
+    , pTemplate :: String
+    , pExport :: [String]
+    , pPpad :: Int
+    , pDecDigits :: Int
+    , pMinWidth :: Int
+    , pMaxWidth :: Int
+    , pMaxWidthEllipsis :: String
+    , pPadChars :: String
+    , pPadRight :: Bool
+    , pBarBack :: String
+    , pBarFore :: String
+    , pBarWidth :: Int
+    , pUseSuffix :: Bool
+    , pNaString :: String
+    , pMaxTotalWidth :: Int
+    , pMaxTotalWidthEllipsis :: String
+    }
+  deriving (Eq, Ord)
+
+getPureConfig :: MConfig -> IO PureConfig
+getPureConfig MC{..} = do
+  pNormalColor <- readIORef normalColor
+  pLow <- readIORef low
+  pLowColor <- readIORef lowColor
+  pHigh <- readIORef high
+  pHighColor <- readIORef highColor
+  pTemplate <- readIORef template
+  pExport <- readIORef export
+  pPpad <- readIORef ppad
+  pDecDigits <- readIORef decDigits
+  pMinWidth <- readIORef minWidth
+  pMaxWidth <- readIORef maxWidth
+  pMaxWidthEllipsis <- readIORef maxWidthEllipsis
+  pPadChars <- readIORef padChars
+  pPadRight <- readIORef padRight
+  pBarBack <- readIORef barBack
+  pBarFore <- readIORef barFore
+  pBarWidth <- readIORef barWidth
+  pUseSuffix <- readIORef useSuffix 
+  pNaString <- readIORef naString
+  pMaxTotalWidth <- readIORef maxTotalWidth
+  pMaxTotalWidthEllipsis <- readIORef maxTotalWidthEllipsis
+  pure $ PureConfig {..}
+
 -- | from 'http:\/\/www.haskell.org\/hawiki\/MonadState'
 type Selector a = MConfig -> IORef a
+type PSelector a = PureConfig -> a
+
+psel :: PureConfig -> PSelector a -> a
+psel value accessor = accessor value
 
 sel :: Selector a -> Monitor a
 sel s =
     do hs <- ask
        liftIO $ readIORef (s hs)
+
+pmods :: PureConfig -> PSelector a -> (a -> a) -> a
+pmods config value f = let val = value config
+                       in f val
 
 mods :: Selector a -> (a -> a) -> Monitor ()
 mods s m =
@@ -77,6 +150,9 @@ setConfigValue v s =
 
 getConfigValue :: Selector a -> Monitor a
 getConfigValue = sel
+
+getPConfigValue :: PureConfig -> PSelector a -> a
+getPConfigValue = psel
 
 mkMConfig :: String
           -> [String]

@@ -1,3 +1,5 @@
+{-#LANGUAGE RecordWildCards#-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Plugins.Monitors.Cpu
@@ -13,12 +15,23 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.Plugins.Monitors.Cpu (startCpu, runCpu, cpuConfig, CpuDataRef, parseCpu) where
+module Xmobar.Plugins.Monitors.Cpu
+  ( startCpu
+  , runCpu
+  , cpuConfig
+  , CpuDataRef
+  , CpuOpts
+  , CpuArguments
+  , parseCpu
+  , getArguments
+  ) where
 
 import Xmobar.Plugins.Monitors.Common
-import qualified Data.ByteString.Lazy.Char8 as B
+import qualified Data.ByteString.Char8 as B
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import System.Console.GetOpt
+import Xmobar.App.Timer (doEveryTenthSeconds)
+import Control.Monad (void)
 
 newtype CpuOpts = CpuOpts
   { loadIconPattern :: Maybe IconPattern
@@ -63,25 +76,50 @@ parseCpu cref =
            percent = map ((/ tot) . fromIntegral) dif
        return percent
 
-formatCpu :: CpuOpts -> [Float] -> Monitor [String]
-formatCpu _ [] = return $ replicate 8 ""
-formatCpu opts xs = do
+formatCpu :: CpuOpts -> [Float] -> PureConfig -> IO [String]
+formatCpu _ [] _ = return $ replicate 8 ""
+formatCpu opts xs p = do
   let t = sum $ take 3 xs
-  b <- showPercentBar (100 * t) t
-  v <- showVerticalBar (100 * t) t
-  d <- showIconPattern (loadIconPattern opts) t
-  ps <- showPercentsWithColors (t:xs)
-  return (b:v:d:ps)
+  b <- pShowPercentBar p (100 * t) t
+  v <- pShowVerticalBar p (100 * t) t
+  d <- pShowIconPattern (loadIconPattern opts) t
+  ps <- pShowPercentsWithColors p (t:xs)
+  return $ (b:v:d:ps)
 
-runCpu :: CpuDataRef -> [String] -> Monitor String
-runCpu cref argv =
-    do c <- io (parseCpu cref)
-       opts <- io $ parseOptsWith options defaultOpts argv
-       l <- formatCpu opts c
-       parseTemplate l
+data CpuArguments = CpuArguments {
+      cpuDataRef :: !CpuDataRef,
+      cpuParams :: !PureConfig,
+      cpuArgs :: ![String],
+      cpuOpts :: !CpuOpts,
+      cpuInputTemplate :: ![(String, String, String)], -- [("Cpu: ","total","% "),("","user","%")]
+      cpuAllTemplate :: ![(String, [(String, String, String)])] -- [("bar",[]),("vbar",[]),("ipat",[]),("total",[]),...]
+    }
+
+getArguments :: [String] -> IO CpuArguments
+getArguments cpuArgs = do
+  cpuDataRef <- newIORef []
+  cpuParams <- computePureConfig cpuArgs cpuConfig
+  cpuInputTemplate <- runTemplateParser cpuParams
+  cpuAllTemplate <- runExportParser (pExport cpuParams)
+  nonOptions <- case getOpt Permute commonOptions cpuArgs of
+                  (_, n, []) -> pure n
+                  (_,_,errs) -> error $ "getArguments: " <> show errs
+  cpuOpts <- case getOpt Permute options nonOptions of
+                  (o, _, []) -> pure $ foldr id defaultOpts o
+                  (_,_,errs) -> error $ "getArguments options: " <> show errs
+  pure CpuArguments{..}
+
+
+runCpu :: CpuArguments -> IO String
+runCpu CpuArguments{..} = do
+  cpuValue <- parseCpu cpuDataRef
+  temMonitorValues <- formatCpu cpuOpts cpuValue cpuParams
+  let templateInput = TemplateInput { temInputTemplate = cpuInputTemplate, temAllTemplate = cpuAllTemplate, ..}
+  pureParseTemplate cpuParams templateInput
 
 startCpu :: [String] -> Int -> (String -> IO ()) -> IO ()
-startCpu a r cb = do
+startCpu args refreshRate cb = do
   cref <- newIORef []
-  _ <- parseCpu cref
-  runM a cpuConfig (runCpu cref) r cb
+  void $ parseCpu cref
+  cpuArgs <- getArguments args
+  doEveryTenthSeconds refreshRate (runCpu cpuArgs >>= cb)
