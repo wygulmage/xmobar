@@ -187,10 +187,18 @@ computeFields (x:xs) inputFields =
     else (Field {fieldName = x, fieldCompute = Skip}) : (computeFields xs inputFields)
 
 formatCpu :: CpuArguments -> CpuData -> IO [String]
-formatCpu args@CpuArguments{..} cpuData = mapM (formatField cpuParams cpuOpts cpuData) cpuFields
+formatCpu args@CpuArguments{..} cpuData = do
+  strs <- mapM (formatField cpuParams cpuOpts cpuData) cpuFields
+  pure $ filter (not . null) strs
 
 getInputFields :: CpuArguments -> [String]
 getInputFields CpuArguments{..} = map (\(_,f,_) -> f) cpuInputTemplate
+
+optimizeAllTemplate :: CpuArguments -> CpuArguments
+optimizeAllTemplate args@CpuArguments{..} =
+  let inputFields = getInputFields args
+      allTemplates = filter (\(field, _) -> field `elem` inputFields) cpuAllTemplate
+  in args { cpuAllTemplate = allTemplates }
 
 data CpuArguments = CpuArguments {
       cpuDataRef :: !CpuDataRef,
@@ -217,8 +225,7 @@ getArguments cpuArgs = do
                   (o, _, []) -> pure $ foldr id defaultOpts o
                   (_,_,errs) -> error $ "getArguments options: " <> show errs
   let cpuFields = computeFields (map fst cpuAllTemplate) (map (\(_,f,_) -> f) cpuInputTemplate)
-  pure CpuArguments{..}
-
+  pure $ optimizeAllTemplate CpuArguments{..}
 
 runCpu :: CpuArguments -> IO String
 runCpu args@CpuArguments{..} = do
