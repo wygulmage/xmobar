@@ -138,12 +138,6 @@ parseCpu cref =
            percent = map safeDiv dif
        return $ convertToCpuData percent
 
-conditionalCompute :: [String] -> String -> IO String -> IO String
-conditionalCompute allFields field action = if field `elem` allFields
-                                            then action
-                                            else pure []
-
-
 data Field = Field {
       fieldName :: !String,
       fieldCompute :: !ShouldCompute
@@ -187,8 +181,8 @@ computeFields (x:xs) inputFields =
     else (Field {fieldName = x, fieldCompute = Skip}) : (computeFields xs inputFields)
 
 formatCpu :: CpuArguments -> CpuData -> IO [String]
-formatCpu args@CpuArguments{..} cpuData = do
-  strs <- mapM (formatField cpuParams cpuOpts cpuData) cpuFields
+formatCpu CpuArguments{..} cpuInfo = do
+  strs <- mapM (formatField cpuParams cpuOpts cpuInfo) cpuFields
   pure $ filter (not . null) strs
 
 getInputFields :: CpuArguments -> [String]
@@ -214,7 +208,7 @@ getArguments :: [String] -> IO CpuArguments
 getArguments cpuArgs = do
   initCpuData <- cpuData
   cpuDataRef <- newIORef initCpuData
-  cpuData <- parseCpu cpuDataRef
+  void $ parseCpu cpuDataRef
   cpuParams <- computePureConfig cpuArgs cpuConfig
   cpuInputTemplate <- runTemplateParser cpuParams
   cpuAllTemplate <- runExportParser (pExport cpuParams)
