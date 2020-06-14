@@ -48,19 +48,16 @@ runExportParser :: [String] -> IO [(String, [(String, String,String)])]
 runExportParser [] = pure []
 runExportParser (x:xs) = do
   s <- runP templateParser x
-  rem <- runExportParser xs
-  pure $ (x,s):rem
+  rest <- runExportParser xs
+  pure $ (x,s):rest
 
 pureParseTemplate :: PureConfig -> TemplateInput -> IO String
 pureParseTemplate PureConfig{..} TemplateInput{..} =
-    do let t = pTemplate
-           e = pExport
-           w = pMaxTotalWidth
-       let m = let expSnds :: [([(String, String, String)], String)]  = zip (map snd temAllTemplate) temMonitorValues
-               in Map.fromList . zip (map fst temAllTemplate) $ expSnds
+    do let m = let expSnds :: [([(String, String, String)], String)]  = zip (map snd temAllTemplate) temMonitorValues
+               in Map.fromList $ zip (map fst temAllTemplate) $ expSnds
        s <- minCombine m temInputTemplate
-       let (n, s') = if w > 0 && length s > w
-                     then trimTo (w - length pMaxTotalWidthEllipsis) "" s
+       let (n, s') = if pMaxTotalWidth > 0 && length s > pMaxTotalWidth
+                     then trimTo (pMaxTotalWidth - length pMaxTotalWidthEllipsis) "" s
                      else (1, s)
        return $ if n > 0 then s' else s' ++ pMaxTotalWidthEllipsis
 
@@ -70,7 +67,7 @@ minCombine m ((s,ts,ss):xs) =
     do next <- minCombine m xs
        str <- case Map.lookup ts m of
          Nothing -> return $ "<" ++ ts ++ ">"
-         Just (s,r) -> let f "" = r; f n = n; in f <$> minCombine m s
+         Just (s',r) -> let f "" = r; f n = n; in f <$> minCombine m s'
        pure $ s ++ str ++ ss ++ next
 
 runP :: Parser [a] -> String -> IO [a]
