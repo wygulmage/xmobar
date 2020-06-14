@@ -43,6 +43,7 @@ module Xmobar.Plugins.Monitors.Common.Output ( IconPattern
                                              , pShowPercentBar
                                              , pShowVerticalBar
                                              , pShowIconPattern
+                                             , pShowPercentWithColors
                                              ) where
 
 import Data.Char

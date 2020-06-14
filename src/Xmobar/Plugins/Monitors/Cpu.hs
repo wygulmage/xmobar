@@ -27,7 +27,7 @@ module Xmobar.Plugins.Monitors.Cpu
   ) where
 
 import Xmobar.Plugins.Monitors.Common
-import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Lazy.Char8 as B
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import System.Console.GetOpt
 import Xmobar.App.Timer (doEveryTenthSeconds)
@@ -48,13 +48,51 @@ options =
      o { loadIconPattern = Just $ parseIconPattern x }) "") ""
   ]
 
+barField :: String
+barField = "bar"
+
+vbarField :: String
+vbarField = "vbar"
+
+ipatField :: String
+ipatField = "ipat"
+
+totalField :: String
+totalField = "total"
+
+userField :: String
+userField = "user"
+
+niceField :: String
+niceField = "nice"
+
+systemField :: String
+systemField = "system"
+
+idleField :: String
+idleField = "idle"
+
+iowaitField :: String
+iowaitField = "iowait"
+
 cpuConfig :: IO MConfig
-cpuConfig = mkMConfig
-       "Cpu: <total>%"
-       ["bar","vbar","ipat","total","user","nice","system","idle","iowait"]
+cpuConfig =
+  mkMConfig
+    "Cpu: <total>%"
+    [ barField
+    , vbarField
+    , ipatField
+    , totalField
+    , userField
+    , niceField
+    , systemField
+    , idleField
+    , iowaitField
+    ]
 
 type CpuDataRef = IORef [Int]
 
+-- Details about the fields here: https://www.kernel.org/doc/Documentation/filesystems/proc.txt
 cpuData :: IO [Int]
 cpuData = cpuParser <$> B.readFile "/proc/stat"
 
@@ -66,25 +104,93 @@ readInt bs = case B.readInt bs of
 cpuParser :: B.ByteString -> [Int]
 cpuParser = map readInt . tail . B.words . head . B.lines
 
-parseCpu :: CpuDataRef -> IO [Float]
+data CpuData = CpuData {
+      cpuUser :: !Float,
+      cpuNice :: !Float,
+      cpuSystem :: !Float,
+      cpuIdle :: !Float,
+      cpuIowait :: !Float,
+      cpuTotal :: !Float
+    }
+
+convertToCpuData :: [Float] -> CpuData
+convertToCpuData (u:n:s:id:iw:_) = CpuData {
+                                   cpuUser = u,
+                                   cpuNice = n,
+                                   cpuSystem = s,
+                                   cpuIdle = id,
+                                   cpuIowait = iw,
+                                   cpuTotal = sum [u,n,s]
+                                 }
+convertToCpuData args = error $ "convertToCpuData: Unexpected list" <> show args
+
+
+parseCpu :: CpuDataRef -> IO CpuData
 parseCpu cref =
     do a <- readIORef cref
        b <- cpuData
        writeIORef cref b
        let dif = zipWith (-) b a
            tot = fromIntegral $ sum dif
-           percent = map ((/ tot) . fromIntegral) dif
-       return percent
+           safeDiv n = case tot of
+                         0 -> 0
+                         v -> (fromIntegral n) / v
+           percent = map safeDiv dif
+       return $ convertToCpuData percent
 
-formatCpu :: CpuOpts -> [Float] -> PureConfig -> IO [String]
-formatCpu _ [] _ = return $ replicate 8 ""
-formatCpu opts xs p = do
-  let t = sum $ take 3 xs
-  b <- pShowPercentBar p (100 * t) t
-  v <- pShowVerticalBar p (100 * t) t
-  d <- pShowIconPattern (loadIconPattern opts) t
-  ps <- pShowPercentsWithColors p (t:xs)
-  return $ (b:v:d:ps)
+conditionalCompute :: [String] -> String -> IO String -> IO String
+conditionalCompute allFields field action = if field `elem` allFields
+                                            then action
+                                            else pure []
+
+
+data Field = Field {
+      fieldName :: !String,
+      fieldCompute :: !ShouldCompute
+    } deriving (Eq, Ord, Show)
+
+data ShouldCompute = Compute | Skip deriving (Eq, Ord, Show)
+
+formatField :: PureConfig -> CpuOpts -> CpuData -> Field -> IO String
+formatField  cpuParams cpuOpts cpuInfo@CpuData{..} Field{..}
+    | fieldName == barField = if fieldCompute == Compute
+                              then pShowPercentBar cpuParams (100 * cpuTotal) cpuTotal
+                              else pure []
+    | fieldName == vbarField = if fieldCompute == Compute
+                               then pShowVerticalBar cpuParams (100 * cpuTotal) cpuTotal
+                               else pure []
+    | fieldName == ipatField = if fieldCompute == Compute
+                               then pShowIconPattern (loadIconPattern cpuOpts) cpuTotal
+                               else pure []
+    | otherwise = if fieldCompute == Compute
+                  then pShowPercentWithColors cpuParams (getFieldValue fieldName cpuInfo)
+                  else pure []
+
+getFieldValue :: String -> CpuData -> Float
+getFieldValue field CpuData{..}
+    | field == barField = cpuTotal
+    | field == vbarField = cpuTotal
+    | field == ipatField = cpuTotal
+    | field == totalField = cpuTotal
+    | field == userField = cpuUser
+    | field == niceField = cpuNice
+    | field == systemField = cpuSystem
+    | field == idleField = cpuIdle
+    | otherwise = cpuIowait
+
+computeFields :: [String] -> [String] -> [Field]
+computeFields [] _ = []
+computeFields (x:xs) inputFields =
+  if x `elem` inputFields
+    then (Field {fieldName = x, fieldCompute = Compute}) :
+         (computeFields xs inputFields)
+    else (Field {fieldName = x, fieldCompute = Skip}) : (computeFields xs inputFields)
+
+formatCpu :: CpuArguments -> CpuData -> IO [String]
+formatCpu args@CpuArguments{..} cpuData = mapM (formatField cpuParams cpuOpts cpuData) cpuFields
+
+getInputFields :: CpuArguments -> [String]
+getInputFields CpuArguments{..} = map (\(_,f,_) -> f) cpuInputTemplate
 
 data CpuArguments = CpuArguments {
       cpuDataRef :: !CpuDataRef,
@@ -92,12 +198,15 @@ data CpuArguments = CpuArguments {
       cpuArgs :: ![String],
       cpuOpts :: !CpuOpts,
       cpuInputTemplate :: ![(String, String, String)], -- [("Cpu: ","total","% "),("","user","%")]
-      cpuAllTemplate :: ![(String, [(String, String, String)])] -- [("bar",[]),("vbar",[]),("ipat",[]),("total",[]),...]
+      cpuAllTemplate :: ![(String, [(String, String, String)])], -- [("bar",[]),("vbar",[]),("ipat",[]),("total",[]),...]
+      cpuFields :: ![Field]
     }
 
 getArguments :: [String] -> IO CpuArguments
 getArguments cpuArgs = do
-  cpuDataRef <- newIORef []
+  initCpuData <- cpuData
+  cpuDataRef <- newIORef initCpuData
+  cpuData <- parseCpu cpuDataRef
   cpuParams <- computePureConfig cpuArgs cpuConfig
   cpuInputTemplate <- runTemplateParser cpuParams
   cpuAllTemplate <- runExportParser (pExport cpuParams)
@@ -107,19 +216,18 @@ getArguments cpuArgs = do
   cpuOpts <- case getOpt Permute options nonOptions of
                   (o, _, []) -> pure $ foldr id defaultOpts o
                   (_,_,errs) -> error $ "getArguments options: " <> show errs
+  let cpuFields = computeFields (map fst cpuAllTemplate) (map (\(_,f,_) -> f) cpuInputTemplate)
   pure CpuArguments{..}
 
 
 runCpu :: CpuArguments -> IO String
-runCpu CpuArguments{..} = do
+runCpu args@CpuArguments{..} = do
   cpuValue <- parseCpu cpuDataRef
-  temMonitorValues <- formatCpu cpuOpts cpuValue cpuParams
+  temMonitorValues <- formatCpu args cpuValue
   let templateInput = TemplateInput { temInputTemplate = cpuInputTemplate, temAllTemplate = cpuAllTemplate, ..}
   pureParseTemplate cpuParams templateInput
 
 startCpu :: [String] -> Int -> (String -> IO ()) -> IO ()
 startCpu args refreshRate cb = do
-  cref <- newIORef []
-  void $ parseCpu cref
   cpuArgs <- getArguments args
   doEveryTenthSeconds refreshRate (runCpu cpuArgs >>= cb)
