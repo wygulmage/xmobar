@@ -22,7 +22,6 @@ module Xmobar.Plugins.Monitors.Common.Types ( Monitor
                                             , Opts (..)
                                             , Selector
                                             , setConfigValue
-                                            , getConfigValue
                                             , mkMConfig
                                             , io
                                             , PureConfig (..)
@@ -134,10 +133,6 @@ sel :: Selector a -> Monitor a
 sel s =
     do hs <- ask
        liftIO $ readIORef (s hs)
-
-pmods :: PureConfig -> PSelector a -> (a -> a) -> a
-pmods config value f = let val = value config
-                       in f val
 
 mods :: Selector a -> (a -> a) -> Monitor ()
 mods s m =

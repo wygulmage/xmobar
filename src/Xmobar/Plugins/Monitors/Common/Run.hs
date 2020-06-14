@@ -24,7 +24,7 @@ module Xmobar.Plugins.Monitors.Common.Run ( runM
                                           , getArgvs
                                           , doArgs
                                           , computePureConfig
-                                          , commonOptions
+                                          , pluginOptions
                                           ) where
 
 import Control.Exception (SomeException,handle)
@@ -35,10 +35,8 @@ import System.Console.GetOpt
 import Xmobar.Plugins.Monitors.Common.Types
 import Xmobar.Run.Exec (doEveryTenthSeconds)
 
-commonOptions = options
-
-options :: [OptDescr Opts]
-options =
+pluginOptions :: [OptDescr Opts]
+pluginOptions =
     [
       Option ['H'] ["High"] (ReqArg High "number") "The high threshold"
     , Option ['L'] ["Low"] (ReqArg Low "number") "The low threshold"
@@ -66,7 +64,7 @@ options =
 -- | Get all argument values out of a list of arguments.
 getArgvs :: [String] -> [String]
 getArgvs args =
-    case getOpt Permute options args of
+    case getOpt Permute pluginOptions args of
         (_, n, []  ) -> n
         (_, _, errs) -> errs
 
@@ -77,7 +75,7 @@ doArgs :: [String]
        -> ([String] -> Monitor Bool)
        -> Monitor String
 doArgs args action detect =
-    case getOpt Permute options args of
+    case getOpt Permute pluginOptions args of
       (o, n, [])   -> do doConfigOptions o
                          ready <- detect n
                          if ready
@@ -158,6 +156,6 @@ getMConfig args mconfig = do
   runReaderT (updateOptions args >> ask) config
 
 updateOptions :: [String] -> Monitor ()
-updateOptions args= case getOpt Permute options args of
+updateOptions args= case getOpt Permute pluginOptions args of
                       (o, _, []) -> doConfigOptions o
                       _ -> return ()

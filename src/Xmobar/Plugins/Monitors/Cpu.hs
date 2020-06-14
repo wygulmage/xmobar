@@ -114,11 +114,11 @@ data CpuData = CpuData {
     }
 
 convertToCpuData :: [Float] -> CpuData
-convertToCpuData (u:n:s:id:iw:_) = CpuData {
+convertToCpuData (u:n:s:ie:iw:_) = CpuData {
                                    cpuUser = u,
                                    cpuNice = n,
                                    cpuSystem = s,
-                                   cpuIdle = id,
+                                   cpuIdle = ie,
                                    cpuIowait = iw,
                                    cpuTotal = sum [u,n,s]
                                  }
@@ -212,7 +212,7 @@ getArguments cpuArgs = do
   cpuParams <- computePureConfig cpuArgs cpuConfig
   cpuInputTemplate <- runTemplateParser cpuParams
   cpuAllTemplate <- runExportParser (pExport cpuParams)
-  nonOptions <- case getOpt Permute commonOptions cpuArgs of
+  nonOptions <- case getOpt Permute pluginOptions cpuArgs of
                   (_, n, []) -> pure n
                   (_,_,errs) -> error $ "getArguments: " <> show errs
   cpuOpts <- case getOpt Permute options nonOptions of
