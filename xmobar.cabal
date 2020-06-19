@@ -242,7 +242,7 @@ library
        cpp-options: -DALSA
 
     if flag(with_datezone) || flag(all_extensions)
-       build-depends: timezone-olson == 0.1.*, timezone-series == 0.1.*
+       build-depends: timezone-olson >= 0.1 && < 0.3, timezone-series == 0.1.*
        other-modules: Xmobar.Plugins.DateZone
        cpp-options: -DDATEZONE
 
