@@ -41,8 +41,8 @@ import qualified Data.Map as Map
 import System.Console.GetOpt (ArgOrder(Permute), OptDescr, getOpt)
 import Text.ParserCombinators.Parsec
 
-runTemplateParser :: PureConfig -> IO [(String, String, String)]
-runTemplateParser PureConfig{..} = runP templateParser pTemplate
+runTemplateParser :: MonitorConfig -> IO [(String, String, String)]
+runTemplateParser MonitorConfig{..} = runP templateParser pTemplate
 
 runExportParser :: [String] -> IO [(String, [(String, String,String)])]
 runExportParser [] = pure []
@@ -51,8 +51,8 @@ runExportParser (x:xs) = do
   rest <- runExportParser xs
   pure $ (x,s):rest
 
-pureParseTemplate :: PureConfig -> TemplateInput -> IO String
-pureParseTemplate PureConfig{..} TemplateInput{..} =
+pureParseTemplate :: MonitorConfig -> TemplateInput -> IO String
+pureParseTemplate MonitorConfig{..} TemplateInput{..} =
     do let m = let expSnds :: [([(String, String, String)], String)]  = zip (map snd temAllTemplate) temMonitorValues
                in Map.fromList $ zip (map fst temAllTemplate) expSnds
        s <- minCombine m temInputTemplate

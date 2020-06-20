@@ -56,7 +56,7 @@ import Xmobar.Plugins.Monitors.Common.Types
 
 type IconPattern = Int -> String
 
-pShowVerticalBar :: (MonadIO m) => PureConfig -> Float -> Float -> m String
+pShowVerticalBar :: (MonadIO m) => MonitorConfig -> Float -> Float -> m String
 pShowVerticalBar p v x = pColorizeString p v [convert $ 100 * x]
   where convert :: Float -> Char
         convert val
@@ -65,62 +65,49 @@ pShowVerticalBar p v x = pColorizeString p v [convert $ 100 * x]
           | otherwise = chr t
           where t = 9600 + (round val `div` 12)
 
-pShowPercentsWithColors :: (MonadIO m) => PureConfig -> [Float] -> m [String]
+pShowPercentsWithColors :: (MonadIO m) => MonitorConfig -> [Float] -> m [String]
 pShowPercentsWithColors p fs =
   do let fstrs = map (pFloatToPercent p) fs
          temp = map (*100) fs
      zipWithM (pShowWithColors p . const) fstrs temp
 
-pShowPercentWithColors :: (MonadIO m) => PureConfig -> Float -> m String
+pShowPercentWithColors :: (MonadIO m) => MonitorConfig -> Float -> m String
 pShowPercentWithColors p f = fmap head $ pShowPercentsWithColors p [f]
 
-pShowPercentBar :: (MonadIO m) => PureConfig -> Float -> Float -> m String
-pShowPercentBar p@PureConfig{..} v x = do
-  let bb = pBarBack
-      bf = pBarFore
-      bw = pBarWidth
-  let len = min bw $ round (fromIntegral bw * x)
-  s <- pColorizeString p v (take len $ cycle bf)
-  return $ s ++ take (bw - len) (cycle bb)
+pShowPercentBar :: (MonadIO m) => MonitorConfig -> Float -> Float -> m String
+pShowPercentBar p@MonitorConfig{..} v x = do
+  let len = min pBarWidth $ round (fromIntegral pBarWidth * x)
+  s <- pColorizeString p v (take len $ cycle pBarFore)
+  return $ s ++ take (pBarWidth - len) (cycle pBarBack)
 
-pShowWithColors :: (Num a, Ord a, MonadIO m) => PureConfig -> (a -> String) -> a -> m String
+pShowWithColors :: (Num a, Ord a, MonadIO m) => MonitorConfig -> (a -> String) -> a -> m String
 pShowWithColors p f x = do
   let str = pShowWithPadding p (f x)
   pColorizeString p x str
 
-pColorizeString :: (Num a, Ord a, MonadIO m) => PureConfig -> a -> String -> m String
+pColorizeString :: (Num a, Ord a, MonadIO m) => MonitorConfig -> a -> String -> m String
 pColorizeString p x s = do
-    let h = pHigh p
-        l = pLow p
     let col = pSetColor p s
-        [ll,hh] = map fromIntegral $ sort [l, h] -- consider high < low
+        [ll,hh] = map fromIntegral $ sort [pLow p, pHigh p] -- consider high < low
     pure $ head $ [col pHighColor   | x > hh ] ++
                   [col pNormalColor | x > ll ] ++
                   [col pLowColor    | True]
 
-pSetColor :: PureConfig -> String -> PSelector (Maybe String) -> String
+pSetColor :: MonitorConfig -> String -> PSelector (Maybe String) -> String
 pSetColor config str s =
     do let a = getPConfigValue config s
        case a of
             Nothing -> str
             Just c -> "<fc=" ++ c ++ ">" ++ str ++ "</fc>"
 
-pShowWithPadding :: PureConfig -> String -> String
-pShowWithPadding PureConfig{..} s = let mn = pMinWidth
-                                        mx = pMaxWidth
-                                        p = pPadChars
-                                        pr = pPadRight
-                                        ellipsis = pMaxWidthEllipsis
-                                    in padString mn mx p pr ellipsis s
+pShowWithPadding :: MonitorConfig -> String -> String
+pShowWithPadding MonitorConfig {..} s =
+  padString pMinWidth pMaxWidth pPadChars pPadRight pMaxWidthEllipsis s
 
-pFloatToPercent :: PureConfig -> Float -> String
-pFloatToPercent PureConfig{..} n = let pad = pPpad
-                                       pc = pPadChars
-                                       pr = pPadRight
-                                       up = pUseSuffix
-                                       p = showDigits 0 (n * 100)
-                                       ps = if up then "%" else ""
-                                   in padString pad pad pc pr "" p ++ ps
+pFloatToPercent :: MonitorConfig -> Float -> String
+pFloatToPercent MonitorConfig{..} n = let p = showDigits 0 (n * 100)
+                                          ps = if pUseSuffix then "%" else ""
+                                      in padString pPpad pPpad pPadChars pPadRight "" p ++ ps
 
 parseIconPattern :: String -> IconPattern
 parseIconPattern path =

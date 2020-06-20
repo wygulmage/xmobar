@@ -24,10 +24,10 @@ module Xmobar.Plugins.Monitors.Common.Types ( Monitor
                                             , setConfigValue
                                             , mkMConfig
                                             , io
-                                            , PureConfig (..)
+                                            , MonitorConfig (..)
                                             , getPConfigValue
                                             , getConfigValue
-                                            , getPureConfig
+                                            , getMonitorConfig
                                             , PSelector
                                             , TemplateInput(..)
                                             ) where
@@ -71,8 +71,8 @@ data MConfig =
        , maxTotalWidthEllipsis :: IORef String
        }
 
-data PureConfig =
-  PureConfig
+data MonitorConfig =
+  MonitorConfig
     { pNormalColor :: Maybe String
     , pLow :: Int
     , pLowColor :: Maybe String
@@ -97,8 +97,8 @@ data PureConfig =
     }
   deriving (Eq, Ord)
 
-getPureConfig :: MConfig -> IO PureConfig
-getPureConfig MC{..} = do
+getMonitorConfig :: MConfig -> IO MonitorConfig
+getMonitorConfig MC{..} = do
   pNormalColor <- readIORef normalColor
   pLow <- readIORef low
   pLowColor <- readIORef lowColor
@@ -120,13 +120,13 @@ getPureConfig MC{..} = do
   pNaString <- readIORef naString
   pMaxTotalWidth <- readIORef maxTotalWidth
   pMaxTotalWidthEllipsis <- readIORef maxTotalWidthEllipsis
-  pure $ PureConfig {..}
+  pure $ MonitorConfig {..}
 
 -- | from 'http:\/\/www.haskell.org\/hawiki\/MonadState'
 type Selector a = MConfig -> IORef a
-type PSelector a = PureConfig -> a
+type PSelector a = MonitorConfig -> a
 
-psel :: PureConfig -> PSelector a -> a
+psel :: MonitorConfig -> PSelector a -> a
 psel value accessor = accessor value
 
 sel :: Selector a -> Monitor a
@@ -146,7 +146,7 @@ setConfigValue v s =
 getConfigValue :: Selector a -> Monitor a
 getConfigValue = sel
 
-getPConfigValue :: PureConfig -> PSelector a -> a
+getPConfigValue :: MonitorConfig -> PSelector a -> a
 getPConfigValue = psel
 
 mkMConfig :: String

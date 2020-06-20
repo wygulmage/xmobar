@@ -23,7 +23,7 @@ module Xmobar.Plugins.Monitors.Common.Run ( runM
                                           , runMLD
                                           , getArgvs
                                           , doArgs
-                                          , computePureConfig
+                                          , computeMonitorConfig
                                           , pluginOptions
                                           ) where
 
@@ -145,10 +145,10 @@ runMLD args conf action looper detect cb = handle (cb . showException) loop
 showException :: SomeException -> String
 showException = ("error: "++) . show . flip asTypeOf undefined
 
-computePureConfig :: [String] -> IO MConfig -> IO PureConfig
-computePureConfig args mconfig = do
+computeMonitorConfig :: [String] -> IO MConfig -> IO MonitorConfig
+computeMonitorConfig args mconfig = do
   newConfig <- getMConfig args mconfig
-  getPureConfig newConfig
+  getMonitorConfig newConfig
 
 getMConfig :: [String] -> IO MConfig -> IO MConfig
 getMConfig args mconfig = do

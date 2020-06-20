@@ -145,7 +145,7 @@ data Field = Field {
 
 data ShouldCompute = Compute | Skip deriving (Eq, Ord, Show)
 
-formatField :: PureConfig -> CpuOpts -> CpuData -> Field -> IO String
+formatField :: MonitorConfig -> CpuOpts -> CpuData -> Field -> IO String
 formatField cpuParams cpuOpts cpuInfo@CpuData {..} Field {..}
   | fieldName == barField =
     if fieldCompute == Compute
@@ -203,7 +203,7 @@ optimizeAllTemplate args@CpuArguments {..} =
 data CpuArguments =
   CpuArguments
     { cpuDataRef :: !CpuDataRef
-    , cpuParams :: !PureConfig
+    , cpuParams :: !MonitorConfig
     , cpuArgs :: ![String]
     , cpuOpts :: !CpuOpts
     , cpuInputTemplate :: ![(String, String, String)] -- [("Cpu: ","total","% "),("","user","%")]
@@ -217,7 +217,7 @@ getArguments cpuArgs = do
   initCpuData <- cpuData
   cpuDataRef <- newIORef initCpuData
   void $ parseCpu cpuDataRef
-  cpuParams <- computePureConfig cpuArgs cpuConfig
+  cpuParams <- computeMonitorConfig cpuArgs cpuConfig
   cpuInputTemplate <- runTemplateParser cpuParams
   cpuAllTemplate <- runExportParser (pExport cpuParams)
   nonOptions <-
