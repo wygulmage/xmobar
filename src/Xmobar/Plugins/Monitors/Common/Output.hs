@@ -101,8 +101,8 @@ pSetColor config str s =
             Just c -> "<fc=" ++ c ++ ">" ++ str ++ "</fc>"
 
 pShowWithPadding :: MonitorConfig -> String -> String
-pShowWithPadding MonitorConfig {..} s =
-  padString pMinWidth pMaxWidth pPadChars pPadRight pMaxWidthEllipsis s
+pShowWithPadding MonitorConfig {..} =
+  padString pMinWidth pMaxWidth pPadChars pPadRight pMaxWidthEllipsis
 
 pFloatToPercent :: MonitorConfig -> Float -> String
 pFloatToPercent MonitorConfig{..} n = let p = showDigits 0 (n * 100)
