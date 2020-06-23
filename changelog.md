@@ -1,9 +1,11 @@
-## Version 0.35 (unreleased)
+## Version 0.35 (June, 2020)
 
 _New features_
 
   - `MultiCoreTemp` now works with Ryzen processors.  New option
     `--hwmonitor-path` for better performance.
+  - CPU Monitor optimizations.
+  - Version bumps for some dependencies, including timezone-olson.
 
 ## Version 0.34 (June, 2020)
 
