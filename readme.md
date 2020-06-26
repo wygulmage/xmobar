@@ -1853,7 +1853,7 @@ giving me the chance to contribute.
 
 # License
 
-This software is released under a BSD-style license. See [LICENSE] for
+This software is released under a BSD-style license. See [license] for
 more details.
 
 Copyright &copy; 2010-2020 Jose Antonio Ortega Ruiz
