@@ -1,6 +1,92 @@
 [![Hackage](https://img.shields.io/hackage/v/xmobar.svg)](http://hackage.haskell.org/package/xmobar)
 [![Build Status](https://travis-ci.org/jaor/xmobar.svg?branch=master)](https://travis-ci.org/jaor/xmobar)
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [About](#about)
+- [Bug reports](#bug-reports)
+- [Installation](#installation)
+    - [Using cabal-install](#using-cabal-install)
+    - [From source](#from-source)
+    - [Optional features](#optional-features)
+- [Running xmobar](#running-xmobar)
+    - [Signal Handling](#signal-handling)
+- [Configuration](#configuration)
+    - [Quick Start](#quick-start)
+        - [Running xmobar with i3status](#running-xmobar-with-i3status)
+        - [Dynamically sizing xmobar](#dynamically-sizing-xmobar)
+    - [Command Line Options](#command-line-options)
+    - [The DBus Interface](#the-dbus-interface)
+        - [Example for using the DBus IPC interface with XMonad](#example-for-using-the-dbus-ipc-interface-with-xmonad)
+    - [The Output Template](#the-output-template)
+    - [The `commands` Configuration Option](#the-commands-configuration-option)
+    - [System Monitor Plugins](#system-monitor-plugins)
+        - [Icon patterns](#icon-patterns)
+        - [Default Monitor Arguments](#default-monitor-arguments)
+        - [`Uptime Args RefreshRate`](#uptime-args-refreshrate)
+        - [`Weather StationID Args RefreshRate`](#weather-stationid-args-refreshrate)
+        - [`WeatherX StationID SkyConditions Args RefreshRate`](#weatherx-stationid-skyconditions-args-refreshrate)
+        - [`Network Interface Args RefreshRate`](#network-interface-args-refreshrate)
+        - [`DynNetwork Args RefreshRate`](#dynnetwork-args-refreshrate)
+        - [`Wireless Interface Args RefreshRate`](#wireless-interface-args-refreshrate)
+        - [`Memory Args RefreshRate`](#memory-args-refreshrate)
+        - [`Swap Args RefreshRate`](#swap-args-refreshrate)
+        - [`Cpu Args RefreshRate`](#cpu-args-refreshrate)
+        - [`MultiCpu Args RefreshRate`](#multicpu-args-refreshrate)
+        - [`Battery Args RefreshRate`](#battery-args-refreshrate)
+        - [`BatteryP Dirs Args RefreshRate`](#batteryp-dirs-args-refreshrate)
+        - [`BatteryN Dirs Args RefreshRate Alias`](#batteryn-dirs-args-refreshrate-alias)
+        - [`TopProc Args RefreshRate`](#topproc-args-refreshrate)
+        - [`TopMem Args RefreshRate`](#topmem-args-refreshrate)
+        - [`DiskU Disks Args RefreshRate`](#disku-disks-args-refreshrate)
+        - [`DiskIO Disks Args RefreshRate`](#diskio-disks-args-refreshrate)
+        - [`ThermalZone Number Args RefreshRate`](#thermalzone-number-args-refreshrate)
+            - [`Thermal Zone Args RefreshRate`](#thermal-zone-args-refreshrate)
+        - [`CpuFreq Args RefreshRate`](#cpufreq-args-refreshrate)
+        - [`CoreTemp Args RefreshRate`](#coretemp-args-refreshrate)
+        - [`MultiCoreTemp Args RefreshRate`](#multicoretemp-args-refreshrate)
+        - [`Volume Mixer Element Args RefreshRate`](#volume-mixer-element-args-refreshrate)
+        - [`Alsa Mixer Element Args`](#alsa-mixer-element-args)
+        - [`MPD Args RefreshRate`](#mpd-args-refreshrate)
+        - [`Mpris1 PlayerName Args RefreshRate`](#mpris1-playername-args-refreshrate)
+        - [`Mpris2 PlayerName Args RefreshRate`](#mpris2-playername-args-refreshrate)
+        - [`Mail Args Alias`](#mail-args-alias)
+        - [`MailX Args Opts Alias`](#mailx-args-opts-alias)
+        - [`MBox Mboxes Opts Alias`](#mbox-mboxes-opts-alias)
+        - [`XPropertyLog PropName`](#xpropertylog-propname)
+        - [`UnsafeXPropertyLog PropName`](#unsafexpropertylog-propname)
+        - [`NamedXPropertyLog PropName Alias`](#namedxpropertylog-propname-alias)
+        - [`NamedXPropertyLog PropName Alias`](#namedxpropertylog-propname-alias-1)
+        - [`Brightness Args RefreshRate`](#brightness-args-refreshrate)
+        - [`Kbd Opts`](#kbd-opts)
+        - [`Locks`](#locks)
+        - [`CatInt n filename`](#catint-n-filename)
+        - [`UVMeter`](#uvmeter)
+    - [Executing External Commands](#executing-external-commands)
+    - [Other Plugins](#other-plugins)
+        - [`StdinReader`](#stdinreader)
+        - [`UnsafeStdinReader`](#unsafestdinreader)
+        - [`Date Format Alias RefreshRate`](#date-format-alias-refreshrate)
+        - [`DateZone Format Locale Zone Alias RefreshRate`](#datezone-format-locale-zone-alias-refreshrate)
+        - [`CommandReader "/path/to/program" Alias`](#commandreader-pathtoprogram-alias)
+        - [`PipeReader "default text:/path/to/pipe" Alias`](#pipereader-default-textpathtopipe-alias)
+        - [`MarqueePipeReader "default text:/path/to/pipe" (length, rate, sep) Alias`](#marqueepipereader-default-textpathtopipe-length-rate-sep-alias)
+        - [`BufferedPipeReader Alias [(Timeout, Bool, "/path/to/pipe1"), ..]`](#bufferedpipereader-alias-timeout-bool-pathtopipe1-)
+        - [`XMonadLog`](#xmonadlog)
+        - [`UnsafeXMonadLog`](#unsafexmonadlog)
+        - [`HandleReader Handle Alias`](#handlereader-handle-alias)
+- [Plugins](#plugins)
+    - [Writing a Plugin](#writing-a-plugin)
+    - [Using a Plugin](#using-a-plugin)
+    - [Configurations written in pure Haskell](#configurations-written-in-pure-haskell)
+- [Authors and credits](#authors-and-credits)
+    - [Thanks](#thanks)
+- [Related](#related)
+- [License](#license)
+
+<!-- markdown-toc end -->
+
 # About
 
 Xmobar is a minimalistic status bar. It was originally designed and
@@ -23,7 +109,7 @@ and, again, two instances of xmobar.
 [xmonad]: http://xmonad.org
 [Ion3]: http://tuomov.iki.fi/software/
 
-# Bug Reports
+# Bug reports
 
 To submit bug reports you can use the [bug tracker over at
 Github](https://github.com/jaor/xmobar/issues).
