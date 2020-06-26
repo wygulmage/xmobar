@@ -21,62 +21,62 @@
         - [Example for using the DBus IPC interface with XMonad](#example-for-using-the-dbus-ipc-interface-with-xmonad)
     - [The Output Template](#the-output-template)
     - [The `commands` Configuration Option](#the-commands-configuration-option)
-    - [System Monitor Plugins](#system-monitor-plugins)
-        - [Icon patterns](#icon-patterns)
-        - [Default Monitor Arguments](#default-monitor-arguments)
-        - [`Uptime Args RefreshRate`](#uptime-args-refreshrate)
-        - [`Weather StationID Args RefreshRate`](#weather-stationid-args-refreshrate)
-        - [`WeatherX StationID SkyConditions Args RefreshRate`](#weatherx-stationid-skyconditions-args-refreshrate)
-        - [`Network Interface Args RefreshRate`](#network-interface-args-refreshrate)
-        - [`DynNetwork Args RefreshRate`](#dynnetwork-args-refreshrate)
-        - [`Wireless Interface Args RefreshRate`](#wireless-interface-args-refreshrate)
-        - [`Memory Args RefreshRate`](#memory-args-refreshrate)
-        - [`Swap Args RefreshRate`](#swap-args-refreshrate)
-        - [`Cpu Args RefreshRate`](#cpu-args-refreshrate)
-        - [`MultiCpu Args RefreshRate`](#multicpu-args-refreshrate)
-        - [`Battery Args RefreshRate`](#battery-args-refreshrate)
-        - [`BatteryP Dirs Args RefreshRate`](#batteryp-dirs-args-refreshrate)
-        - [`BatteryN Dirs Args RefreshRate Alias`](#batteryn-dirs-args-refreshrate-alias)
-        - [`TopProc Args RefreshRate`](#topproc-args-refreshrate)
-        - [`TopMem Args RefreshRate`](#topmem-args-refreshrate)
-        - [`DiskU Disks Args RefreshRate`](#disku-disks-args-refreshrate)
-        - [`DiskIO Disks Args RefreshRate`](#diskio-disks-args-refreshrate)
-        - [`ThermalZone Number Args RefreshRate`](#thermalzone-number-args-refreshrate)
-            - [`Thermal Zone Args RefreshRate`](#thermal-zone-args-refreshrate)
-        - [`CpuFreq Args RefreshRate`](#cpufreq-args-refreshrate)
-        - [`CoreTemp Args RefreshRate`](#coretemp-args-refreshrate)
-        - [`MultiCoreTemp Args RefreshRate`](#multicoretemp-args-refreshrate)
-        - [`Volume Mixer Element Args RefreshRate`](#volume-mixer-element-args-refreshrate)
-        - [`Alsa Mixer Element Args`](#alsa-mixer-element-args)
-        - [`MPD Args RefreshRate`](#mpd-args-refreshrate)
-        - [`Mpris1 PlayerName Args RefreshRate`](#mpris1-playername-args-refreshrate)
-        - [`Mpris2 PlayerName Args RefreshRate`](#mpris2-playername-args-refreshrate)
-        - [`Mail Args Alias`](#mail-args-alias)
-        - [`MailX Args Opts Alias`](#mailx-args-opts-alias)
-        - [`MBox Mboxes Opts Alias`](#mbox-mboxes-opts-alias)
-        - [`XPropertyLog PropName`](#xpropertylog-propname)
-        - [`UnsafeXPropertyLog PropName`](#unsafexpropertylog-propname)
-        - [`NamedXPropertyLog PropName Alias`](#namedxpropertylog-propname-alias)
-        - [`NamedXPropertyLog PropName Alias`](#namedxpropertylog-propname-alias-1)
-        - [`Brightness Args RefreshRate`](#brightness-args-refreshrate)
-        - [`Kbd Opts`](#kbd-opts)
-        - [`Locks`](#locks)
-        - [`CatInt n filename`](#catint-n-filename)
-        - [`UVMeter`](#uvmeter)
-    - [Executing External Commands](#executing-external-commands)
-    - [Other Plugins](#other-plugins)
-        - [`StdinReader`](#stdinreader)
-        - [`UnsafeStdinReader`](#unsafestdinreader)
-        - [`Date Format Alias RefreshRate`](#date-format-alias-refreshrate)
-        - [`DateZone Format Locale Zone Alias RefreshRate`](#datezone-format-locale-zone-alias-refreshrate)
-        - [`CommandReader "/path/to/program" Alias`](#commandreader-pathtoprogram-alias)
-        - [`PipeReader "default text:/path/to/pipe" Alias`](#pipereader-default-textpathtopipe-alias)
-        - [`MarqueePipeReader "default text:/path/to/pipe" (length, rate, sep) Alias`](#marqueepipereader-default-textpathtopipe-length-rate-sep-alias)
-        - [`BufferedPipeReader Alias [(Timeout, Bool, "/path/to/pipe1"), ..]`](#bufferedpipereader-alias-timeout-bool-pathtopipe1-)
-        - [`XMonadLog`](#xmonadlog)
-        - [`UnsafeXMonadLog`](#unsafexmonadlog)
-        - [`HandleReader Handle Alias`](#handlereader-handle-alias)
-- [Plugins](#plugins)
+- [System Monitor Plugins](#system-monitor-plugins)
+    - [Icon patterns](#icon-patterns)
+    - [Default Monitor Arguments](#default-monitor-arguments)
+    - [`Uptime Args RefreshRate`](#uptime-args-refreshrate)
+    - [`Weather StationID Args RefreshRate`](#weather-stationid-args-refreshrate)
+    - [`WeatherX StationID SkyConditions Args RefreshRate`](#weatherx-stationid-skyconditions-args-refreshrate)
+    - [`Network Interface Args RefreshRate`](#network-interface-args-refreshrate)
+    - [`DynNetwork Args RefreshRate`](#dynnetwork-args-refreshrate)
+    - [`Wireless Interface Args RefreshRate`](#wireless-interface-args-refreshrate)
+    - [`Memory Args RefreshRate`](#memory-args-refreshrate)
+    - [`Swap Args RefreshRate`](#swap-args-refreshrate)
+    - [`Cpu Args RefreshRate`](#cpu-args-refreshrate)
+    - [`MultiCpu Args RefreshRate`](#multicpu-args-refreshrate)
+    - [`Battery Args RefreshRate`](#battery-args-refreshrate)
+    - [`BatteryP Dirs Args RefreshRate`](#batteryp-dirs-args-refreshrate)
+    - [`BatteryN Dirs Args RefreshRate Alias`](#batteryn-dirs-args-refreshrate-alias)
+    - [`TopProc Args RefreshRate`](#topproc-args-refreshrate)
+    - [`TopMem Args RefreshRate`](#topmem-args-refreshrate)
+    - [`DiskU Disks Args RefreshRate`](#disku-disks-args-refreshrate)
+    - [`DiskIO Disks Args RefreshRate`](#diskio-disks-args-refreshrate)
+    - [`ThermalZone Number Args RefreshRate`](#thermalzone-number-args-refreshrate)
+    - [`Thermal Zone Args RefreshRate`](#thermal-zone-args-refreshrate)
+    - [`CpuFreq Args RefreshRate`](#cpufreq-args-refreshrate)
+    - [`CoreTemp Args RefreshRate`](#coretemp-args-refreshrate)
+    - [`MultiCoreTemp Args RefreshRate`](#multicoretemp-args-refreshrate)
+    - [`Volume Mixer Element Args RefreshRate`](#volume-mixer-element-args-refreshrate)
+    - [`Alsa Mixer Element Args`](#alsa-mixer-element-args)
+    - [`MPD Args RefreshRate`](#mpd-args-refreshrate)
+    - [`Mpris1 PlayerName Args RefreshRate`](#mpris1-playername-args-refreshrate)
+    - [`Mpris2 PlayerName Args RefreshRate`](#mpris2-playername-args-refreshrate)
+    - [`Mail Args Alias`](#mail-args-alias)
+    - [`MailX Args Opts Alias`](#mailx-args-opts-alias)
+    - [`MBox Mboxes Opts Alias`](#mbox-mboxes-opts-alias)
+    - [`XPropertyLog PropName`](#xpropertylog-propname)
+    - [`UnsafeXPropertyLog PropName`](#unsafexpropertylog-propname)
+    - [`NamedXPropertyLog PropName Alias`](#namedxpropertylog-propname-alias)
+    - [`NamedXPropertyLog PropName Alias`](#namedxpropertylog-propname-alias-1)
+    - [`Brightness Args RefreshRate`](#brightness-args-refreshrate)
+    - [`Kbd Opts`](#kbd-opts)
+    - [`Locks`](#locks)
+    - [`CatInt n filename`](#catint-n-filename)
+    - [`UVMeter`](#uvmeter)
+- [Executing External Commands](#executing-external-commands)
+- [Other Plugins](#other-plugins)
+    - [`StdinReader`](#stdinreader)
+    - [`UnsafeStdinReader`](#unsafestdinreader)
+    - [`Date Format Alias RefreshRate`](#date-format-alias-refreshrate)
+    - [`DateZone Format Locale Zone Alias RefreshRate`](#datezone-format-locale-zone-alias-refreshrate)
+    - [`CommandReader "/path/to/program" Alias`](#commandreader-pathtoprogram-alias)
+    - [`PipeReader "default text:/path/to/pipe" Alias`](#pipereader-default-textpathtopipe-alias)
+    - [`MarqueePipeReader "default text:/path/to/pipe" (length, rate, sep) Alias`](#marqueepipereader-default-textpathtopipe-length-rate-sep-alias)
+    - [`BufferedPipeReader Alias [(Timeout, Bool, "/path/to/pipe1"), ..]`](#bufferedpipereader-alias-timeout-bool-pathtopipe1-)
+    - [`XMonadLog`](#xmonadlog)
+    - [`UnsafeXMonadLog`](#unsafexmonadlog)
+    - [`HandleReader Handle Alias`](#handlereader-handle-alias)
+- [User plugins](#user-plugins)
     - [Writing a Plugin](#writing-a-plugin)
     - [Using a Plugin](#using-a-plugin)
     - [Configurations written in pure Haskell](#configurations-written-in-pure-haskell)
@@ -644,7 +644,7 @@ plugin, and much more: we list all available plugins below.
 Other commands can be created as plugins with the Plugin
 infrastructure. See below.
 
-## System Monitor Plugins
+# System Monitor Plugins
 
 This is the description of the system monitor plugins available in
 xmobar.  Some of them are only installed when an optional build option
@@ -655,7 +655,7 @@ Monitors have default aliases.  The sections below describe every
 monitor in turn, but before we provide a list of the configuration
 options (or *monitor arguments*) they all share.
 
-### Icon patterns
+## Icon patterns
 
 Some monitors allow usage of strings that depend on some integer value
 from 0 to 8 by replacing all occurrences of `"%%"` with it
@@ -673,7 +673,7 @@ it allows to replace vertical bars with custom icons. For example,
 Will display `bright_0.xpm` to `bright_8.xpm` depending on current brightness
 value.
 
-### Default Monitor Arguments
+## Default Monitor Arguments
 
 Monitors accept a common set of arguments, described in the first
 subsection below.  In addition, some monitors accept additional options
@@ -809,7 +809,7 @@ something like:
     Glasgow Airport: 16.0C
 
 
-### `Uptime Args RefreshRate`
+## `Uptime Args RefreshRate`
 
 - Aliases to `uptime`
 - Args: default monitor arguments. The low and high
@@ -820,7 +820,7 @@ something like:
   to add units to the display of those numeric fields.
 - Default template: `Up: <days>d <hours>h <minutes>m`
 
-### `Weather StationID Args RefreshRate`
+## `Weather StationID Args RefreshRate`
 
 - Aliases to the Station ID: so `Weather "LIPB" []` can be used in
   template as `%LIPB%`
@@ -843,7 +843,7 @@ something like:
 - Default template: `<station>: <tempC>C, rh <rh>% (<hour>)`
 - Retrieves weather information from http://tgftp.nws.noaa.gov.
 
-### `WeatherX StationID SkyConditions Args RefreshRate`
+## `WeatherX StationID SkyConditions Args RefreshRate`
 
 - Works in the same way as `Weather`, but takes an additional
   argument, a list of pairs from sky conditions to their replacement
@@ -876,7 +876,7 @@ For example:
 As mentioned, the replacement string can also be an icon
 specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
 
-### `Network Interface Args RefreshRate`
+## `Network Interface Args RefreshRate`
 
 - Aliases to the interface name: so `Network "eth0" []` can be used as
   `%eth0%`
@@ -894,7 +894,7 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
   Mb/s, etc.).
 - Default template: `<dev>: <rx>KB|<tx>KB`
 
-### `DynNetwork Args RefreshRate`
+## `DynNetwork Args RefreshRate`
 
 - Active interface is detected automatically
 - Aliases to "dynnetwork"
@@ -911,7 +911,7 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
 - Default template: `<dev>: <rx>KB|<tx>KB`
 - Example of usage of `--devices` option: `["--", "--devices", "wlp2s0,enp0s20f41"]`
 
-### `Wireless Interface Args RefreshRate`
+## `Wireless Interface Args RefreshRate`
 
 - If set to "", first suitable wireless interface is used.
 - Aliases to the interface name with the suffix "wi": thus, `Wireless
@@ -929,7 +929,7 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
 - To activate this plugin you must pass `--flags="with_nl80211"` or
   `--flags="with_iwlib"` during compilation
 
-### `Memory Args RefreshRate`
+## `Memory Args RefreshRate`
 
 - Aliases to `memory`
 - Args: default monitor arguments, plus:
@@ -944,7 +944,7 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
              `availableratio`, `availablebar`, `availablevbar`, `availableipat`
 - Default template: `Mem: <usedratio>% (<cache>M)`
 
-### `Swap Args RefreshRate`
+## `Swap Args RefreshRate`
 
 - Aliases to `swap`
 - Args: default monitor arguments
@@ -953,7 +953,7 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
 	    `total`, `used`, `free`, `usedratio`
 - Default template: `Swap: <usedratio>%`
 
-### `Cpu Args RefreshRate`
+## `Cpu Args RefreshRate`
 
 - Aliases to `cpu`
 - Args: default monitor arguments, plus:
@@ -963,7 +963,7 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
 	    `total`, `bar`, `vbar`, `ipat`, `user`, `nice`, `system`, `idle`, `iowait`
 - Default template: `Cpu: <total>%`
 
-### `MultiCpu Args RefreshRate`
+## `MultiCpu Args RefreshRate`
 
 - Aliases to `multicpu`
 - Args: default monitor arguments, plus:
@@ -985,11 +985,11 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
   and display one entry for each.
 - Default template: `Cpu: <total>%`
 
-### `Battery Args RefreshRate`
+## `Battery Args RefreshRate`
 
 - Same as `BatteryP ["BAT", "BAT0", "BAT1", "BAT2"] Args RefreshRate`.
 
-### `BatteryP Dirs Args RefreshRate`
+## `BatteryP Dirs Args RefreshRate`
 
 - Aliases to `battery`
 
@@ -1070,13 +1070,13 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
 - The "idle" AC state is selected whenever the AC power entering the
   battery is zero.
 
-### `BatteryN Dirs Args RefreshRate Alias`
+## `BatteryN Dirs Args RefreshRate Alias`
 
 Works like `BatteryP`, but lets you specify an alias for the monitor
 other than "battery".  Useful in case you one separate monitors for
 more than one battery.
 
-### `TopProc Args RefreshRate`
+## `TopProc Args RefreshRate`
 
 - Aliases to `top`
 - Args: default monitor arguments. The low and high
@@ -1093,7 +1093,7 @@ more than one battery.
   maximum and/or minimum width, using the `-m`/`-M` arguments. `no` gives
   the total number of processes.
 
-### `TopMem Args RefreshRate`
+## `TopMem Args RefreshRate`
 
 - Aliases to `topmem`
 - Args: default monitor arguments. The low and high
@@ -1106,7 +1106,7 @@ more than one battery.
   processes (`bothn` displays both, and is useful to specify an
   overall maximum and/or minimum width, using the `-m`/`-M` arguments.
 
-### `DiskU Disks Args RefreshRate`
+## `DiskU Disks Args RefreshRate`
 
 - Aliases to `disku`
 - Disks: list of pairs of the form (device or mount point, template),
@@ -1125,7 +1125,7 @@ more than one battery.
                ["-L", "20", "-H", "50", "-m", "1", "-p", "3"]
                20
 
-### `DiskIO Disks Args RefreshRate`
+## `DiskIO Disks Args RefreshRate`
 
 - Aliases to `diskio`
 - Disks: list of pairs of the form (device or mount point, template),
@@ -1148,7 +1148,7 @@ more than one battery.
 
          DiskIO [("/", "<read> <write>"), ("sdb1", "<total>")] [] 10
 
-### `ThermalZone Number Args RefreshRate`
+## `ThermalZone Number Args RefreshRate`
 
 - Aliases to "thermaln": so `ThermalZone 0 []` can be used in template
   as `%thermal0%`
@@ -1165,7 +1165,7 @@ more than one battery.
 
          Run ThermalZone 0 ["-t","<id>: <temp>C"] 30
 
-#### `Thermal Zone Args RefreshRate`
+## `Thermal Zone Args RefreshRate`
 
 - **This plugin is deprecated. Use `ThermalZone` instead.**
 
@@ -1182,7 +1182,7 @@ more than one battery.
 
          Run Thermal "THRM" ["-t","iwl4965-temp: <temp>C"] 50
 
-### `CpuFreq Args RefreshRate`
+## `CpuFreq Args RefreshRate`
 
 - Aliases to `cpufreq`
 - Args: default monitor arguments
@@ -1196,7 +1196,7 @@ more than one battery.
          Run CpuFreq ["-t", "Freq:<cpu0>|<cpu1>GHz", "-L", "0", "-H", "2",
                       "-l", "lightblue", "-n","white", "-h", "red"] 50
 
-### `CoreTemp Args RefreshRate`
+## `CoreTemp Args RefreshRate`
 
 - Aliases to `coretemp`
 - Args: default monitor arguments
@@ -1211,7 +1211,7 @@ more than one battery.
                        "-L", "40", "-H", "60",
                        "-l", "lightblue", "-n", "gray90", "-h", "red"] 50
 
-### `MultiCoreTemp Args RefreshRate`
+## `MultiCoreTemp Args RefreshRate`
 
 - Aliases to `multicoretemp`
 - Args: default monitor arguments, plus:
@@ -1248,7 +1248,7 @@ more than one battery.
                             "-l", "green", "-n", "yellow", "-h", "red",
                             "--", "--mintemp", "20", "--maxtemp", "100"] 50
 
-### `Volume Mixer Element Args RefreshRate`
+## `Volume Mixer Element Args RefreshRate`
 
 - Aliases to the mixer name and element name separated by a colon. Thus,
   `Volume "default" "Master" [] 10` can be used as `%default:Master%`.
@@ -1301,7 +1301,7 @@ more than one battery.
   system. In addition, to activate this plugin you must pass
   `--flags="with_alsa"` during compilation.
 
-### `Alsa Mixer Element Args`
+## `Alsa Mixer Element Args`
 
 Like [Volume](#volume-mixer-element-args-refreshrate), but with the
 following differences:
@@ -1320,7 +1320,7 @@ following differences:
 - `stdbuf` (from coreutils) must be (and most probably already is) in
   your `PATH`.
 
-### `MPD Args RefreshRate`
+## `MPD Args RefreshRate`
 
 - This monitor will only be compiled if you ask for it using the
   `with_mpd` flag. It needs [libmpd] 5.0 or later (available on Hackage).
@@ -1348,7 +1348,7 @@ following differences:
                   "<composer> <title> (<album>) <track>/<plength> <statei> [<flags>]",
                   "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
 
-### `Mpris1 PlayerName Args RefreshRate`
+## `Mpris1 PlayerName Args RefreshRate`
 
 - Aliases to `mpris1`
 - Requires [dbus] and [text] packages.
@@ -1364,7 +1364,7 @@ following differences:
 
          Run Mpris1 "clementine" ["-t", "<artist> - [<tracknumber>] <title>"] 10
 
-### `Mpris2 PlayerName Args RefreshRate`
+## `Mpris2 PlayerName Args RefreshRate`
 
 - Aliases to `mpris2`
 - Requires [dbus] and [text] packages.
@@ -1381,7 +1381,7 @@ following differences:
 
          Run Mpris2 "spotify" ["-t", "<artist> - [<composer>] <title>"] 10
 
-### `Mail Args Alias`
+## `Mail Args Alias`
 
 - Args: list of maildirs in form
   `[("name1","path1"),...]`. Paths may start with a '~'
@@ -1395,7 +1395,7 @@ following differences:
                    ("lists", "~/var/mail/lists")]
                   "mail"
 
-### `MailX Args Opts Alias`
+## `MailX Args Opts Alias`
 
 - Args: list of maildirs in form
   `[("name1","path1","color1"),...]`. Paths may start with a '~'
@@ -1419,7 +1419,7 @@ following differences:
                    "mail"
 
 
-### `MBox Mboxes Opts Alias`
+## `MBox Mboxes Opts Alias`
 
 - Mboxes a list of mbox files of the form `[("name", "path", "color")]`,
   where name is the displayed name, path the absolute or relative (to
@@ -1446,7 +1446,7 @@ following differences:
          Run MBox [("I ", "inbox", "red"), ("O ", "~/foo/mbox", "")]
                   ["-d", "/var/mail/", "-p", " "] "mbox"
 
-### `XPropertyLog PropName`
+## `XPropertyLog PropName`
 
 - Aliases to `PropName`
 - Reads the X property named by `PropName` (a string) and displays its
@@ -1456,7 +1456,7 @@ following differences:
 
 [examples/xmonadpropwrite.hs script]: https://github.com/jaor/xmobar/raw/master/examples/xmonadpropwrite.hs
 
-### `UnsafeXPropertyLog PropName`
+## `UnsafeXPropertyLog PropName`
 
 - Aliases to `PropName`
 - Same as `XPropertyLog`, but the input is not filtered to avoid
@@ -1464,17 +1464,17 @@ following differences:
   the value of the read property is responsible of performing any
   needed cleanups.
 
-### `NamedXPropertyLog PropName Alias`
+## `NamedXPropertyLog PropName Alias`
 
 - Aliases to `Alias`
 - Same as `XPropertyLog`, but a custom alias can be specified.
 
-### `NamedXPropertyLog PropName Alias`
+## `NamedXPropertyLog PropName Alias`
 
 - Aliases to `Alias`
 - Same as `UnsafeXPropertyLog`, but a custom alias can be specified.
 
-### `Brightness Args RefreshRate`
+## `Brightness Args RefreshRate`
 
 - Aliases to `bright`
 - Args: default monitor arguments, plus the following specif ones:
@@ -1492,7 +1492,7 @@ following differences:
 
        Run Brightness ["-t", "<bar>"] 60
 
-### `Kbd Opts`
+## `Kbd Opts`
 
 - Registers to XKB/X11-Events and output the currently active keyboard layout.
   Supports replacement of layout names.
@@ -1504,7 +1504,7 @@ following differences:
 
 		Run Kbd [("us(dvorak)", "DV"), ("us", "US")]
 
-### `Locks`
+## `Locks`
 
 - Displays the status of Caps Lock, Num Lock and Scroll Lock.
 - Aliases to `locks`
@@ -1512,7 +1512,7 @@ following differences:
 
 	Run Locks
 
-### `CatInt n filename`
+## `CatInt n filename`
 
 - Reads and displays an integer from the file whose path is `filename`
   (especially useful with files in `/sys`).
@@ -1522,7 +1522,7 @@ following differences:
 
     Run CatInt 0 "/sys/devices/platform/thinkpad_hwmon/fan1_input" [] 50
 
-### `UVMeter`
+## `UVMeter`
 
 - Aliases to "uv " + station id. For example: `%uv Brisbane%` or `%uv
   Alice Springs%`
@@ -1541,7 +1541,7 @@ following differences:
 
         Run UVMeter "Brisbane" ["-H", "3", "-L", "3", "--low", "green", "--high", "red"] 900
 
-## Executing External Commands
+# Executing External Commands
 
 In order to execute an external command you can either write the
 command name in the template, in this case it will be executed without
@@ -1582,9 +1582,9 @@ execution fails.  For instance:
 
 will display "N/A" if for some reason the `date` invocation fails.
 
-## Other Plugins
+# Other Plugins
 
-### `StdinReader`
+## `StdinReader`
 
 - Aliases to StdinReader
 - Displays any text received by xmobar on its standard input.
@@ -1592,7 +1592,7 @@ will display "N/A" if for some reason the `date` invocation fails.
   actions via stdin.  This is safer than `UnsafeStdinReader` because there is
   no need to escape the content before passing it to xmobar's standard input.
 
-### `UnsafeStdinReader`
+## `UnsafeStdinReader`
 
 - Aliases to UnsafeStdinReader
 - Displays any text received by xmobar on its standard input.
@@ -1606,13 +1606,13 @@ will display "N/A" if for some reason the `date` invocation fails.
   clicking on xmobar:
   ```<action=`xdotool key alt+1`>ws1</action> <action=`xdotool key alt+1`>ws2</action>```
 
-### `Date Format Alias RefreshRate`
+## `Date Format Alias RefreshRate`
 
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
 - Sample usage: `Run Date "%a %b %_d %Y <fc=#ee9a00>%H:%M:%S</fc>" "date" 10`
 
-### `DateZone Format Locale Zone Alias RefreshRate`
+## `DateZone Format Locale Zone Alias RefreshRate`
 
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
@@ -1625,17 +1625,17 @@ will display "N/A" if for some reason the `date` invocation fails.
 - Sample usage:
   `Run DateZone "%a %H:%M:%S" "de_DE.UTF-8" "Europe/Vienna" "viennaTime" 10`
 
-### `CommandReader "/path/to/program" Alias`
+## `CommandReader "/path/to/program" Alias`
 
 - Runs the given program, and displays its standard output.
 
-### `PipeReader "default text:/path/to/pipe" Alias`
+## `PipeReader "default text:/path/to/pipe" Alias`
 
 - Reads its displayed output from the given pipe.
 - Prefix an optional default text separated by a colon
 - Expands environment variables in the first argument of syntax '${VAR}' or '$VAR'
 
-### `MarqueePipeReader "default text:/path/to/pipe" (length, rate, sep) Alias`
+## `MarqueePipeReader "default text:/path/to/pipe" (length, rate, sep) Alias`
 
 - Generally equivalent to PipeReader
 - Text is displayed as marquee with the specified length, rate in 10th
@@ -1645,7 +1645,7 @@ will display "N/A" if for some reason the `date` invocation fails.
 
 - Expands environment variables in the first argument
 
-### `BufferedPipeReader Alias [(Timeout, Bool, "/path/to/pipe1"), ..]`
+## `BufferedPipeReader Alias [(Timeout, Bool, "/path/to/pipe1"), ..]`
 
 - Display data from multiple pipes.
 - Timeout (in tenth of seconds) is the value after which the previous
@@ -1677,7 +1677,7 @@ will display "N/A" if for some reason the `date` invocation fails.
 [examples/status.sh]: http://github.com/jaor/xmobar/raw/master/examples/status.sh
 
 
-### `XMonadLog`
+## `XMonadLog`
 
 - Aliases to XMonadLog
 - Displays information from xmonad's `_XMONAD_LOG`. You can set this
@@ -1695,7 +1695,7 @@ will display "N/A" if for some reason the `date` invocation fails.
 
 [here]: http://xmonad.org/xmonad-docs/xmonad-contrib/XMonad-Hooks-DynamicLog.html
 
-### `UnsafeXMonadLog`
+## `UnsafeXMonadLog`
 
 - Aliases to UnsafeXMonadLog
 - Similar to StdinReader versus UnsafeStdinReader, this does not strip `<action
@@ -1708,7 +1708,7 @@ will display "N/A" if for some reason the `date` invocation fails.
           logHook = dynamicLogString myPP >>= xmonadPropLog
         }
 
-### `HandleReader Handle Alias`
+## `HandleReader Handle Alias`
 
 - Display data from a Haskell `Handle`
 - This plugin is only useful if you are running xmobar from another Haskell
@@ -1725,7 +1725,7 @@ will display "N/A" if for some reason the `date` invocation fails.
         hPutStr writeHandle "Hello World"
 
 
-# Plugins
+# User plugins
 
 ## Writing a Plugin
 
