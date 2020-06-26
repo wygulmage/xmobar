@@ -1,4 +1,6 @@
-## Version 0.36 (Unreleased)
+## Version 0.35.1 (June, 2020)
+
+- Dropped support for GHC < 8.4 (see issue #461)
 
 ## Version 0.35 (June, 2020)
 
@@ -19,8 +21,9 @@ _New features_
   - Optimize date plugin by avoiding calling getTimeZone for each of
     the time the date has to be updated. Instead, it's computed once
     at the start and re-used for each invocation.
-  - Optimize Weather and UVMeter plugin by using global Manager instead of
-    creating for each http request when useManager is explicitly configured as False.
+  - Optimize Weather and UVMeter plugin by using global Manager
+    instead of creating for each http request when useManager is
+    explicitly configured as False.
 
 ## Version 0.33 (February, 2020)
 

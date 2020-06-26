@@ -1,5 +1,5 @@
 name:               xmobar
-version:            0.36
+version:            0.35.1
 homepage:           http://xmobar.org
 synopsis:           A Minimalistic Text Based Status Bar
 description: 	    Xmobar is a minimalistic text based status bar.
@@ -166,7 +166,7 @@ library
     ghc-options: -funbox-strict-fields -Wall -fno-warn-unused-do-bind
 
     build-depends:
-      base >= 4.9.1.0 && < 4.15,
+      base >= 4.11.0 && < 4.15,
       containers,
       regex-compat,
       process,
