@@ -57,7 +57,7 @@
     - [`XPropertyLog PropName`](#xpropertylog-propname)
     - [`UnsafeXPropertyLog PropName`](#unsafexpropertylog-propname)
     - [`NamedXPropertyLog PropName Alias`](#namedxpropertylog-propname-alias)
-    - [`NamedXPropertyLog PropName Alias`](#namedxpropertylog-propname-alias-1)
+    - [`UnsafeNamedXPropertyLog PropName Alias`](#unsafenamedxpropertylog-propname-alias-1)
     - [`Brightness Args RefreshRate`](#brightness-args-refreshrate)
     - [`Kbd Opts`](#kbd-opts)
     - [`Locks`](#locks)
@@ -1469,7 +1469,7 @@ following differences:
 - Aliases to `Alias`
 - Same as `XPropertyLog`, but a custom alias can be specified.
 
-## `NamedXPropertyLog PropName Alias`
+## `UnsafeNamedXPropertyLog PropName Alias`
 
 - Aliases to `Alias`
 - Same as `UnsafeXPropertyLog`, but a custom alias can be specified.
