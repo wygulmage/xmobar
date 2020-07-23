@@ -36,7 +36,7 @@ import Xmobar.X11.Types
 import Xmobar.X11.Text
 import Xmobar.X11.ColorCache
 import Xmobar.X11.Window (drawBorder)
-import Xmobar.X11.Parsers (Widget(..))
+import Xmobar.X11.Parsers (ColorInfo(..), Widget(..))
 import Xmobar.System.Utils (safeIndex)
 
 #ifdef XFT
@@ -48,7 +48,7 @@ fi :: (Integral a, Num b) => a -> b
 fi = fromIntegral
 
 -- | Draws in and updates the window
-drawInWin :: Rectangle -> [[(Widget, String, Int, Maybe [Action])]] -> X ()
+drawInWin :: Rectangle -> [[(Widget, ColorInfo, Int, Maybe [Action])]] -> X ()
 drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
   r <- ask
   let (c,d) = (config &&& display) r
@@ -102,33 +102,35 @@ verticalOffset ht (Icon _) _ _ conf
   | otherwise = return $ fi (ht `div` 2) - 1
 
 printString :: Display -> Drawable -> XFont -> GC -> String -> String
-            -> Position -> Position -> String -> Int -> IO ()
-printString d p (Core fs) gc fc bc x y s a = do
+            -> Position -> Position -> Position -> Position -> String -> Int -> IO ()
+printString d p (Core fs) gc fc bc x y ay ht s a = do
     setFont d gc $ fontFromFontStruct fs
     withColors d [fc, bc] $ \[fc', bc'] -> do
       setForeground d gc fc'
       when (a == 255) (setBackground d gc bc')
       drawImageString d p gc x y s
 
-printString d p (Utf8 fs) gc fc bc x y s a =
+printString d p (Utf8 fs) gc fc bc x y ay ht s a =
     withColors d [fc, bc] $ \[fc', bc'] -> do
       setForeground d gc fc'
       when (a == 255) (setBackground d gc bc')
       liftIO $ wcDrawImageString d p fs gc x y s
 
 #ifdef XFT
-printString dpy drw fs@(Xft fonts) _ fc bc x y s al =
+printString dpy drw fs@(Xft fonts) _ fc bc x y ay ht s al =
   withDrawingColors dpy drw fc bc $ \draw fc' bc' -> do
     when (al == 255) $ do
       (a,d)  <- textExtents fs s
       gi <- xftTxtExtents' dpy fonts s
-      drawXftRect draw bc' x (y - a) (1 + xglyphinfo_xOff gi) (a + d + 2)
+      if ay < 0
+        then drawXftRect draw bc' x (y - a) (1 + xglyphinfo_xOff gi) (a + d + 2)
+        else drawXftRect draw bc' x ay (1 + xglyphinfo_xOff gi) ht
     drawXftString' draw fc' fonts (toInteger x) (toInteger y) s
 #endif
 
 -- | An easy way to print the stuff we need to print
 printStrings :: Drawable -> GC -> NE.NonEmpty XFont -> [Int] -> Position
-             -> Align -> [(Widget, String, Int, Position)] -> X ()
+             -> Align -> [(Widget, ColorInfo, Int, Position)] -> X ()
 printStrings _ _ _ _ _ _ [] = return ()
 printStrings dr gc fontlist voffs offs a sl@((s,c,i,l):xs) = do
   r <- ask
@@ -142,12 +144,16 @@ printStrings dr gc fontlist voffs offs a sl@((s,c,i,l):xs) = do
                  C -> (remWidth + offs) `div` 2
                  R -> remWidth
                  L -> offs
-      (fc,bc) = case break (==',') c of
+      (fc,bc) = case break (==',') (colorsString c) of
                  (f,',':b) -> (f, b           )
                  (f,    _) -> (f, bgColor conf)
   valign <- verticalOffset ht s (NE.head fontlist) (voffs !! i) conf
+  let (ht',ay) = case (bgTopOffset c, bgBottomOffset c) of
+                   (-1,_)  -> (0, -1)
+                   (_,-1)  -> (0, -1)
+                   (ot,ob) -> ((fromIntegral ht) - ot - ob, ob)
   case s of
-    (Text t) -> liftIO $ printString d dr fontst gc fc bc offset valign t alph
+    (Text t) -> liftIO $ printString d dr fontst gc fc bc offset valign ay ht' t alph
     (Icon p) -> liftIO $ maybe (return ())
                            (B.drawBitmap d dr gc fc bc offset valign)
                            (lookup p (iconS r))
