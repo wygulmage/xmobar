@@ -158,11 +158,10 @@ printStrings dr gc fontlist voffs offs a boxes sl@((s,c,i,l):xs) = do
     (Icon p) -> liftIO $ maybe (return ())
                            (B.drawBitmap d dr gc fc bc offset valign)
                            (lookup p (iconS r))
-  let x2 = offset + l - 1
   let triBoxes = tBoxes c
       dropBoxes = filter (\(_,b) -> not(b `elem` triBoxes)) boxes
-      boxes' = map (\((x1,_),b) -> ((x1, x2), b)) (filter (\(_,b) -> b `elem` triBoxes) boxes)
-            ++ map (\b -> ((offset - 1, x2), b)) (triBoxes \\ (map snd boxes))
+      boxes' = map (\((x1,_),b) -> ((x1, offset + l), b)) (filter (\(_,b) -> b `elem` triBoxes) boxes)
+            ++ map (\b -> ((offset, offset + l), b)) (triBoxes \\ (map snd boxes))
   if Prelude.null xs
     then liftIO $ drawBoxes d dr gc (fromIntegral ht) (dropBoxes ++ boxes')
     else liftIO $ drawBoxes d dr gc (fromIntegral ht) dropBoxes
@@ -199,5 +198,5 @@ drawBoxBorder d dr gc pos alg offset ht (x1,x2) = do
   case pos of
     BBTop    -> drawLine d dr gc (x1 + p1) 0  (x2 + p2) 0
     BBBottom -> drawLine d dr gc (x1 + p1) (ht - 1) (x2 + p2) (ht - 1)
-    BBLeft   -> drawLine d dr gc x1 p1 x1 (ht + p2)
-    BBRight  -> drawLine d dr gc x2 p1 x2 (ht + p2)
+    BBLeft   -> drawLine d dr gc (x1 - 1) p1 (x1 - 1) (ht + p2)
+    BBRight  -> drawLine d dr gc (x2 - 1) p1 (x2 - 1) (ht + p2)
