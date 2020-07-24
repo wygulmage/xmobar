@@ -23,7 +23,8 @@ import Prelude hiding (lookup)
 import Control.Monad.IO.Class
 import Control.Monad.Reader
 import Control.Arrow ((&&&))
-import Data.Map hiding (foldr, map, filter)
+import Data.Map hiding ((\\), foldr, map, filter)
+import Data.List ((\\))
 import qualified Data.List.NonEmpty as NE
 
 import Graphics.X11.Xlib hiding (textExtents, textWidth)
@@ -36,7 +37,7 @@ import Xmobar.X11.Types
 import Xmobar.X11.Text
 import Xmobar.X11.ColorCache
 import Xmobar.X11.Window (drawBorder)
-import Xmobar.X11.Parsers (TextRenderInfo(..), Widget(..))
+import Xmobar.X11.Parsers hiding (parseString)
 import Xmobar.System.Utils (safeIndex)
 
 #ifdef XFT
@@ -76,9 +77,9 @@ drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
       liftIO $ setForeground d gc bgcolor
       liftIO $ fillRectangle d p gc 0 0 wid ht
     -- write to the pixmap the new string
-    printStrings p gc fs vs 1 L =<< strLn left
-    printStrings p gc fs vs 1 R =<< strLn right
-    printStrings p gc fs vs 1 C =<< strLn center
+    printStrings p gc fs vs 1 L [] =<< strLn left
+    printStrings p gc fs vs 1 R [] =<< strLn right
+    printStrings p gc fs vs 1 C [] =<< strLn center
     -- draw border if requested
     liftIO $ drawBorder (border c) (borderWidth c) d p gc bdcolor wid ht
     -- copy the pixmap with the new string to the window
@@ -130,9 +131,9 @@ printString dpy drw fs@(Xft fonts) _ fc bc x y ay ht s al =
 
 -- | An easy way to print the stuff we need to print
 printStrings :: Drawable -> GC -> NE.NonEmpty XFont -> [Int] -> Position
-             -> Align -> [(Widget, TextRenderInfo, Int, Position)] -> X ()
-printStrings _ _ _ _ _ _ [] = return ()
-printStrings dr gc fontlist voffs offs a sl@((s,c,i,l):xs) = do
+             -> Align -> [((Position, Position), Box)] -> [(Widget, TextRenderInfo, Int, Position)] -> X ()
+printStrings _ _ _ _ _ _ _ [] = return ()
+printStrings dr gc fontlist voffs offs a boxes sl@((s,c,i,l):xs) = do
   r <- ask
   let (conf,d) = (config &&& display) r
       alph = alpha conf
@@ -157,4 +158,46 @@ printStrings dr gc fontlist voffs offs a sl@((s,c,i,l):xs) = do
     (Icon p) -> liftIO $ maybe (return ())
                            (B.drawBitmap d dr gc fc bc offset valign)
                            (lookup p (iconS r))
-  printStrings dr gc fontlist voffs (offs + l) a xs
+  let x2 = offset + l - 1
+  let triBoxes = tBoxes c
+      dropBoxes = filter (\(_,b) -> not(b `elem` triBoxes)) boxes
+      boxes' = map (\((x1,_),b) -> ((x1, x2), b)) (filter (\(_,b) -> b `elem` triBoxes) boxes)
+            ++ map (\b -> ((offset - 1, x2), b)) (triBoxes \\ (map snd boxes))
+  if Prelude.null xs
+    then liftIO $ drawBoxes d dr gc (fromIntegral ht) (dropBoxes ++ boxes')
+    else liftIO $ drawBoxes d dr gc (fromIntegral ht) dropBoxes
+  printStrings dr gc fontlist voffs (offs + l) a boxes' xs
+
+drawBoxes :: Display -> Drawable -> GC -> Position -> [((Position, Position), Box)] -> IO ()
+drawBoxes _ _ _ _ [] = return ()
+drawBoxes d dr gc ht (b:bs) = do
+  let (xx, Box pos alg offset lineWidth fc) = b
+  withColors d [fc] $ \[fc'] -> do
+    setForeground d gc fc'
+    setLineAttributes d gc lineWidth lineSolid capNotLast joinMiter
+    case pos of
+      BBVBoth -> do
+        drawBoxBorder d dr gc BBTop    alg offset ht xx
+        drawBoxBorder d dr gc BBBottom alg offset ht xx
+      BBHBoth -> do
+        drawBoxBorder d dr gc BBLeft   alg offset ht xx
+        drawBoxBorder d dr gc BBRight  alg offset ht xx
+      BBFull  -> do
+        drawBoxBorder d dr gc BBTop    alg offset ht xx
+        drawBoxBorder d dr gc BBBottom alg offset ht xx
+        drawBoxBorder d dr gc BBLeft   alg offset ht xx
+        drawBoxBorder d dr gc BBRight  alg offset ht xx
+      _ -> drawBoxBorder d dr gc pos   alg offset ht xx
+  drawBoxes d dr gc ht bs
+
+drawBoxBorder :: Display -> Drawable -> GC -> BoxBorder -> Align -> Position -> Position -> (Position, Position) -> IO ()
+drawBoxBorder d dr gc pos alg offset ht (x1,x2) = do
+  let (p1,p2) = case alg of
+                 L -> (0,      (-offset))
+                 C -> (offset, (-offset))
+                 R -> (offset, 0        )
+  case pos of
+    BBTop    -> drawLine d dr gc (x1 + p1) 0  (x2 + p2) 0
+    BBBottom -> drawLine d dr gc (x1 + p1) (ht - 1) (x2 + p2) (ht - 1)
+    BBLeft   -> drawLine d dr gc x1 p1 x1 (ht + p2)
+    BBRight  -> drawLine d dr gc x2 p1 x2 (ht + p2)
