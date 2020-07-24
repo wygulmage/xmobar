@@ -36,7 +36,7 @@ import Xmobar.X11.Types
 import Xmobar.X11.Text
 import Xmobar.X11.ColorCache
 import Xmobar.X11.Window (drawBorder)
-import Xmobar.X11.Parsers (ColorInfo(..), Widget(..))
+import Xmobar.X11.Parsers (TextRenderInfo(..), Widget(..))
 import Xmobar.System.Utils (safeIndex)
 
 #ifdef XFT
@@ -48,7 +48,7 @@ fi :: (Integral a, Num b) => a -> b
 fi = fromIntegral
 
 -- | Draws in and updates the window
-drawInWin :: Rectangle -> [[(Widget, ColorInfo, Int, Maybe [Action])]] -> X ()
+drawInWin :: Rectangle -> [[(Widget, TextRenderInfo, Int, Maybe [Action])]] -> X ()
 drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
   r <- ask
   let (c,d) = (config &&& display) r
@@ -130,7 +130,7 @@ printString dpy drw fs@(Xft fonts) _ fc bc x y ay ht s al =
 
 -- | An easy way to print the stuff we need to print
 printStrings :: Drawable -> GC -> NE.NonEmpty XFont -> [Int] -> Position
-             -> Align -> [(Widget, ColorInfo, Int, Position)] -> X ()
+             -> Align -> [(Widget, TextRenderInfo, Int, Position)] -> X ()
 printStrings _ _ _ _ _ _ [] = return ()
 printStrings dr gc fontlist voffs offs a sl@((s,c,i,l):xs) = do
   r <- ask
@@ -144,11 +144,11 @@ printStrings dr gc fontlist voffs offs a sl@((s,c,i,l):xs) = do
                  C -> (remWidth + offs) `div` 2
                  R -> remWidth
                  L -> offs
-      (fc,bc) = case break (==',') (colorsString c) of
+      (fc,bc) = case break (==',') (tColorsString c) of
                  (f,',':b) -> (f, b           )
                  (f,    _) -> (f, bgColor conf)
   valign <- verticalOffset ht s (NE.head fontlist) (voffs !! i) conf
-  let (ht',ay) = case (bgTopOffset c, bgBottomOffset c) of
+  let (ht',ay) = case (tBgTopOffset c, tBgBottomOffset c) of
                    (-1,_)  -> (0, -1)
                    (_,-1)  -> (0, -1)
                    (ot,ob) -> ((fromIntegral ht) - ot - ob, ob)

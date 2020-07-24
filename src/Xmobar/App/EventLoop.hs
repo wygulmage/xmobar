@@ -250,17 +250,17 @@ startCommand sig (com,s,ss)
     where is = s ++ "Updating..." ++ ss
 
 updateString :: Config -> TVar [String]
-                -> IO [[(Widget, ColorInfo, Int, Maybe [Action])]]
+                -> IO [[(Widget, TextRenderInfo, Int, Maybe [Action])]]
 updateString conf v = do
   s <- readTVarIO v
   let l:c:r:_ = s ++ repeat ""
   liftIO $ mapM (parseString conf) [l, c, r]
 
-updateActions :: XConf -> Rectangle -> [[(Widget, ColorInfo, Int, Maybe [Action])]]
+updateActions :: XConf -> Rectangle -> [[(Widget, TextRenderInfo, Int, Maybe [Action])]]
                  -> IO [([Action], Position, Position)]
 updateActions conf (Rectangle _ _ wid _) ~[left,center,right] = do
   let (d,fs) = (display &&& fontListS) conf
-      strLn :: [(Widget, ColorInfo, Int, Maybe [Action])] -> IO [(Maybe [Action], Position, Position)]
+      strLn :: [(Widget, TextRenderInfo, Int, Maybe [Action])] -> IO [(Maybe [Action], Position, Position)]
       strLn  = liftIO . mapM getCoords
       iconW i = maybe 0 Bitmap.width (lookup i $ iconS conf)
       getCoords (Text s,_,i,a) = textWidth d (safeIndex fs i) s >>= \tw -> return (a, 0, fi tw)
