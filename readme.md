@@ -276,8 +276,8 @@ For the output template:
 - `<fn=1>string</fn>` will print `string` with the first font from
   `additionalFonts`.  The index `0` corresponds to the standard font.
 
-- `<box=BBBottom C 0 1 red>string</box>` will underline `string` in red and `<box=BBFull C 0 1 white>string</box>` will draw a white box around `string`.
-  <br>Usage: `<box=Position Align Offset Width Color>`.
+- `<box=BBBottom C 0 1 red>string</box>` will underline `string` in red and `<box=BBFull>string</box>` will draw a white box around `string`.
+  <br>Usage: `<box=Position Align Offset Width Color>`. Only `Position` is required, everything else has a default value.
   <br>Positions: `BBTop, BBBottom, BBVBoth, BBLeft, BBRight, BBHBoth, BBFull`
 
 - `<icon=/path/to/icon.xbm/>` will insert the given bitmap. XPM image
