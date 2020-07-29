@@ -268,10 +268,17 @@ For the output template:
   may contain markups to change the characters' color.
 
 - `<fc=#FF0000>string</fc>` will print `string` with `#FF0000` color
-  (red).
+  (red). `<fc=#FF0000,#000000>string</fc>` will print `string` in red with
+  a black background (`#000000`). Background absolute offsets can be specified
+  for XFT fonts. `<fc=#FF0000,#000000:0>string</fc>` will have a background
+  matching the bar's height.
 
 - `<fn=1>string</fn>` will print `string` with the first font from
   `additionalFonts`.  The index `0` corresponds to the standard font.
+
+- `<box=BBBottom C 0 1 red>string</box>` will underline `string` in red and `<box=BBFull C 0 1 white>string</box>` will draw a white box around `string`.
+  <br>Usage: `<box=Position Align Offset Width Color>`.
+  <br>Positions: `BBTop, BBBottom, BBVBoth, BBLeft, BBRight, BBHBoth, BBFull`
 
 - `<icon=/path/to/icon.xbm/>` will insert the given bitmap. XPM image
   format is also supported when compiled with `--flags="with_xpm"`.
