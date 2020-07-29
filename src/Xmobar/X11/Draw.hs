@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE TupleSections #-}
 
 ------------------------------------------------------------------------------
 -- |
@@ -152,16 +153,16 @@ printStrings dr gc fontlist voffs offs a boxes sl@((s,c,i,l):xs) = do
   let (ht',ay) = case (tBgTopOffset c, tBgBottomOffset c) of
                    (-1,_)  -> (0, -1)
                    (_,-1)  -> (0, -1)
-                   (ot,ob) -> ((fromIntegral ht) - ot - ob, ob)
+                   (ot,ob) -> (fromIntegral ht - ot - ob, ob)
   case s of
     (Text t) -> liftIO $ printString d dr fontst gc fc bc offset valign ay ht' t alph
     (Icon p) -> liftIO $ maybe (return ())
                            (B.drawBitmap d dr gc fc bc offset valign)
                            (lookup p (iconS r))
   let triBoxes = tBoxes c
-      dropBoxes = filter (\(_,b) -> not(b `elem` triBoxes)) boxes
+      dropBoxes = filter (\(_,b) -> b `notElem` triBoxes) boxes
       boxes' = map (\((x1,_),b) -> ((x1, offset + l), b)) (filter (\(_,b) -> b `elem` triBoxes) boxes)
-            ++ map (\b -> ((offset, offset + l), b)) (triBoxes \\ (map snd boxes))
+            ++ map ((offset, offset + l),) (triBoxes \\ map snd boxes)
   if Prelude.null xs
     then liftIO $ drawBoxes d dr gc (fromIntegral ht) (dropBoxes ++ boxes')
     else liftIO $ drawBoxes d dr gc (fromIntegral ht) dropBoxes
@@ -192,9 +193,9 @@ drawBoxes d dr gc ht (b:bs) = do
 drawBoxBorder :: Display -> Drawable -> GC -> BoxBorder -> Align -> Position -> Position -> (Position, Position) -> IO ()
 drawBoxBorder d dr gc pos alg offset ht (x1,x2) = do
   let (p1,p2) = case alg of
-                 L -> (0,      (-offset))
-                 C -> (offset, (-offset))
-                 R -> (offset, 0        )
+                 L -> (0,      -offset)
+                 C -> (offset, -offset)
+                 R -> (offset, 0      )
   case pos of
     BBTop    -> drawLine d dr gc (x1 + p1) 0  (x2 + p2) 0
     BBBottom -> drawLine d dr gc (x1 + p1) (ht - 1) (x2 + p2) (ht - 1)

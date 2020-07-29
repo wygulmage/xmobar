@@ -40,7 +40,7 @@ data BoxBorder = BBTop
 data Box = Box BoxBorder Align Int32 CInt String deriving ( Eq )
 instance Read Box where
   readsPrec _ input = do
-    let b = case (words input) of
+    let b = case words input of
              [pos]               -> Just $ Box (read pos) C 0 1 "white"
              [pos,alg]           -> Just $ Box (read pos) (read alg) 0 1 "white"
              [pos,alg,off]       -> Just $ Box (read pos) (read alg) (read off) 1 "white"
