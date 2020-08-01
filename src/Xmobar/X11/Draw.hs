@@ -172,32 +172,37 @@ drawBoxes :: Display -> Drawable -> GC -> Position -> [((Position, Position), Bo
 drawBoxes _ _ _ _ [] = return ()
 drawBoxes d dr gc ht (b:bs) = do
   let (xx, Box pos alg offset lineWidth fc) = b
+      lw = fromIntegral lineWidth :: Position
   withColors d [fc] $ \[fc'] -> do
     setForeground d gc fc'
     setLineAttributes d gc lineWidth lineSolid capNotLast joinMiter
     case pos of
       BBVBoth -> do
-        drawBoxBorder d dr gc BBTop    alg offset ht xx
-        drawBoxBorder d dr gc BBBottom alg offset ht xx
+        drawBoxBorder d dr gc BBTop    alg offset ht xx lw
+        drawBoxBorder d dr gc BBBottom alg offset ht xx lw
       BBHBoth -> do
-        drawBoxBorder d dr gc BBLeft   alg offset ht xx
-        drawBoxBorder d dr gc BBRight  alg offset ht xx
+        drawBoxBorder d dr gc BBLeft   alg offset ht xx lw
+        drawBoxBorder d dr gc BBRight  alg offset ht xx lw
       BBFull  -> do
-        drawBoxBorder d dr gc BBTop    alg offset ht xx
-        drawBoxBorder d dr gc BBBottom alg offset ht xx
-        drawBoxBorder d dr gc BBLeft   alg offset ht xx
-        drawBoxBorder d dr gc BBRight  alg offset ht xx
-      _ -> drawBoxBorder d dr gc pos   alg offset ht xx
+        drawBoxBorder d dr gc BBTop    alg offset ht xx lw
+        drawBoxBorder d dr gc BBBottom alg offset ht xx lw
+        drawBoxBorder d dr gc BBLeft   alg offset ht xx lw
+        drawBoxBorder d dr gc BBRight  alg offset ht xx lw
+      _ -> drawBoxBorder d dr gc pos   alg offset ht xx lw
   drawBoxes d dr gc ht bs
 
-drawBoxBorder :: Display -> Drawable -> GC -> BoxBorder -> Align -> Position -> Position -> (Position, Position) -> IO ()
-drawBoxBorder d dr gc pos alg offset ht (x1,x2) = do
+drawBoxBorder :: Display -> Drawable -> GC -> BoxBorder -> Align -> Position -> Position
+                 -> (Position, Position) -> Position -> IO ()
+drawBoxBorder d dr gc pos alg offset ht (x1,x2) lw = do
   let (p1,p2) = case alg of
                  L -> (0,      -offset)
                  C -> (offset, -offset)
                  R -> (offset, 0      )
+      lc = lw `div` 2
   case pos of
-    BBTop    -> drawLine d dr gc (x1 + p1) 0  (x2 + p2) 0
-    BBBottom -> drawLine d dr gc (x1 + p1) (ht - 1) (x2 + p2) (ht - 1)
+    BBTop    -> drawLine d dr gc (x1 + p1) lc  (x2 + p2) lc
+    BBBottom -> do
+      let lc' = max lc 1
+      drawLine d dr gc (x1 + p1) (ht - lc') (x2 + p2) (ht - lc')
     BBLeft   -> drawLine d dr gc (x1 - 1) p1 (x1 - 1) (ht + p2)
-    BBRight  -> drawLine d dr gc (x2 - 1) p1 (x2 - 1) (ht + p2)
+    BBRight  -> drawLine d dr gc (x2 + lc - 1) p1 (x2 + lc - 1) (ht + p2)
