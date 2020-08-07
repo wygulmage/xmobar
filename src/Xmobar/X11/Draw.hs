@@ -206,3 +206,4 @@ drawBoxBorder d dr gc pos (BoxOffset alg offset) ht (x1,x2) lw (BoxMargins mt mr
       drawLine d dr gc (x1 + p1) (ht - lc') (x2 + p2) (ht - lc')
     BBLeft   -> drawLine d dr gc (x1 - 1 + ml) p1 (x1 - 1 + ml) (ht + p2)
     BBRight  -> drawLine d dr gc (x2 + lc - 1 - mr) p1 (x2 + lc - 1 - mr) (ht + p2)
+    _ -> error "unreachable code"
