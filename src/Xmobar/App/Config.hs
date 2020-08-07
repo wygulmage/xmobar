@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.Config.Defaults
--- Copyright: (c) 2018, 2019 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2018, 2019, 2020 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: jao@gnu.org
@@ -17,11 +17,10 @@
 
 
 module Xmobar.App.Config (defaultConfig,
-                          xmobarConfigDir,
                           xmobarDataDir,
                           xmobarConfigFile) where
 
-import Control.Monad (when)
+import Control.Monad (when, filterM)
 
 import System.Environment
 import System.Directory
@@ -65,29 +64,6 @@ defaultConfig =
                         "<fc=#00FF00>%uname%</fc> * <fc=#FF0000>%theDate%</fc>"
            , verbose = False
            }
-
--- | Return the path to the xmobar configuration directory.  This
--- directory is where user configuration files are stored (e.g, the
--- xmobar.hs file).  You may also create a @lib@ subdirectory in the
--- configuration directory and the default recompile command will add
--- it to the GHC include path.
---
--- Several directories are considered.  In order of
--- preference:
---
---   1. The directory specified in the @XMOBAR_CONFIG_DIR@ environment variable.
---   2. The @~\/.xmobar@ directory.
---   3. The @XDG_CONFIG_HOME/xmobar@ directory.
---
--- The first directory that exists will be used.  If none of the
--- directories exist then (1) will be used if it is set, otherwise (2)
--- will be used.
-xmobarConfigDir :: IO String
-xmobarConfigDir =
-    findFirstDirWithEnv False "XMOBAR_CONFIG_DIR"
-      [ getAppUserDataDirectory "xmobar"
-      , getXdgDirectory XdgConfig "xmobar"
-      ]
 
 -- | Return the path to the xmobar data directory.  This directory is
 -- used by Xmobar to store data files such as the run-time state file
@@ -140,11 +116,21 @@ findFirstDirWithEnv create envName paths = do
       Nothing -> findFirstDirOf create paths
       Just envPath -> findFirstDirOf create (return envPath:paths)
 
+xmobarInConfigDirs :: FilePath -> IO (Maybe FilePath)
+xmobarInConfigDirs fn  = do
+    env <- lookupEnv "XMOBAR_CONFIG_DIR"
+    xdg <- getXdgDirectory XdgConfig "xmobar"
+    app <- getAppUserDataDirectory "xmobar"
+    hom <- getHomeDirectory
+    let candidates = case env of
+                       Nothing -> [app, xdg, hom]
+                       Just p -> [p, app, xdg, hom]
+    fs <- filterM (\d -> fileExist (d </> fn)) candidates
+    return $ if null fs then Nothing else Just (head fs </> fn)
+
 xmobarConfigFile :: IO (Maybe FilePath)
 xmobarConfigFile =
-  ffirst [ xdg "xmobar.hs", xdg "xmobarrc", home ".xmobarrc"]
-  where xdg p = fmap (</> p) xmobarConfigDir
-        home p = fmap (</> p) getHomeDirectory
-        ffirst [] = return Nothing
-        ffirst (f:fs) =
-          f >>= fileExist >>= \e -> if e then fmap Just f else ffirst fs
+  fmap ffirst $ mapM xmobarInConfigDirs ["xmobar.hs", ".xmobarrc", "xmobarrc"]
+  where ffirst [] = Nothing
+        ffirst (Nothing:fs) = ffirst fs
+        ffirst (p:_) = p

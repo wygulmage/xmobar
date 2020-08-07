@@ -7,7 +7,8 @@ _New features_
 
 _Bug fixes_
 
-  - Documentation fixes (Tomáš Janoušek).
+  - Documentation fixes (Tomáš Janoušek)
+  - Don't get confused by empty configuration dirs (fixes #313)
 
 ## Version 0.35.1 (June, 2020)
 
