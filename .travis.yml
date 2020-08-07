@@ -8,10 +8,10 @@ addons:
     update: true
     sources:
       - hvr-ghc
-    packages: cabal-install-2.2
+    packages: cabal-install-3.0
 
 ghc:
-  - 8.10
+  - 8.8.3
 
 before_install:
   - sudo apt-get -qq update
