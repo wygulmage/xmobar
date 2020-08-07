@@ -221,9 +221,12 @@ showPercentBar v x = do
   bb <- getConfigValue barBack
   bf <- getConfigValue barFore
   bw <- getConfigValue barWidth
-  let len = min bw $ round (fromIntegral bw * x)
-  s <- colorizeString v (take len $ cycle bf)
-  return $ s ++ take (bw - len) (cycle bb)
+  let c = bw < 1
+      w = if c then length bf else bw
+      len = min w $ round (fromIntegral w * x)
+      bfs = if c then [bf !! (len - 1)] else take len $ cycle bf
+  s <- colorizeString v bfs
+  return $ s ++ if c then "" else take (bw - len) (cycle bb)
 
 showIconPattern :: Maybe IconPattern -> Float -> Monitor String
 showIconPattern Nothing _ = return ""

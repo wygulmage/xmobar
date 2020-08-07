@@ -792,6 +792,10 @@ These are the options available for all monitors below:
     - Total number of characters used to draw bars.
     - Long option: `--bwidth`
     - Default value: 10
+    - Special value: 0.  When this parameter is 0, the percentage to
+      display is interpreted as a position in the bar foreground
+      string (given by `-f`), and the character at that position is
+      displayed.
 - `-x` _string_ N/A string
     - String to be used when the monitor is not available
     - Long option: `--nastring`
