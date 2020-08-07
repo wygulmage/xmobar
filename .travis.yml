@@ -3,16 +3,14 @@ language: haskell
 os: linux
 dist: bionic
 
-apt:
-  update: true
-  sources:
-    - hvr-ghc
-  packages: cabal-install-3.0
+addons:
+  apt:
+    update: true
+    sources:
+      - hvr-ghc
+    packages: cabal-install-2.2
 
 ghc:
-  - 8.4
-  - 8.6
-  - 8.8.3
   - 8.10
 
 before_install:
