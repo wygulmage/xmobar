@@ -1,3 +1,14 @@
+## Version 0.36 (unreleased)
+
+_New features_
+
+  - Monitor progress bars: a value of 0 for `-W` denotes an index in
+    the `-f` string, similar to icon patterns but using characters.
+
+_Bug fixes_
+
+  - Documentation fixes (Tomáš Janoušek).
+
 ## Version 0.35.1 (June, 2020)
 
 - Dropped support for GHC < 8.4 (see issue #461)
