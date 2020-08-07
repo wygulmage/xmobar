@@ -15,7 +15,6 @@
 module Xmobar.Plugins.Monitors.MultiCpu (startMultiCpu) where
 
 import Xmobar.Plugins.Monitors.Common
-import Control.Applicative ((<$>))
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.List (isPrefixOf, transpose, unfoldr)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)

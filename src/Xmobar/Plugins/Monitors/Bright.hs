@@ -14,7 +14,6 @@
 
 module Xmobar.Plugins.Monitors.Bright (brightConfig, runBright) where
 
-import Control.Applicative ((<$>))
 import Control.Exception (SomeException, handle)
 import qualified Data.ByteString.Lazy.Char8 as B
 import System.FilePath ((</>))
@@ -89,4 +88,3 @@ readBright files = do
   return (currVal / maxVal)
   where grab f = handle handler (read . B.unpack <$> B.readFile f)
         handler = const (return 0) :: SomeException -> IO Float
-

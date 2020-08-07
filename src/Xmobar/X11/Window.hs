@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Window
--- Copyright   :  (c) 2011-18 Jose A. Ortega Ruiz
+-- Copyright   :  (c) 2011-18, 20 Jose A. Ortega Ruiz
 --             :  (c) 2012 Jochen Keil
 -- License     :  BSD-style (see LICENSE)
 --
@@ -16,7 +16,6 @@
 module Xmobar.X11.Window where
 
 import Prelude
-import Control.Applicative ((<$>))
 import Control.Monad (when, unless)
 import Graphics.X11.Xlib hiding (textExtents)
 import Graphics.X11.Xlib.Extras

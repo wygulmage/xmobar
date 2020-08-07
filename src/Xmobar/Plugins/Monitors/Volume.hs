@@ -21,9 +21,8 @@ module Xmobar.Plugins.Monitors.Volume
   , VolumeOpts
   ) where
 
-import Control.Applicative ( (<$>), liftA3 )
+import Control.Applicative ( liftA3 )
 import Control.Monad ( liftM2, liftM3, mplus )
-import Data.Traversable (sequenceA)
 import Xmobar.Plugins.Monitors.Common
 import Sound.ALSA.Mixer
 import qualified Sound.ALSA.Exception as AE

@@ -22,7 +22,6 @@ import Control.Concurrent(forkIO, threadDelay)
 import Control.Concurrent.STM (TChan, atomically, writeTChan, tryReadTChan, newTChan)
 import Control.Exception
 import Control.Monad(forever, unless)
-import Control.Applicative ((<$>))
 
 type Length = Int       -- length of the text to display
 type Rate = Int         -- delay in tenth seconds

@@ -4,7 +4,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.Plugins.Monitors.Parsers
--- Copyright: (c) 2018 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2018, 2020 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: jao@gnu.org
@@ -36,7 +36,6 @@ module Xmobar.Plugins.Monitors.Common.Parsers ( runP
 
 import Xmobar.Plugins.Monitors.Common.Types
 
-import Control.Applicative ((<$>))
 import qualified Data.Map as Map
 import System.Console.GetOpt (ArgOrder(Permute), OptDescr, getOpt)
 import Text.ParserCombinators.Parsec

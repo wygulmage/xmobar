@@ -3,7 +3,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.X11.EventLoop
--- Copyright: (c) 2018 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2018, 2020 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: jao@gnu.org
@@ -31,7 +31,6 @@ import Graphics.X11.Xinerama
 import Graphics.X11.Xrandr
 
 import Control.Arrow ((&&&))
-import Control.Applicative ((<$>))
 import Control.Monad.Reader
 import Control.Concurrent
 import Control.Concurrent.Async (Async, async)

@@ -13,7 +13,6 @@
 -----------------------------------------------------------------------------
 module Xmobar.System.Environment(expandEnv) where
 
-import Control.Applicative  ((<$>))
 import Data.Maybe (fromMaybe)
 import System.Environment   (lookupEnv)
 

@@ -23,7 +23,6 @@ module Xmobar.Plugins.Monitors.Net (
 import Xmobar.Plugins.Monitors.Common
 
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
-import Data.Monoid ((<>))
 import Data.Time.Clock (UTCTime, getCurrentTime, diffUTCTime)
 import Data.Word (Word64)
 import Control.Monad (forM, filterM)

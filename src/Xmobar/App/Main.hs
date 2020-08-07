@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.App.Main
--- Copyright: (c) 2018, 2019 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2018, 2019, 2020 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: jao@gnu.org
@@ -26,8 +26,7 @@ import qualified Data.Map as Map
 import Data.List (intercalate)
 import System.Posix.Process (executeFile)
 import System.Environment (getArgs)
-import System.FilePath
-import System.FilePath.Posix (takeBaseName, takeDirectory)
+import System.FilePath ((</>), takeBaseName, takeDirectory, takeExtension)
 import Text.Parsec.Error (ParseError)
 import Data.List.NonEmpty (NonEmpty(..))
 

@@ -3,7 +3,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.X11.Draw
--- Copyright: (c) 2018 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2018, 2020 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: jao@gnu.org
@@ -22,7 +22,6 @@ module Xmobar.X11.Draw (drawInWin) where
 import Prelude hiding (lookup)
 import Control.Monad.IO.Class
 import Control.Monad.Reader
-import Control.Monad (when)
 import Control.Arrow ((&&&))
 import Data.Map hiding (foldr, map, filter)
 import qualified Data.List.NonEmpty as NE
