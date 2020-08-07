@@ -1,6 +1,7 @@
 language: haskell
 
-dist: xenial
+os: linux
+dist: bionic
 
 apt:
   update: true
