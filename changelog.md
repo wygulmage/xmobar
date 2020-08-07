@@ -4,11 +4,13 @@ _New features_
 
   - Monitor progress bars: a value of 0 for `-W` denotes an index in
     the `-f` string, similar to icon patterns but using characters.
+  - New tag `<box>` to add borders around text (Unoqwy).
+  - `fc` color background now accepts and offset (Unoqwy).
 
 _Bug fixes_
 
   - Documentation fixes (Tomáš Janoušek)
-  - Don't get confused by empty configuration dirs (fixes #313)
+  - Don't get confused by empty configuration dirs (fixes #412)
 
 ## Version 0.35.1 (June, 2020)
 
