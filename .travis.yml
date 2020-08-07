@@ -7,12 +7,12 @@ apt:
   update: true
   sources:
     - hvr-ghc
-  packages: cabal-install-2.2
+  packages: cabal-install-3.0
 
 ghc:
   - 8.4
   - 8.6
-  - 8.8
+  - 8.8.3
   - 8.10
 
 before_install:
