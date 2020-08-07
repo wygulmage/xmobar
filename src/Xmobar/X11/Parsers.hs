@@ -14,7 +14,8 @@
 --
 -----------------------------------------------------------------------------
 
-module Xmobar.X11.Parsers (parseString, Box(..), BoxBorder(..), TextRenderInfo(..), Widget(..)) where
+module Xmobar.X11.Parsers (parseString, Box(..), BoxBorder(..), BoxOffset(..),
+  BoxMargins(..), TextRenderInfo(..), Widget(..)) where
 
 import Xmobar.Config.Types
 import Xmobar.X11.Actions
@@ -29,6 +30,9 @@ import Foreign.C.Types (CInt)
 
 data Widget = Icon String | Text String
 
+data BoxOffset = BoxOffset Align Int32 deriving Eq 
+-- margins: Top, Right, Bottom, Left
+data BoxMargins = BoxMargins Int32 Int32 Int32 Int32 deriving Eq
 data BoxBorder = BBTop
                | BBBottom
                | BBVBoth
@@ -37,19 +41,7 @@ data BoxBorder = BBTop
                | BBHBoth
                | BBFull
                  deriving ( Read, Eq )
-data Box = Box BoxBorder Align Int32 CInt String deriving ( Eq )
-instance Read Box where
-  readsPrec _ input = do
-    let b = case words input of
-             [pos]               -> Just $ Box (read pos) C 0 1 "white"
-             [pos,alg]           -> Just $ Box (read pos) (read alg) 0 1 "white"
-             [pos,alg,off]       -> Just $ Box (read pos) (read alg) (read off) 1 "white"
-             [pos,alg,off,wdh]   -> Just $ Box (read pos) (read alg) (read off) (read wdh) "white"
-             [pos,alg,off,wdh,c] -> Just $ Box (read pos) (read alg) (read off) (read wdh) c
-             _ -> Nothing
-    case b of
-      Just b' -> [(b', "")]
-      _ -> []
+data Box = Box BoxBorder BoxOffset CInt String BoxMargins deriving Eq
 data TextRenderInfo =
     TextRenderInfo { tColorsString   :: String
                    , tBgTopOffset    :: Int32
@@ -94,7 +86,7 @@ textParser c f a = do s <- many1 $
                             noneOf "<" <|>
                               try (notFollowedBy' (char '<')
                                     (try (string "fc=")  <|>
-                                     try (string "box=")  <|>
+                                     try (string "box")  <|>
                                      try (string "fn=")  <|>
                                      try (string "action=") <|>
                                      try (string "/action>") <|>
@@ -177,13 +169,42 @@ colorParser (TextRenderInfo _ _ _ bs) f a = do
 boxParser :: TextRenderInfo -> FontIndex -> Maybe [Action]
               -> Parser [(Widget, TextRenderInfo, FontIndex, Maybe [Action])]
 boxParser (TextRenderInfo cs ot ob bs) f a = do
-  c <- between (string "<box=") (string ">") (many1 (alphaNum <|> char ' ' <|> char '#'))
-  let b = fromMaybe (Box BBFull C 0 1 "white") $ readMaybe c
+  c <- between (string "<box") (string ">") (option "" (many1 (alphaNum <|> char '=' <|> char ' ' <|> char '#' <|> char ',')))
+  let b = Box BBFull (BoxOffset C 0) 1 cs (BoxMargins 0 0 0 0)
+  let g = boxReader b (words c)
   s <- manyTill
-       (allParsers (TextRenderInfo cs ot ob (b : bs)) f a)
+       (allParsers (TextRenderInfo cs ot ob (g : bs)) f a)
        (try $ string "</box>")
   return (concat s)
+
+boxReader :: Box -> [String] -> Box
+boxReader b [] = b
+boxReader b (x:xs) = do
+  let (param,val) = case break (=='=') x of
+                 (p,'=':v) -> (p, v)
+                 (p,    _) -> (p, "")
+  boxReader (boxParamReader b param val) xs
  
+boxParamReader :: Box -> String -> String -> Box
+boxParamReader b _ "" = b
+boxParamReader (Box bb off lw fc mgs) "type" val = 
+  Box (fromMaybe bb $ readMaybe ("BB" ++ val)) off lw fc mgs
+boxParamReader (Box bb (BoxOffset alg off) lw fc mgs) "offset" (a:o) =
+  Box bb (BoxOffset (fromMaybe alg $ readMaybe [a]) (fromMaybe off $ readMaybe o)) lw fc mgs
+boxParamReader (Box bb off lw fc mgs) "width" val = 
+  Box bb off (fromMaybe lw $ readMaybe val) fc mgs
+boxParamReader (Box bb off lw _ mgs) "color" val = 
+  Box bb off lw val mgs
+boxParamReader (Box bb off lw fc mgs@(BoxMargins mt mr mb ml)) ('m':pos) val = do
+  let mgs' = case pos of
+         "t" -> BoxMargins (fromMaybe mt $ readMaybe val) mr mb ml
+         "r" -> BoxMargins mt (fromMaybe mr $ readMaybe val) mb ml
+         "b" -> BoxMargins mt mr (fromMaybe mb $ readMaybe val) ml
+         "l" -> BoxMargins mt mr mb (fromMaybe ml $ readMaybe val)
+         _ -> mgs
+  Box bb off lw fc mgs'
+boxParamReader b _ _ = b
+
 -- | Parsers a string wrapped in a font specification.
 fontParser :: TextRenderInfo -> Maybe [Action]
               -> Parser [(Widget, TextRenderInfo, FontIndex, Maybe [Action])]

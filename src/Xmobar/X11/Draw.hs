@@ -105,14 +105,14 @@ verticalOffset ht (Icon _) _ _ conf
 
 printString :: Display -> Drawable -> XFont -> GC -> String -> String
             -> Position -> Position -> Position -> Position -> String -> Int -> IO ()
-printString d p (Core fs) gc fc bc x y ay ht s a = do
+printString d p (Core fs) gc fc bc x y _ _ s a = do
     setFont d gc $ fontFromFontStruct fs
     withColors d [fc, bc] $ \[fc', bc'] -> do
       setForeground d gc fc'
       when (a == 255) (setBackground d gc bc')
       drawImageString d p gc x y s
 
-printString d p (Utf8 fs) gc fc bc x y ay ht s a =
+printString d p (Utf8 fs) gc fc bc x y _ _ s a =
     withColors d [fc, bc] $ \[fc', bc'] -> do
       setForeground d gc fc'
       when (a == 255) (setBackground d gc bc')
@@ -171,38 +171,38 @@ printStrings dr gc fontlist voffs offs a boxes sl@((s,c,i,l):xs) = do
 drawBoxes :: Display -> Drawable -> GC -> Position -> [((Position, Position), Box)] -> IO ()
 drawBoxes _ _ _ _ [] = return ()
 drawBoxes d dr gc ht (b:bs) = do
-  let (xx, Box pos alg offset lineWidth fc) = b
+  let (xx, Box bb offset lineWidth fc mgs) = b
       lw = fromIntegral lineWidth :: Position
   withColors d [fc] $ \[fc'] -> do
     setForeground d gc fc'
     setLineAttributes d gc lineWidth lineSolid capNotLast joinMiter
-    case pos of
+    case bb of
       BBVBoth -> do
-        drawBoxBorder d dr gc BBTop    alg offset ht xx lw
-        drawBoxBorder d dr gc BBBottom alg offset ht xx lw
+        drawBoxBorder d dr gc BBTop    offset ht xx lw mgs
+        drawBoxBorder d dr gc BBBottom offset ht xx lw mgs
       BBHBoth -> do
-        drawBoxBorder d dr gc BBLeft   alg offset ht xx lw
-        drawBoxBorder d dr gc BBRight  alg offset ht xx lw
+        drawBoxBorder d dr gc BBLeft   offset ht xx lw mgs
+        drawBoxBorder d dr gc BBRight  offset ht xx lw mgs
       BBFull  -> do
-        drawBoxBorder d dr gc BBTop    alg offset ht xx lw
-        drawBoxBorder d dr gc BBBottom alg offset ht xx lw
-        drawBoxBorder d dr gc BBLeft   alg offset ht xx lw
-        drawBoxBorder d dr gc BBRight  alg offset ht xx lw
-      _ -> drawBoxBorder d dr gc pos   alg offset ht xx lw
+        drawBoxBorder d dr gc BBTop    offset ht xx lw mgs
+        drawBoxBorder d dr gc BBBottom offset ht xx lw mgs
+        drawBoxBorder d dr gc BBLeft   offset ht xx lw mgs
+        drawBoxBorder d dr gc BBRight  offset ht xx lw mgs
+      _ -> drawBoxBorder d dr gc bb    offset ht xx lw mgs
   drawBoxes d dr gc ht bs
 
-drawBoxBorder :: Display -> Drawable -> GC -> BoxBorder -> Align -> Position -> Position
-                 -> (Position, Position) -> Position -> IO ()
-drawBoxBorder d dr gc pos alg offset ht (x1,x2) lw = do
+drawBoxBorder :: Display -> Drawable -> GC -> BoxBorder -> BoxOffset -> Position
+                 -> (Position, Position) -> Position -> BoxMargins -> IO ()
+drawBoxBorder d dr gc pos (BoxOffset alg offset) ht (x1,x2) lw (BoxMargins mt mr mb ml) = do
   let (p1,p2) = case alg of
                  L -> (0,      -offset)
                  C -> (offset, -offset)
                  R -> (offset, 0      )
       lc = lw `div` 2
   case pos of
-    BBTop    -> drawLine d dr gc (x1 + p1) lc  (x2 + p2) lc
+    BBTop    -> drawLine d dr gc (x1 + p1) (mt + lc) (x2 + p2) (mt + lc)
     BBBottom -> do
-      let lc' = max lc 1
+      let lc' = max lc 1 + mb
       drawLine d dr gc (x1 + p1) (ht - lc') (x2 + p2) (ht - lc')
-    BBLeft   -> drawLine d dr gc (x1 - 1) p1 (x1 - 1) (ht + p2)
-    BBRight  -> drawLine d dr gc (x2 + lc - 1) p1 (x2 + lc - 1) (ht + p2)
+    BBLeft   -> drawLine d dr gc (x1 - 1 + ml) p1 (x1 - 1 + ml) (ht + p2)
+    BBRight  -> drawLine d dr gc (x2 + lc - 1 - mr) p1 (x2 + lc - 1 - mr) (ht + p2)
