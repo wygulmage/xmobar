@@ -28,7 +28,8 @@ import qualified DBus.Client as DC
 import Control.Arrow ((***))
 import Data.Maybe ( fromJust )
 import Data.Int ( Int32, Int64 )
-import System.IO.Unsafe (unsafePerformIO)
+import Data.Word ( Word32 )
+import System.IO.Unsafe ( unsafePerformIO )
 
 import Control.Exception (try)
 
@@ -127,21 +128,25 @@ makeList version md = map getStr (fieldsList version) where
                            where hh = (n `div` 60) `div` 60
                                  mm = (n `div` 60) `mod` 60
                                  ss = n `mod` 60
+            pInt str v = let num = fromVar v in
+                           case str of
+                             "mtime" -> formatTime (num `div` 1000)
+                             "tracknumber" -> printf "%02d" num
+                             "mpris:length" -> formatTime (num `div` 1000000)
+                             "xesam:trackNumber" -> printf "%02d" num
+                             _ -> (show::Int32 -> String) num
+            pw32 v = printf "%02d" (fromVar v::Word32)
+            plen str v = let num = fromVar v in
+                           case str of
+                             "mpris:length" -> formatTime (num `div` 1000000)
+                             _ -> (show::Int64 -> String) num
             getStr str = case lookup str md of
                 Nothing -> ""
                 Just v -> case variantType v of
                             TypeString -> fromVar v
-                            TypeInt32 -> let num = fromVar v in
-                                          case str of
-                                           "mtime" -> formatTime (num `div` 1000)
-                                           "tracknumber" -> printf "%02d" num
-                                           "mpris:length" -> formatTime (num `div` 1000000)
-                                           "xesam:trackNumber" -> printf "%02d" num
-                                           _ -> (show::Int32 -> String) num
-                            TypeInt64 -> let num = fromVar v in
-                                          case str of
-                                           "mpris:length" -> formatTime (num `div` 1000000)
-                                           _ -> (show::Int64 -> String) num
+                            TypeInt32 -> pInt str v
+                            TypeWord32 -> pw32 v
+                            TypeInt64 -> plen str v
                             TypeArray TypeString ->
                               let x = arrayItems (fromVar v) in
                                 if null x then "" else fromVar (head x)
