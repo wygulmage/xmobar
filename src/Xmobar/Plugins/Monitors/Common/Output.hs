@@ -3,7 +3,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.Plugins.Monitors.Strings
--- Copyright: (c) 2018, 2019 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2018, 2019, 2020 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: jao@gnu.org
@@ -224,7 +224,7 @@ showPercentBar v x = do
   let c = bw < 1
       w = if c then length bf else bw
       len = min w $ round (fromIntegral w * x)
-      bfs = if c then [bf !! (len - 1)] else take len $ cycle bf
+      bfs = if c then [bf !! max 0 (len - 1)] else take len $ cycle bf
   s <- colorizeString v bfs
   return $ s ++ if c then "" else take (bw - len) (cycle bb)
 
