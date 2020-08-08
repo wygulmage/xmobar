@@ -164,7 +164,7 @@ foreign import ccall "XftDrawStringUtf8"
 drawXftString :: (Integral a1, Integral a) =>
                  AXftDraw -> AXftColor -> AXftFont -> a -> a1 -> String -> IO ()
 drawXftString d c f x y string =
-    withArrayLen (map fi (UTF8.encode string))
+    withArrayLen (map (fi . ord) string)
       (\len ptr -> cXftDrawStringUtf8 d c f (fi x) (fi y) ptr (fi len))
 
 drawXftString' :: AXftDraw ->
