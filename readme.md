@@ -275,8 +275,8 @@ For the output template:
 - `<box>string</box>` will print string surrounded by a box in the
   foreground color.  The `box` tag accepts several optional arguments
   to tailor its looks:
-  - `type`: `Top`, `Bottom`, `HBoth` (a single line above or below
-    string, or both), `Left`, `Right`, `VBoth` (single vertical
+  - `type`: `Top`, `Bottom`, `VBoth` (a single line above or below
+    string, or both), `Left`, `Right`, `HBoth` (single vertical
     lines), `Full` (a rectangle, the default).
   - `color`: the color of the box lines.
   - `width`: the width of the box lines.
@@ -284,10 +284,18 @@ For the output template:
     pixels to offset the box lines; the alignment denotes the position
     of the resulting line, with L/R meaning top/bottom for the
     vertical lines, and left/right for horizontal ones.
+  - `mt`, `mb`, `ml`, `mr` specify margins to be added at the top,
+    bottom, left and right lines For instance, `l=R5` asks for a
+    margin of 5 pixels to the left, with right alignment.
 
-  For example, a box underlining its text with a line of with 2 and a
-  margin of 3 pixels either side would be:
-           <box type=Bottom width=2 offset=C3>string</box>
+  For example, a box underlining its text with a red line of with 2:
+
+           <box type=Bottom width=2 color=red>string</box>
+
+  and if you wanted an underline and an overline with a margin of 2
+  pixels either side:
+
+           <box type=VBoth mt=2 mb=2>string</box>
 
 - `<fn=1>string</fn>` will print `string` with the first font from
   `additionalFonts`.  The index `0` corresponds to the standard font.
