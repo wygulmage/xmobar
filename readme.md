@@ -285,10 +285,9 @@ For the output template:
     of the resulting line, with L/R meaning top/bottom for the
     vertical lines, and left/right for horizontal ones.
   - `mt`, `mb`, `ml`, `mr` specify margins to be added at the top,
-    bottom, left and right lines For instance, `l=R5` asks for a
-    margin of 5 pixels to the left, with right alignment.
+    bottom, left and right lines.
 
-  For example, a box underlining its text with a red line of with 2:
+  For example, a box underlining its text with a red line of width 2:
 
            <box type=Bottom width=2 color=red>string</box>
 
