@@ -16,8 +16,6 @@
         - [Running xmobar with i3status](#running-xmobar-with-i3status)
         - [Dynamically sizing xmobar](#dynamically-sizing-xmobar)
     - [Command Line Options](#command-line-options)
-    - [The DBus Interface](#the-dbus-interface)
-        - [Example for using the DBus IPC interface with XMonad](#example-for-using-the-dbus-ipc-interface-with-xmonad)
     - [The Output Template](#the-output-template)
     - [The `commands` Configuration Option](#the-commands-configuration-option)
 - [System Monitor Plugins](#system-monitor-plugins)
@@ -56,7 +54,7 @@
     - [`XPropertyLog PropName`](#xpropertylog-propname)
     - [`UnsafeXPropertyLog PropName`](#unsafexpropertylog-propname)
     - [`NamedXPropertyLog PropName Alias`](#namedxpropertylog-propname-alias)
-    - [`UnsafeNamedXPropertyLog PropName Alias`](#unsafenamedxpropertylog-propname-alias-1)
+    - [`UnsafeNamedXPropertyLog PropName Alias`](#unsafenamedxpropertylog-propname-alias)
     - [`Brightness Args RefreshRate`](#brightness-args-refreshrate)
     - [`Kbd Opts`](#kbd-opts)
     - [`Locks`](#locks)
@@ -75,6 +73,8 @@
     - [`XMonadLog`](#xmonadlog)
     - [`UnsafeXMonadLog`](#unsafexmonadlog)
     - [`HandleReader Handle Alias`](#handlereader-handle-alias)
+- [The DBus Interface](#the-dbus-interface)
+    - [Example for using the DBus IPC interface with XMonad](#example-for-using-the-dbus-ipc-interface-with-xmonad)
 - [User plugins](#user-plugins)
     - [Writing a Plugin](#writing-a-plugin)
     - [Using a Plugin](#using-a-plugin)
@@ -497,106 +497,6 @@ xmobar --help):
       -x screen     --screen=screen        On which X screen number to start
 
     Mail bug reports and suggestions to <mail@jao.io>
-
-## The DBus Interface
-
-When compiled with the optional `with_dbus` flag, xmobar can be
-controlled over dbus. All signals defined in [src/Signal.hs] as `data
-SignalType` can now be sent over dbus to xmobar.  Due to current
-limitations of the implementation only one process of xmobar can
-acquire the dbus. This is handled on a first-come-first-served basis,
-meaning that the first process will get the dbus interface. Other
-processes will run without further problems, yet have no dbus
-interface.
-
-[src/Signal.hs]: https://github.com/jaor/xmobar/blob/master/src/Xmobar/System/Signal.hs
-
-- Bus Name: `org.Xmobar.Control`
-- Object Path: `/org/Xmobar/Control`
-- Member Name: Any of SignalType, e.g. `string:Reveal`
-- Interface Name: `org.Xmobar.Control`
-
-An example using the `dbus-send` command line utility:
-
-        dbus-send \
-            --session \
-            --dest=org.Xmobar.Control \
-            --type=method_call \
-            --print-reply \
-            '/org/Xmobar/Control' \
-            org.Xmobar.Control.SendSignal \
-            "string:Toggle 0"
-
-It is also possible to send multiple signals at once:
-
-        # send to another screen, reveal and toggle the persistent flag
-        dbus-send [..] \
-            "string:ChangeScreen 0" "string:Reveal 0" "string:TogglePersistent"
-
-The `Toggle`, `Reveal`, and `Hide` signals take an additional integer
-argument that denotes an initial delay, in tenths of a second, before
-the command takes effect.
-
-### Example for using the DBus IPC interface with XMonad
-
-Bind the key which should {,un}map xmobar to a dummy value. This is necessary
-for {,un}grabKey in xmonad.
-
-    ((0, xK_Alt_L   ), return ())
-
-Also, install `avoidStruts` layout modifier from `XMonad.Hooks.ManageDocks`
-
-Finally, install these two event hooks (`handleEventHook` in `XConfig`)
-`myDocksEventHook` is a replacement for `docksEventHook` which reacts on unmap
-events as well (which `docksEventHook` doesn't).
-
-    import qualified XMonad.Util.ExtensibleState as XS
-
-    data DockToggleTime = DTT { lastTime :: Time } deriving (Eq, Show, Typeable)
-
-    instance ExtensionClass DockToggleTime where
-        initialValue = DTT 0
-
-    toggleDocksHook :: Int -> KeySym -> Event -> X All
-    toggleDocksHook to ks ( KeyEvent { ev_event_display = d
-                                     , ev_event_type    = et
-                                     , ev_keycode       = ekc
-                                     , ev_time          = etime
-                                     } ) =
-            io (keysymToKeycode d ks) >>= toggleDocks >> return (All True)
-        where
-        toggleDocks kc
-            | ekc == kc && et == keyPress = do
-                safeSendSignal ["Reveal 0", "TogglePersistent"]
-                XS.put ( DTT etime )
-            | ekc == kc && et == keyRelease = do
-                gap <- XS.gets ( (-) etime . lastTime )
-                safeSendSignal [ "TogglePersistent"
-                               , "Hide " ++ show (if gap < 400 then to else 0)
-                               ]
-            | otherwise = return ()
-
-        safeSendSignal s = catchX (io $ sendSignal s) (return ())
-        sendSignal    = withSession . callSignal
-        withSession mc = connectSession >>= \c -> callNoReply c mc >> disconnect c
-        callSignal :: [String] -> MethodCall
-        callSignal s = ( methodCall
-                         ( objectPath_    "/org/Xmobar/Control" )
-                         ( interfaceName_ "org.Xmobar.Control"  )
-                         ( memberName_    "SendSignal"          )
-                       ) { methodCallDestination = Just $ busName_ "org.Xmobar.Control"
-                         , methodCallBody        = map toVariant s
-                         }
-
-    toggleDocksHook _ _ _ = return (All True)
-
-    myDocksEventHook :: Event -> X All
-    myDocksEventHook e = do
-        when (et == mapNotify || et == unmapNotify) $
-            whenX ((not `fmap` (isClient w)) <&&> runQuery checkDock w) refresh
-        return (All True)
-        where w  = ev_window e
-              et = ev_event_type e
 
 
 ## The Output Template
@@ -1746,6 +1646,105 @@ will display "N/A" if for some reason the `date` invocation fails.
                 }
         hPutStr writeHandle "Hello World"
 
+# The DBus Interface
+
+When compiled with the optional `with_dbus` flag, xmobar can be
+controlled over dbus. All signals defined in [src/Signal.hs] as `data
+SignalType` can now be sent over dbus to xmobar.  Due to current
+limitations of the implementation only one process of xmobar can
+acquire the dbus. This is handled on a first-come-first-served basis,
+meaning that the first process will get the dbus interface. Other
+processes will run without further problems, yet have no dbus
+interface.
+
+[src/Signal.hs]: https://github.com/jaor/xmobar/blob/master/src/Xmobar/System/Signal.hs
+
+- Bus Name: `org.Xmobar.Control`
+- Object Path: `/org/Xmobar/Control`
+- Member Name: Any of SignalType, e.g. `string:Reveal`
+- Interface Name: `org.Xmobar.Control`
+
+An example using the `dbus-send` command line utility:
+
+        dbus-send \
+            --session \
+            --dest=org.Xmobar.Control \
+            --type=method_call \
+            --print-reply \
+            '/org/Xmobar/Control' \
+            org.Xmobar.Control.SendSignal \
+            "string:Toggle 0"
+
+It is also possible to send multiple signals at once:
+
+        # send to another screen, reveal and toggle the persistent flag
+        dbus-send [..] \
+            "string:ChangeScreen 0" "string:Reveal 0" "string:TogglePersistent"
+
+The `Toggle`, `Reveal`, and `Hide` signals take an additional integer
+argument that denotes an initial delay, in tenths of a second, before
+the command takes effect.
+
+## Example for using the DBus IPC interface with XMonad
+
+Bind the key which should {,un}map xmobar to a dummy value. This is necessary
+for {,un}grabKey in xmonad.
+
+    ((0, xK_Alt_L   ), return ())
+
+Also, install `avoidStruts` layout modifier from `XMonad.Hooks.ManageDocks`
+
+Finally, install these two event hooks (`handleEventHook` in `XConfig`)
+`myDocksEventHook` is a replacement for `docksEventHook` which reacts on unmap
+events as well (which `docksEventHook` doesn't).
+
+    import qualified XMonad.Util.ExtensibleState as XS
+
+    data DockToggleTime = DTT { lastTime :: Time } deriving (Eq, Show, Typeable)
+
+    instance ExtensionClass DockToggleTime where
+        initialValue = DTT 0
+
+    toggleDocksHook :: Int -> KeySym -> Event -> X All
+    toggleDocksHook to ks ( KeyEvent { ev_event_display = d
+                                     , ev_event_type    = et
+                                     , ev_keycode       = ekc
+                                     , ev_time          = etime
+                                     } ) =
+            io (keysymToKeycode d ks) >>= toggleDocks >> return (All True)
+        where
+        toggleDocks kc
+            | ekc == kc && et == keyPress = do
+                safeSendSignal ["Reveal 0", "TogglePersistent"]
+                XS.put ( DTT etime )
+            | ekc == kc && et == keyRelease = do
+                gap <- XS.gets ( (-) etime . lastTime )
+                safeSendSignal [ "TogglePersistent"
+                               , "Hide " ++ show (if gap < 400 then to else 0)
+                               ]
+            | otherwise = return ()
+
+        safeSendSignal s = catchX (io $ sendSignal s) (return ())
+        sendSignal    = withSession . callSignal
+        withSession mc = connectSession >>= \c -> callNoReply c mc >> disconnect c
+        callSignal :: [String] -> MethodCall
+        callSignal s = ( methodCall
+                         ( objectPath_    "/org/Xmobar/Control" )
+                         ( interfaceName_ "org.Xmobar.Control"  )
+                         ( memberName_    "SendSignal"          )
+                       ) { methodCallDestination = Just $ busName_ "org.Xmobar.Control"
+                         , methodCallBody        = map toVariant s
+                         }
+
+    toggleDocksHook _ _ _ = return (All True)
+
+    myDocksEventHook :: Event -> X All
+    myDocksEventHook e = do
+        when (et == mapNotify || et == unmapNotify) $
+            whenX ((not `fmap` (isClient w)) <&&> runQuery checkDock w) refresh
+        return (All True)
+        where w  = ev_window e
+              et = ev_event_type e
 
 # User plugins
 
