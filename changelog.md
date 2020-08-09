@@ -11,6 +11,8 @@ _Bug fixes_
 
   - Documentation fixes (Tomáš Janoušek)
   - Don't get confused by empty configuration dirs (fixes #412)
+  - Xft rendering: Avoid encoding to UTF8 on all scenarios. This
+    causes issue to StdinReader monitor when the handle wasn't binary.
 
 ## Version 0.35.1 (June, 2020)
 
