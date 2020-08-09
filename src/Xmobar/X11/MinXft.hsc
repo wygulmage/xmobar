@@ -161,10 +161,16 @@ withAXftDraw d p v c act = do
 foreign import ccall "XftDrawStringUtf8"
   cXftDrawStringUtf8 :: AXftDraw -> AXftColor -> AXftFont -> CInt -> CInt -> Ptr (#type FcChar8) -> CInt -> IO ()
 
+utf8EncodeString :: Num b => String -> [b]
+utf8EncodeString str = if UTF8.isUTF8Encoded str
+                       then map (fi . ord) str
+                       else map fi (UTF8.encode str)
+
+
 drawXftString :: (Integral a1, Integral a) =>
                  AXftDraw -> AXftColor -> AXftFont -> a -> a1 -> String -> IO ()
 drawXftString d c f x y string =
-    withArrayLen (map (fi . ord) string)
+    withArrayLen (utf8EncodeString string)
       (\len ptr -> cXftDrawStringUtf8 d c f (fi x) (fi y) ptr (fi len))
 
 drawXftString' :: AXftDraw ->
