@@ -272,6 +272,23 @@ For the output template:
   for XFT fonts. `<fc=#FF0000,#000000:0>string</fc>` will have a background
   matching the bar's height.
 
+- `<box>string</box>` will print string surrounded by a box in the
+  foreground color.  The `box` tag accepts several optional arguments
+  to tailor its looks:
+  - `type`: `Top`, `Bottom`, `HBoth` (a single line above or below
+    string, or both), `Left`, `Right`, `VBoth` (single vertical
+    lines), `Full` (a rectangle, the default).
+  - `color`: the color of the box lines.
+  - `width`: the width of the box lines.
+  - `offset`: an alignment char (L, C or R) followed by the amount of
+    pixels to offset the box lines; the alignment denotes the position
+    of the resulting line, with L/R meaning top/bottom for the
+    vertical lines, and left/right for horizontal ones.
+
+  For example, a box underlining its text with a line of with 2 and a
+  margin of 3 pixels either side would be:
+           <box type=Bottom width=2 offset=C3>string</box>
+
 - `<fn=1>string</fn>` will print `string` with the first font from
   `additionalFonts`.  The index `0` corresponds to the standard font.
 
