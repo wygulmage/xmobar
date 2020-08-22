@@ -1,11 +1,11 @@
-## Version 0.36 (unreleased)
+## Version 0.36 (August, 2020)
 
 _New features_
 
   - Monitor progress bars: a value of 0 for `-W` denotes an index in
     the `-f` string, similar to icon patterns but using characters.
   - New tag `<box>` to add borders around text (Unoqwy).
-  - `fc` color background now accepts and offset (Unoqwy).
+  - `fc` color background now accepts an offset (Unoqwy).
 
 _Bug fixes_
 
