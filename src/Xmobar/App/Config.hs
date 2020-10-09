@@ -21,6 +21,7 @@ module Xmobar.App.Config (defaultConfig,
                           xmobarConfigFile) where
 
 import Control.Monad (when, filterM)
+import Data.Functor ((<&>))
 
 import System.Environment
 import System.Directory
@@ -105,7 +106,7 @@ findFirstDirOf create possibles = do
     go [] = return Nothing
     go (x:xs) = do
       exists <- x >>= doesDirectoryExist
-      if exists then x >>= return . Just else go xs
+      if exists then x <&> Just else go xs
 
 -- | Simple wrapper around @findFirstDirOf@ that allows the primary
 -- path to be specified by an environment variable.

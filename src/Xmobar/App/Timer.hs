@@ -2,7 +2,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.App.Timer
--- Copyright: (c) 2019 Tomáš Janoušek
+-- Copyright: (c) 2019, 2020 Tomáš Janoušek
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: Tomáš Janoušek <tomi@nomi.cz>
@@ -54,7 +54,7 @@ newPeriod :: Int64 -> IO (Unique, Period)
 newPeriod r = do
     u <- newUnique
     t <- now
-    v <- atomically newEmptyTMVar
+    v <- newEmptyTMVarIO
     let t' = t - t `mod` r
     return (u, Period { rate = r, next = t', tick = v })
 
@@ -212,7 +212,7 @@ delayUntilNextFire = do
                 delay = (tNext - tNow) `min` fromIntegral maxDelay
                 delayUsec = fromIntegral delay * 100000
             registerDelay delayUsec
-        Nothing -> atomically $ newTVar False
+        Nothing -> newTVarIO False
     atomically $ do
         delayOver <- readTVar delayVar
         periods' <- fromJust <$> readTVar periodsVar

@@ -70,7 +70,7 @@ runX :: XConf -> X () -> IO ()
 runX xc f = runReaderT f xc
 
 newRefreshLock :: IO (TMVar ())
-newRefreshLock = atomically $ newTMVar ()
+newRefreshLock = newTMVarIO ()
 
 refreshLock :: TMVar () -> IO a -> IO a
 refreshLock var = bracket_ lock unlock
@@ -95,7 +95,7 @@ startLoop xcfg@(XConf _ _ w _ _ _ _) sig pauser vs = do
 #ifdef XFT
     xftInitFtLibrary
 #endif
-    tv <- atomically $ newTVar []
+    tv <- newTVarIO []
     _ <- forkIO (handle (handler "checker") (checker tv [] vs sig pauser))
 #ifdef THREADED_RUNTIME
     _ <- forkOS (handle (handler "eventer") (eventer sig))
@@ -238,10 +238,10 @@ startCommand :: TMVar SignalType
              -> (Runnable,String,String)
              -> IO ([Async ()], TVar String)
 startCommand sig (com,s,ss)
-    | alias com == "" = do var <- atomically $ newTVar is
+    | alias com == "" = do var <- newTVarIO is
                            atomically $ writeTVar var (s ++ ss)
                            return ([], var)
-    | otherwise = do var <- atomically $ newTVar is
+    | otherwise = do var <- newTVarIO is
                      let cb str = atomically $ writeTVar var (s ++ str ++ ss)
                      a1 <- async $ start com cb
                      a2 <- async $ trigger com $ maybe (return ())

@@ -2,7 +2,7 @@
 ------------------------------------------------------------------------------
 -- |
 -- Module: Xmobar.Config.Parse
--- Copyright: (c) 2018 Jose Antonio Ortega Ruiz
+-- Copyright: (c) 2018, 2020 Jose Antonio Ortega Ruiz
 -- License: BSD3-style (see LICENSE)
 --
 -- Maintainer: jao@gnu.org
@@ -22,6 +22,7 @@ import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Number (int)
 import Text.ParserCombinators.Parsec.Perm ((<|?>), (<$?>), permute)
 import Control.Monad.IO.Class (liftIO)
+import Data.Functor ((<&>))
 
 import Xmobar.Config.Types
 
@@ -174,4 +175,4 @@ commandsErr = "commands: this usually means that a command could not" ++
 -- parsed.
 readConfig :: Config -> FilePath -> IO (Either ParseError (Config,[String]))
 readConfig defaultConfig f =
-  liftIO (readFileSafe f) >>= return . parseConfig defaultConfig
+  liftIO (readFileSafe f) <&> parseConfig defaultConfig
