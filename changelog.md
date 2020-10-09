@@ -1,3 +1,9 @@
+## Version 0.37 (unreleased)
+
+_New features_
+
+  - New command line option `--add-font` (Ivan Brennan)
+
 ## Version 0.36 (August, 2020)
 
 _New features_
