@@ -1814,8 +1814,9 @@ a Haskell configuration that uses a new plugin, all in one file.
 
 When xmobar runs with the full path to that Haskell file as its
 argument (or if you put it in `~/.config/xmobar/xmobar.hs`), and with
-the xmobar library installed, the Haskell code will be compiled as
-needed, and the new executable spawned for you.
+the xmobar library installed (e.g., with `cabal install --lib xmobar`),
+the Haskell code will be compiled as needed, and the new executable
+spawned for you.
 
 That's it!
 
