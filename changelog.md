@@ -6,8 +6,8 @@ _New features_
 
 _Bug fixes_
 
-  - Fix date plugin not picking up DST and timezone changes
-    (Fixed by reverting the optimization merged in 0.34).
+  - Fix date plugin not picking up DST and timezone changes (refresh
+    timezone once a minute to preserve the optimized performace of 0.34).
 
 ## Version 0.36 (August, 2020)
 

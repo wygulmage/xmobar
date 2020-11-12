@@ -1540,6 +1540,7 @@ will display "N/A" if for some reason the `date` invocation fails.
 
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
+- Timezone changes are picked up automatically every minute.
 - Sample usage: `Run Date "%a %b %_d %Y <fc=#ee9a00>%H:%M:%S</fc>" "date" 10`
 
 ## `DateZone Format Locale Zone Alias RefreshRate`
