@@ -102,6 +102,8 @@ These are two xmobar instances using the author's configuration:
 
 ![bottom](https://gitlab.com/jaor/xmobar-config/raw/master/img/xmobar-bottom.png)
 
+![exwm](https://gitlab.com/jaor/xmobar-config/raw/master/img/xmobar-exwm.png)
+
 and [this one](doc/xmobar-xmonad.png) is a full desktop with [xmonad]
 and, again, two instances of xmobar.
 
