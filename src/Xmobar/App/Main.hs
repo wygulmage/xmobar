@@ -63,7 +63,7 @@ xmobar conf = withDeferSignals $ do
       let ic = Map.empty
           to = textOffset conf
           ts = textOffsets conf ++ replicate (length fl) (-1)
-      startLoop (XConf d r w (fs :| fl) (to:ts) ic conf) sig refLock vars
+      startLoop (XConf d r w (fs :| fl) (to :| ts) ic conf) sig refLock vars
 
 configFromArgs :: Config -> IO Config
 configFromArgs cfg = getArgs >>= getOpts >>= doOpts cfg . fst

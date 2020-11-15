@@ -131,7 +131,7 @@ printString dpy drw fs@(Xft fonts) _ fc bc x y ay ht s al =
 #endif
 
 -- | An easy way to print the stuff we need to print
-printStrings :: Drawable -> GC -> NE.NonEmpty XFont -> [Int] -> Position
+printStrings :: Drawable -> GC -> NE.NonEmpty XFont -> NE.NonEmpty Int -> Position
              -> Align -> [((Position, Position), Box)] -> [(Widget, TextRenderInfo, Int, Position)] -> X ()
 printStrings _ _ _ _ _ _ _ [] = return ()
 printStrings dr gc fontlist voffs offs a boxes sl@((s,c,i,l):xs) = do
@@ -142,6 +142,7 @@ printStrings dr gc fontlist voffs offs a boxes sl@((s,c,i,l):xs) = do
       totSLen = foldr (\(_,_,_,len) -> (+) len) 0 sl
       remWidth = fi wid - fi totSLen
       fontst = safeIndex fontlist i
+      voff = safeIndex voffs i
       offset = case a of
                  C -> (remWidth + offs) `div` 2
                  R -> remWidth
@@ -149,7 +150,7 @@ printStrings dr gc fontlist voffs offs a boxes sl@((s,c,i,l):xs) = do
       (fc,bc) = case break (==',') (tColorsString c) of
                  (f,',':b) -> (f, b           )
                  (f,    _) -> (f, bgColor conf)
-  valign <- verticalOffset ht s fontst (voffs !! i) conf
+  valign <- verticalOffset ht s fontst voff conf
   let (ht',ay) = case (tBgTopOffset c, tBgBottomOffset c) of
                    (-1,_)  -> (0, -1)
                    (_,-1)  -> (0, -1)

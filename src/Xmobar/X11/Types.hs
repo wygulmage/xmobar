@@ -35,7 +35,7 @@ data XConf =
           , rect      :: Rectangle
           , window    :: Window
           , fontListS :: NE.NonEmpty XFont
-          , verticalOffsets :: [Int]
+          , verticalOffsets :: NE.NonEmpty Int
           , iconS     :: Map FilePath Bitmap
           , config    :: Config
           }
