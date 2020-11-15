@@ -149,7 +149,7 @@ printStrings dr gc fontlist voffs offs a boxes sl@((s,c,i,l):xs) = do
       (fc,bc) = case break (==',') (tColorsString c) of
                  (f,',':b) -> (f, b           )
                  (f,    _) -> (f, bgColor conf)
-  valign <- verticalOffset ht s (NE.head fontlist) (voffs !! i) conf
+  valign <- verticalOffset ht s fontst (voffs !! i) conf
   let (ht',ay) = case (tBgTopOffset c, tBgBottomOffset c) of
                    (-1,_)  -> (0, -1)
                    (_,-1)  -> (0, -1)
