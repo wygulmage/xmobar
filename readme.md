@@ -106,6 +106,8 @@ author's configuration:
 
 ![](doc/screenshots/xmobar-exwm.png)
 
+This is the [changelog](https://xmobar.org/changelog.html) for recent releases.
+
 # Installation
 
 ## Using cabal-install
