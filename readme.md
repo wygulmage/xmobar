@@ -98,11 +98,11 @@ extensibility through plugins.
 
 These are two xmobar instances using the author's configuration:
 
-![top](https://gitlab.com/jaor/xmobar-config/raw/master/img/xmobar-top.png)
+![top](doc/screenshots/xmobar-top.png)
 
-![bottom](https://gitlab.com/jaor/xmobar-config/raw/master/img/xmobar-bottom.png)
+![bottom](doc/screenshots/xmobar-bottom.png)
 
-![exwm](https://gitlab.com/jaor/xmobar-config/raw/master/img/xmobar-exwm.png)
+![exwm](doc/screenshots/xmobar-exwm.png)
 
 and [this one](doc/xmobar-xmonad.png) is a full desktop with [xmonad]
 and, again, two instances of xmobar.
