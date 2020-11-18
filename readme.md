@@ -4,7 +4,6 @@
 **Table of Contents**
 
 - [About](#about)
-- [Bug reports](#bug-reports)
 - [Installation](#installation)
     - [Using cabal-install](#using-cabal-install)
     - [From source](#from-source)
@@ -105,11 +104,6 @@ These are two xmobar instances using the author's configuration:
 ![bottom](doc/screenshots/xmobar-bottom.png)
 
 ![exwm](doc/screenshots/xmobar-exwm.png)
-
-# Bug reports
-
-To submit bug reports you can use the [bug tracker over at
-Github](https://github.com/jaor/xmobar/issues).
 
 # Installation
 
@@ -1829,29 +1823,27 @@ configuration](https://gitlab.com/jaor/xmobar-config/).
 # Authors and credits
 
 Andrea Rossato originally designed and implemented xmobar up to
-version 0.11.1. Since then, it is maintained and developed by [jao],
-with the help of the greater xmobar and Haskell communities.
+version 0.11.1. Since then, it is maintained and developed by
+[jao](https://jao.io), with the help of the greater xmobar and Haskell
+communities.
 
-In particular, xmobar [incorporates patches] by Mohammed Alshiekh,
-Alex Ameen, Axel Angel, Dhananjay Balan, Claudio Bley, Dragos Boca,
-Ben Boeckel, Ivan Brennan, Duncan Burke, Roman Cheplyaka, Patrick
-Chilton, Antoine Eiche, Nathaniel Wesley Filardo, John Goerzen, Reto
-Hablützel, Juraj Hercek, Tomáš Janoušek, Ada Joule, Spencer Janssen,
-Roman Joost, Jochen Keil, Lennart Kolmodin, Krzysztof Kosciuszkiewicz,
-Dmitry Kurochkin, Todd Lunter, Vanessa McHale, Robert J. Macomber,
-Dmitry Malikov, David McLean, Marcin Mikołajczyk, Dino Morelli, Tony
-Morris, Eric Mrak, Thiago Negri, Edward O'Callaghan, Svein Ove, Martin
-Perner, Jens Petersen, Alexander Polakov, Sibi Prabakaran, Pavan
-Rikhi, Petr Rockai, Andrew Emmanuel Rosa, Sackville-West, Markus
-Scherer, Daniel Schüssler, Olivier Schneider, Alexander Shabalin,
-Valentin Shirokov, Peter Simons, Alexander Solovyov, Will Song, John
-Soros, Felix Springer, Travis Staton, Artem Tarasov, Samuli Thomasson,
-Edward Tjörnhammar, Sergei Trofimovich, Thomas Tuegel, John Tyree, Jan
+In particular, xmobar incorporates patches by Mohammed Alshiekh, Alex
+Ameen, Axel Angel, Dhananjay Balan, Claudio Bley, Dragos Boca, Ben
+Boeckel, Ivan Brennan, Duncan Burke, Roman Cheplyaka, Patrick Chilton,
+Antoine Eiche, Nathaniel Wesley Filardo, John Goerzen, Reto Hablützel,
+Juraj Hercek, Tomáš Janoušek, Ada Joule, Spencer Janssen, Roman Joost,
+Jochen Keil, Lennart Kolmodin, Krzysztof Kosciuszkiewicz, Dmitry
+Kurochkin, Todd Lunter, Vanessa McHale, Robert J. Macomber, Dmitry
+Malikov, David McLean, Marcin Mikołajczyk, Dino Morelli, Tony Morris,
+Eric Mrak, Thiago Negri, Edward O'Callaghan, Svein Ove, Martin Perner,
+Jens Petersen, Alexander Polakov, Sibi Prabakaran, Pavan Rikhi, Petr
+Rockai, Andrew Emmanuel Rosa, Sackville-West, Markus Scherer, Daniel
+Schüssler, Olivier Schneider, Alexander Shabalin, Valentin Shirokov,
+Peter Simons, Alexander Solovyov, Will Song, John Soros, Felix
+Springer, Travis Staton, Artem Tarasov, Samuli Thomasson, Edward
+Tjörnhammar, Sergei Trofimovich, Thomas Tuegel, John Tyree, Jan
 Vornberger, Anton Vorontsov, Daniel Wagner, Zev Weiss, Phil Xiaojun
 Hu, Edward Z. Yang and Norbert Zeh.
-
-[jao]: http://jao.io
-[incorporates patches]: http://www.ohloh.net/p/xmobar/contributors
 
 ## Thanks
 
@@ -1874,11 +1866,7 @@ giving me the chance to contribute.
 - To understand the internal mysteries of xmobar you may try reading
   [this tutorial] on X Window Programming in Haskell.
 
-- My [sawflibs] project includes a module to automate running xmobar
-  in [sawfish].
-
 [this tutorial]: http://www.haskell.org/haskellwiki/X_window_programming_in_Haskell
-[sawflibs]: http://github.com/jaor/sawflibs
 
 # License
 
