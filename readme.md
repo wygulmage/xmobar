@@ -104,7 +104,7 @@ These are two xmobar instances using the author's configuration:
 
 ![exwm](doc/screenshots/xmobar-exwm.png)
 
-and [this one](doc/xmobar-xmonad.png) is a full desktop with [xmonad]
+and [this one](doc/screenshots/xmobar-xmonad.png) is a full desktop with [xmonad]
 and, again, two instances of xmobar.
 
 [xmonad]: http://xmonad.org
