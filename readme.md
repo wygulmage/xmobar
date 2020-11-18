@@ -97,13 +97,14 @@ status bar, and supports similar features, like dynamic color
 management, icons, output templates, and extensibility through
 plugins.
 
-These are two xmobar instances using the author's configuration:
+These are some xmobar [screenshots](doc/screenshots) using the
+author's configuration:
 
-![top](doc/screenshots/xmobar-top.png)
+![top](doc/screenshots/xmobar-top.png)\
 
-![bottom](doc/screenshots/xmobar-bottom.png)
+![bottom](doc/screenshots/xmobar-bottom.png)\
 
-![exwm](doc/screenshots/xmobar-exwm.png)
+![exwm](doc/screenshots/xmobar-exwm.png)\
 
 # Installation
 
