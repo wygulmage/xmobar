@@ -89,12 +89,14 @@
 # About
 
 Xmobar is a minimalistic status bar. It was originally designed and
-implemented by Andrea Rossato to work with [xmonad], but it is
-actually usable with any window manager.
+implemented by Andrea Rossato to work with
+[xmonad](http://xmonad.org), but it is actually usable with any window
+manager.
 
-Xmobar was inspired by the [Ion3] status bar, and supports similar
-features, like dynamic color management, icons, output templates, and
-extensibility through plugins.
+Xmobar was inspired by the [Ion3](http://tuomov.iki.fi/software/)
+status bar, and supports similar features, like dynamic color
+management, icons, output templates, and extensibility through
+plugins.
 
 These are two xmobar instances using the author's configuration:
 
@@ -103,12 +105,6 @@ These are two xmobar instances using the author's configuration:
 ![bottom](doc/screenshots/xmobar-bottom.png)
 
 ![exwm](doc/screenshots/xmobar-exwm.png)
-
-and [this one](doc/screenshots/xmobar-xmonad.png) is a full desktop with [xmonad]
-and, again, two instances of xmobar.
-
-[xmonad]: http://xmonad.org
-[Ion3]: http://tuomov.iki.fi/software/
 
 # Bug reports
 
