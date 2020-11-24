@@ -45,6 +45,7 @@
     - [`Volume Mixer Element Args RefreshRate`](#volume-mixer-element-args-refreshrate)
     - [`Alsa Mixer Element Args`](#alsa-mixer-element-args)
     - [`MPD Args RefreshRate`](#mpd-args-refreshrate)
+    - [`MPDX Alias Args RefreshRate`](#mpdx-alias-args-refreshrate)
     - [`Mpris1 PlayerName Args RefreshRate`](#mpris1-playername-args-refreshrate)
     - [`Mpris2 PlayerName Args RefreshRate`](#mpris2-playername-args-refreshrate)
     - [`Mail Args Alias`](#mail-args-alias)
@@ -1273,6 +1274,10 @@ following differences:
          Run MPD ["-t",
                   "<composer> <title> (<album>) <track>/<plength> <statei> [<flags>]",
                   "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
+
+## `MPDX Alias Args RefreshRate`
+
+Like `MPD` but uses as alias its first argument instead of "mpd".
 
 ## `Mpris1 PlayerName Args RefreshRate`
 

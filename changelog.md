@@ -3,6 +3,8 @@
 _New features_
 
   - New command line option `--add-font` (Ivan Brennan)
+  - New monitor `MPDX` that extends `MPD` with the ability of having a
+    custom alias.  Useful for connecting with multiple servers.
 
 _Bug fixes_
 

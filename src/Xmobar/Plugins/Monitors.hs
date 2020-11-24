@@ -3,7 +3,7 @@
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Xmobar.Plugins.Monitors
--- Copyright   :  (c) 2010, 2011, 2012, 2013, 2017, 2018, 2019 Jose Antonio Ortega Ruiz
+-- Copyright   :  (c) 2010, 2011, 2012, 2013, 2017, 2018, 2019, 2020 Jose Antonio Ortega Ruiz
 --                (c) 2007-10 Andrea Rossato
 -- License     :  BSD-style (see LICENSE)
 --
@@ -89,7 +89,8 @@ data Monitors = Network      Interface   Args Rate
               | Wireless Interface  Args Rate
 #endif
 #ifdef LIBMPD
-              | MPD      Args       Rate
+              | MPD Args Rate
+              | MPDX String Args Rate
               | AutoMPD  Args
 #endif
 #ifdef ALSA
@@ -148,6 +149,7 @@ instance Exec Monitors where
 #ifdef LIBMPD
     alias (MPD _ _) = "mpd"
     alias (AutoMPD _) = "autompd"
+    alias (MPDX a _ _) = a
 #endif
 #ifdef ALSA
     alias (Volume m c _ _) = m ++ ":" ++ c
@@ -191,6 +193,7 @@ instance Exec Monitors where
 #endif
 #ifdef LIBMPD
     start (MPD a r) = runMD a mpdConfig runMPD r mpdReady
+    start (MPDX _ a r) = start (MPD a r)
     start (AutoMPD a) = runMBD a mpdConfig runMPD mpdWait mpdReady
 #endif
 #ifdef ALSA
