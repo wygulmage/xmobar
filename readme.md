@@ -182,11 +182,15 @@ Otherwise, you'll need to install them yourself.
   use the `xft:` prefix in the `font` configuration option. For
   instance:
 
+    ``` haskell
         font = "xft:Times New Roman-10:italic"
+    ```
 
   Or to have fallback fonts, just separate them by commas:
 
+    ``` haskell
         font = "xft:Open Sans:size=9,WenQuanYi Zen Hei:size=9"
+    ```
 
 - `with_mpd` Enables support for the [MPD] daemon. Requires the
   [libmpd] package.
@@ -349,21 +353,29 @@ Other configuration options:
 
   For example:
 
-          position = BottomW C 75
+    ``` haskell
+        position = BottomW C 75
+    ```
 
   to place xmobar at the bottom, centered with the 75% of the screen
   width.  Or
 
-          position = BottomP 120 0
+    ``` haskell
+        position = BottomP 120 0
+    ```
 
   to place xmobar at the bottom, with 120 pixel indent of the left.
   Or
 
-          position = Static { xpos = 0 , ypos = 0, width = 1024, height = 15 }
+    ``` haskell
+        position = Static { xpos = 0 , ypos = 0, width = 1024, height = 15 }
+    ```
 
   or
 
-          position = Top
+    ``` haskell
+        position = Top
+    ```
 
 - `textOffset` The vertical offset, in pixels, for the text baseline.
    If negative or not given, xmobar will try to center text
@@ -467,40 +479,40 @@ file.
 
 Example:
 
-    xmobar -B white -a right -F blue -t '%LIPB%' -c '[Run Weather "LIPB" [] 36000]'
+        xmobar -B white -a right -F blue -t '%LIPB%' -c '[Run Weather "LIPB" [] 36000]'
 
 This is the list of command line options (the output of
 xmobar --help):
 
-    Usage: xmobar [OPTION...] [FILE]
-    Options:
-      -h, -?        --help                 This help
-      -V            --version              Show version information
-      -v            --verbose              Emit verbose debugging messages
-      -r            --recompile            Force recompilation (for Haskell FILE)
-      -f font name  --font=font name       Font name
-      -N font name  --add-font=font name   Add to the list of additional fonts
-      -w class      --wmclass=class        X11 WM_CLASS property
-      -n name       --wmname=name          X11 WM_NAME property
-      -B bg color   --bgcolor=bg color     Background color. Default black
-      -F fg color   --fgcolor=fg color     Foreground color. Default grey
-      -A alpha      --alpha=alpha          Transparency: 0 is transparent
-                                           and 255 (the default) is opaque
-      -o            --top                  Place xmobar at the top of the screen
-      -b            --bottom               Place xmobar at the bottom of the screen
-      -p            --position=position    Specify position, same as in config file
-      -d            --dock                 Try to start xmobar as a dock
-      -a alignsep   --alignsep=alignsep    Separators for left, center and right text
-                                           alignment. Default: '}{'
-      -s char       --sepchar=char         Character used to separate commands in
-                                           the output template. Default '%'
-      -t template   --template=template    Output template
-      -i path       --iconroot=path        Default directory for icon pattern files
-      -c commands   --commands=commands    List of commands to be executed
-      -C command    --add-command=command  Add to the list of commands to be executed
-      -x screen     --screen=screen        On which X screen number to start
+        Usage: xmobar [OPTION...] [FILE]
+        Options:
+          -h, -?        --help                 This help
+          -V            --version              Show version information
+          -v            --verbose              Emit verbose debugging messages
+          -r            --recompile            Force recompilation (for Haskell FILE)
+          -f font name  --font=font name       Font name
+          -N font name  --add-font=font name   Add to the list of additional fonts
+          -w class      --wmclass=class        X11 WM_CLASS property
+          -n name       --wmname=name          X11 WM_NAME property
+          -B bg color   --bgcolor=bg color     Background color. Default black
+          -F fg color   --fgcolor=fg color     Foreground color. Default grey
+          -A alpha      --alpha=alpha          Transparency: 0 is transparent
+                                               and 255 (the default) is opaque
+          -o            --top                  Place xmobar at the top of the screen
+          -b            --bottom               Place xmobar at the bottom of the screen
+          -p            --position=position    Specify position, same as in config file
+          -d            --dock                 Try to start xmobar as a dock
+          -a alignsep   --alignsep=alignsep    Separators for left, center and right text
+                                               alignment. Default: '}{'
+          -s char       --sepchar=char         Character used to separate commands in
+                                               the output template. Default '%'
+          -t template   --template=template    Output template
+          -i path       --iconroot=path        Default directory for icon pattern files
+          -c commands   --commands=commands    List of commands to be executed
+          -C command    --add-command=command  Add to the list of commands to be executed
+          -x screen     --screen=screen        On which X screen number to start
 
-    Mail bug reports and suggestions to <mail@jao.io>
+        Mail bug reports and suggestions to <mail@jao.io>
 
 
 ## The Output Template
@@ -520,7 +532,7 @@ reported.
 It's possible to insert in the global templates icon directives of the
 form:
 
-     <icon=/path/to/bitmap.xbm/>
+        <icon=/path/to/bitmap.xbm/>
 
 which will produce the expected result. Accepted image formats are XBM
 and XPM (when `with_xpm` flag is enabled). If path does not start with
@@ -528,7 +540,7 @@ and XPM (when `with_xpm` flag is enabled). If path does not start with
 
 It's also possible to use action directives of the form:
 
-     <action=`command` button=12345>
+        <action=`command` button=12345>
 
 which will be executed when clicked on with specified mouse buttons. This tag
 can be nested, allowing different commands to be run depending on button clicked.
@@ -546,17 +558,23 @@ enclosed by square parenthesis.
 
 Example:
 
-    [Run Memory ["-t","Mem: <usedratio>%"] 10, Run Swap [] 10]
+  ``` haskell
+      [Run Memory ["-t","Mem: <usedratio>%"] 10, Run Swap [] 10]
+  ```
 
 to run the Memory monitor plugin with the specified template, and the
 swap monitor plugin, with default options, every second.  And here's
 an example of a template for the commands above using an icon:
 
-    template="<icon=/home/jao/.xmobar/mem.xbm/><memory> <swap>"
+  ``` haskell
+      template="<icon=/home/jao/.xmobar/mem.xbm/><memory> <swap>"
+  ```
 
 This example will run "xclock" command when date is clicked:
 
-    template="<action=`xclock`>%date%</action>
+  ``` haskell
+      template="<action=`xclock`>%date%</action>
+  ```
 
 The only internal available command is `Com` (see below Executing
 External Commands). All other commands are provided by plugins. xmobar
@@ -587,11 +605,13 @@ as `"<icon=/path/to/icon_3.xpm/>"` when the value is `3`, also `"%"` is interpre
 as `"%"`, `"%%"` as `"3"`, `"%%%"` as `"3%"`, `"%%%%"` as `"33"` and so on). Essentially
 it allows to replace vertical bars with custom icons. For example,
 
-    Run Brightness
-      [ "-t", "<ipat>"
-      , "--"
-      , "--brightness-icon-pattern", "<icon=bright_%%.xpm/>"
-      ] 30
+  ``` haskell
+      Run Brightness
+        [ "-t", "<ipat>"
+        , "--"
+        , "--brightness-icon-pattern", "<icon=bright_%%.xpm/>"
+        ] 30
+  ```
 
 Will display `bright_0.xpm` to `bright_8.xpm` depending on current brightness
 value.
@@ -726,14 +746,16 @@ These are the options available for all monitors below:
 
 Commands' arguments must be set as a list. E.g.:
 
-    Run Weather "EGPF" ["-t", "<station>: <tempC>C"] 36000
+  ``` haskell
+      Run Weather "EGPF" ["-t", "<station>: <tempC>C"] 36000
+  ```
 
 In this case xmobar will run the weather monitor, getting information
 for the weather station ID EGPF (Glasgow Airport, as a homage to GHC)
 every hour (36000 tenth of seconds), with a template that will output
 something like:
 
-    Glasgow Airport: 16.0C
+        Glasgow Airport: 16.0C
 
 
 ## `Uptime Args RefreshRate`
@@ -781,24 +803,24 @@ something like:
 
 For example:
 
-```haskell
-  WeatherX "LEBL"
-           [ ("clear", "🌣")
-           , ("sunny", "🌣")
-           , ("mostly clear", "🌤")
-           , ("mostly sunny", "🌤")
-           , ("partly sunny", "⛅")
-           , ("fair", "🌑")
-           , ("cloudy","☁")
-           , ("overcast","☁")
-           , ("partly cloudy", "⛅")
-           , ("mostly cloudy", "🌧")
-           , ("considerable cloudiness", "⛈")]
-           ["-t", "<fn=2><skyConditionS></fn> <tempC>° <rh>%  <windKmh> (<hour>)"
-           , "-L","10", "-H", "25", "--normal", "black"
-           , "--high", "lightgoldenrod4", "--low", "darkseagreen4"]
-           18000
-```
+  ``` haskell
+      WeatherX "LEBL"
+               [ ("clear", "🌣")
+               , ("sunny", "🌣")
+               , ("mostly clear", "🌤")
+               , ("mostly sunny", "🌤")
+               , ("partly sunny", "⛅")
+               , ("fair", "🌑")
+               , ("cloudy","☁")
+               , ("overcast","☁")
+               , ("partly cloudy", "⛅")
+               , ("mostly cloudy", "🌧")
+               , ("considerable cloudiness", "⛈")]
+               ["-t", "<fn=2><skyConditionS></fn> <tempC>° <rh>%  <windKmh> (<hour>)"
+               , "-L","10", "-H", "25", "--normal", "black"
+               , "--high", "lightgoldenrod4", "--low", "darkseagreen4"]
+               18000
+  ```
 
 As mentioned, the replacement string can also be an icon
 specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
@@ -914,7 +936,11 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
 
 ## `Battery Args RefreshRate`
 
-- Same as `BatteryP ["BAT", "BAT0", "BAT1", "BAT2"] Args RefreshRate`.
+- Same as
+
+    ``` haskell
+        BatteryP ["BAT", "BAT0", "BAT1", "BAT2"] Args RefreshRate
+    ```
 
 ## `BatteryP Dirs Args RefreshRate`
 
@@ -966,15 +992,17 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
 - Example (note that you need "--" to separate regular monitor options from
   Battery's specific ones):
 
-         Run BatteryP ["BAT0"]
-                      ["-t", "<acstatus><watts> (<left>%)",
-                       "-L", "10", "-H", "80", "-p", "3",
-                       "--", "-O", "<fc=green>On</fc> - ", "-i", "",
-                       "-L", "-15", "-H", "-5",
-                       "-l", "red", "-m", "blue", "-h", "green"
-                       "-a", "notify-send -u critical 'Battery running out!!'",
-                       "-A", "3"]
-                      600
+    ``` haskell
+        Run BatteryP ["BAT0"]
+                     ["-t", "<acstatus><watts> (<left>%)",
+                      "-L", "10", "-H", "80", "-p", "3",
+                      "--", "-O", "<fc=green>On</fc> - ", "-i", "",
+                      "-L", "-15", "-H", "-5",
+                      "-l", "red", "-m", "blue", "-h", "green"
+                      "-a", "notify-send -u critical 'Battery running out!!'",
+                      "-A", "3"]
+                     600
+    ```
 
   In the above example, the thresholds before the "--" separator
   affect only the `<left>` and `<leftbar>` fields, while those after
@@ -987,12 +1015,14 @@ specification, such as `("clear", "<icon=weather-clear.xbm/>")`.
   It is also possible to specify template variables in the `-O` and
   `-o` switches, as in the following example:
 
-         Run BatteryP ["BAT0"]
-                      ["-t", "<acstatus>"
-                      , "-L", "10", "-H", "80"
-                      , "-l", "red", "-h", "green"
-                      , "--", "-O", "Charging", "-o", "Battery: <left>%"
-                      ] 10
+    ``` haskell
+        Run BatteryP ["BAT0"]
+                     ["-t", "<acstatus>"
+                     , "-L", "10", "-H", "80"
+                     , "-l", "red", "-h", "green"
+                     , "--", "-O", "Charging", "-o", "Battery: <left>%"
+                     ] 10
+    ```
 
 - The "idle" AC state is selected whenever the AC power entering the
   battery is zero.
@@ -1048,9 +1078,11 @@ more than one battery.
 - Default template: none (you must specify a template for each file system).
 - Example:
 
-         DiskU [("/", "<used>/<size>"), ("sdb1", "<usedbar>")]
-               ["-L", "20", "-H", "50", "-m", "1", "-p", "3"]
-               20
+    ``` haskell
+        DiskU [("/", "<used>/<size>"), ("sdb1", "<usedbar>")]
+              ["-L", "20", "-H", "50", "-m", "1", "-p", "3"]
+              20
+    ```
 
 ## `DiskIO Disks Args RefreshRate`
 
@@ -1073,7 +1105,9 @@ more than one battery.
 - Default template: none (you must specify a template for each file system).
 - Example:
 
-         DiskIO [("/", "<read> <write>"), ("sdb1", "<total>")] [] 10
+    ``` haskell
+        DiskIO [("/", "<read> <write>"), ("sdb1", "<total>")] [] 10
+    ```
 
 ## `ThermalZone Number Args RefreshRate`
 
@@ -1090,7 +1124,9 @@ more than one battery.
   directory).
 - Example:
 
-         Run ThermalZone 0 ["-t","<id>: <temp>C"] 30
+    ``` haskell
+        Run ThermalZone 0 ["-t","<id>: <temp>C"] 30
+    ```
 
 ## `Thermal Zone Args RefreshRate`
 
@@ -1107,7 +1143,9 @@ more than one battery.
   Check directories in /proc/acpi/thermal_zone for possible values.
 - Example:
 
-         Run Thermal "THRM" ["-t","iwl4965-temp: <temp>C"] 50
+    ``` haskell
+        Run Thermal "THRM" ["-t","iwl4965-temp: <temp>C"] 50
+    ```
 
 ## `CpuFreq Args RefreshRate`
 
@@ -1120,8 +1158,10 @@ more than one battery.
 - This monitor requires acpi_cpufreq module to be loaded in kernel
 - Example:
 
-         Run CpuFreq ["-t", "Freq:<cpu0>|<cpu1>GHz", "-L", "0", "-H", "2",
-                      "-l", "lightblue", "-n","white", "-h", "red"] 50
+    ``` haskell
+        Run CpuFreq ["-t", "Freq:<cpu0>|<cpu1>GHz", "-L", "0", "-H", "2",
+                     "-l", "lightblue", "-n","white", "-h", "red"] 50
+    ```
 
 ## `CoreTemp Args RefreshRate`
 
@@ -1134,9 +1174,11 @@ more than one battery.
 - This monitor requires coretemp module to be loaded in kernel
 - Example:
 
-         Run CoreTemp ["-t", "Temp:<core0>|<core1>C",
-                       "-L", "40", "-H", "60",
-                       "-l", "lightblue", "-n", "gray90", "-h", "red"] 50
+    ``` haskell
+        Run CoreTemp ["-t", "Temp:<core0>|<core1>C",
+                      "-L", "40", "-H", "60",
+                      "-l", "lightblue", "-n", "gray90", "-h", "red"] 50
+    ```
 
 ## `MultiCoreTemp Args RefreshRate`
 
@@ -1170,10 +1212,12 @@ more than one battery.
 - This monitor requires coretemp module to be loaded in kernel
 - Example:
 
-         Run MultiCoreTemp ["-t", "Temp: <avg>°C | <avgpc>%",
-                            "-L", "60", "-H", "80",
-                            "-l", "green", "-n", "yellow", "-h", "red",
-                            "--", "--mintemp", "20", "--maxtemp", "100"] 50
+    ``` haskell
+        Run MultiCoreTemp ["-t", "Temp: <avg>°C | <avgpc>%",
+                           "-L", "60", "-H", "80",
+                           "-l", "green", "-n", "yellow", "-h", "red",
+                           "--", "--mintemp", "20", "--maxtemp", "100"] 50
+    ```
 
 ## `Volume Mixer Element Args RefreshRate`
 
@@ -1271,9 +1315,11 @@ following differences:
 - Example (note that you need "--" to separate regular monitor options from
   MPD's specific ones):
 
-         Run MPD ["-t",
-                  "<composer> <title> (<album>) <track>/<plength> <statei> [<flags>]",
-                  "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
+    ``` haskell
+        Run MPD ["-t",
+                 "<composer> <title> (<album>) <track>/<plength> <statei> [<flags>]",
+                 "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
+    ```
 
 ## `MPDX Alias Args RefreshRate`
 
@@ -1293,7 +1339,9 @@ Like `MPD` but uses as alias its first argument instead of "mpd".
 - Default template: `<artist> - <title>`
 - Example:
 
-         Run Mpris1 "clementine" ["-t", "<artist> - [<tracknumber>] <title>"] 10
+    ``` haskell
+        Run Mpris1 "clementine" ["-t", "<artist> - [<tracknumber>] <title>"] 10
+    ```
 
 ## `Mpris2 PlayerName Args RefreshRate`
 
@@ -1310,7 +1358,9 @@ Like `MPD` but uses as alias its first argument instead of "mpd".
 - Default template: `<artist> - <title>`
 - Example:
 
-         Run Mpris2 "spotify" ["-t", "<artist> - [<composer>] <title>"] 10
+    ``` haskell
+        Run Mpris2 "spotify" ["-t", "<artist> - [<composer>] <title>"] 10
+    ```
 
 ## `Mail Args Alias`
 
@@ -1322,9 +1372,11 @@ Like `MPD` but uses as alias its first argument instead of "mpd".
   during compilation.
 - Example:
 
-         Run Mail [("inbox", "~/var/mail/inbox"),
-                   ("lists", "~/var/mail/lists")]
-                  "mail"
+    ``` haskell
+        Run Mail [("inbox", "~/var/mail/inbox"),
+                  ("lists", "~/var/mail/lists")]
+                 "mail"
+    ```
 
 ## `MailX Args Opts Alias`
 
@@ -1344,11 +1396,12 @@ Like `MPD` but uses as alias its first argument instead of "mpd".
   during compilation.
 - Example:
 
-         Run MailX [("I", "inbox", "green"),
-                    ("L", "lists", "orange")]
-                   ["-d", "~/var/mail", "-p", " ", "-s", " "]
-                   "mail"
-
+    ``` haskell
+        Run MailX [("I", "inbox", "green"),
+                   ("L", "lists", "orange")]
+                  ["-d", "~/var/mail", "-p", " ", "-s", " "]
+                  "mail"
+    ```
 
 ## `MBox Mboxes Opts Alias`
 
@@ -1374,8 +1427,10 @@ Like `MPD` but uses as alias its first argument instead of "mpd".
   (when it's not empty); it can be used in the template with the alias
   `mbox`:
 
-         Run MBox [("I ", "inbox", "red"), ("O ", "~/foo/mbox", "")]
-                  ["-d", "/var/mail/", "-p", " "] "mbox"
+    ``` haskell
+        Run MBox [("I ", "inbox", "red"), ("O ", "~/foo/mbox", "")]
+                 ["-d", "/var/mail/", "-p", " "] "mbox"
+    ```
 
 ## `XPropertyLog PropName`
 
@@ -1421,7 +1476,9 @@ Like `MPD` but uses as alias its first argument instead of "mpd".
 - Default template: `<percent>`
 - Example:
 
-       Run Brightness ["-t", "<bar>"] 60
+    ``` haskell
+        Run Brightness ["-t", "<bar>"] 60
+    ```
 
 ## `Kbd Opts`
 
@@ -1433,7 +1490,9 @@ Like `MPD` but uses as alias its first argument instead of "mpd".
     -  second element of the tuple is the corresponding replacement
 - Example:
 
-		Run Kbd [("us(dvorak)", "DV"), ("us", "US")]
+    ``` haskell
+        Run Kbd [("us(dvorak)", "DV"), ("us", "US")]
+    ```
 
 ## `Locks`
 
@@ -1441,7 +1500,9 @@ Like `MPD` but uses as alias its first argument instead of "mpd".
 - Aliases to `locks`
 - Example:
 
-	Run Locks
+    ``` haskell
+        Run Locks
+    ```
 
 ## `CatInt n filename`
 
@@ -1451,7 +1512,9 @@ Like `MPD` but uses as alias its first argument instead of "mpd".
   have several.
 - Example:
 
-    Run CatInt 0 "/sys/devices/platform/thinkpad_hwmon/fan1_input" [] 50
+    ``` haskell
+        Run CatInt 0 "/sys/devices/platform/thinkpad_hwmon/fan1_input" [] 50
+    ```
 
 ## `UVMeter`
 
@@ -1470,7 +1533,9 @@ Like `MPD` but uses as alias its first argument instead of "mpd".
   http://www.arpansa.gov.au/uvindex/realtime/xml/uvvalues.xml
 - Example:
 
+    ``` haskell
         Run UVMeter "Brisbane" ["-H", "3", "-L", "3", "--low", "green", "--high", "red"] 900
+    ```
 
 # Executing External Commands
 
@@ -1491,12 +1556,16 @@ option list with the Com template command:
 
 E.g.:
 
-        Run Com "uname" ["-s","-r"] "" 0
+  ``` haskell
+      Run Com "uname" ["-s","-r"] "" 0
+  ```
 
 can be used in the output template as `%uname%` (and xmobar will call
 _uname_ only once), while
 
-        Run Com "date" ["+\"%a %b %_d %H:%M\""] "mydate" 600
+  ``` haskell
+      Run Com "date" ["+\"%a %b %_d %H:%M\""] "mydate" 600
+  ```
 
 can be used in the output template as `%mydate%`.
 
@@ -1509,7 +1578,9 @@ end, you can use the `ComX` variant:
 Works like `Com`, but displaying `ExitMessage` (a string) if the
 execution fails.  For instance:
 
-        Run ComX "date" ["+\"%a %b %_d %H:%M\""] "N/A" "mydate" 600
+  ``` haskell
+      Run ComX "date" ["+\"%a %b %_d %H:%M\""] "N/A" "mydate" 600
+  ```
 
 will display "N/A" if for some reason the `date` invocation fails.
 
@@ -1541,7 +1612,11 @@ will display "N/A" if for some reason the `date` invocation fails.
 - Format is a time format string, as accepted by the standard ISO C
   `strftime` function (or Haskell's `formatCalendarTime`).
 - Timezone changes are picked up automatically every minute.
-- Sample usage: `Run Date "%a %b %_d %Y <fc=#ee9a00>%H:%M:%S</fc>" "date" 10`
+- Sample usage:
+
+  ``` haskell
+      Run Date "%a %b %_d %Y <fc=#ee9a00>%H:%M:%S</fc>" "date" 10
+  ```
 
 ## `DateZone Format Locale Zone Alias RefreshRate`
 
@@ -1554,7 +1629,10 @@ will display "N/A" if for some reason the `date` invocation fails.
   in /usr/share/zoneinfo/. If "" is given as Zone, the default system time is
   used.
 - Sample usage:
-  `Run DateZone "%a %H:%M:%S" "de_DE.UTF-8" "Europe/Vienna" "viennaTime" 10`
+
+    ``` haskell
+        Run DateZone "%a %H:%M:%S" "de_DE.UTF-8" "Europe/Vienna" "viennaTime" 10
+    ```
 
 ## `CommandReader "/path/to/program" Alias`
 
@@ -1572,7 +1650,9 @@ will display "N/A" if for some reason the `date` invocation fails.
 - Text is displayed as marquee with the specified length, rate in 10th
   seconds and separator when it wraps around
 
+    ``` haskell
         Run MarqueePipeReader "/tmp/testpipe" (10, 7, "+") "mpipe"
+    ```
 
 - Expands environment variables in the first argument
 
@@ -1592,10 +1672,12 @@ will display "N/A" if for some reason the `date` invocation fails.
 - Use it for OSD-like status bars e.g. for setting the volume or
   brightness:
 
+    ``` haskell
         Run BufferedPipeReader "bpr"
             [ (  0, False, "/tmp/xmobar_window"  )
             , ( 15,  True, "/tmp/xmobar_status"  )
             ]
+    ```
 
   Have your window manager send window titles to
   `"/tmp/xmobar_window"`. They will always be shown and not reveal
@@ -1615,11 +1697,14 @@ will display "N/A" if for some reason the `date` invocation fails.
   property by using `xmonadPropLog` as your log hook in xmonad's
   configuration, as in the following example (more info [here]):
 
+    ``` haskell
         main = do
           spawn "xmobar"
           xmonad $ defaultConfig {
             logHook = dynamicLogString defaultPP >>= xmonadPropLog
           }
+    ```
+
    This plugin can be used as a sometimes more convenient alternative
    to `StdinReader`. For instance, it allows you to (re)start xmobar
    outside xmonad.
@@ -1634,10 +1719,12 @@ will display "N/A" if for some reason the `date` invocation fails.
 - It is advised that you still use `xmobarStrip` for the ppTitle in your
   logHook:
 
+    ``` haskell
         myPP = defaultPP { ppTitle = xmobarStrip }
         main = xmonad $ defaultConfig {
           logHook = dynamicLogString myPP >>= xmonadPropLog
         }
+    ```
 
 ## `HandleReader Handle Alias`
 
@@ -1648,12 +1735,14 @@ will display "N/A" if for some reason the `date` invocation fails.
   Handles. Pass the `read` Handle to HandleReader and write your output to the
   `write` Handle:
 
+    ``` haskell
         (readHandle, writeHandle) <- createPipe
         xmobarProcess <- forkProcess $ xmobar myConfig
                 { commands =
                     Run (HandleReader readHandle "handle") : commands myConfig
                 }
         hPutStr writeHandle "Hello World"
+    ```
 
 # The DBus Interface
 
@@ -1699,7 +1788,9 @@ the command takes effect.
 Bind the key which should {,un}map xmobar to a dummy value. This is necessary
 for {,un}grabKey in xmonad.
 
-    ((0, xK_Alt_L   ), return ())
+  ``` haskell
+      ((0, xK_Alt_L   ), return ())
+  ```
 
 Also, install `avoidStruts` layout modifier from `XMonad.Hooks.ManageDocks`
 
@@ -1707,53 +1798,55 @@ Finally, install these two event hooks (`handleEventHook` in `XConfig`)
 `myDocksEventHook` is a replacement for `docksEventHook` which reacts on unmap
 events as well (which `docksEventHook` doesn't).
 
-    import qualified XMonad.Util.ExtensibleState as XS
+  ``` haskell
+      import qualified XMonad.Util.ExtensibleState as XS
 
-    data DockToggleTime = DTT { lastTime :: Time } deriving (Eq, Show, Typeable)
+      data DockToggleTime = DTT { lastTime :: Time } deriving (Eq, Show, Typeable)
 
-    instance ExtensionClass DockToggleTime where
-        initialValue = DTT 0
+      instance ExtensionClass DockToggleTime where
+          initialValue = DTT 0
 
-    toggleDocksHook :: Int -> KeySym -> Event -> X All
-    toggleDocksHook to ks ( KeyEvent { ev_event_display = d
-                                     , ev_event_type    = et
-                                     , ev_keycode       = ekc
-                                     , ev_time          = etime
-                                     } ) =
-            io (keysymToKeycode d ks) >>= toggleDocks >> return (All True)
-        where
-        toggleDocks kc
-            | ekc == kc && et == keyPress = do
-                safeSendSignal ["Reveal 0", "TogglePersistent"]
-                XS.put ( DTT etime )
-            | ekc == kc && et == keyRelease = do
-                gap <- XS.gets ( (-) etime . lastTime )
-                safeSendSignal [ "TogglePersistent"
-                               , "Hide " ++ show (if gap < 400 then to else 0)
-                               ]
-            | otherwise = return ()
+      toggleDocksHook :: Int -> KeySym -> Event -> X All
+      toggleDocksHook to ks ( KeyEvent { ev_event_display = d
+                                      , ev_event_type    = et
+                                      , ev_keycode       = ekc
+                                      , ev_time          = etime
+                                      } ) =
+              io (keysymToKeycode d ks) >>= toggleDocks >> return (All True)
+          where
+          toggleDocks kc
+              | ekc == kc && et == keyPress = do
+                  safeSendSignal ["Reveal 0", "TogglePersistent"]
+                  XS.put ( DTT etime )
+              | ekc == kc && et == keyRelease = do
+                  gap <- XS.gets ( (-) etime . lastTime )
+                  safeSendSignal [ "TogglePersistent"
+                              , "Hide " ++ show (if gap < 400 then to else 0)
+                              ]
+              | otherwise = return ()
 
-        safeSendSignal s = catchX (io $ sendSignal s) (return ())
-        sendSignal    = withSession . callSignal
-        withSession mc = connectSession >>= \c -> callNoReply c mc >> disconnect c
-        callSignal :: [String] -> MethodCall
-        callSignal s = ( methodCall
-                         ( objectPath_    "/org/Xmobar/Control" )
-                         ( interfaceName_ "org.Xmobar.Control"  )
-                         ( memberName_    "SendSignal"          )
-                       ) { methodCallDestination = Just $ busName_ "org.Xmobar.Control"
-                         , methodCallBody        = map toVariant s
-                         }
+          safeSendSignal s = catchX (io $ sendSignal s) (return ())
+          sendSignal    = withSession . callSignal
+          withSession mc = connectSession >>= \c -> callNoReply c mc >> disconnect c
+          callSignal :: [String] -> MethodCall
+          callSignal s = ( methodCall
+                          ( objectPath_    "/org/Xmobar/Control" )
+                          ( interfaceName_ "org.Xmobar.Control"  )
+                          ( memberName_    "SendSignal"          )
+                      ) { methodCallDestination = Just $ busName_ "org.Xmobar.Control"
+                          , methodCallBody        = map toVariant s
+                          }
 
-    toggleDocksHook _ _ _ = return (All True)
+      toggleDocksHook _ _ _ = return (All True)
 
-    myDocksEventHook :: Event -> X All
-    myDocksEventHook e = do
-        when (et == mapNotify || et == unmapNotify) $
-            whenX ((not `fmap` (isClient w)) <&&> runQuery checkDock w) refresh
-        return (All True)
-        where w  = ev_window e
+      myDocksEventHook :: Event -> X All
+      myDocksEventHook e = do
+          when (et == mapNotify || et == unmapNotify) $
+              whenX ((not `fmap` (isClient w)) <&&> runQuery checkDock w) refresh
+          return (All True)
+          where w  = ev_window e
               et = ev_event_type e
+  ```
 
 # User plugins
 
@@ -1766,10 +1859,12 @@ Next you must declare this data type an instance of the `Exec` class, by
 defining the 1 needed method (alternatively `start` or `run`) and 2
 optional ones (alias and rate):
 
-        start :: e -> (String -> IO ()) -> IO ()
-        run   :: e -> IO String
-        rate  :: e -> Int
-        alias :: e -> String
+  ``` haskell
+      start :: e -> (String -> IO ()) -> IO ()
+      run   :: e -> IO String
+      rate  :: e -> Int
+      alias :: e -> String
+  ```
 
 `start` must receive a callback to be used to display the `String`
 produced by the plugin. This method can be used for plugins that need
@@ -1785,16 +1880,18 @@ example of a plugin that runs just once, and
 
 Notice that Date could be implemented as:
 
-        instance Exec Date where
-            alias (Date _ a _) = a
-            start (Date f _ r) = date f r
+  ``` haskell
+      instance Exec Date where
+          alias (Date _ a _) = a
+          start (Date f _ r) = date f r
 
-        date :: String -> Int -> (String -> IO ()) -> IO ()
-        date format r callback = do go
-            where go = do
-                    t <- toCalendarTime =<< getClockTime
-                    callback $ formatCalendarTime defaultTimeLocale format t
-                    tenthSeconds r >> go
+      date :: String -> Int -> (String -> IO ()) -> IO ()
+      date format r callback = do go
+          where go = do
+                  t <- toCalendarTime =<< getClockTime
+                  callback $ formatCalendarTime defaultTimeLocale format t
+                  tenthSeconds r >> go
+  ```
 
 This implementation is equivalent to the one you can read in
 `Plugins/Date.hs`.
