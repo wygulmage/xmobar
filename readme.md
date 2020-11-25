@@ -1321,9 +1321,9 @@ following differences:
                  "--", "-P", ">>", "-Z", "|", "-S", "><"] 10
     ```
 
-## `MPDX Alias Args RefreshRate`
+## `MPDX Args RefreshRate Alias`
 
-Like `MPD` but uses as alias its first argument instead of "mpd".
+Like `MPD` but uses as alias its last argument instead of "mpd".
 
 ## `Mpris1 PlayerName Args RefreshRate`
 

@@ -90,7 +90,7 @@ data Monitors = Network      Interface   Args Rate
 #endif
 #ifdef LIBMPD
               | MPD Args Rate
-              | MPDX String Args Rate
+              | MPDX Args Rate Alias
               | AutoMPD  Args
 #endif
 #ifdef ALSA
@@ -149,7 +149,7 @@ instance Exec Monitors where
 #ifdef LIBMPD
     alias (MPD _ _) = "mpd"
     alias (AutoMPD _) = "autompd"
-    alias (MPDX a _ _) = a
+    alias (MPDX _ _ a) = a
 #endif
 #ifdef ALSA
     alias (Volume m c _ _) = m ++ ":" ++ c
@@ -193,7 +193,7 @@ instance Exec Monitors where
 #endif
 #ifdef LIBMPD
     start (MPD a r) = runMD a mpdConfig runMPD r mpdReady
-    start (MPDX _ a r) = start (MPD a r)
+    start (MPDX a r _) = start (MPD a r)
     start (AutoMPD a) = runMBD a mpdConfig runMPD mpdWait mpdReady
 #endif
 #ifdef ALSA
