@@ -140,6 +140,7 @@ library
                    Xmobar.Plugins.XMonadLog,
                    Xmobar.Plugins.Kbd,
                    Xmobar.Plugins.Locks,
+                   Xmobar.Plugins.NotmuchMail,
                    Xmobar.Plugins.Monitors,
                    Xmobar.Plugins.Monitors.Batt,
                    Xmobar.Plugins.Monitors.Common,

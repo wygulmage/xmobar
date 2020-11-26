@@ -39,6 +39,7 @@ module Xmobar (xmobar
               , module Xmobar.Plugins.Mail
               , module Xmobar.Plugins.MBox
 #endif
+              , module Xmobar.Plugins.NotmuchMail
               , module Xmobar.Plugins.Monitors
               , module Xmobar.Plugins.PipeReader
               , module Xmobar.Plugins.MarqueePipeReader
@@ -70,6 +71,7 @@ import Xmobar.Plugins.PipeReader
 import Xmobar.Plugins.StdinReader
 import Xmobar.Plugins.MarqueePipeReader
 import Xmobar.Plugins.XMonadLog
+import Xmobar.Plugins.NotmuchMail
 
 import Xmobar.App.Main(xmobar, xmobarMain, configFromArgs)
 import Xmobar.App.Config(defaultConfig)
