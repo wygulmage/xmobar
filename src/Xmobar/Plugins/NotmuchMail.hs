@@ -18,8 +18,8 @@
 --
 -- As mail that was tagged is moved from the @new@ directory to @cur@,
 -- the @inotify@ solution that he mail 'Mail' plugin (and its variants)
--- uses won't work for such mail.  Hence we have to resort to refreshing
--- every N time intervals.
+-- uses won't work for such mail.  Hence, we have to resort to a
+-- refresh-based monitor.
 --
 -- Note that, in the `notmuch` spirit, this plugin checks for new
 -- threads and not new individual messages.  For convenience, the

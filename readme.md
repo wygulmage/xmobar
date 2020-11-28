@@ -45,12 +45,13 @@
     - [`Volume Mixer Element Args RefreshRate`](#volume-mixer-element-args-refreshrate)
     - [`Alsa Mixer Element Args`](#alsa-mixer-element-args)
     - [`MPD Args RefreshRate`](#mpd-args-refreshrate)
-    - [`MPDX Alias Args RefreshRate`](#mpdx-alias-args-refreshrate)
+    - [`MPDX Args RefreshRate Alias`](#mpdx-args-refreshrate-alias)
     - [`Mpris1 PlayerName Args RefreshRate`](#mpris1-playername-args-refreshrate)
     - [`Mpris2 PlayerName Args RefreshRate`](#mpris2-playername-args-refreshrate)
     - [`Mail Args Alias`](#mail-args-alias)
     - [`MailX Args Opts Alias`](#mailx-args-opts-alias)
     - [`MBox Mboxes Opts Alias`](#mbox-mboxes-opts-alias)
+    - [`NotmuchMail Alias Args Rate`](#notmuchmail-alias-args-rate)
     - [`XPropertyLog PropName`](#xpropertylog-propname)
     - [`UnsafeXPropertyLog PropName`](#unsafexpropertylog-propname)
     - [`NamedXPropertyLog PropName Alias`](#namedxpropertylog-propname-alias)
@@ -1431,6 +1432,84 @@ Like `MPD` but uses as alias its last argument instead of "mpd".
         Run MBox [("I ", "inbox", "red"), ("O ", "~/foo/mbox", "")]
                  ["-d", "/var/mail/", "-p", " "] "mbox"
     ```
+
+## `NotmuchMail Alias Args Rate`
+
+This plugin checks for new mail, provided that this mail is indexed by
+`notmuch`.  In the `notmuch` spirit, this plugin checks for new
+**threads** and not new individual messages.
+
+- Alias: What name the plugin should have in your template string.
+- Args: A list of `MailItem`s of the form
+
+    ``` haskell
+        [ MailItem "name" "address" "query"
+        ...
+        ]
+    ```
+
+  or, using explicit record syntax:
+
+    ``` haskell
+        [ MailItem
+            { name    = "name"
+            , address = "address"
+            , query   = "query"
+            }
+          ...
+        ]
+    ```
+
+  where
+
+    - `name` is what gets printed in the status bar before the number
+      of new threads.
+    - `address` is the e-mail address of the recipient, i.e. we only
+      query mail that was send to this particular address (in more
+      concrete terms, we pass the address to the `to:` constructor when
+      performing the search).  If `address` is empty, we search through
+      all unread mail, regardless of whom it was sent to.
+    - `query` is funneled to `notmuch search` verbatim.  For the general
+      query syntax, consult `notmuch search --help`, as well as
+      `notmuch-search-terms(7)`.  Note that the `unread` tag is
+      **always** added in front of the query and composed with it via an
+      **and**.
+
+- Rate: Rate with which to update the plugin (in deciseconds).
+- Example:
+
+  - A single `MailItem` that displays all unread threads from the given
+    address:
+
+      ``` haskell
+          MailItem "mbs:" "soliditsallgood@mailbox.org" ""
+      ```
+
+  - A single `MailItem` that displays all unread threads with
+    "[My-Subject]" somewhere in the title:
+
+      ``` haskell
+        MailItem "S:" "" "subject:[My-Subject]"
+      ```
+
+  - A full example of a `NotmuchMail` configuration:
+
+      ``` haskell
+          Run NotmuchMail "mail"  -- name for the template string
+            [ -- All unread mail to the below address, but nothing that's tagged
+              -- with @lists@ or @haskell@.
+              MailItem "mbs:"
+                       "soliditsallgood@mailbox.org"
+                       "not tag:lists and not tag:haskell"
+
+              -- All unread mail that has @[Haskell-Cafe]@ in the subject line.
+            , MailItem "C:" "" "subject:[Haskell-Cafe]"
+
+              -- All unread mail that's tagged as @lists@, but not @haskell@.
+            , MailItem "H:" "" "tag:lists and not tag:haskell"
+            ]
+            600                   -- update every 60 seconds
+      ```
 
 ## `XPropertyLog PropName`
 
