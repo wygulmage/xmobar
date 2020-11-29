@@ -1,4 +1,4 @@
-## Version 0.37 (unreleased)
+## Version 0.37 (November, 2020)
 
 _New features_
 
