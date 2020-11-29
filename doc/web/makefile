@@ -13,16 +13,19 @@ default: index.html
 $(index): $(index.src)
 	@tail -n+3 $(index.src) | sed "1s/^/$(title)\n/" > $(index)
 
-index.html: releases.html $(index) $(css)
+index.html: changelog.html $(index) $(css)
 	pandoc -f markdown -t html -c $(css) -N -s \
                $(index) > index.html
 
-releases.html: $(releases) $(css)
+changelog.html: $(releases) $(css)
 	pandoc -f markdown -t html -c $(css) -s \
-               $(releases) > releases.html
+               $(releases) > changelog.html
 
 upload-images:
 	rsync -zav $(images) $(remote)/doc/screenshots
+
+upload-changes: changelog.html
+	scp changelog.html $(remote)
 
 upload-pages: $(htmls)
 	scp $(htmls) $(css) $(remote)
