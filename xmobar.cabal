@@ -16,7 +16,8 @@ bug-reports:        https://github.com/jaor/xmobar/issues
 cabal-version:      >= 1.10
 build-type:         Simple
 
-extra-source-files: readme.md, changelog.md,
+extra-source-files: readme.org, changelog.md,
+                    doc/quick-start.org, doc/plugins.org
                     examples/padding-icon.sh,
                     examples/xmobar.config,
                     examples/xmobar.hs,
