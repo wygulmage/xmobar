@@ -40,6 +40,12 @@ item below.
   apt install xmobar
 #+end_src
 
+*** OpenSUSE
+
+#+begin_src shell
+  zypper install xmobar
+#+end_src
+
 *** Void Linux
 
 #+begin_src shell
