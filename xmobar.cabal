@@ -99,6 +99,7 @@ library
     exposed-modules: Xmobar,
                      Xmobar.Plugins.Monitors.Common.Types,
                      Xmobar.Plugins.Monitors.Common.Run,
+                     Xmobar.Plugins.Monitors.Common,
                      Xmobar.Plugins.Monitors.Cpu
 
     other-modules: Paths_xmobar,
@@ -144,7 +145,6 @@ library
                    Xmobar.Plugins.NotmuchMail,
                    Xmobar.Plugins.Monitors,
                    Xmobar.Plugins.Monitors.Batt,
-                   Xmobar.Plugins.Monitors.Common,
                    Xmobar.Plugins.Monitors.Common.Output,
                    Xmobar.Plugins.Monitors.Common.Parsers,
                    Xmobar.Plugins.Monitors.Common.Files,
