@@ -107,6 +107,9 @@ Since 0.14 xmobar reacts to SIGUSR1 and SIGUSR2:
 - If you want to jump straight into configuring xmobar, head over to the
   [[./doc/quick-start.org][quick-start]] guide.
 
+- If you want to get a detailed overview of all available plugins and
+  monitors, visit the [[./doc/plugins.org][plugins]] file.
+
 - If you want to know how to contribute to the xmobar project, check out
   [[contributing.org][contributing]].
 
