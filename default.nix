@@ -1,14 +1,14 @@
 { mkDerivation, alsa-core, alsa-mixer, async, base, bytestring
 , containers, dbus, directory, extensible-exceptions, filepath
-, hinotify, hspec, http-conduit, http-types, iwlib, libmpd, libXpm
-, libXrandr, libXrender, mtl, old-locale, parsec, parsec-numbers
-, process, regex-compat, stdenv, stm, temporary, time
-, timezone-olson, timezone-series, transformers, unix, utf8-string
-, wirelesstools, X11, X11-xft
+, gauge, hinotify, hspec, http-client-tls, http-conduit, http-types
+, iwlib, lib, libmpd, libXpm, libXrandr, libXrender, mtl
+, old-locale, parsec, parsec-numbers, process, regex-compat, stm
+, temporary, time, timezone-olson, timezone-series, transformers
+, unix, utf8-string, wirelesstools, X11, X11-xft
 }:
 mkDerivation {
   pname = "xmobar";
-  version = "0.29.5";
+  version = "0.37";
   src = ./.;
   configureFlags = [
     "-fwith_alsa" "-fwith_conduit" "-fwith_datezone" "-fwith_dbus"
@@ -20,10 +20,10 @@ mkDerivation {
   isExecutable = true;
   libraryHaskellDepends = [
     alsa-core alsa-mixer async base bytestring containers dbus
-    directory extensible-exceptions filepath hinotify http-conduit
-    http-types iwlib libmpd mtl old-locale parsec parsec-numbers
-    process regex-compat stm time timezone-olson timezone-series
-    transformers unix utf8-string X11 X11-xft
+    directory extensible-exceptions filepath hinotify http-client-tls
+    http-conduit http-types iwlib libmpd mtl old-locale parsec
+    parsec-numbers process regex-compat stm time timezone-olson
+    timezone-series transformers unix utf8-string X11 X11-xft
   ];
   librarySystemDepends = [
     libXpm libXrandr libXrender wirelesstools
@@ -36,8 +36,8 @@ mkDerivation {
     filepath hspec mtl old-locale parsec parsec-numbers process
     regex-compat stm temporary time transformers unix X11
   ];
-  doCheck = false;
+  benchmarkHaskellDepends = [ base gauge mtl time ];
   homepage = "http://xmobar.org";
   description = "A Minimalistic Text Based Status Bar";
-  license = stdenv.lib.licenses.bsd3;
+  license = lib.licenses.bsd3;
 }
