@@ -35,17 +35,17 @@ import Data.ByteString.Char8 (pack)
 #endif
 
 data FileSystemStats = FileSystemStats {
-  fsStatBlockSize :: Integer
+  fsStatBlockSize :: !Integer
   -- ^ Optimal transfer block size.
-  , fsStatBlockCount :: Integer
+  , fsStatBlockCount :: !Integer
   -- ^ Total data blocks in file system.
-  , fsStatByteCount :: Integer
+  , fsStatByteCount :: !Integer
   -- ^ Total bytes in file system.
-  , fsStatBytesFree :: Integer
+  , fsStatBytesFree :: !Integer
   -- ^ Free bytes in file system.
-  , fsStatBytesAvailable :: Integer
+  , fsStatBytesAvailable :: !Integer
   -- ^ Free bytes available to non-superusers.
-  , fsStatBytesUsed :: Integer
+  , fsStatBytesUsed :: !Integer
   -- ^ Bytes used.
   } deriving (Show, Eq)
 

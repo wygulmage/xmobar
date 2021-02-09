@@ -24,12 +24,9 @@ expandEnv (c:s) = case c of
     remainder <- expandEnv s'
     return $ envVar ++ remainder
     where (e, s') = getVar s
-          getVar "" = ("", "")
-          getVar ('{':s'') = (takeUntil "}" s'', drop 1 . dropUntil "}" $ s'')
-          getVar s'' = (takeUntil filterstr s'', dropUntil filterstr s'')
+          getVar ('{' : s'') = fmap (drop 1) (span (/= '}') s'')
+          getVar s'' = span (`notElem` filterstr) s''
           filterstr = ",./? \t;:\"'~`!@#$%^&*()<>-+=\\|"
-          takeUntil f = takeWhile (not . flip elem f)
-          dropUntil f = dropWhile (not . flip elem f)
 
   '\\' -> case s == "" of
     True  -> return "\\"

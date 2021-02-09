@@ -20,19 +20,22 @@ module Xmobar.X11.Parsers (parseString, Box(..), BoxBorder(..), BoxOffset(..),
 import Xmobar.Config.Types
 import Xmobar.X11.Actions
 
+import Control.Applicative
 import Control.Monad (guard, mzero)
 import Data.Maybe (fromMaybe)
 import Data.Int (Int32)
-import Text.ParserCombinators.Parsec
+import Text.ParserCombinators.Parsec (Parser, parse)
+import Text.Parser.Char
+import Text.Parser.Combinators
 import Text.Read (readMaybe)
 import Graphics.X11.Types (Button)
 import Foreign.C.Types (CInt)
 
-data Widget = Icon String | Text String
+data Widget = Icon !String | Text !String
 
-data BoxOffset = BoxOffset Align Int32 deriving Eq 
+data BoxOffset = BoxOffset !Align !Int32 deriving Eq
 -- margins: Top, Right, Bottom, Left
-data BoxMargins = BoxMargins Int32 Int32 Int32 Int32 deriving Eq
+data BoxMargins = BoxMargins !Int32 !Int32 !Int32 !Int32 deriving Eq
 data BoxBorder = BBTop
                | BBBottom
                | BBVBoth
@@ -41,12 +44,12 @@ data BoxBorder = BBTop
                | BBHBoth
                | BBFull
                  deriving ( Read, Eq )
-data Box = Box BoxBorder BoxOffset CInt String BoxMargins deriving Eq
+data Box = Box !BoxBorder !BoxOffset !CInt !String !BoxMargins deriving Eq
 data TextRenderInfo =
-    TextRenderInfo { tColorsString   :: String
-                   , tBgTopOffset    :: Int32
-                   , tBgBottomOffset :: Int32
-                   , tBoxes          :: [Box]
+    TextRenderInfo { tColorsString   :: !String
+                   , tBgTopOffset    :: !Int32
+                   , tBgBottomOffset :: !Int32
+                   , tBoxes          :: ![Box]
                    }
 type FontIndex   = Int
 
@@ -82,7 +85,8 @@ stringParser c f a = manyTill (allParsers c f a) eof
 -- | Parses a maximal string without markup.
 textParser :: TextRenderInfo -> FontIndex -> Maybe [Action]
               -> Parser [(Widget, TextRenderInfo, FontIndex, Maybe [Action])]
-textParser c f a = do s <- many1 $
+-- textParser c f a = do s <- many1 $
+textParser c f a = do s <- some $
                             noneOf "<" <|>
                               try (notFollowedBy' (char '<')
                                     (try (string "fc=")  <|>
@@ -108,7 +112,8 @@ rawParser :: TextRenderInfo
           -> Parser [(Widget, TextRenderInfo, FontIndex, Maybe [Action])]
 rawParser c f a = do
   string "<raw="
-  lenstr <- many1 digit
+  -- lenstr <- many1 digit
+  lenstr <- some digit
   char ':'
   case reads lenstr of
     [(len,[])] -> do
@@ -137,10 +142,13 @@ actionParser :: TextRenderInfo -> FontIndex -> Maybe [Action]
                 -> Parser [(Widget, TextRenderInfo, FontIndex, Maybe [Action])]
 actionParser c f act = do
   string "<action="
-  command <- choice [between (char '`') (char '`') (many1 (noneOf "`")),
-                   many1 (noneOf ">")]
+  -- command <- choice [between (char '`') (char '`') (many1 (noneOf "`")),
+  command <- choice [between (char '`') (char '`') (some (noneOf "`")),
+                   -- many1 (noneOf ">")]
+                   some (noneOf ">")]
   buttons <- (char '>' >> return "1") <|> (space >> spaces >>
-    between (string "button=") (string ">") (many1 (oneOf "12345")))
+    -- between (string "button=") (string ">") (many1 (oneOf "12345")))
+    between (string "button=") (string ">") (some (oneOf "12345")))
   let a = Spawn (toButtons buttons) command
       a' = case act of
         Nothing -> Just [a]
@@ -169,7 +177,8 @@ colorParser (TextRenderInfo _ _ _ bs) f a = do
 boxParser :: TextRenderInfo -> FontIndex -> Maybe [Action]
               -> Parser [(Widget, TextRenderInfo, FontIndex, Maybe [Action])]
 boxParser (TextRenderInfo cs ot ob bs) f a = do
-  c <- between (string "<box") (string ">") (option "" (many1 (alphaNum <|> char '=' <|> char ' ' <|> char '#' <|> char ',')))
+  -- c <- between (string "<box") (string ">") (option "" (many1 (alphaNum <|> char '=' <|> char ' ' <|> char '#' <|> char ',')))
+  c <- between (string "<box") (string ">") (option "" (some (alphaNum <|> char '=' <|> char ' ' <|> char '#' <|> char ',')))
   let b = Box BBFull (BoxOffset C 0) 1 cs (BoxMargins 0 0 0 0)
   let g = boxReader b (words c)
   s <- manyTill
@@ -215,4 +224,5 @@ fontParser c a = do
 
 -- | Parses a color specification (hex or named)
 colors :: Parser String
-colors = many1 (alphaNum <|> char ',' <|> char ':' <|> char '#')
+-- colors = many1 (alphaNum <|> char ',' <|> char ':' <|> char '#')
+colors = some (alphaNum <|> char ',' <|> char ':' <|> char '#')

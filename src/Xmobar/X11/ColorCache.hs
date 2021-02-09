@@ -33,7 +33,7 @@ import Control.Monad.Trans (MonadIO, liftIO)
 import Control.Exception (SomeException, handle)
 import Graphics.X11.Xlib
 
-data DynPixel = DynPixel Bool Pixel
+data DynPixel = DynPixel !Bool !Pixel
 
 initColor :: Display -> String -> IO DynPixel
 initColor dpy c = handle black $ initColor' dpy c

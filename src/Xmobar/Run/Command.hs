@@ -20,18 +20,23 @@ module Xmobar.Run.Command where
 import Control.Exception (handle, SomeException(..))
 import System.Process
 import System.Exit
-import System.IO (hClose, hGetLine)
+import System.IO (hClose)
+
+import qualified Data.ByteString as Bytes
+import qualified Data.ByteString.UTF8 as UTF8
 
 import Xmobar.Run.Exec
 
-data Command = Com Program Args Alias Rate
-             | ComX Program Args String Alias Rate
+data Command = Com !Program !Args !Alias !Rate
+             | ComX !Program !Args !String !Alias !Rate
                deriving (Show,Read,Eq)
 
 type Args    = [String]
 type Program = String
 type Alias   = String
 type Rate    = Int
+
+myhGetLine = fmap UTF8.toString . Bytes.hGetLine
 
 instance Exec Command where
     alias (ComX p _ _ a _) =
@@ -46,7 +51,7 @@ instance Exec Command where
                 exit <- waitForProcess p
                 let closeHandles = hClose o >> hClose i >> hClose e
                     getL = handle (\(SomeException _) -> return "")
-                                  (hGetLine o)
+                                  (myhGetLine o)
                 case exit of
                   ExitSuccess -> do str <- getL
                                     closeHandles

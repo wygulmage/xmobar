@@ -18,7 +18,9 @@
 module Xmobar.Run.Template(parseTemplate, splitTemplate) where
 
 import qualified Data.Map as Map
-import Text.ParserCombinators.Parsec
+import Text.ParserCombinators.Parsec (Parser, parse)
+import Text.Parser.Char
+import Text.Parser.Combinators
 
 import Xmobar.Run.Exec
 import Xmobar.Run.Command

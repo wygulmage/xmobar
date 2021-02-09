@@ -26,7 +26,7 @@ import Control.Monad (forever, forM, guard)
 import Data.Foldable (foldrM, for_)
 import Data.Int (Int64)
 import Data.Map (Map)
-import qualified Data.Map as M
+import qualified Data.Map.Strict as M
 import Data.Maybe (isJust, fromJust)
 import Data.Time.Clock.POSIX (getPOSIXTime)
 import Data.Unique
@@ -36,7 +36,7 @@ type Periods = Map Unique Period
 
 data Tick = Tick (TMVar ()) | UnCoalesce
 
-data Period = Period { rate :: Int64, next :: Int64, tick :: TMVar Tick }
+data Period = Period { rate :: !Int64, next :: !Int64, tick :: TMVar Tick }
 
 data UnCoalesceException = UnCoalesceException deriving Show
 instance Exception UnCoalesceException

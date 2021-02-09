@@ -30,24 +30,24 @@ data Opts = Help
           | Verbose
           | Recompile
           | Version
-          | Font       String
-          | AddFont    String
-          | BgColor    String
-          | FgColor    String
-          | Alpha      String
+          | Font       !String
+          | AddFont    !String
+          | BgColor    !String
+          | FgColor    !String
+          | Alpha      !String
           | T
           | B
           | D
-          | AlignSep   String
-          | Commands   String
-          | AddCommand String
-          | SepChar    String
-          | Template   String
-          | OnScr      String
-          | IconRoot   String
-          | Position   String
-          | WmClass    String
-          | WmName     String
+          | AlignSep   !String
+          | Commands   !String
+          | AddCommand !String
+          | SepChar    !String
+          | Template   !String
+          | OnScr      !String
+          | IconRoot   !String
+          | Position   !String
+          | WmClass    !String
+          | WmName     !String
        deriving (Show, Eq)
 
 options :: [OptDescr Opts]

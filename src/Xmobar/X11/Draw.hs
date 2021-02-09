@@ -66,7 +66,7 @@ drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
 #if XFT
   when (alpha c /= 255) (liftIO $ drawBackground d p (bgColor c) (alpha c) wr)
 #else
-  _ <- return wr
+  _ <- return wr -- this should do nothing.
 #endif
   withColors d [bgColor c, borderColor c] $ \[bgcolor, bdcolor] -> do
     gc <- liftIO $ createGC  d w

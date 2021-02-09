@@ -58,3 +58,4 @@ changeLoop s f = atomically s >>= go
 
 safeIndex :: NE.NonEmpty a -> Int -> a
 safeIndex xs index = fromMaybe (NE.head xs) (NE.toList xs !!? index)
+-- ^ This seems like a terrible function. @safeIndex 5 (0 :| []) = 0@. Where is it used and why?

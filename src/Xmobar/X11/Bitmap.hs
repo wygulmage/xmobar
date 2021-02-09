@@ -44,13 +44,13 @@ runExceptT = runErrorT
 
 #endif
 
-data BitmapType = Mono Pixel | Poly
+data BitmapType = Mono !Pixel | Poly
 
-data Bitmap = Bitmap { width  :: Dimension
-                     , height :: Dimension
-                     , pixmap :: Pixmap
-                     , shapePixmap :: Maybe Pixmap
-                     , bitmapType :: BitmapType
+data Bitmap = Bitmap { width  :: !Dimension
+                     , height :: !Dimension
+                     , pixmap :: !Pixmap
+                     , shapePixmap :: !(Maybe Pixmap)
+                     , bitmapType :: !BitmapType
                      }
 
 updateCache :: Display -> Window -> Map FilePath Bitmap -> FilePath ->

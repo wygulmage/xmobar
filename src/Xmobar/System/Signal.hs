@@ -43,11 +43,11 @@ instance Exception WakeUp
 data SignalType = Wakeup
                 | Reposition
                 | ChangeScreen
-                | Hide   Int
-                | Reveal Int
-                | Toggle Int
+                | Hide   !Int
+                | Reveal !Int
+                | Toggle !Int
                 | TogglePersistent
-                | Action Button Position
+                | Action !Button !Position
     deriving (Read, Show)
 
 #ifdef DBUS
