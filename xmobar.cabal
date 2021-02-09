@@ -30,7 +30,7 @@ source-repository head
 
 flag with_xft
   description: Use Xft to render text. UTF-8 support included.
-  default: False
+  default: True
 
 flag with_utf8
   description: With UTF-8 support.
@@ -46,7 +46,7 @@ flag with_iwlib
 
 flag with_nl80211
   description: Wireless info support via nl80211. Required for the Wireless plugin on systems running Linux, the kernel.
-  default: False
+  default: True
 
 flag with_mpd
   description: MPD support. Needs libmpd installed.
@@ -58,7 +58,7 @@ flag all_extensions
 
 flag with_alsa
   description: Use alsa-mixer to get the volume from soundcards.
-  default: False
+  default: True
 
 flag with_datezone
   description: Enables localized date support.
@@ -78,7 +78,7 @@ flag with_xpm
 
 flag with_threaded
   description: Use threaded runtime. Required for timer coalescing (less power usage).
-  default: False
+  default: True
 
 flag with_rtsopts
   description: Use -with-rtsopts=-V0 to reduce wakeups.
