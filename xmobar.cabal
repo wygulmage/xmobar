@@ -319,60 +319,60 @@ executable xmobar
        ghc-options: -threaded
        cpp-options: -DTHREADED_RUNTIME
 
-test-suite XmobarTest
-  default-language:   Haskell2010
-  type:           exitcode-stdio-1.0
-  hs-source-dirs: src, test
-  main-is:        Spec.hs
-  build-depends: base,
-                 containers,
-                 regex-compat,
-                 process,
-                 old-locale,
-                 bytestring,
-                 directory,
-                 unix,
-                 time,
-                 filepath,
-                 transformers,
-                 X11,
-                 mtl,
-                 parsec,
-                 parsec-numbers,
-                 stm,
-                 async,
-                 temporary,
-                 hspec == 2.*,
-                 xmobar
+-- test-suite XmobarTest
+--   default-language:   Haskell2010
+--   type:           exitcode-stdio-1.0
+--   hs-source-dirs: src, test
+--   main-is:        Spec.hs
+--   build-depends: base,
+--                  containers,
+--                  regex-compat,
+--                  process,
+--                  old-locale,
+--                  bytestring,
+--                  directory,
+--                  unix,
+--                  time,
+--                  filepath,
+--                  transformers,
+--                  X11,
+--                  mtl,
+--                  parsec,
+--                  parsec-numbers,
+--                  stm,
+--                  async,
+--                  temporary,
+--                  hspec == 2.*,
+--                  xmobar
 
-  other-modules: Xmobar.Plugins.Monitors.CommonSpec
-                 Xmobar.Plugins.Monitors.Common
-                 Xmobar.Plugins.Monitors.Common.Parsers
-                 Xmobar.Plugins.Monitors.Common.Types
-                 Xmobar.Plugins.Monitors.Common.Output
-                 Xmobar.Plugins.Monitors.Common.Files
-                 Xmobar.Plugins.Monitors.Cpu
-                 Xmobar.Plugins.Monitors.CpuSpec
-                 Xmobar.Plugins.Monitors.Common.Run
-                 Xmobar.Run.Exec
-                 Xmobar.App.Timer
-                 Xmobar.System.Signal
+--   other-modules: Xmobar.Plugins.Monitors.CommonSpec
+--                  Xmobar.Plugins.Monitors.Common
+--                  Xmobar.Plugins.Monitors.Common.Parsers
+--                  Xmobar.Plugins.Monitors.Common.Types
+--                  Xmobar.Plugins.Monitors.Common.Output
+--                  Xmobar.Plugins.Monitors.Common.Files
+--                  Xmobar.Plugins.Monitors.Cpu
+--                  Xmobar.Plugins.Monitors.CpuSpec
+--                  Xmobar.Plugins.Monitors.Common.Run
+--                  Xmobar.Run.Exec
+--                  Xmobar.App.Timer
+--                  Xmobar.System.Signal
 
-  if flag(with_alsa) || flag(all_extensions)
-      build-depends: alsa-mixer,
-                     alsa-core,
-                     process >= 1.4.3.0
-      other-modules: Xmobar.Plugins.Monitors.Volume
-                     Xmobar.Plugins.Monitors.Alsa
-                     Xmobar.Plugins.Monitors.AlsaSpec
+--   if flag(with_alsa) || flag(all_extensions)
+--       build-depends: alsa-mixer,
+--                      alsa-core,
+--                      process >= 1.4.3.0
+--       other-modules: Xmobar.Plugins.Monitors.Volume
+--                      Xmobar.Plugins.Monitors.Alsa
+--                      Xmobar.Plugins.Monitors.AlsaSpec
 
-      cpp-options: -DALSA
+--       cpp-options: -DALSA
 
-benchmark xmobarbench
-  type: exitcode-stdio-1.0
-  main-is: main.hs
-  hs-source-dirs:
-      bench
-  ghc-options: -funbox-strict-fields -Wall -fno-warn-unused-do-bind -O2
-  build-depends: base, gauge, xmobar, mtl, time
-  default-language: Haskell2010
+-- benchmark xmobarbench
+--   type: exitcode-stdio-1.0
+--   main-is: main.hs
+--   hs-source-dirs:
+--       bench
+--   ghc-options: -funbox-strict-fields -Wall -fno-warn-unused-do-bind -O2
+--   build-depends: base, gauge, xmobar, mtl, time
+--   default-language: Haskell2010
