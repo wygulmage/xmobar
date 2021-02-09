@@ -1,7 +1,7 @@
 { mkDerivation, alsa-core, alsa-mixer, async, base, bytestring
 , containers, dbus, directory, extensible-exceptions, filepath
 , hinotify, hspec, http-conduit, http-types, iwlib, libmpd, libXpm
-, libXrandr, libXrender, mtl, old-locale, parsec, parsec-numbers
+, libXrandr, libXrender, mtl, old-locale, parsec, parsec-numbers, parsers
 , process, regex-compat, stdenv, stm, temporary, time
 , timezone-olson, timezone-series, transformers, unix, utf8-string
 , wirelesstools, X11, X11-xft
