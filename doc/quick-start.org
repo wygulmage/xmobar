@@ -313,7 +313,7 @@ See [[https://github.com/jaor/xmobar/issues/239#issuecomment-233206552][this ide
 dynamically xmobar's size and run it alongside a system tray widget such
 as trayer or stalonetray (although the idea is not limited to trays,
 really). For your convenience, there is a version of Jonas' script in
-[[./examples/padding-icon.sh][examples/padding-icon.sh]].
+[[../examples/padding-icon.sh][examples/padding-icon.sh]].
 
 * Command Line Options
 
