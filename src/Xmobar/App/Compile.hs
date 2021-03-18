@@ -165,7 +165,7 @@ recompile confDir dataDir execName force verb = liftIO $ do
 #ifdef THREADED_RUNTIME
                   ++ ["-threaded"]
 #endif
-#ifdef DRTSOPTS
+#ifdef RTSOPTS
                   ++ ["-rtsopts", "-with-rtsopts", "-V0"]
 #endif
                   ++ ["-o", bin]
