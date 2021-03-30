@@ -1,3 +1,4 @@
+{-#LANGUAGE CPP #-}
 {-#LANGUAGE RecordWildCards#-}
 
 -----------------------------------------------------------------------------
@@ -29,6 +30,9 @@ module Xmobar.Plugins.Monitors.Cpu
 import Xmobar.Plugins.Monitors.Common
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
+#ifdef FREEBSD
+import System.BSD.Sysctl (sysctlPeekArray)
+#endif
 import System.Console.GetOpt
 import Xmobar.App.Timer (doEveryTenthSeconds)
 import Control.Monad (void)
@@ -90,6 +94,43 @@ cpuConfig =
     , iowaitField
     ]
 
+data CpuData = CpuData {
+      cpuUser :: !Float,
+      cpuNice :: !Float,
+      cpuSystem :: !Float,
+      cpuIdle :: !Float,
+      cpuIowait :: !Float,
+      cpuTotal :: !Float
+    }
+
+#ifdef FREEBSD
+-- kern.cp_time data from the previous iteration for computing the difference
+type CpuDataRef = IORef [Word]
+
+cpuData :: IO [Word]
+cpuData = sysctlPeekArray "kern.cp_time" :: IO [Word]
+
+parseCpu :: CpuDataRef -> IO CpuData
+parseCpu cref = do
+    prev <- readIORef cref
+    curr <- cpuData
+    writeIORef cref curr
+    let diff = map fromIntegral $ zipWith (-) curr prev
+        user = diff !! 0
+        nice = diff !! 1
+        system = diff !! 2
+        intr = diff !! 3
+        idle = diff !! 4
+        total = user + nice + system + intr + idle
+    return CpuData
+      { cpuUser = user/total
+      , cpuNice = nice/total
+      , cpuSystem = (system+intr)/total
+      , cpuIdle = idle/total
+      , cpuIowait = 0
+      , cpuTotal = user/total
+      }
+#else
 type CpuDataRef = IORef [Int]
 
 -- Details about the fields here: https://www.kernel.org/doc/Documentation/filesystems/proc.txt
@@ -103,15 +144,6 @@ readInt bs = case B.readInt bs of
 
 cpuParser :: B.ByteString -> [Int]
 cpuParser = map readInt . tail . B.words . head . B.lines
-
-data CpuData = CpuData {
-      cpuUser :: !Float,
-      cpuNice :: !Float,
-      cpuSystem :: !Float,
-      cpuIdle :: !Float,
-      cpuIowait :: !Float,
-      cpuTotal :: !Float
-    }
 
 convertToCpuData :: [Float] -> CpuData
 convertToCpuData (u:n:s:ie:iw:_) =
@@ -137,6 +169,7 @@ parseCpu cref =
                          v -> fromIntegral n / v
            percent = map safeDiv dif
        return $ convertToCpuData percent
+#endif
 
 data Field = Field {
       fieldName :: !String,
