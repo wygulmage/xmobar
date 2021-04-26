@@ -175,7 +175,7 @@ getStaticStrutValues (Static cx cy cw ch) rwh
     where st = cy + ch
           sb = rwh - cy
           xs = cx -- a simple calculation for horizontal (x) placement
-          xe = xs + cw
+          xe = xs + cw - 1
 getStaticStrutValues _ _ = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 drawBorder :: Border -> Int -> Display -> Drawable -> GC -> Pixel
