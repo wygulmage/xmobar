@@ -118,7 +118,7 @@ textExtents (Core fs) s = do
   return (a,d)
 textExtents (Utf8 fs) s = do
   let (_,rl)  = wcTextExtents fs s
-      ascent  = fromIntegral $ - (rect_y rl)
+      ascent  = fromIntegral $ negate (rect_y rl)
       descent = fromIntegral $ rect_height rl + fromIntegral (rect_y rl)
   return (ascent, descent)
 #ifdef XFT
