@@ -5,6 +5,9 @@ _Bug fixes_
   - Fix off-by-one in strut calculation for `Static` position which reserved
     space for the panel than necessary and caused issues in some multi-head
     setups (fixes #530).
+  - Revert the double-UTF-8 encoding workarounds of 0.36 (#482), as they're no
+    longer necessary with xmonad-contrib master, and aren't needed with any
+    released version of xmonad-contrib either.
 
 ## Version 0.37 (November, 2020)
 
