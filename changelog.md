@@ -1,3 +1,11 @@
+## Version 0.38 (unreleased)
+
+_Bug fixes_
+
+  - Fix off-by-one in strut calculation for `Static` position which reserved
+    space for the panel than necessary and caused issues in some multi-head
+    setups (fixes #530).
+
 ## Version 0.37 (November, 2020)
 
 _New features_
