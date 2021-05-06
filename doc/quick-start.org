@@ -1,7 +1,7 @@
 Xmobar can either be configured using the configuration language, or
 used as a Haskell library (similar to xmonad) and compiled with your
 specific configuration. For an example of the latter, you can have a
-loot at [[./examples/xmobar.hs][examples/xmobar.hs]] or, for a more complicated example, peruse
+loot at [[../examples/xmobar.hs][examples/xmobar.hs]] or, for a more complicated example, peruse
 [[https://gitlab.com/jaor/xmobar-config/][the author's configuration]].
 
 There is also an example of a config using the configuration language

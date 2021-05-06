@@ -158,7 +158,7 @@ me the chance to contribute.
 * Related
 
 - To understand the internal mysteries of xmobar you may try reading
-  [[http://www.haskell.org/haskellwiki/X_window_programming_in_Haskell][this tutorial]] on X Window Programming in Haskell.
+  [[https://wiki.haskell.org/X_window_programming_in_Haskell][this tutorial]] on X Window Programming in Haskell.
 
 * License
 
