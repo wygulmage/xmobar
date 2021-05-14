@@ -8,6 +8,7 @@ _Bug fixes_
   - Revert the double-UTF-8 encoding workarounds of 0.36 (#482), as they're no
     longer necessary with xmonad-contrib master, and aren't needed with any
     released version of xmonad-contrib either.
+  - Fix slow reactions to SIGUSR1/2 signals (reposition, change screen).
 
 ## Version 0.37 (November, 2020)
 

@@ -89,7 +89,7 @@ drawInWin wr@(Rectangle _ _ wid ht) ~[left,center,right] = do
     liftIO $ freeGC d gc
     liftIO $ freePixmap d p
     -- resync
-    liftIO $ sync d True
+    liftIO $ sync d False
 
 verticalOffset :: (Integral b, Integral a, MonadIO m) =>
                   a -> Widget -> XFont -> Int -> Config -> m b

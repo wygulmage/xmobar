@@ -69,6 +69,7 @@ repositionWin d win fs c = do
       r = setPosition c (position c) srs (fromIntegral ht)
   moveResizeWindow d win (rect_x r) (rect_y r) (rect_width r) (rect_height r)
   setStruts r c d win srs
+  sync d False
   return r
 
 fi :: (Integral a, Num b) => a -> b
