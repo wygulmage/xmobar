@@ -149,6 +149,7 @@ library
                    Xmobar.Plugins.Monitors.Common.Parsers,
                    Xmobar.Plugins.Monitors.Common.Files,
                    Xmobar.Plugins.Monitors.CoreTemp,
+                   Xmobar.Plugins.Monitors.K10Temp,
                    Xmobar.Plugins.Monitors.CpuFreq,
                    Xmobar.Plugins.Monitors.Disk,
                    Xmobar.Plugins.Monitors.Mem,

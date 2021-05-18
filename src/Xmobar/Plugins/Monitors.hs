@@ -35,6 +35,7 @@ import Xmobar.Plugins.Monitors.ThermalZone
 import Xmobar.Plugins.Monitors.CpuFreq
 import Xmobar.Plugins.Monitors.CoreTemp
 import Xmobar.Plugins.Monitors.MultiCoreTemp
+import Xmobar.Plugins.Monitors.K10Temp
 import Xmobar.Plugins.Monitors.Disk
 import Xmobar.Plugins.Monitors.Top
 import Xmobar.Plugins.Monitors.Uptime
@@ -74,6 +75,7 @@ data Monitors = Network      Interface   Args Rate
               | CpuFreq      Args        Rate
               | CoreTemp     Args        Rate
               | MultiCoreTemp Args       Rate
+              | K10Temp      Slot        Args Rate
               | TopProc      Args        Rate
               | TopMem       Args        Rate
               | Uptime       Args        Rate
@@ -113,6 +115,7 @@ type ZoneNo    = Int
 type Interface = String
 type Rate      = Int
 type DiskSpec  = [(String, String)]
+type Slot      = String
 
 instance Exec Monitors where
 #ifdef WEATHER
@@ -136,6 +139,7 @@ instance Exec Monitors where
     alias (TopMem _ _) = "topmem"
     alias (CoreTemp _ _) = "coretemp"
     alias (MultiCoreTemp _ _) = "multicoretemp"
+    alias (K10Temp _ _ _) = "k10temp"
     alias DiskU {} = "disku"
     alias DiskIO {} = "diskio"
     alias (Uptime _ _) = "uptime"
@@ -181,6 +185,7 @@ instance Exec Monitors where
     start (CpuFreq a r) = runM a cpuFreqConfig runCpuFreq r
     start (CoreTemp a r) = runM a coreTempConfig runCoreTemp r
     start (MultiCoreTemp a r) = startMultiCoreTemp a r
+    start (K10Temp s a r) = runM (a ++ [s]) k10TempConfig runK10Temp r
     start (DiskU s a r) = runM a diskUConfig (runDiskU s) r
     start (DiskIO s a r) = startDiskIO s a r
     start (Uptime a r) = runM a uptimeConfig runUptime r
