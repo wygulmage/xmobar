@@ -1,4 +1,4 @@
-## Version 0.38 (unreleased)
+## Version 0.38 (May, 2021)
 
 _Bug fixes_
 
