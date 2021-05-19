@@ -16,8 +16,6 @@ module Xmobar.Plugins.Monitors.K10Temp where
 
 import Xmobar.Plugins.Monitors.Common
 
-import Data.Char (isDigit)
-
 -- |
 -- K10 temperature default configuration. Default template contains only the
 -- die temperature, user should specify custom template in order to get more

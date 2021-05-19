@@ -139,7 +139,7 @@ instance Exec Monitors where
     alias (TopMem _ _) = "topmem"
     alias (CoreTemp _ _) = "coretemp"
     alias (MultiCoreTemp _ _) = "multicoretemp"
-    alias (K10Temp _ _ _) = "k10temp"
+    alias K10Temp {} = "k10temp"
     alias DiskU {} = "disku"
     alias DiskIO {} = "diskio"
     alias (Uptime _ _) = "uptime"
