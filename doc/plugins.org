@@ -455,6 +455,39 @@ something like:
                         "-l", "green", "-n", "yellow", "-h", "red",
                         "--", "--mintemp", "20", "--maxtemp", "100"] 50
    #+end_src
+
+*** =K10Temp Slot Args RefreshRate=
+
+ - Aliases to =k10temp=
+
+ - Slot: The PCI slot address of the k10temp device
+
+ - Args: default monitor arguments
+
+ - Thresholds refer to temperature in degrees
+
+ - Variables that can be used with the =-t/--template= argument:
+   =Tctl=, =Tdie=, =Tccd1=, .., =Tccd8=
+
+ - Default template: =Temp: <Tdie>C=
+
+ - This monitor requires k10temp module to be loaded in kernel
+
+ - It is important to note that not all measurements are available
+   on on all models of processor. Of particular importance - Tdie
+   (used in the default template) may not be present on processors
+   prior to Zen (17h). Tctl, however, may be offset from the real
+   temperature and so is not used by default.
+
+ - Example:
+
+   #+begin_src haskell
+     Run CoreTemp ["-t", "Temp: <Tdie>C|<Tccd1>C",
+                   "-L", "40", "-H", "60",
+                   "-l", "lightblue", "-n", "gray90", "-h", "red"] 50
+   #+end_src
+
+
 *** =Memory Args RefreshRate=
 
  - Aliases to =memory=
