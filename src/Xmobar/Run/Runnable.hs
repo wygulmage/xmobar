@@ -34,7 +34,7 @@ instance Exec Runnable where
      trigger (Run a) = trigger a
 
 instance Show Runnable where
-    show (Run x) = show x
+    show (Run x) = "Run " ++ show x
 
 instance Read Runnable where
     readPrec = readRunnable

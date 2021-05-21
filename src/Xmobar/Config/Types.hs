@@ -65,7 +65,7 @@ data Config =
                                     --   right text alignment
            , template :: String     -- ^ The output template
            , verbose :: Bool        -- ^ Emit additional debug messages
-           } deriving (Read)
+           } deriving (Read, Show)
 
 data XPosition = Top
                | TopW Align Int
@@ -77,9 +77,9 @@ data XPosition = Top
                | BottomSize Align Int Int
                | Static {xpos, ypos, width, height :: Int}
                | OnScreen Int XPosition
-                 deriving ( Read, Eq )
+                 deriving ( Read, Show, Eq )
 
-data Align = L | R | C deriving ( Read, Eq )
+data Align = L | R | C deriving ( Read, Show, Eq )
 
 data Border = NoBorder
             | TopB
@@ -88,4 +88,4 @@ data Border = NoBorder
             | TopBM Int
             | BottomBM Int
             | FullBM Int
-              deriving ( Read, Eq )
+              deriving ( Read, Show, Eq )
