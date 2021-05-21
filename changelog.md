@@ -1,3 +1,9 @@
+## Version 0.39 (unreleased)
+
+_New features_
+
+  - New monitor: k10temp (Sam Kirby)
+
 ## Version 0.38 (May, 2021)
 
 _Bug fixes_
