@@ -911,18 +911,6 @@ something like:
      ]
    #+end_src
 
-   or, using explicit record syntax:
-
-   #+begin_src haskell
-     [ MailItem
-         { name    = "name"
-         , address = "address"
-         , query   = "query"
-         }
-       ...
-     ]
-   #+end_src
-
    where
 
    - =name= is what gets printed in the status bar before the number of
