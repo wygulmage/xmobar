@@ -30,6 +30,7 @@ import Xmobar.Plugins.XMonadLog
 import Xmobar.Plugins.EWMH
 import Xmobar.Plugins.Kbd
 import Xmobar.Plugins.Locks
+import Xmobar.Plugins.NotmuchMail
 
 #ifdef INOTIFY
 import Xmobar.Plugins.Mail
@@ -54,7 +55,7 @@ infixr :*:
 -- this function's type signature.
 runnableTypes :: Command :*: Monitors :*: Date :*: PipeReader :*:
                  BufferedPipeReader :*: CommandReader :*: StdinReader :*:
-                 XMonadLog :*: EWMH :*: Kbd :*: Locks :*:
+                 XMonadLog :*: EWMH :*: Kbd :*: Locks :*: NotmuchMail :*:
 #ifdef INOTIFY
                  Mail :*: MBox :*:
 #endif
