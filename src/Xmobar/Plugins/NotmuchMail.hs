@@ -39,6 +39,7 @@ import Control.Concurrent.Async (mapConcurrently)
 import Data.Maybe (catMaybes)
 import System.Exit (ExitCode(ExitSuccess))
 import System.Process (readProcessWithExitCode)
+import Text.Read (Lexeme(Ident), ReadPrec, lexP, parens, prec, readPrec, reset)
 
 
 -- | A 'MailItem' is a name, an address, and a query to give to @notmuch@.
@@ -48,7 +49,13 @@ data MailItem = MailItem
                        --   the empty string to query all indexed mail instead
   , query   :: String  -- ^ Query to give to @notmuch search@
   }
-  deriving (Read, Show)
+  deriving (Show)
+
+instance Read MailItem where
+  readPrec :: ReadPrec MailItem
+  readPrec = parens . prec 11 $ do
+    Ident "MailItem" <- lexP
+    MailItem <$> reset readPrec <*> reset readPrec <*> reset readPrec
 
 -- | A full mail configuration.
 data NotmuchMail = NotmuchMail
@@ -56,7 +63,13 @@ data NotmuchMail = NotmuchMail
   , mailItems :: [MailItem]  -- ^ 'MailItem's to check
   , nmRate    :: Int         -- ^ Update frequency (in deciseconds)
   }
-  deriving (Read, Show)
+  deriving (Show)
+
+instance Read NotmuchMail where
+  readPrec :: ReadPrec NotmuchMail
+  readPrec = parens . prec 11 $ do
+    Ident "NotmuchMail" <- lexP
+    NotmuchMail <$> reset readPrec <*> reset readPrec <*> reset readPrec
 
 -- | How to execute this plugin.
 instance Exec NotmuchMail where
