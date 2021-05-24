@@ -20,3 +20,5 @@ tags
 /.ghc.environment.*
 /cabal.project.local~
 /stack.yaml.lock
+/.dir-locals.el
+/doc/web/changelog.html

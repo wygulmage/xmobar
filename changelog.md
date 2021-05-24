@@ -4,6 +4,10 @@ _New features_
 
   - New monitor: k10temp (Sam Kirby)
 
+_Bug fixes_
+
+  - NotmuchMail usable in text configurations (#547)
+
 ## Version 0.38 (May, 2021)
 
 _Bug fixes_
