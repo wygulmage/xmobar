@@ -51,6 +51,11 @@ don't have to.
   xbps-install xmobar
 #+end_src
 
+*** Gentoo
+#+begin_src shell
+  emerge --ask xmobar
+#+end_src
+
 ** Using cabal-install
 
 Xmobar is available from [[http://hackage.haskell.org/package/xmobar/][Hackage]], and you can install it using
