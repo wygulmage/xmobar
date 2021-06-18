@@ -424,7 +424,7 @@ something like:
      limit for percentage calculation.
    - =--maxtemp=: temperature in degree Celsius, that sets the upper
      limit for percentage calculation.
-   - =--hwmonitor-path=: this monitor tries to find coretemp devices by
+   - =--hwmon-path=: this monitor tries to find coretemp devices by
      looking for them in directories following the pattern
      =/sys/bus/platform/devices/coretemp.*/hwmon/hwmon*=, but some
      processors (notably Ryzen) might expose those files in a different

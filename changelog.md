@@ -59,7 +59,7 @@ _Bug fixes_
 _New features_
 
   - `MultiCoreTemp` now works with Ryzen processors.  New option
-    `--hwmonitor-path` for better performance.
+    `--hwmon-path` for better performance.
   - CPU Monitor optimizations.
   - Version bumps for some dependencies, including timezone-olson.
 
