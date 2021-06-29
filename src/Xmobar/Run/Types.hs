@@ -41,6 +41,10 @@ import Xmobar.Plugins.MBox
 import Xmobar.Plugins.DateZone
 #endif
 
+#ifdef KRAKEN
+import Xmobar.Plugins.Kraken
+#endif
+
 import Xmobar.Run.Command
 
 -- | An alias for tuple types that is more convenient for long lists.
@@ -61,6 +65,9 @@ runnableTypes :: Command :*: Monitors :*: Date :*: PipeReader :*:
 #endif
 #ifdef DATEZONE
                  DateZone :*:
+#endif
+#ifdef KRAKEN
+                 Kraken :*:
 #endif
                  MarqueePipeReader :*: ()
 runnableTypes = undefined
