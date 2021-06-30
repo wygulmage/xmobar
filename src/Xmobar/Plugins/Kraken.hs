@@ -21,7 +21,7 @@ import qualified Data.Map as Map
 import qualified Data.Vector as V
 
 data Kraken = Kraken [String] String
-  deriving (Read,Show)
+  deriving (Read, Show)
 
 instance Exec Kraken where
   alias (Kraken _ a) = a
@@ -42,7 +42,7 @@ instance Exec Kraken where
 
 wsClientApp :: [String] -> MVar (Text, Double)  -> ClientApp ()
 wsClientApp ps mvar connection = do
-  sendTextData connection (encode (Subscribe { event = "subscribe", pair = map pack ps, subscription = Subscription { name = "ticker" }} ))
+  sendTextData connection (encode Subscribe { event = "subscribe", pair = map pack ps, subscription = Subscription { name = "ticker" }})
   void . forever $ do
     message <- receiveData connection
     case (eitherDecode message :: Either String Message) of
@@ -71,7 +71,7 @@ instance FromJSON Ask where
       p <- parseDoubleString $ v V.! 0
       w <- parseJSON $ v V.! 1
       l <- parseDoubleString $ v V.! 2
-      return $ Ask { askPrice = p, askWholeLotVolume = w, askLotVolume = l }
+      return Ask { askPrice = p, askWholeLotVolume = w, askLotVolume = l }
     | otherwise = mzero
   parseJSON nonArray = typeMismatch "Array" nonArray
 
@@ -87,7 +87,7 @@ instance FromJSON Bid where
       p <- parseDoubleString $ v V.! 0
       w <- parseJSON $ v V.! 1
       l <- parseDoubleString $ v V.! 2
-      return $ Bid { bidPrice = p, bidWholeLotVolume = w, bidLotVolume = l }
+      return Bid { bidPrice = p, bidWholeLotVolume = w, bidLotVolume = l }
     | otherwise = mzero
   parseJSON nonArray = typeMismatch "Array" nonArray
 
@@ -101,7 +101,7 @@ instance FromJSON Close where
     | V.length v == 2 = do
       p <- parseDoubleString $ v V.! 0
       l <- parseDoubleString $ v V.! 1
-      return $ Close { closePrice= p, closeLotVolume = l }
+      return Close { closePrice= p, closeLotVolume = l }
     | otherwise = mzero
   parseJSON nonArray = typeMismatch "Array" nonArray
 
@@ -149,6 +149,6 @@ instance FromJSON Message where
       info  <- parseJSON $ a V.! 1
       cName <- parseJSON $ a V.! 2
       p     <- parseJSON $ a V.! 3
-      pure $ TickerMessage { channelId = cId, tickerInformation = info, channelName = cName, tickerPair = p }
+      pure TickerMessage { channelId = cId, tickerInformation = info, channelName = cName, tickerPair = p }
     | otherwise = mzero
   parseJSON v = typeMismatch "Object or Array" v
