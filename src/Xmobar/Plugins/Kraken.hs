@@ -4,17 +4,18 @@
 module Xmobar.Plugins.Kraken (Kraken(..)) where
 
 import Control.Concurrent
-import Control.Monad (forever, mzero, void)
+import Control.Exception (catch)
+import Control.Monad (forever, mzero, void, when)
 import Data.Aeson
 import Data.Aeson.Types (Parser, typeMismatch)
 import Data.List (sort)
 import Data.Text (Text, pack, unpack)
 import GHC.Generics
+import Network.WebSockets (ClientApp, ConnectionException(ConnectionClosed), receiveData, sendTextData)
 import System.IO (hPutStrLn, stderr)
 import Text.Read (readMaybe)
-import Xmobar.Run.Exec(Exec(..))
-import Network.WebSockets (ClientApp, receiveData, sendTextData)
 import Wuss (runSecureClient)
+import Xmobar.Run.Exec(Exec(..))
 
 import qualified Data.HashMap.Lazy as HML (lookup)
 import qualified Data.Map as Map
@@ -27,7 +28,7 @@ instance Exec Kraken where
   alias (Kraken _ a) = a
   start (Kraken ps _) cb = do
     mvar <- newEmptyMVar 
-    forkIO $ runSecureClient "ws.kraken.com" 443 "/" $ wsClientApp ps mvar
+    forkIO $ reconnectOnConnectionClose $ wsClientApp ps mvar
     let loop mv p = do
          v <- takeMVar mv
          let g = Map.insert (unpack $ fst v) (snd v) p
@@ -39,6 +40,10 @@ instance Exec Kraken where
     where
       display :: Map.Map String Double -> String 
       display m = unwords $ sort $ map (\x -> fst x ++ ": " ++ show (snd x)) $ Map.toList m
+
+      reconnectOnConnectionClose :: ClientApp () -> IO ()
+      reconnectOnConnectionClose ws = runSecureClient "ws.kraken.com" 443 "/" ws
+        `catch` (\e -> when (e == ConnectionClosed) $ reconnectOnConnectionClose ws)
 
 wsClientApp :: [String] -> MVar (Text, Double)  -> ClientApp ()
 wsClientApp ps mvar connection = do
