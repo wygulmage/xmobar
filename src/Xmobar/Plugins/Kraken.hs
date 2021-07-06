@@ -3,8 +3,9 @@
 
 module Xmobar.Plugins.Kraken (Kraken(..)) where
 
-import Control.Concurrent
-import Control.Exception (catch)
+import Control.Concurrent (MVar, newEmptyMVar, putMVar, takeMVar)
+import Control.Concurrent.Async (async, cancel)
+import Control.Exception (bracket, catch)
 import Control.Monad (forever, mzero, void, when)
 import Data.Aeson
 import Data.Aeson.Types (Parser, typeMismatch)
@@ -28,14 +29,14 @@ instance Exec Kraken where
   alias (Kraken _ a) = a
   start (Kraken ps _) cb = do
     mvar <- newEmptyMVar 
-    forkIO $ reconnectOnConnectionClose $ wsClientApp ps mvar
-    let loop mv p = do
-         v <- takeMVar mv
-         let g = Map.insert (unpack $ fst v) (snd v) p
-         cb (display g)
-         loop mv g
+    bracket (async $ reconnectOnConnectionClose $ wsClientApp ps mvar) cancel $ \_ -> do
+      let loop mv p = do
+           v <- takeMVar mv
+           let g = Map.insert (unpack $ fst v) (snd v) p
+           cb (display g)
+           loop mv g
 
-    loop mvar (Map.fromList $ zip ps (repeat 0.0))
+      loop mvar (Map.fromList $ zip ps (repeat 0.0))
 
     where
       display :: Map.Map String Double -> String 
