@@ -106,5 +106,5 @@ xmobarMain = do
     Just p -> do r <- readConfig defaultConfig p
                  case r of
                    Left e ->
-                     buildLaunch args (verboseFlag flags) (recompileFlag flags) p e
+                     buildLaunch (filter (/= p) args) (verboseFlag flags) (recompileFlag flags) p e
                    Right (c, defs) -> doOpts c flags >>= xmobar' defs
