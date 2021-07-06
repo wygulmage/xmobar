@@ -3,6 +3,8 @@
 _New features_
 
   - New monitor: k10temp (Sam Kirby)
+  - Better handling of command line arguments for Haskell-based
+    configuration keys (see #553 and #554)
 
 _Bug fixes_
 
