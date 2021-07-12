@@ -80,9 +80,11 @@ setPosition c p rs ht =
   case p' of
     Top -> Rectangle rx ry rw h
     TopP l r -> Rectangle (rx + fi l) ry (rw - fi l - fi r) h
+    TopH ch -> Rectangle rx ry rw $ mh ch
     TopW a i -> Rectangle (ax a i) ry (nw i) h
     TopSize a i ch -> Rectangle (ax a i) ry (nw i) (mh ch)
     Bottom -> Rectangle rx ny rw h
+    BottomH ch -> Rectangle rx ny rw $ mh ch
     BottomW a i -> Rectangle (ax a i) ny (nw i) h
     BottomP l r -> Rectangle (rx + fi l) ny (rw - fi l - fi r) h
     BottomSize a i ch  -> Rectangle (ax a i) (ny' ch) (nw i) (mh ch)
@@ -153,10 +155,12 @@ getStrutValues r@(Rectangle x y w h) p rwh =
   case p of
     OnScreen _ p'   -> getStrutValues r p' rwh
     Top             -> [0, 0, st,  0, 0, 0, 0, 0, nx, nw,  0,  0]
+    TopH    _       -> [0, 0, st,  0, 0, 0, 0, 0, nx, nw,  0,  0]
     TopP    _ _     -> [0, 0, st,  0, 0, 0, 0, 0, nx, nw,  0,  0]
     TopW    _ _     -> [0, 0, st,  0, 0, 0, 0, 0, nx, nw,  0,  0]
     TopSize      {} -> [0, 0, st,  0, 0, 0, 0, 0, nx, nw,  0,  0]
     Bottom          -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
+    BottomH _       -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
     BottomP _ _     -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
     BottomW _ _     -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
     BottomSize   {} -> [0, 0,  0, sb, 0, 0, 0, 0,  0,  0, nx, nw]
