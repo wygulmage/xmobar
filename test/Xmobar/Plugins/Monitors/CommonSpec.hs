@@ -13,7 +13,7 @@ spec :: Spec
 spec =
   describe "Common.padString" $ do
     it "returns given string when called with default values" $
-      do padString 0 0 "" False "" "test" `shouldBe` "test"
+      padString 0 0 "" False "" "test" `shouldBe` "test"
 
     it "truncates to max width" $ do
       let maxw = 3
@@ -27,3 +27,9 @@ spec =
           ellipsis = "..."
           expectedStr = (++ ellipsis) . take 3 $ givenStr
       padString 0 maxw "" False ellipsis givenStr `shouldBe` expectedStr
+
+    it "does not pad empty strings" $ do
+      let padChars = " "
+          givenStr = ""
+          expectedStr = ""
+      padString 0 0 padChars False "" givenStr `shouldBe` expectedStr
