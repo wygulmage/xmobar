@@ -15,11 +15,14 @@
 
 module Xmobar.System.Kbd where
 
+import Control.Monad ((<=<))
+
 import Foreign
 import Foreign.C.Types
 import Foreign.C.String
 
 import Graphics.X11.Xlib
+import Graphics.X11.Xlib.Extras (none)
 
 #include <X11/XKBlib.h>
 #include <X11/extensions/XKB.h>
@@ -319,3 +322,23 @@ getLayoutStr' st dpy kbdDescPtr =
         else -- Behaviour on error
             do
                 return "Error while requesting layout!"
+
+getGrpNames :: Display -> IO [String]
+getGrpNames dpy =  do
+        kbdDescPtr <- xkbAllocKeyboard
+        status <- xkbGetNames dpy xkbGroupNamesMask kbdDescPtr
+        str <- getGrpNames' status dpy kbdDescPtr
+        xkbFreeNames kbdDescPtr xkbGroupNamesMask 1
+        xkbFreeKeyboard kbdDescPtr 0 1
+        return str
+
+getGrpNames' :: Status -> Display -> (Ptr XkbDescRec) -> IO [String]
+getGrpNames' st dpy kbdDescPtr =
+        if st == 0 then -- Success
+            do
+            kbdDesc <- peek kbdDescPtr
+            nameArray <- peek (names kbdDesc)
+            let grpsArr = groups nameArray
+            let grps = takeWhile (/=none) grpsArr
+            mapM (peekCString <=< xGetAtomName dpy) grps
+        else return ["Error while requesting layout!"]
