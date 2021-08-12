@@ -14,9 +14,11 @@
 
 module Xmobar.Plugins.Kbd(Kbd(..)) where
 
-import Data.List (isPrefixOf, findIndex)
-import Data.Maybe (fromJust)
+import Data.List (isPrefixOf)
+import Data.Maybe (fromMaybe)
+import Data.Char (toLower)
 import Control.Monad (forever)
+import Control.Applicative ((<|>))
 import Graphics.X11.Xlib
 import Graphics.X11.Xlib.Extras
 
@@ -27,47 +29,46 @@ import Xmobar.System.Kbd
 
 -- 'Bad' prefixes of layouts
 noLaySymbols :: [String]
-noLaySymbols = ["group", "inet", "ctr", "pc", "ctrl", "terminate"]
+noLaySymbols = ["group", "inet", "ctr", "compose", "pc", "ctrl", "terminate"]
 
 
 -- splits the layout string into the actual layouts
 splitLayout :: String -> [String]
-splitLayout s = splitLayout' noLaySymbols $ split s '+'
-
-splitLayout' :: [String] ->  [String] -> [String]
---                  end of recursion, remove empty strings
-splitLayout' [] s = map (takeWhile (/= ':')) $ filter (not . null) s
---                    remove current string if it has a 'bad' prefix
-splitLayout' bad s  =
-  splitLayout' (tail bad) [x | x <- s, not $ isPrefixOf (head bad) x]
+splitLayout s
+  = filter flt
+  . map (takeWhile (/= ':'))
+  $ split (=='+') s
+  where
+  flt "" = False
+  flt s' = not $ any (`isPrefixOf` s') noLaySymbols
 
 -- split String at each Char
-split :: String -> Char -> [String]
-split [] _ = [""]
-split (c:cs) delim
-    | c == delim = "" : rest
-    | otherwise = (c : head rest) : tail rest
-        where
-            rest = split cs delim
+split :: (Char -> Bool) -> String -> [String]
+split p s = case break p s of
+  (pref, _:suf) -> pref : split p suf
+  (pref, "") -> [pref]
 
 -- replaces input string if on search list (exact match) with corresponding
 -- element on replacement list.
 --
 -- if not found, return string unchanged
 searchReplaceLayout :: KbdOpts -> String -> String
-searchReplaceLayout opts s = let c = findIndex (\x -> fst x == s) opts in
-    case c of
-        Nothing -> s
-        x -> let i = fromJust x in snd $ opts!!i
+searchReplaceLayout opts s = fromMaybe s $ lookup s opts
 
 -- returns the active layout
 getKbdLay :: Display -> KbdOpts -> IO String
 getKbdLay dpy opts = do
-        lay <- getLayoutStr dpy
-        curLay <- getKbdLayout dpy
-        return $ searchReplaceLayout opts $ splitLayout lay!!curLay
+  lay <- splitLayout <$> getLayoutStr dpy
+  grps <- map (map toLower . take 2) <$> getGrpNames dpy
+  curLay <- getKbdLayout dpy
+  return $ searchReplaceLayout opts
+         $ fromMaybe "??"
+         $ (lay !!? curLay) <|> (grps !!? curLay)
 
-
+(!!?) :: [a] -> Int -> Maybe a
+(!!?) []       _ = Nothing
+(!!?) (x : _)  0 = Just x
+(!!?) (_ : xs) i = xs !!? (i - 1)
 
 newtype Kbd = Kbd [(String, String)]
   deriving (Read, Show)
