@@ -303,7 +303,7 @@ getLayoutStr dpy =  do
         kbdDescPtr <- xkbAllocKeyboard
         status <- xkbGetNames dpy xkbSymbolsNameMask kbdDescPtr
         str <- getLayoutStr' status dpy kbdDescPtr
-        xkbFreeNames kbdDescPtr xkbGroupNamesMask 1
+        xkbFreeNames kbdDescPtr xkbSymbolsNameMask 1
         xkbFreeKeyboard kbdDescPtr 0 1
         return str
 
