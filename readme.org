@@ -142,8 +142,8 @@ Schneider, Alexander Shabalin, Valentin Shirokov, Peter Simons,
 Alexander Solovyov, Will Song, John Soros, Felix Springer, Travis
 Staton, Artem Tarasov, Samuli Thomasson, Edward Tjörnhammar, Sergei
 Trofimovich, Thomas Tuegel, John Tyree, Jan Vornberger, Anton
-Vorontsov, Daniel Wagner, Zev Weiss, Phil Xiaojun Hu, Edward Z. Yang
-and Norbert Zeh.
+Vorontsov, Daniel Wagner, Zev Weiss, Phil Xiaojun Hu, Nikolay Yakimov,
+aEdward Z. Yang, Leo Zhang, and Norbert Zeh.
 
 ** Thanks
 

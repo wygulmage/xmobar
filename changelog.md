@@ -13,6 +13,7 @@ _Bug fixes_
 
   - NotmuchMail usable in text configurations (#547)
   - Fix for off-by-one in padding (#560)
+  - Fixes for Kbd (#561)
 
 ## Version 0.38 (May, 2021)
 
